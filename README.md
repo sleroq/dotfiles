@@ -11,13 +11,13 @@ sudo paru -S fbxkb visual-studio-code-bin github-desktop-bin keepassxc xfce4-cli
 sudo paru -S onionshare stacer-bin xaos hakuneko-desktop krita neovim qutebrowser discord teamviewer brave-bin gimp
 
 # Extentions
-https://github.com/dessant/clear-browsing-data
-https://github.com/darkreader/darkreader
-https://github.com/duckduckgo/duckduckgo-privacy-extension
-https://github.com/mozilla/multi-account-containers#readme
-https://addons.mozilla.org/en-US/firefox/addon/image-search-options/
-https://addons.mozilla.org/en-US/firefox/addon/keepassxc-browser/
-https://addons.mozilla.org/en-US/firefox/addon/enhancer-for-youtube/
-https://addons.mozilla.org/en-US/firefox/addon/metastream-remote/
-https://addons.mozilla.org/en-US/firefox/addon/tabliss/
-https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/
+https://github.com/dessant/clear-browsing-data</br>
+https://github.com/darkreader/darkreader</br>
+https://github.com/duckduckgo/duckduckgo-privacy-extension</br>
+https://github.com/mozilla/multi-account-containers</br>
+https://addons.mozilla.org/en-US/firefox/addon/image-search-options/</br>
+https://addons.mozilla.org/en-US/firefox/addon/keepassxc-browser/</br>
+https://addons.mozilla.org/en-US/firefox/addon/enhancer-for-youtube/</br>
+https://addons.mozilla.org/en-US/firefox/addon/metastream-remote/</br>
+https://addons.mozilla.org/en-US/firefox/addon/tabliss/</br>
+https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/</br>
