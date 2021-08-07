@@ -41,6 +41,7 @@ fbxkb &
 #run applications from startup
 
 run "xfce4-clipman"
+run "flameshot"
 #run "insync start"
 #run "spotify"
 #run "ckb-next -b"
