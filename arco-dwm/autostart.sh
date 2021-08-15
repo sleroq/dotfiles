@@ -17,8 +17,11 @@ function run {
 #run xrandr --output HDMI2 --right-of HDMI1 --auto
 #autorandr horizontal
 
+# Disable mouse acceleration
+run ixinput --set-prop "A4TECH USB Device" 306 0, 1
+
 # Layout
-setxkbmap -layout us,ru -option grp:alt_shift_toggle &
+run setxkbmap -layout us,ru -option grp:alt_shift_toggle &
 run fbxkb &
 
 run "nm-applet"
@@ -38,8 +41,6 @@ sxhkd -c ~/.config/arco-dwm/sxhkd/sxhkdrc &
 #you can set wallpapers in themes as well
 feh --bg-fill /usr/share/backgrounds/arcolinux/arco-wallpaper.jpg &
 
-# Disable mouse acceleration
-run ixinput --set-prop "A4TECH USB Device" 306 0, 1 &
 #run applications from startup
 
 run "xfce4-clipman"
