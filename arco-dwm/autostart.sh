@@ -6,7 +6,7 @@ function run {
     $@&
   fi
 }
-run "dex $HOME/.config/autostart/arcolinux-welcome-app.desktop"
+# run "dex $HOME/.config/autostart/arcolinux-welcome-app.desktop"
 #run "xrandr --output VGA-1 --primary --mode 1360x768 --pos 0x0 --rotate normal"
 #run "xrandr --output HDMI2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI1 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output VIRTUAL1 --off"
 #run xrandr --output eDP-1 --primary --mode 1368x768 --pos 0x0 --rotate normal --output DP-1 --off --output HDMI-1 --off --output DP-2 --off --output HDMI-2 --off
@@ -16,6 +16,10 @@ run "dex $HOME/.config/autostart/arcolinux-welcome-app.desktop"
 #run xrandr --output DVI-D-1 --right-of DVI-I-1 --auto
 #run xrandr --output HDMI2 --right-of HDMI1 --auto
 #autorandr horizontal
+
+# Layout
+setxkbmap -layout us,ru -option grp:alt_shift_toggle &
+run fbxkb &
 
 run "nm-applet"
 run "pamac-tray"
@@ -34,10 +38,8 @@ sxhkd -c ~/.config/arco-dwm/sxhkd/sxhkdrc &
 #you can set wallpapers in themes as well
 feh --bg-fill /usr/share/backgrounds/arcolinux/arco-wallpaper.jpg &
 
-# Layout
-setxkbmap -layout us,ru -option grp:alt_shift_toggle &
-fbxkb &
-
+# Disable mouse acceleration
+run ixinput --set-prop "A4TECH USB Device" 306 0, 1 &
 #run applications from startup
 
 run "xfce4-clipman"
