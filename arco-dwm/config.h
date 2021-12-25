@@ -81,11 +81,12 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
-static const char *filecmd[]  = { "thunar", NULL };
-static const char *calendar[]  = { "gsimplecal", NULL };
+static const char *dmenucmd[]     = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
+static const char *filecmd[]      = { "thunar", NULL };
+static const char *calendar[]     = { "gsimplecal", NULL };
 static const char *taskmanager[]  = { "xfce4-taskmanager", NULL };
-static const char *clipman[]  = { "xfce4-popup-clipman", NULL };
+static const char *clipman[]      = { "xfce4-popup-clipman", NULL };
+static const char *terminal[]     = { "konsole", NULL };
 
 #include "selfrestart.c"
 #include "shiftview.c"
@@ -96,6 +97,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_e,      spawn,          {.v = filecmd } },   // Modified
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
+	{ MODKEY,                       XK_Return, spawn,          {.v = terminal } },
 
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
@@ -190,7 +192,7 @@ static Key keys[] = {
 static Button buttons[] = {
 	/* click                event mask      button          function        argument */
 	{ ClkLtSymbol,          0,              Button1,        cyclelayout,    {.i = +1 } },    // Modified
-	{ ClkLtSymbol,          0,              Button3,        cyclelayout,    {.i = -1 } },   // Modified
+	{ ClkLtSymbol,          0,              Button3,        cyclelayout,    {.i = -1 } },    // Modified
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
 	{ ClkStatusText,        0,              Button1,        spawn,          {.v = taskmanager } },
 	{ ClkStatusText,        0,              Button2,        spawn,          {.v = filecmd } },
