@@ -15,10 +15,10 @@ static const int swallowfloating         = 0;   /* 1 means swallow floating wind
 static int nomodbuttons                  = 1;   /* allow client mouse button bindings that have no modifier */
 #endif // NO_MOD_BUTTONS_PATCH
 #if VANITYGAPS_PATCH
-static const unsigned int gappih         = 20;  /* horiz inner gap between windows */
-static const unsigned int gappiv         = 10;  /* vert inner gap between windows */
-static const unsigned int gappoh         = 10;  /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov         = 30;  /* vert outer gap between windows and screen edge */
+static const unsigned int gappih         = 5;  /* horiz inner gap between windows */
+static const unsigned int gappiv         = 5;  /* vert inner gap between windows */
+static const unsigned int gappoh         = 5;  /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov         = 5;  /* vert outer gap between windows and screen edge */
 static const int smartgaps_fact          = 1;   /* gap factor when there is only one client; 0 = no gaps, 3 = 3x outer gaps */
 #endif // VANITYGAPS_PATCH
 #if AUTOSTART_PATCH
@@ -127,7 +127,7 @@ static void (*bartabmonfns[])(Monitor *) = { NULL /* , customlayoutfn */ };
 #if BAR_PANGO_PATCH
 static const char font[]                 = "monospace 10";
 #else
-static const char *fonts[]               = { "monospace:size=10" };
+static const char *fonts[]               = { "monospace:size=10.5", "FontAwesome:size=10.5" };
 #endif // BAR_PANGO_PATCH
 static const char dmenufont[]            = "monospace:size=10";
 
@@ -387,7 +387,8 @@ static Sp scratchpads[] = {
  * them. This works seamlessly with alternative tags and alttagsdecoration patches.
  */
 static char *tagicons[][NUMTAGS] = {
-	[DEFAULT_TAGS]        = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+	//[DEFAULT_TAGS]        = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+	[DEFAULT_TAGS]        = { "", "", "", "", "", "", "", "", "" },
 	[ALTERNATIVE_TAGS]    = { "A", "B", "C", "D", "E", "F", "G", "H", "I" },
 	[ALT_TAGS_DECORATION] = { "<1>", "<2>", "<3>", "<4>", "<5>", "<6>", "<7>", "<8>", "<9>" },
 };
@@ -815,6 +816,7 @@ static const char *termcmd[]  = { "alacritty", NULL };
 static const char *filemanagercmd[]  = { "thunar", NULL };
 // static const char *clipmenucmd[]  = { "CM_HISTLENGTH=16", "CM_OUTPUT_CLIP=1", "clipmenu", NULL };
 static const char *clipmenucmd[]  = { "clipmenu", NULL };
+static const char *screenshotcmd[]  = { "flameshot", "gui", NULL };
 
 #if BAR_STATUSCMD_PATCH
 #if BAR_DWMBLOCKS_PATCH
@@ -847,6 +849,7 @@ static Key keys[] = {
 	#endif // KEYMODES_PATCH
 	{ MODKEY,                       XK_p,          spawn,                  {.v = dmenucmd } },
 	{ MODKEY,                       XK_Return,     spawn,                  {.v = termcmd } },        // ** Modified **
+	{ 0,                            XK_Print,      spawn,                  {.v = screenshotcmd } },  // ** Modified **
 	{ MODKEY,                       XK_e,          spawn,                  {.v = filemanagercmd } }, // ** Modified **
 	{ MODKEY,                       XK_v,          spawn,                  {.v = clipmenucmd } },    // ** Modified **
 	#if RIODRAW_PATCH
