@@ -1,9 +1,10 @@
 # ForArch
 My configs / scripts
 
+# [DWM](./dwm/DWM.md)
+
 ## Screensots:
 <img src="https://imgur.com/6CCeQYv.png"      alt="dwm"/>
-<img src="https://i.ibb.co/hMyL0r7/tint2.png" alt="tint2"/>
 
 # Apps
 
@@ -21,7 +22,6 @@ paru -S exodus onionshare stacer-bin xaos hakuneko-desktop krita neovim qutebrow
 # Extentions
 
 https://github.com/darkreader/darkreader</br>
-https://github.com/mozilla/multi-account-containers</br>
 https://addons.mozilla.org/en-US/firefox/addon/keepassxc-browser/</br>
 https://addons.mozilla.org/en-US/firefox/addon/enhancer-for-youtube/</br>
 https://addons.mozilla.org/en-US/firefox/addon/metastream-remote/</br>

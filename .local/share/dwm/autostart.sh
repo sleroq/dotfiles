@@ -17,7 +17,9 @@ compton &
 # Clipboard manager
 /home/sloq/.local/share/dwm/start_clipmenud.sh &
 
+flameshot &
+
 # Safeeyes
 # safeeyes &
 
-
+dwmbar &
