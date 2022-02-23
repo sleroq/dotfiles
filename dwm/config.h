@@ -817,6 +817,7 @@ static const char *filemanagercmd[]  = { "thunar", NULL };
 // static const char *clipmenucmd[]  = { "CM_HISTLENGTH=16", "CM_OUTPUT_CLIP=1", "clipmenu", NULL };
 static const char *clipmenucmd[]  = { "clipmenu", NULL };
 static const char *screenshotcmd[]  = { "flameshot", "gui", NULL };
+static const char *volumecontrollcmd[]  = { "pulsemixer", NULL };
 
 #if BAR_STATUSCMD_PATCH
 #if BAR_DWMBLOCKS_PATCH
@@ -852,6 +853,7 @@ static Key keys[] = {
 	{ 0,                            XK_Print,      spawn,                  {.v = screenshotcmd } },  // ** Modified **
 	{ MODKEY,                       XK_e,          spawn,                  {.v = filemanagercmd } }, // ** Modified **
 	{ MODKEY,                       XK_v,          spawn,                  {.v = clipmenucmd } },    // ** Modified **
+	{ MODKEY|ShiftMask,             XK_v,          spawn,                  {.v = volumecontrollcmd } }, // ** Modified **
 	#if RIODRAW_PATCH
 	{ MODKEY|ControlMask,           XK_p,          riospawnsync,           {.v = dmenucmd } },
 	{ MODKEY|ControlMask,           XK_Return,     riospawn,               {.v = termcmd } },

@@ -11,6 +11,9 @@ dunst &
 # Notifications
 compton &
 
+# Network settings
+nm-applet &
+
 # Virtual box additions
 # VBoxClient-all &
 
