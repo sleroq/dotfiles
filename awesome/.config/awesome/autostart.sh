@@ -7,6 +7,8 @@ function run {
   fi
 }
 
+run xrandr --output HDMI-A-0 --mode 1680x1050
+
 run picom
 
 run flameshot
