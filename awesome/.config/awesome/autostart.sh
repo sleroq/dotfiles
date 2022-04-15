@@ -10,3 +10,7 @@ function run {
 run picom
 
 run flameshot
+
+run nm-applet
+
+run pasystray -g
