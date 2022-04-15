@@ -312,7 +312,11 @@ globalkeys = gears.table.join(
               {description = "select next", group = "layout"}),
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(-1)                end,
               {description = "select previous", group = "layout"}),
-    awful.key({ }, "Print", function () awful.util.spawn("flameshot gui") end),
+    awful.key({                   }, "Print", function () awful.util.spawn("flameshot gui")   end,
+              {description = "make a screenshot"}),
+    awful.key({ modkey, "Shift"   }, "n",
+        function () awful.spawn.with_shell("feh --bg-max -z -r ~/Sync/валпаперс")             end,
+              {description = "change wallpapers"}),
 
     awful.key({ modkey, "Control" }, "n",
               function ()
@@ -327,7 +331,7 @@ globalkeys = gears.table.join(
               {description = "restore minimized", group = "client"}),
 
     -- Prompt
-    awful.key({ modkey },            "r",     function () awful.screen.focused().mypromptbox:run() end,
+    awful.key({ modkey }, "r", function () awful.screen.focused().mypromptbox:run() end,
               {description = "run prompt", group = "launcher"}),
 
     awful.key({ modkey }, "x",
