@@ -14,3 +14,5 @@ run flameshot
 run nm-applet
 
 run pasystray -g
+
+feh --bg-max -z -r ~/Sync/валпаперс
