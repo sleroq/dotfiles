@@ -312,6 +312,7 @@ globalkeys = gears.table.join(
               {description = "select next", group = "layout"}),
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(-1)                end,
               {description = "select previous", group = "layout"}),
+    awful.key({ }, "Print", function () awful.util.spawn("flameshot gui") end),
 
     awful.key({ modkey, "Control" }, "n",
               function ()
