@@ -12,6 +12,9 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 -- Notification library
 local naughty = require("naughty")
+-- Alt-tab plugin
+local cyclefocus = require('cyclefocus')
+
 local menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup")
 -- Enable hotkeys help widget for VIM and other apps
@@ -252,18 +255,18 @@ globalkeys = gears.table.join(
         {description = "focus previous by index", group = "client"}
     ),
 
-    awful.key({ "Mod1",           }, "Tab",
-        function ()
-            awful.client.focus.byidx( 1)
-        end,
-        {description = "focus next by index", group = "client"}
-    ),
-    awful.key({ "Mod1", "Shift"   }, "Tab",
-        function ()
-            awful.client.focus.byidx(-1)
-        end,
-        {description = "focus previous by index", group = "client"}
-    ),
+    -- awful.key({ "Mod1",           }, "Tab",
+    --     function ()
+    --         awful.client.focus.byidx( 1)
+    --     end,
+    --     {description = "focus next by index", group = "client"}
+    -- ),
+    -- awful.key({ "Mod1", "Shift"   }, "Tab",
+    --     function ()
+    --         awful.client.focus.byidx(-1)
+    --     end,
+    --     {description = "focus previous by index", group = "client"}
+    -- ),
 
     awful.key({ modkey,           }, "w", function () mymainmenu:show() end,
               {description = "show main menu", group = "awesome"}),
@@ -395,7 +398,17 @@ clientkeys = gears.table.join(
             c.maximized_horizontal = not c.maximized_horizontal
             c:raise()
         end ,
-        {description = "(un)maximize horizontally", group = "client"})
+        {description = "(un)maximize horizontally", group = "client"}),
+
+    -- Alt-Tab: cycle through clients on the same screen.
+    cyclefocus.key({ "Mod1",         }, "Tab", {
+            -- cycle_filters from the default filters:
+            cycle_filters = { cyclefocus.filters.same_screen, cyclefocus.filters.common_tag },
+    }),
+    cyclefocus.key({ "Mod1", "Shift" }, "Tab", {
+            -- cycle_filters from the default filters:
+            cycle_filters = { cyclefocus.filters.same_screen, cyclefocus.filters.common_tag },
+    })
 )
 
 -- Bind all key numbers to tags.
