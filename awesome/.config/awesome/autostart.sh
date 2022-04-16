@@ -13,7 +13,7 @@ run sleep 2
 # For sudo apps (disk mounting)
 run /usr/lib/polkit-kde-authentication-agent-1
 
-run setxkbmap -layout us,ru -option grp:alt_space_toggle
+run setxkbmap -layout us,ru -option grp:win_space_toggle
 
 run xrandr --output HDMI-A-0 --mode 1680x1050
 
