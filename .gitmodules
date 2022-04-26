@@ -1,3 +1,6 @@
 [submodule "awesome-cyclefocus"]
 	path = awesome/.config/awesome/awesome-cyclefocus
 	url = git@github.com:sleroq/awesome-cyclefocus.git
+[submodule "sway"]
+	path = sway
+	url = ./sway/
