@@ -2,4 +2,6 @@
 
 set -e
 
-mv ./qtile/config.py ~/.config/qtile/
+cp ./qtile/config.py ~/.config/qtile/
+
+qtile check
