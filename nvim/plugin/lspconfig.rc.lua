@@ -1,4 +1,4 @@
-local status, nvim_lsp = pcall(require, "lspconfig")
+local status, nvim_lsp = pcall(require, 'lspconfig')
 if (not status) then return end
 
 local protocol = require('vim.lsp.protocol')
@@ -75,6 +75,11 @@ nvim_lsp.flow.setup {
   capabilities = capabilities
 }
 
+nvim_lsp.html.setup {
+  on_attach = on_attach,
+  capabilities = capabilities
+}
+
 nvim_lsp.tsserver.setup {
   on_attach = on_attach,
   filetypes = { 'typescript', 'javascript' },
@@ -104,11 +109,11 @@ nvim_lsp.sumneko_lua.setup {
 
 vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics, {
-  underline = true,
-  update_in_insert = false,
-  virtual_text = { spacing = 4, prefix = '●' },
-  severity_sort = true,
-}
+    underline = true,
+    update_in_insert = false,
+    virtual_text = { spacing = 4, prefix = '●' },
+    severity_sort = true,
+  }
 )
 
 -- Diagnostic symbols in the sign column (gutter)
@@ -124,6 +129,6 @@ vim.diagnostic.config({
   },
   update_in_insert = true,
   float = {
-    source = 'always', -- Or "if_many"
+    source = 'always', -- Or 'if_many'
   },
 })
