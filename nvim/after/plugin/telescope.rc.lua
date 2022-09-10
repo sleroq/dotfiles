@@ -9,7 +9,7 @@ end
 
 local fb_actions = require 'telescope'.extensions.file_browser.actions
 
-telescope.setup {
+telescope.setup({
   defaults = {
     mappings = {
       n = {
@@ -38,7 +38,7 @@ telescope.setup {
       },
     },
   },
-}
+})
 
 telescope.load_extension('file_browser')
 

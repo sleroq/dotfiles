@@ -3,7 +3,7 @@ if (not status or not cmp) then return end
 local lspkind = require('lspkind')
 local luasnip = require('luasnip')
 
-cmp.setup {
+cmp.setup({
   snippet = {
     expand = function(args)
       luasnip.lsp_expand(args.body)
@@ -43,7 +43,8 @@ cmp.setup {
   formatting = {
     format = lspkind.cmp_format({ with_text = false, maxwidth = 50 })
   }
-}
+})
+
 vim.cmd [[
   set completeopt=menuone,noinsert,noselect
   highlight! default link CmpItemKind CmpItemMenuDefault

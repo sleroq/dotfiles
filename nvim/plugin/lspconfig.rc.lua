@@ -70,24 +70,24 @@ local capabilities = require('cmp_nvim_lsp').update_capabilities(
   vim.lsp.protocol.make_client_capabilities()
 )
 
-nvim_lsp.flow.setup {
+nvim_lsp.flow.setup({
   on_attach = on_attach,
   capabilities = capabilities
-}
+})
 
-nvim_lsp.html.setup {
+nvim_lsp.html.setup({
   on_attach = on_attach,
   capabilities = capabilities
-}
+})
 
-nvim_lsp.tsserver.setup {
+nvim_lsp.tsserver.setup({
   on_attach = on_attach,
   filetypes = { 'typescript', 'javascript' },
   cmd = { 'typescript-language-server', '--stdio' },
   capabilities = capabilities
-}
+})
 
-nvim_lsp.sumneko_lua.setup {
+nvim_lsp.sumneko_lua.setup({
   on_attach = on_attach,
   settings = {
     Lua = {
@@ -105,7 +105,7 @@ nvim_lsp.sumneko_lua.setup {
       },
     },
   },
-}
+})
 
 vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics, {
