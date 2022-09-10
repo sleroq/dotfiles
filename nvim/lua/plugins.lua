@@ -40,4 +40,6 @@ packer.startup(function(use)
   use 'norcalli/nvim-colorizer.lua'
   use 'folke/zen-mode.nvim'
   use 'kdheepak/lazygit.nvim'
+  use 'lewis6991/gitsigns.nvim'
+  use 'dinhhuy258/git.nvim' -- For git blame & browse
 end)
