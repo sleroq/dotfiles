@@ -1,15 +1,16 @@
 local status, nvim_lsp = pcall(require, 'lspconfig')
 if (not status) then return end
 
-local protocol = require('vim.lsp.protocol')
+local protocol = vim.lsp.protocol
+local keymap = vim.keymap
 
 -- Mappings.
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
 local opts = { noremap = true, silent = true }
-vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
-vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
+keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
+keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
@@ -20,21 +21,21 @@ local on_attach = function(client, bufnr)
   -- Mappings.
   -- See `:help vim.lsp.*` for documentation on any of the below functions
   local bufopts = { noremap = true, silent = true, buffer = bufnr }
-  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-  vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-  vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-  vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-  vim.keymap.set('n', '<space>wl', function()
+  keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+  keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+  keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+  keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+  keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+  keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
+  keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+  keymap.set('n', '<space>wl', function()
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, bufopts)
-  vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
-  vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
-  vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
-  -- vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<space>f', vim.lsp.buf.formatting, bufopts)
+  keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
+  keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
+  keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
+  -- keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+  keymap.set('n', '<space>f', vim.lsp.buf.formatting, bufopts)
 end
 
 protocol.CompletionItemKind = {
@@ -76,6 +77,11 @@ nvim_lsp.flow.setup({
 })
 
 nvim_lsp.html.setup({
+  on_attach = on_attach,
+  capabilities = capabilities
+})
+
+nvim_lsp.gopls.setup({
   on_attach = on_attach,
   capabilities = capabilities
 })
