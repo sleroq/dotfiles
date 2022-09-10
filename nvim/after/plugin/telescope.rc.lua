@@ -42,7 +42,7 @@ telescope.setup({
 
 telescope.load_extension('file_browser')
 
-vim.keymap.set('n', '<Leader>', function()   builtin.live_grep()   end)
+vim.keymap.set('n', '<C-Space>', function()   builtin.live_grep()   end)
 vim.keymap.set('n', '\\\\', function() builtin.buffers()     end)
 vim.keymap.set('n', '<Leader>t', function()   builtin.help_tags()   end)
 vim.keymap.set('n', '<Leader><Leader>', function()   builtin.resume()      end)
