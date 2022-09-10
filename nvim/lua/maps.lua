@@ -22,11 +22,6 @@ keymap.set('n', 'te', ':tabedit ')
 keymap.set('n', 'td', ':q<Return>')
 -- New tab with terminal
 keymap.set('n', 'tt', ':tabnew +term<Return>')
--- Next tab
-keymap.set('n', 'tn', 'gt')
--- Previous tab
-keymap.set('n', 'tN', 'gT')
-keymap.set('n', 'TN', 'gT')
 
 -- Split window
 keymap.set('n', 'ss', ':split<Return><C-w>w')

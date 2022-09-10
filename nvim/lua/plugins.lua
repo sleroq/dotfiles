@@ -13,6 +13,8 @@ packer.startup(function(use)
     requires = { 'tjdevries/colorbuddy.nvim' }
   }
   use 'nvim-lualine/lualine.nvim' -- Statusline
+  use 'akinsho/nvim-bufferline.lua'
+
   use 'onsails/lspkind-nvim' -- vscode-like pictograms
   use 'neovim/nvim-lspconfig' -- LSP
   use 'L3MON4D3/LuaSnip'
