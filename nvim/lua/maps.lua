@@ -18,6 +18,10 @@ keymap.set('n', '<C-a>', 'gg<S-v>G')
 
 -- New tab
 keymap.set('n', 'te', ':tabedit ')
+-- Close tab
+keymap.set('n', 'td', ':q<Return>')
+-- New tab with terminal
+keymap.set('n', 'tt', ':tabnew +term<Return>')
 -- Next tab
 keymap.set('n', 'tn', 'gt')
 -- Previous tab
