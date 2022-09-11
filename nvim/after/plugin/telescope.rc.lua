@@ -1,11 +1,11 @@
 local status, telescope = pcall(require, 'telescope')
 if (not status) then return end
+
 local actions = require('telescope.actions')
 local builtin = require('telescope.builtin')
+local fb_actions = telescope.extensions.file_browser.actions
 
 local function telescope_buffer_dir() return vim.fn.expand('%:p:h') end
-
-local fb_actions = require'telescope'.extensions.file_browser.actions
 
 telescope.setup({
   defaults = { mappings = { n = { ['q'] = actions.close } } },
@@ -19,7 +19,6 @@ telescope.setup({
         ['i'] = { ['<C-w>'] = function() vim.cmd('normal vbd') end },
         ['n'] = {
           -- your custom normal mode mappings
-          ['N'] = fb_actions.create,
           ['h'] = fb_actions.goto_parent_dir,
           ['/'] = function() vim.cmd('startinsert') end
         }
@@ -38,6 +37,9 @@ vim.keymap.set('n', '<Leader>e', function() builtin.diagnostics() end)
 vim.keymap.set('n', '<Leader>f', function()
   builtin.find_files({ no_ignore = false, hidden = true })
 end)
+
+vim.keymap.set('n', 'te', ':tabedit<Return>:Telescope file_browser<Return>')
+vim.keymap.set('n', 'se', ':Telescope file_browser<Return>')
 vim.keymap.set('n', 'sf', function()
   telescope.extensions.file_browser.file_browser({
     path = '%:p:h',
