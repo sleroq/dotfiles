@@ -38,8 +38,18 @@ vim.keymap.set('n', '<Leader>f', function()
   builtin.find_files({ no_ignore = false, hidden = true })
 end)
 
-vim.keymap.set('n', 'te', ':tabedit<Return>:Telescope file_browser<Return>')
-vim.keymap.set('n', 'se', ':Telescope file_browser<Return>')
+function _G.file_browser ()
+  telescope.extensions.file_browser.file_browser({
+    respect_gitignore = false,
+    hidden = true,
+    grouped = true,
+  })
+end
+
+vim.keymap.set('n', 'te', ':tabnew<Return>:lua file_browser()<Return>')
+vim.keymap.set('n', 'se', file_browser)
+-- vim.keymap.set('n', 'se', ':Telescope file_browser<Return>')
+
 vim.keymap.set('n', 'sf', function()
   telescope.extensions.file_browser.file_browser({
     path = '%:p:h',
