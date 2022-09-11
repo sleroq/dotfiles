@@ -9,10 +9,7 @@ vim.cmd([[packadd packer.nvim]])
 packer.startup(function(use)
   use 'wbthomason/packer.nvim'
   use 'nvim-lua/plenary.nvim' -- required by telescope and null-ls
-  use {
-    'svrana/neosolarized.nvim',
-    requires = { 'tjdevries/colorbuddy.nvim' }
-  }
+  use { 'svrana/neosolarized.nvim', requires = { 'tjdevries/colorbuddy.nvim' } }
   use 'nvim-lualine/lualine.nvim' -- Statusline
   use 'akinsho/nvim-bufferline.lua'
 
@@ -35,7 +32,9 @@ packer.startup(function(use)
   use 'glepnir/lspsaga.nvim' -- LSP UI
   use {
     'nvim-treesitter/nvim-treesitter',
-    run = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
+    run = function()
+      require('nvim-treesitter.install').update({ with_sync = true })
+    end
   }
 
   use 'nvim-telescope/telescope.nvim'
@@ -47,7 +46,7 @@ packer.startup(function(use)
 
   use {
     'iamcco/markdown-preview.nvim',
-    run = function() vim.fn['mkdp#util#install']() end,
+    run = function() vim.fn['mkdp#util#install']() end
   }
 
   use 'kdheepak/lazygit.nvim'

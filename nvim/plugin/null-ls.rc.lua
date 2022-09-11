@@ -13,23 +13,21 @@ null_ls.setup({
     null_ls.builtins.diagnostics.golangci_lint,
 
     null_ls.builtins.code_actions.shellcheck,
-    null_ls.builtins.diagnostics.shellcheck,
+    null_ls.builtins.diagnostics.shellcheck, null_ls.builtins.completion.spell
+  }
 
-    null_ls.builtins.completion.spell
-  },
-
--- Formatting on save
---   on_attach = function(client, bufnr)
---       if client.supports_method("textDocument/formatting") then
---           vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
---           vim.api.nvim_create_autocmd("BufWritePre", {
---               group = augroup,
---               buffer = bufnr,
---               callback = function()
---                   -- on 0.8, you should use vim.lsp.buf.format({ bufnr = bufnr }) instead
---                   vim.lsp.buf.formatting_sync()
---               end,
---           })
---       end
---   end,
+  -- Formatting on save
+  --   on_attach = function(client, bufnr)
+  --       if client.supports_method("textDocument/formatting") then
+  --           vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+  --           vim.api.nvim_create_autocmd("BufWritePre", {
+  --               group = augroup,
+  --               buffer = bufnr,
+  --               callback = function()
+  --                   -- on 0.8, you should use vim.lsp.buf.format({ bufnr = bufnr }) instead
+  --                   vim.lsp.buf.formatting_sync()
+  --               end,
+  --           })
+  --       end
+  --   end,
 })

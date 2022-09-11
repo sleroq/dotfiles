@@ -63,28 +63,19 @@ protocol.CompletionItemKind = {
   '', -- Struct
   '', -- Event
   'ﬦ', -- Operator
-  '', -- TypeParameter
+  '' -- TypeParameter
 }
 
 -- Set up completion using nvim_cmp with LSP source
-local capabilities = require('cmp_nvim_lsp').update_capabilities(
-  vim.lsp.protocol.make_client_capabilities()
-)
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp
+                                                                     .protocol
+                                                                     .make_client_capabilities())
 
-nvim_lsp.flow.setup({
-  on_attach = on_attach,
-  capabilities = capabilities
-})
+nvim_lsp.flow.setup({ on_attach = on_attach, capabilities = capabilities })
 
-nvim_lsp.html.setup({
-  on_attach = on_attach,
-  capabilities = capabilities
-})
+nvim_lsp.html.setup({ on_attach = on_attach, capabilities = capabilities })
 
-nvim_lsp.gopls.setup({
-  on_attach = on_attach,
-  capabilities = capabilities
-})
+nvim_lsp.gopls.setup({ on_attach = on_attach, capabilities = capabilities })
 
 nvim_lsp.tsserver.setup({
   on_attach = on_attach,
@@ -99,28 +90,27 @@ nvim_lsp.sumneko_lua.setup({
     Lua = {
       runtime = {
         -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-        version = 'LuaJIT',
+        version = 'LuaJIT'
       },
       diagnostics = {
         -- Get the language server to recognize the `vim` global
-        globals = { 'vim' },
+        globals = { 'vim' }
       },
       workspace = {
         -- Make the server aware of Neovim runtime files
-        library = vim.api.nvim_get_runtime_file('', true),
-      },
-    },
-  },
+        library = vim.api.nvim_get_runtime_file('', true)
+      }
+    }
+  }
 })
 
-vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
-  vim.lsp.diagnostic.on_publish_diagnostics, {
-    underline = true,
-    update_in_insert = false,
-    virtual_text = { spacing = 4, prefix = '●' },
-    severity_sort = true,
-  }
-)
+vim.lsp.handlers['textDocument/publishDiagnostics'] =
+    vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+      underline = true,
+      update_in_insert = false,
+      virtual_text = { spacing = 4, prefix = '●' },
+      severity_sort = true
+    })
 
 -- Diagnostic symbols in the sign column (gutter)
 local signs = { Error = ' ', Warn = ' ', Hint = ' ', Info = ' ' }
@@ -130,11 +120,9 @@ for type, icon in pairs(signs) do
 end
 
 vim.diagnostic.config({
-  virtual_text = {
-    prefix = '●'
-  },
+  virtual_text = { prefix = '●' },
   update_in_insert = true,
   float = {
-    source = 'always', -- Or 'if_many'
-  },
+    source = 'always' -- Or 'if_many'
+  }
 })
