@@ -2,6 +2,9 @@ local keymap = vim.keymap
 
 vim.g.mapleader = ';'
 
+-- Clear search
+keymap.set('n', '<C-_>', ':noh<Return>')
+
 -- Do not yank with x
 keymap.set('n', 'x', '"_x')
 
@@ -18,7 +21,7 @@ keymap.set('n', '<C-a>', 'gg<S-v>G')
 -- Save with root permission (not working for now)
 -- vim.api.nvim_create_user_command('W', 'w !sudo tee > /dev/null %', {})
 
--- New tab
+-- New tab (will be overwritten by Telescope plugin)
 keymap.set('n', 'te', ':tabedit ')
 -- Close tab
 keymap.set('n', 'td', ':q<Return>')
