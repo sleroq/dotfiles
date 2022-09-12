@@ -38,11 +38,11 @@ vim.keymap.set('n', '<Leader>f', function()
   builtin.find_files({ no_ignore = false, hidden = true })
 end)
 
-function _G.file_browser ()
+function _G.file_browser()
   telescope.extensions.file_browser.file_browser({
     respect_gitignore = false,
     hidden = true,
-    grouped = true,
+    grouped = true
   })
 end
 

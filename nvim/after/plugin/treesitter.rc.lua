@@ -3,7 +3,7 @@ if (not status) then return end
 
 ts.setup({
   ensure_installed = {
-    'toml', 'json', 'html', 'lua', 'bash', 'css', 'go', 'markdown'
+    'toml', 'json', 'html', 'lua', 'bash', 'css', 'go', 'markdown', 'org'
   },
   -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = true,
@@ -11,7 +11,11 @@ ts.setup({
   -- Automatically install missing parsers when entering buffer
   auto_install = true,
 
-  highlight = { enable = true, disable = {} },
+  highlight = {
+    enable = true,
+    disable = {},
+    additional_vim_regex_highlighting = { 'org' }
+  },
 
   indent = { enable = true, disable = {} }
 })

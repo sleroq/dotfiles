@@ -32,7 +32,7 @@ cmp.setup({
       end
     end, { 'i', 's' })
   }),
-  sources = { { name = 'nvim_lsp' }, { name = 'luasnip' } },
+  sources = { { name = 'nvim_lsp' }, { name = 'luasnip' }, { name = 'orgmode' } },
   formatting = {
     format = lspkind.cmp_format({ with_text = false, maxwidth = 50 })
   }
