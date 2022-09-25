@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Link this file to /etc/sv/whatever/run, then enable the service
+
+export USER="sleroq"
+export HOME="/home/sleroq"
+
+groups="$(id -Gn "$USER" | tr ' ' ':')"
+svdir="$HOME/.config/service"
+
+exec chpst -u "$USER:$groups" runsvdir "$svdir"
+
