@@ -1,0 +1,20 @@
+* Dotfiles
+** [[https://www.gnu.org/software/stow/][Stow]] for managing dotfiles
+** [[https://nixos.org/][Nix]] for reproducible packages
+
+* Install
+
+This will link user-wide configurations folder to your =$HOME=
+#+begin_src bash
+stow -d src home -t ~/
+#+end_src
+
+This will link system-wide configurations folder to your =$HOME=
+#+begin_src bash
+sudo stow -d src etc -t /etc
+#+end_src
+
+* Nix
+
+Some of dependencies and apps installed with [[https://nixos.org/][nix]]
+here is my [[~/develop/other/dotfiles/src/home/.config/nixpkgs/config.nix][config.nix]]
