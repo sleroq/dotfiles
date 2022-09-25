@@ -14,7 +14,9 @@ alias xq='xbps-query -Rs'
 alias xr=xbps-remove
 
 # Nix package manager
-alias nix-sync='nix-env -iA nixpkgs.myPackages'
+nix-sync() {
+  nix-env -iA nixpkgs.$1
+}
 
 if [ -d $HOME/.nix-profile/etc/profile.d ]; then
   for i in $HOME/.nix-profile/etc/profile.d/*.zsh; do
