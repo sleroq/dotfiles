@@ -64,5 +64,7 @@
       ];
       extraOutputsToInstall = [ "man" "doc" ];
     };
+
+     my-lf = pkgs.callPackage ./packages/my-lf {  };
   };
 }
