@@ -10,8 +10,9 @@
         "/usr/sbin"
         "/usr/bin"
       )
-      export XDG_DATA_DIRS="$HOME/.nix-profile/share:$HOME/.share:/usr/local/share/:/usr/share/}"
+      export XDG_DATA_DIRS="$HOME/.nix-profile/share:$HOME/.share:/usr/local/share/:/usr/share/"
       export MANPATH="$HOME/.nix-profile/share/man:/nix/var/nix/profiles/default/share/man:/usr/share/man"
+      export LD_LIBRARY_PATH="$HOME/.nix-profile/lib:$LD_LIBRARY_PATH"
     '';
 
     myPackages = pkgs.buildEnv {
@@ -21,28 +22,33 @@
           mkdir -p $out/etc/profile.d
           cp ${myProfile} $out/etc/profile.d/my-profile.zsh
         '')
-        nixfmt
-        niv
-
-        go
-
         jq
-
-        kitty
-        lf
-        stow
-        noisetorch
-        helvum
         neofetch
-        pavucontrol
+      ];
+      extraOutputsToInstall = [ "man" "doc" ];
+    };
 
+    toolsEnv = pkgs.buildEnv {
+      name = "tools-packages";
+      paths = [
+        pavucontrol
+        helvum
+        stow
+      ];
+      extraOutputsToInstall = [ "man" "doc" ];
+    };
+
+    appsEnv = pkgs.buildEnv {
+      name = "apps-packages";
+      paths = [
         firefox
         chromium
         tdesktop
         discord
         github-desktop
+        syncthing
+        lf
       ];
-      pathsToLink = [ "/share/man" "/share/doc" "/bin" "/etc" "/share/applications" ];
       extraOutputsToInstall = [ "man" "doc" ];
     };
 
@@ -54,17 +60,21 @@
         # sway -- won't work :c
         waybar
       ];
-      pathsToLink = [
-        "/share/man"
-        "/share/doc"
-        "/bin"
-        "/etc"
-        "/share/applications"
-        "/share/backgrounds"
+      extraOutputsToInstall = [ "man" "doc" ];
+    };
+
+    devEnv = pkgs.buildEnv {
+      name = "development-packages";
+      paths = [
+        nixfmt
+        niv
+        go
       ];
       extraOutputsToInstall = [ "man" "doc" ];
     };
 
-     my-lf = pkgs.callPackage ./packages/my-lf {  };
+    # customEnv = pkgs: {
+    #   my-lf = callPackage ./packages/my-lf {  };
+    # };
   };
 }
