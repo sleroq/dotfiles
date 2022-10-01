@@ -1,4 +1,7 @@
-{
+let
+  extraOutputsToInstall = [ "man" "doc" "info" "icons" ];
+in
+  {
   allowUnfree = true;
   packageOverrides = pkgs: with pkgs; rec {
     myProfile = writeText "my-profile" ''
@@ -24,8 +27,9 @@
         '')
         jq
         neofetch
+        at-spi2-core
       ];
-      extraOutputsToInstall = [ "man" "doc" ];
+      inherit extraOutputsToInstall;
     };
 
     toolsEnv = pkgs.buildEnv {
@@ -34,8 +38,9 @@
         pavucontrol
         helvum
         stow
+        lxappearance
       ];
-      extraOutputsToInstall = [ "man" "doc" ];
+      inherit extraOutputsToInstall;
     };
 
     appsEnv = pkgs.buildEnv {
@@ -48,8 +53,9 @@
         github-desktop
         syncthing
         lf
+        pcmanfm
       ];
-      extraOutputsToInstall = [ "man" "doc" ];
+      inherit extraOutputsToInstall;
     };
 
     waylandEnv = pkgs.buildEnv {
@@ -60,7 +66,7 @@
         # sway -- won't work :c
         waybar
       ];
-      extraOutputsToInstall = [ "man" "doc" ];
+      inherit extraOutputsToInstall;
     };
 
     devEnv = pkgs.buildEnv {
@@ -70,7 +76,7 @@
         niv
         go
       ];
-      extraOutputsToInstall = [ "man" "doc" ];
+      inherit extraOutputsToInstall;
     };
 
     # customEnv = pkgs: {
