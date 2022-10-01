@@ -1,12 +1,12 @@
+
 { lib
 , fetchFromGitHub
 , stdenv
 , file
 , openssl
-, optionalDeps
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "ctpv";
   version = "1.0";
 
@@ -24,6 +24,8 @@ stdenv.mkDerivation rec {
   preInstall = ''
     make $makeFlags install
   '';
+
+  outputs = [ "bin" "man" "out" ];
 
   meta = with lib; {
     description = "Terminal previewer";
