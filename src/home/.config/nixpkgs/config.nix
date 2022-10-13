@@ -1,5 +1,7 @@
+{ pkgs }:
+
 let
-  extraOutputsToInstall = [ "man" "doc" "info" "icons" ];
+  extraOutputsToInstall = [ "man" "doc" "inhfo" "icons" ];
 in
   {
   allowUnfree = true;
@@ -13,8 +15,8 @@ in
         "/usr/sbin"
         "/usr/bin"
       )
-      export XDG_DATA_DIRS="$HOME/.nix-profile/share:$HOME/.share:/usr/local/share/:/usr/share/"
-      export MANPATH="$HOME/.nix-profile/share/man:/nix/var/nix/profiles/default/share/man:/usr/share/man"
+      export XDG_DATA_DIRS="$HOME/.nix-profile/share:$XDG_DATA_DIRS"
+      export MANPATH="$HOME/.nix-profile/share/man:/nix/var/nix/profiles/default/share/man:$MANPATH"
       export LD_LIBRARY_PATH="$HOME/.nix-profile/lib:$LD_LIBRARY_PATH"
     '';
 
@@ -26,8 +28,6 @@ in
           cp ${myProfile} $out/etc/profile.d/my-profile.zsh
         '')
         jq
-        neofetch
-        at-spi2-core
       ];
       inherit extraOutputsToInstall;
     };
@@ -51,9 +51,13 @@ in
         tdesktop
         discord
         github-desktop
-        syncthing
+
         lf
-        pcmanfm
+
+        tmux
+
+        gimp
+        mpv
       ];
       inherit extraOutputsToInstall;
     };
@@ -73,8 +77,6 @@ in
       name = "development-packages";
       paths = [
         nixfmt
-        niv
-        go
       ];
       inherit extraOutputsToInstall;
     };
