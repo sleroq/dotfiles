@@ -1,0 +1,33 @@
+[Packages]
+
+  [Packages.xbps]
+    GuiApps = [
+      "emacs-gtk3",
+      "filelight",
+      "flameshot",
+      "lutris",
+      "lxappearance",
+      "NoiseTorch",
+      ["keepassxc", "3.4"],
+    ]
+
+    CliApps = [
+      "neofetch",
+      "neovim",
+      "bpytop",
+      "lf",
+      "gocryptfs"
+    ]
+
+  [Packages.nix]
+    GuiApps = [
+      "emacs-gtk3",
+      "flameshot",
+      "lutris",
+      ["filelight", "2.6"],
+    ]
+
+  [Packages.flatpak]
+    GuiApps = [
+      "emacs-gtk3",
+  ]
