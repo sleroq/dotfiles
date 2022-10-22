@@ -44,6 +44,8 @@
 (setq org-directory (concat SAFE_PLACE "/emacs-org/"))
 (setq org-startup-with-inline-images t)
 
+(setq org-roam-directory (concat SAFE_PLACE "/org-roam/"))
+
 
 ;; Autosave
 (setq auto-save-visited-mode t)
