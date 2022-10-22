@@ -37,9 +37,13 @@
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
 
+(setq SAFE_PLACE (getenv "SAFE_PLACE"))
+
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setq org-directory (concat SAFE_PLACE "/emacs-org/"))
+(setq org-startup-with-inline-images t)
+
 
 ;; Autosave
 (setq auto-save-visited-mode t)
