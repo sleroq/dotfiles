@@ -61,6 +61,10 @@
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
 
+;; Org-roam search with Deft (https://www.orgroam.com/manual.html#Full_002dtext-search-with-Deft)
+(setq deft-use-filter-string-for-filename t)
+(setq deft-directory org-roam-directory)
+(setq deft-recursive t)
 
 ;; Spellcheck
 (with-eval-after-load "ispell"
