@@ -50,13 +50,16 @@ export GOPATH=$HOME/develop/go
 path+=("$(go env GOPATH)/bin")
 
 # Wayland
-export MOZ_ENABLE_WAYLAND=1
-export QT_QPA_PLATFORM=wayland-egl
-export ELM_DISPLAY=wl
-export SDL_VIDEODRIVER=wayland
-export _JAVA_AWT_WM_NONREPARENTING=1
-export XDG_CURRENT_DESKTOP=sway
-export XDG_SESSION_DESKTOP=sway
+if [[ -z DESKTOP_SESSION ]]
+then
+  export MOZ_ENABLE_WAYLAND=1
+  export QT_QPA_PLATFORM=wayland-egl
+  export ELM_DISPLAY=wl
+  export SDL_VIDEODRIVER=wayland
+  export _JAVA_AWT_WM_NONREPARENTING=1
+  export XDG_CURRENT_DESKTOP=sway
+  export XDG_SESSION_DESKTOP=sway
+fi
 
 # Services
 export SVDIR=~/.config/service
