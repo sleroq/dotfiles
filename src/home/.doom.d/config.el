@@ -61,6 +61,18 @@
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
 
+
+;; Spellcheck
+(with-eval-after-load "ispell"
+        (add-to-list
+         'ispell-local-dictionary-alist
+         '("en_US-large,ru_RU" "[[:alpha:]]" "[^[:alpha:]]" "['0-9]" t
+           ("-d" "en_US-large,ru_RU")
+           nil utf-8))
+
+        (setq ispell-dictionary "en_US-large,ru_RU")
+        (setq ispell-personal-dictionary (concat SAFE_PLACE "/files/ispell-dictionary.txt")))
+
 ;; Autosave
 (setq auto-save-visited-mode t)
 (setq auto-save-default t)
