@@ -39,8 +39,9 @@
 
 (setq SAFE_PLACE (getenv "SAFE_PLACE"))
 
-;; If you use `org' and don't want your org files in the default location below,
-;; change `org-directory'. It must be set before org loads!
+;; Treemacs
+(map! :leader :desc "Treemacs toggle" :n "f t" #'+treemacs/toggle)
+;; (map! :leader (:prefix ("f" . "file")) :desc "Treemacs toggle" :n "t" #'+treemacs/toggle)
 (setq org-directory (concat SAFE_PLACE "/emacs-org/"))
 (setq org-startup-with-inline-images t)
 
