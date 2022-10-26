@@ -42,19 +42,39 @@
 ;; Treemacs
 (map! :leader :desc "Treemacs toggle" :n "f t" #'+treemacs/toggle)
 ;; (map! :leader (:prefix ("f" . "file")) :desc "Treemacs toggle" :n "t" #'+treemacs/toggle)
+
+;; Org-mode
 (setq org-directory (concat SAFE_PLACE "/emacs-org/"))
 (setq org-startup-with-inline-images t)
 
+(setq org-agenda-files (list
+    (concat SAFE_PLACE "/emacs-org/")))
+
+;; Org-Roam
 (setq org-roam-directory (concat SAFE_PLACE "/org-roam/"))
+(add-to-list 'org-agenda-files (concat SAFE_PLACE "/org-roam/"))
+
+(setq org-roam-capture-templates
+    '(("d" "default" plain "%?" :target
+        (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+        :unnarrowed t)
+      ("p" "Person" plain "
+* Info
+Telegram: [[https://t.me/%^{Telegram username}][%\\1]]"
+       :target
+       (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
+#+PROPERTY: Birthday %^{Birthday|<0000-00-00>}
+#+PROPERTY: CREATED %T
+#+title: ${title}
+#+filetags: :Person%^G")
+       :unnarrowed t)))
 
 (use-package! websocket
     :after org-roam)
 
 (use-package! org-roam-ui
-    :after org-roam ;; or :after org
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
+    :after org;; or :after org-roam
+;;  if you don't care about startup time, use
 ;;  :hook (after-init . org-roam-ui-mode)
     :config
     (setq org-roam-ui-sync-theme t
