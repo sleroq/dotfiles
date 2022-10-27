@@ -45,6 +45,7 @@
 
 ;; Org-mode
 (setq org-directory (concat SAFE_PLACE "/emacs-org/"))
+(setq org-attach-directory (concat SAFE_PLACE "/files/org-attachments/"))
 (setq org-startup-with-inline-images t)
 
 (setq org-agenda-files (list
