@@ -62,6 +62,21 @@
 (setq org-agenda-files (list
     (concat SAFE_PLACE "/emacs-org/")))
 
+;; Gemini
+(after! org
+    (use-package ox-gemini))
+
+(add-to-list 'org-publish-project-alist
+    (list "gemini"
+          :recursive t
+          :base-directory (concat SAFE_PLACE "/gemini/")
+          :publishing-directory "~/develop/other/gemini/"
+          ;; :preparation-function 'sleroq/remove-published-org-roam
+          :publishing-function 'org-gemini-publish-to-gemini
+          :with-author nil
+          :section-numbers nil
+          :with-creator nil))
+
 ;; Org-Roam
 (setq org-roam-directory (concat SAFE_PLACE "/roam/"))
 (add-to-list 'org-agenda-files (concat SAFE_PLACE "/roam/"))
