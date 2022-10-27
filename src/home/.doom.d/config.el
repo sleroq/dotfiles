@@ -63,8 +63,8 @@
     (concat SAFE_PLACE "/emacs-org/")))
 
 ;; Org-Roam
-(setq org-roam-directory (concat SAFE_PLACE "/org-roam/"))
-(add-to-list 'org-agenda-files (concat SAFE_PLACE "/org-roam/"))
+(setq org-roam-directory (concat SAFE_PLACE "/roam/"))
+(add-to-list 'org-agenda-files (concat SAFE_PLACE "/roam/"))
 
 ;; (defun sleroq/remove-published-org-roam (options)
 ;;   "Remove previously generated html files"
@@ -82,18 +82,21 @@
           :with-creator nil))
 
 (setq org-roam-capture-templates
-    '(("d" "default" plain "%?" :target
-        (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+    `(("d" "default" plain "%?" :target
+        (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
+#+startup: show2levels
+#+title: ${title}\n
+")
         :unnarrowed t)
-      ("p" "Person" plain "
-* Info
-Telegram: [[https://t.me/%^{Telegram username}][%\\1]]"
+      ("p" "Person" plain
+       (file ,(concat SAFE_PLACE "/templates/person.org"))
        :target
        (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
 #+PROPERTY: Birthday %^{Birthday|<0000-00-00>}
 #+PROPERTY: CREATED %T
 #+title: ${title}
-#+filetags: :Person%^G")
+#+startup: show2levels
+#+filetags: :Person%^G\n")
        :unnarrowed t)))
 
 (use-package! websocket
