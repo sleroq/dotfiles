@@ -48,12 +48,38 @@
 (setq org-attach-directory (concat SAFE_PLACE "/files/org-attachments/"))
 (setq org-startup-with-inline-images t)
 
+(setq org-publish-project-alist (list
+    (list "emacs-org"
+          :recursive t
+          :base-directory org-directory
+          :publishing-directory (concat org-directory "public/")
+          :exclude "public"
+          :publishing-function 'org-html-publish-to-html
+          :with-author nil
+          :with-creator nil)))
+(setq org-html-head "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://gongzhitaao.org/orgcss/org.css\"/>")
+
 (setq org-agenda-files (list
     (concat SAFE_PLACE "/emacs-org/")))
 
 ;; Org-Roam
 (setq org-roam-directory (concat SAFE_PLACE "/org-roam/"))
 (add-to-list 'org-agenda-files (concat SAFE_PLACE "/org-roam/"))
+
+;; (defun sleroq/remove-published-org-roam (options)
+;;   "Remove previously generated html files"
+;;   (package--delete-directory (concat SAFE_PLACE "/public-roam")))
+
+(add-to-list 'org-publish-project-alist
+    (list "roam"
+          :recursive t
+          :base-directory org-roam-directory
+          :publishing-directory (concat SAFE_PLACE "/public/roam/")
+          ;; :preparation-function 'sleroq/remove-published-org-roam
+          :publishing-function 'org-html-publish-to-html
+          :with-author nil
+          :section-numbers nil
+          :with-creator nil))
 
 (setq org-roam-capture-templates
     '(("d" "default" plain "%?" :target
