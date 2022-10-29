@@ -1,9 +1,5 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-;; Place your private configuration here! Remember, you do not need to run 'doom
-;; sync' after modifying this file!
-
-
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
 (setq user-full-name "Sleroq"
@@ -18,8 +14,7 @@
 ;; - `doom-unicode-font' -- for unicode glyphs
 ;; - `doom-serif-font' -- for the `fixed-pitch-serif' face
 ;;
-;; See 'C-h v doom-font' for documentation and more examples of what they
-;; accept. For example:
+;; See 'C-h v doom-font' for documentation and more examples
 (setq doom-font (font-spec :family "JetBrainsMono Nerd Font Mono" :size 16 :weight 'normal)
      doom-variable-pitch-font (font-spec :family "JetBrainsMono Nerd Font Mono" :size 17))
 ;;
@@ -39,11 +34,18 @@
 
 (setq SAFE_PLACE (getenv "SAFE_PLACE"))
 
+;;
 ;; Treemacs
+;;
+
 (map! :leader :desc "Treemacs toggle" :n "f t" #'+treemacs/toggle)
 ;; (map! :leader (:prefix ("f" . "file")) :desc "Treemacs toggle" :n "t" #'+treemacs/toggle)
 
+
+;;
 ;; Org-mode
+;;
+
 (setq org-directory (concat SAFE_PLACE "/emacs-org/"))
 (setq org-attach-directory (concat SAFE_PLACE "/files/org-attachments/"))
 (setq org-startup-with-inline-images t)
@@ -59,38 +61,18 @@
           :with-creator nil)))
 (setq org-html-head "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://gongzhitaao.org/orgcss/org.css\"/>")
 
-(setq org-agenda-files (list
-    (concat SAFE_PLACE "/emacs-org/")))
 
-;; Gemini
-(after! org
-    (use-package ox-gemini))
-
-(add-to-list 'org-publish-project-alist
-    (list "gemini"
-          :recursive t
-          :base-directory (concat SAFE_PLACE "/gemini/")
-          :publishing-directory "~/develop/other/gemini/"
-          ;; :preparation-function 'sleroq/remove-published-org-roam
-          :publishing-function 'org-gemini-publish-to-gemini
-          :with-author nil
-          :section-numbers nil
-          :with-creator nil))
-
+;;
 ;; Org-Roam
-(setq org-roam-directory (concat SAFE_PLACE "/roam/"))
-(add-to-list 'org-agenda-files (concat SAFE_PLACE "/roam/"))
+;;
 
-;; (defun sleroq/remove-published-org-roam (options)
-;;   "Remove previously generated html files"
-;;   (package--delete-directory (concat SAFE_PLACE "/public-roam")))
+(setq org-roam-directory (concat SAFE_PLACE "/roam/"))
 
 (add-to-list 'org-publish-project-alist
     (list "roam"
           :recursive t
           :base-directory org-roam-directory
           :publishing-directory (concat SAFE_PLACE "/public/roam/")
-          ;; :preparation-function 'sleroq/remove-published-org-roam
           :publishing-function 'org-html-publish-to-html
           :with-author nil
           :section-numbers nil
@@ -100,6 +82,7 @@
     `(("d" "default" plain "%?" :target
         (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
 #+startup: show2levels
+#+category: ${title}
 #+title: ${title}\n
 ")
         :unnarrowed t)
@@ -109,6 +92,7 @@
        (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
 #+PROPERTY: Birthday %^{Birthday|<0000-00-00>}
 #+PROPERTY: CREATED %T
+#+category: ${title}
 #+title: ${title}
 #+startup: show2levels
 #+filetags: :Person%^G\n")
@@ -132,7 +116,56 @@
 (setq deft-directory org-roam-directory)
 (setq deft-recursive t)
 
+
+;;
+;; Agenda
+;;
+
+(defun my/org-roam-filter-by-tag (tag-name)
+  (lambda (node)
+    (member tag-name (org-roam-node-tags node))))
+
+(defun my/org-roam-list-notes-by-tag (tag-name)
+  (mapcar #'org-roam-node-file
+    (seq-filter
+      (my/org-roam-filter-by-tag tag-name)
+      (org-roam-node-list))))
+
+(defun my/org-update-agenda-files ()
+  (interactive)
+  ;; Add to agenda only files with tag Board:
+  (setq org-agenda-files (my/org-roam-list-notes-by-tag "Board"))
+  (add-to-list 'org-agenda-files (concat SAFE_PLACE "/emacs-org/")))
+
+;; Update agenda file-list for new session
+(after! org-roam
+  (my/org-update-agenda-files))
+
+
+;;
+;; Gemini
+;;
+
+(after! org
+    (use-package ox-gemini))
+
+(map! :leader (:prefix ("l" "custom")) :desc "Open Elpher" :n "l e" #'elpher)
+
+(add-to-list 'org-publish-project-alist
+    (list "gemini"
+          :recursive t
+          :base-directory (concat SAFE_PLACE "/gemini/")
+          :publishing-directory "~/develop/other/gemini/"
+          :publishing-function 'org-gemini-publish-to-gemini
+          :with-author nil
+          :section-numbers nil
+          :with-creator nil))
+
+
+;;
 ;; Spellcheck
+;;
+
 (with-eval-after-load "ispell"
         (add-to-list
          'ispell-local-dictionary-alist
@@ -143,7 +176,11 @@
         (setq ispell-dictionary "en_US-large,ru_RU")
         (setq ispell-personal-dictionary (concat SAFE_PLACE "/files/ispell-dictionary.txt")))
 
+
+;;
 ;; Autosave
+;;
+
 (setq auto-save-visited-mode t)
 (setq auto-save-default t)
 
