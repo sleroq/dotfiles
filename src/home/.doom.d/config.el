@@ -47,8 +47,11 @@
 ;;
 
 (setq org-directory (concat SAFE_PLACE "/emacs-org/"))
-(setq org-attach-directory (concat SAFE_PLACE "/files/org-attachments/"))
+(setq org-attach-id-dir (concat SAFE_PLACE "/files/attachments/"))
+
 (setq org-startup-with-inline-images t)
+(after! org
+  (setq org-image-actual-width 600))
 
 (setq org-publish-project-alist (list
     (list "emacs-org"
@@ -59,7 +62,8 @@
           :publishing-function 'org-html-publish-to-html
           :with-author nil
           :with-creator nil)))
-(setq org-html-head "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://gongzhitaao.org/orgcss/org.css\"/>")
+
+(setq org-html-head "<fink rel=\"stylesheet\" type=\"text/css\" href=\"https://gongzhitaao.org/orgcss/org.css\"/>")
 
 
 ;;
@@ -81,6 +85,7 @@
 (setq org-roam-capture-templates
     `(("d" "default" plain "%?" :target
         (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
+#+PROPERTY: CREATED %T
 #+startup: show2levels
 #+category: ${title}
 #+title: ${title}\n
@@ -96,6 +101,26 @@
 #+title: ${title}
 #+startup: show2levels
 #+filetags: :Person%^G\n")
+       :unnarrowed t)
+      ("m" "Monthly archive" plain
+       (file ,(concat SAFE_PLACE "/templates/monthly-archive.org"))
+       :target
+       (file+head "monthly/%<%Y-%m> ${slug}.org" "
+#+PROPERTY: CREATED %T
+#+category: %<%Y-%m> ${title}
+#+title: %<%Y-%m> ${title}
+#+startup: show2levels
+#+filetags: :archive:\n")
+       :unnarrowed t)
+      ("a" "Anime" plain
+       (file ,(concat SAFE_PLACE "/templates/anime.org"))
+       :target
+       (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
+#+PROPERTY: CREATED %T
+#+category: ${title}
+#+title: ${title}
+#+startup: show2levels
+#+filetags: :Anime:\n")
        :unnarrowed t)))
 
 (use-package! websocket
@@ -135,6 +160,7 @@
   (interactive)
   ;; Add to agenda only files with tag Board:
   (setq org-agenda-files (my/org-roam-list-notes-by-tag "Board"))
+  (add-to-list 'org-agenda-files "~/Sync/Shared org/")
   (add-to-list 'org-agenda-files (concat SAFE_PLACE "/emacs-org/")))
 
 ;; Update agenda file-list for new session
