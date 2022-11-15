@@ -84,7 +84,7 @@
        (spell
         +flyspell
         +hunspell) ; tasing you for misspelling mispelling
-       ;; grammar           ; tasing grammar mistake every you make (languagetool)
+       grammar           ; tasing grammar mistake every you make (languagetool)
 
        :tools
        ;;ansible
