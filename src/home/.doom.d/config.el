@@ -53,6 +53,11 @@
 (after! org
   (setq org-image-actual-width 600))
 
+(setq mixed-pitch-face 'variable-pitch)
+
+(add-hook 'org-mode-hook 'writeroom-mode)
+(add-hook 'org-mode-hook 'mixed-pitch-mode)
+
 (setq org-publish-project-alist (list
     (list "emacs-org"
           :recursive t
