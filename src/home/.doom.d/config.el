@@ -101,6 +101,7 @@
 #+title: ${title}
 #+startup: show2levels
 #+filetags: :Person%^G\n")
+       :empty-lines-before 1
        :unnarrowed t)
       ("m" "Monthly archive" plain
        (file ,(concat SAFE_PLACE "/templates/monthly-archive.org"))
@@ -111,16 +112,51 @@
 #+title: %<%Y-%m> ${title}
 #+startup: show2levels
 #+filetags: :archive:\n")
+       :empty-lines-before 1
        :unnarrowed t)
       ("a" "Anime" plain
        (file ,(concat SAFE_PLACE "/templates/anime.org"))
        :target
-       (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
+       (file+head "anime/%<%Y%m%d%H%M%S>-${slug}.org" "
 #+PROPERTY: CREATED %T
 #+category: ${title}
 #+title: ${title}
 #+startup: show2levels
 #+filetags: :Anime:\n")
+       :empty-lines-before 1
+       :unnarrowed t)
+      ("g" "Game" plain
+       (file ,(concat SAFE_PLACE "/templates/game.org"))
+       :target
+       (file+head "gaming/%<%Y%m%d%H%M%S>-${slug}.org" "
+#+PROPERTY: CREATED %T
+#+category: ${title}
+#+title: ${title}
+#+startup: show2levels
+#+filetags: :Gaming:\n")
+       :empty-lines-before 1
+       :unnarrowed t)
+      ("b" "Book" plain
+       (file ,(concat SAFE_PLACE "/templates/book.org"))
+       :target
+       (file+head "reading/%<%Y%m%d%H%M%S>-${slug}.org" "
+#+PROPERTY: CREATED %T
+#+category: ${title}
+#+title: ${title}
+#+startup: show2levels
+#+filetags: :Reading:\n")
+       :empty-lines-before 1
+       :unnarrowed t)
+      ("ans" "Answer" plain
+       (file ,(concat SAFE_PLACE "/templates/answer.org"))
+       :target
+       (file+head "reading/%<%Y%m%d%H%M%S>-${slug}.org" "
+#+PROPERTY: CREATED %T
+#+category: ${title}
+#+title: ${title}
+#+startup: show2levels
+#+filetags: :Answer:\n")
+       :empty-lines-before 1
        :unnarrowed t)))
 
 (use-package! websocket
@@ -140,6 +176,24 @@
 (setq deft-use-filter-string-for-filename t)
 (setq deft-directory org-roam-directory)
 (setq deft-recursive t)
+(setq deft-strip-summary-regexp
+  (concat "\\("
+          "^:.+:.*\n" ; any line with a :SOMETHING:
+          "\\|^#\\+.*\n" ; anyline starting with a #+
+          "\\|^\\*.+.*\n" ; anyline where an asterisk starts the line
+          "\\)"))
+
+(advice-add 'deft-parse-title :override
+    (lambda (file contents)
+      (if deft-use-filename-as-title
+      (deft-base-filename file)
+    (let* ((case-fold-search 't)
+           (begin (string-match "title: " contents))
+           (end-of-begin (match-end 0))
+           (end (string-match "\n" contents begin)))
+      (if begin
+          (substring contents end-of-begin end)
+        (format "%s" file))))))
 
 
 ;;
