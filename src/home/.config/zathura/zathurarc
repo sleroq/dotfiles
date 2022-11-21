@@ -1,0 +1,8 @@
+set selection-clipboard clipboard
+set recolor
+set recolor-lightcolor \#2f343f
+set recolor-keephue
+# set font Hack normal 9
+set inputbar-bg \#404552
+set statusbar-bg \#404552
+set default-bg \#2f343f
