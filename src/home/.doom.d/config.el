@@ -52,7 +52,13 @@
 
 (setq org-startup-with-inline-images t)
 (after! org
-  (setq org-image-actual-width 600))
+  (setq org-image-actual-width 600)
+  (setq org-todo-keywords
+    '((sequence "TODO(t)" "HOLD(h)" "IDEA(i)" "|" "DONE(d!)" "KILL(k!)" "NO(n!)")
+      (sequence "[ ](T)" "[-](S)" "|" "[X](D)")))
+   (setq org-todo-keyword-faces
+     '(("IDEA" . (:foreground "brightcyan"))))
+   (setq org-log-done 'time))
 
 (setq mixed-pitch-face 'variable-pitch)
 
