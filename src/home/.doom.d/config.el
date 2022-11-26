@@ -268,6 +268,11 @@
         (setq ispell-dictionary "en_US-large,ru_RU")
         (setq ispell-personal-dictionary (concat SAFE_PLACE "/files/ispell-dictionary.txt")))
 
+;;
+;; Vterm
+;;
+
+(setq vterm-shell "/usr/bin/zsh")
 
 ;;
 ;; Autosave
