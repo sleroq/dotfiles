@@ -100,9 +100,9 @@
 #+PROPERTY: CREATED %T
 #+startup: show2levels
 #+category: ${title}
-#+title: ${title}\n
-")
+#+title: ${title}\n")
         :unnarrowed t)
+
       ("p" "Person" plain
        (file ,(concat SAFE_PLACE "/templates/person.org"))
        :target
@@ -115,6 +115,7 @@
 #+filetags: :Person%^G\n")
        :empty-lines-before 1
        :unnarrowed t)
+
       ("m" "Monthly archive" plain
        (file ,(concat SAFE_PLACE "/templates/monthly-archive.org"))
        :target
@@ -126,6 +127,7 @@
 #+filetags: :archive:\n")
        :empty-lines-before 1
        :unnarrowed t)
+
       ("a" "Anime" plain
        (file ,(concat SAFE_PLACE "/templates/anime.org"))
        :target
@@ -137,7 +139,10 @@
 #+filetags: :Anime:\n")
        :empty-lines-before 1
        :unnarrowed t)
-      ("g" "Game" plain
+
+      ("g" "Gaming")
+
+      ("gg" "Game" plain
        (file ,(concat SAFE_PLACE "/templates/game.org"))
        :target
        (file+head "gaming/%<%Y%m%d%H%M%S>-${slug}.org" "
@@ -148,6 +153,19 @@
 #+filetags: :Gaming:\n")
        :empty-lines-before 1
        :unnarrowed t)
+
+      ("gn" "Game note" plain
+       (file ,(concat SAFE_PLACE "/templates/game-note.org"))
+       :target
+       (file+head "gaming/%<%Y%m%d%H%M%S>-${slug}.org" "
+#+PROPERTY: CREATED %T
+#+category: ${title}
+#+title: ${title}
+#+startup: show2levels
+#+filetags: :Gaming%^G\n")
+       :empty-lines-before 1
+       :unnarrowed t)
+
       ("b" "Book" plain
        (file ,(concat SAFE_PLACE "/templates/book.org"))
        :target
@@ -159,7 +177,8 @@
 #+filetags: :Reading:\n")
        :empty-lines-before 1
        :unnarrowed t)
-      ("ans" "Answer" plain
+
+      ("o" "Answer" plain
        (file ,(concat SAFE_PLACE "/templates/answer.org"))
        :target
        (file+head "reading/%<%Y%m%d%H%M%S>-${slug}.org" "
