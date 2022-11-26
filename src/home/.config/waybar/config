@@ -7,12 +7,12 @@
     // "spacing": 4, // Gaps between modules (4px)
 
     // Choose the order of the modules
-    "modules-left": ["sway/workspaces", "sway/mode", "custom/media"],
+    "modules-left": ["wlr/workspaces", "wlr/mode", "custom/media"],
     "modules-center": ["tray"],
-    "modules-right": ["pulseaudio", "network", "cpu", "sway/language", "clock"],
+    "modules-right": ["pulseaudio", "network", "cpu", "wlr/language", "clock"],
 
     // Modules configuration
-    // "sway/workspaces": {
+    // "wlr/workspaces": {
     //     "disable-scroll": true,
     //     "all-outputs": true,
     //     "format": "{name}: {icon}",
