@@ -181,7 +181,7 @@
       ("o" "Answer" plain
        (file ,(concat SAFE_PLACE "/templates/answer.org"))
        :target
-       (file+head "reading/%<%Y%m%d%H%M%S>-${slug}.org" "
+       (file+head "answers/%<%Y%m%d%H%M%S>-${slug}.org" "
 #+PROPERTY: CREATED %T
 #+category: ${title}
 #+title: ${title}
