@@ -7,7 +7,7 @@
     // "spacing": 4, // Gaps between modules (4px)
 
     // Choose the order of the modules
-    "modules-left": ["wlr/workspaces", "wlr/mode", "custom/media"],
+    "modules-left": ["wlr/workspaces", "custom/media"],
     "modules-center": ["tray"],
     "modules-right": ["pulseaudio", "network", "cpu", "wlr/language", "clock"],
 
@@ -27,10 +27,7 @@
     //         "default": ""
     //     }
     // },
-
-    "sway/mode": {
-        "format": "<span style=\"italic\">{}</span>"
-    },
+    //
     "tray": {
         "icon-size": 16,
         "spacing": 14
@@ -99,7 +96,7 @@
             "car": "",
             "default": ["", "", ""]
         },
-        "on-click": "pavucontrol"
+        "on-click": "pavucontrol-qt"
     },
     "custom/media": {
         "format": "{icon} {}",
