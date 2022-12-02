@@ -57,7 +57,8 @@
     '((sequence "TODO(t)" "HOLD(h)" "IDEA(i)" "|" "DONE(d!)" "KILL(k!)" "NO(n!)")
       (sequence "[ ](T)" "[-](S)" "|" "[X](D)")))
    (setq org-todo-keyword-faces
-     '(("IDEA" . (:foreground "brightcyan"))))
+    '(("IDEA" . (:foreground "brightcyan"))
+      ("REVIEW" . (:foreground "#FDFD96")))) ;; pastel-yellow
    (setq org-log-done 'time))
 
 (setq mixed-pitch-face 'variable-pitch)
