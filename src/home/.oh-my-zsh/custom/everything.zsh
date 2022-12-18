@@ -9,7 +9,7 @@ path+=("$HOME/develop/other/dotfiles/scripts")
 
 # XBPS package manager
 alias update='xbps-install -Su'
-alias xi=xbps-install
+# alias xi=xbps-install
 alias xq='xbps-query -Rs'
 alias xr=xbps-remove
 
