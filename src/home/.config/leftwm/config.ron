@@ -119,6 +119,8 @@
         (command: MoveToTag, value: "7", modifier: ["modkey", "Shift"], key: "7"),
         (command: MoveToTag, value: "8", modifier: ["modkey", "Shift"], key: "8"),
         (command: MoveToTag, value: "9", modifier: ["modkey", "Shift"], key: "9"),
+
+        (command: Execute, value: "lock", modifier: ["Control", "Alt"], key: "l"),
     ],
     state_path: None,
 )
