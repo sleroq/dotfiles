@@ -26,6 +26,7 @@
       "freerdp",
       "rustdesk-bin",
       "kdeconnect",
+      "activate-linux-git",
     ]
 
     GuiTools = [
@@ -48,8 +49,12 @@
       "libreoffice-fresh",
       "obs-studio",
 
-      "thunar",
+      "thunar-extended",
       "thunar-volman",
+      "gvfs",
+      "tumbler",
+      "ffmpegthumbnailer",
+      
       "dolphin",
       "filelight",
       "syncthing",
@@ -99,6 +104,7 @@
       # Xorg
       "xorg-server",
       "xorg-xinit",
+      "xorg-xkill",
       "picom",
       "maim",       # Screenshot utility
       "sct",        # Color temperature
@@ -107,6 +113,8 @@
 
       "awesome",
       "i3lock-color",
+
+      "leftwm",
 
       # Wayland
       "wl-clipboard",
@@ -123,6 +131,12 @@
 
       "plasma-meta",
       "plasma-wayland-session",
+
+      # Gtk settings
+      "lxappearance",
+
+      # Qt settings
+      "qt5ct",
     ]
 
     Develop = [
@@ -173,9 +187,7 @@
       "python-pip",
       "python-virtualenv",
 
-      "mariadb",
-      "postgresql",
-      "redis",
+      "mongodb-compass",
     ]
 
     System = [
