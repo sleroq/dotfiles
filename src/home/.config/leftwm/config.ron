@@ -43,10 +43,10 @@
     layout_mode: Tag,
     insert_behavior: Bottom,
     scratchpad: [
-        (name: "Alacritty", value: "alacritty", x: 860, y: 390, height: 300, width: 200),
+        (name: "Kitty", value: "kitty", x: 860, y: 390, height: 300, width: 200),
     ],
     window_rules: [
-        ( window_title: "KeePassXC", spawn_on_tag: 5 ), //, spawn_floating: true ),
+        ( window_class: "KeePassXC", spawn_on_tag: 5 ), //, spawn_floating: true ),
         ( window_class: "krunner", spawn_floating: true ),
     ],
     disable_current_tag_swap: false,
