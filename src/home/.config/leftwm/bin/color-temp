@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+TEMPFILE="$SCRIPTPATH"/../tmp/color-temp
+
+set -e
+
+TEMP=$( < "$TEMPFILE" )
+
+# Pass integer
+save () {
+  if [[ $1 -ge 1000 ]] && [[ $1 -le 10000 ]]
+  then
+    echo "$NEWTEMP" > "$TEMPFILE"
+  fi
+}
+
+# Pass integer
+inc () {
+  local NEWTEMP=$(( TEMP + $1 ))
+  sct $NEWTEMP
+  save $NEWTEMP
+}
+
+# Pass integer
+dsc () {
+  local NEWTEMP=$(( TEMP - $1 ))
+  sct $NEWTEMP
+  save $NEWTEMP
+}
+
+while getopts d:i: OPTION; do
+  case "$OPTION" in
+    i)
+      inc "$OPTARG"
+      ;;
+    d)
+      dsc "$OPTARG"
+      ;;
+    ?)
+      echo "script usage: color-temp [-i integer] [-d integer]" >&2
+      exit 1
+      ;;
+  esac
+done
