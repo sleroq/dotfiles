@@ -10,3 +10,7 @@ run() {
 run xset r rate 250 25
 
 run /usr/lib/polkit-kde-authentication-agent-1
+
+# Screen dim and lock
+xset s 180 120
+run xss-lock -n dim-screen.sh -- lock
