@@ -46,8 +46,9 @@
         (name: "Kitty", value: "kitty", x: 860, y: 390, height: 300, width: 200),
     ],
     window_rules: [
-        ( window_class: "KeePassXC", spawn_on_tag: 5 ), //, spawn_floating: true ),
+        ( window_class: "KeePassXC", spawn_on_tag: 5 ),
         ( window_class: "krunner", spawn_floating: true ),
+        ( window_class: "Pavucontrol", spawn_floating: true ),
     ],
     disable_current_tag_swap: false,
     disable_tile_drag: false,
@@ -65,6 +66,7 @@
         (command: Execute, value: "kitty", modifier: ["modkey"], key: "Return"),
         (command: Execute, value: "flameshot gui", key: "Print"),
         (command: Execute, value: "thunar", modifier: ["modkey"], key: "e"),
+        (command: Execute, value: "feh --bg-fill --randomize \"$HOME\"/Pictures/wallpapers", modifier: ["modkey"], key: "w"),
 
         (command: Execute, value: "xbacklight -inc 5", key: "XF86XK_MonBrightnessUp"),
         (command: Execute, value: "xbacklight -dec 5", key: "XF86XK_MonBrightnessDown"),
@@ -82,7 +84,6 @@
         (command: Execute, value: "loginctl kill-session $XDG_SESSION_ID", modifier: ["modkey", "Shift"], key: "q"),
         (command: Execute, value: "slock", modifier: ["modkey", "Control"], key: "l"),
         (command: MoveToLastWorkspace, modifier: ["modkey", "Shift"], key: "w"),
-        (command: SwapTags, modifier: ["modkey"], key: "w"),
         (command: MoveWindowUp, modifier: ["modkey", "Shift"], key: "k"),
         (command: MoveWindowDown, modifier: ["modkey", "Shift"], key: "j"),
         (command: MoveWindowTop, modifier: ["modkey", "Shift"], key: "Return"),
