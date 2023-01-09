@@ -33,7 +33,14 @@
 (setq display-line-numbers-type t)
 (setq undo-limit 50000000)
 
+(setq server-socket-dir "/tmp/emacs1000")
+
 (setq SAFE_PLACE (getenv "SAFE_PLACE"))
+
+(setq place-is-open (file-directory-p SAFE_PLACE))
+
+(if (eq place-is-open nil)
+    (message "meow"))
 
 ;;
 ;; Treemacs
@@ -47,19 +54,20 @@
 ;; Org-mode
 ;;
 
-(setq org-directory (concat SAFE_PLACE "/emacs-org/"))
-(setq org-attach-id-dir (concat SAFE_PLACE "/files/attachments/"))
+(if (eq place-is-open t)
+  (setq org-directory (concat SAFE_PLACE "/emacs-org/"))
+  (setq org-attach-id-dir (concat SAFE_PLACE "/files/attachments/"))
+  (after! org
+    (setq org-image-actual-width 600)
+    (setq org-todo-keywords
+      '((sequence "TODO(t)" "HOLD(h)" "IDEA(i)" "|" "DONE(d!)" "KILL(k!)" "NO(n!)")
+        (sequence "[ ](T)" "[-](S)" "|" "[X](D)")))
+     (setq org-todo-keyword-faces
+      '(("IDEA" . (:foreground "brightcyan"))
+        ("REVIEW" . (:foreground "#FDFD96")))) ;; pastel-yellow
+     (setq org-log-done 'time)))
 
 (setq org-startup-with-inline-images t)
-(after! org
-  (setq org-image-actual-width 600)
-  (setq org-todo-keywords
-    '((sequence "TODO(t)" "HOLD(h)" "IDEA(i)" "|" "DONE(d!)" "KILL(k!)" "NO(n!)")
-      (sequence "[ ](T)" "[-](S)" "|" "[X](D)")))
-   (setq org-todo-keyword-faces
-    '(("IDEA" . (:foreground "brightcyan"))
-      ("REVIEW" . (:foreground "#FDFD96")))) ;; pastel-yellow
-   (setq org-log-done 'time))
 
 (setq mixed-pitch-face 'variable-pitch)
 
@@ -83,149 +91,150 @@
 ;; Org-Roam
 ;;
 
-(setq org-roam-directory (concat SAFE_PLACE "/roam/"))
+(if (eq place-is-open t)
+  (setq org-roam-directory (concat SAFE_PLACE "/roam/"))
 
-(add-to-list 'org-publish-project-alist
-    (list "roam"
-          :recursive t
-          :base-directory org-roam-directory
-          :publishing-directory (concat SAFE_PLACE "/public/roam/")
-          :publishing-function 'org-html-publish-to-html
-          :with-author nil
-          :section-numbers nil
-          :with-creator nil))
+  (add-to-list 'org-publish-project-alist
+      (list "roam"
+            :recursive t
+            :base-directory org-roam-directory
+            :publishing-directory (concat SAFE_PLACE "/public/roam/")
+            :publishing-function 'org-html-publish-to-html
+            :with-author nil
+            :section-numbers nil
+            :with-creator nil))
 
-(setq org-roam-capture-templates
-    `(("d" "default" plain "%?" :target
-        (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
-#+PROPERTY: CREATED %T
-#+startup: show2levels
-#+category: ${title}
-#+title: ${title}\n")
-        :unnarrowed t)
+  (setq org-roam-capture-templates
+      `(("d" "default" plain "%?" :target
+          (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
+  #+PROPERTY: CREATED %T
+  #+startup: show2levels
+  #+category: ${title}
+  #+title: ${title}\n")
+          :unnarrowed t)
 
-      ("p" "Person" plain
-       (file ,(concat SAFE_PLACE "/templates/person.org"))
-       :target
-       (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
-#+PROPERTY: Birthday %^{Birthday|<0000-00-00>}
-#+PROPERTY: CREATED %T
-#+category: ${title}
-#+title: ${title}
-#+startup: show2levels
-#+filetags: :Person%^G\n")
-       :empty-lines-before 1
-       :unnarrowed t)
+        ("p" "Person" plain
+         (file ,(concat SAFE_PLACE "/templates/person.org"))
+         :target
+         (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
+  #+PROPERTY: Birthday %^{Birthday|<0000-00-00>}
+  #+PROPERTY: CREATED %T
+  #+category: ${title}
+  #+title: ${title}
+  #+startup: show2levels
+  #+filetags: :Person%^G\n")
+         :empty-lines-before 1
+         :unnarrowed t)
 
-      ("m" "Monthly archive" plain
-       (file ,(concat SAFE_PLACE "/templates/monthly-archive.org"))
-       :target
-       (file+head "monthly/%<%Y-%m> ${slug}.org" "
-#+PROPERTY: CREATED %T
-#+category: %<%Y-%m> ${title}
-#+title: %<%Y-%m> ${title}
-#+startup: show2levels
-#+filetags: :archive:\n")
-       :empty-lines-before 1
-       :unnarrowed t)
+        ("m" "Monthly archive" plain
+         (file ,(concat SAFE_PLACE "/templates/monthly-archive.org"))
+         :target
+         (file+head "monthly/%<%Y-%m> ${slug}.org" "
+  #+PROPERTY: CREATED %T
+  #+category: %<%Y-%m> ${title}
+  #+title: %<%Y-%m> ${title}
+  #+startup: show2levels
+  #+filetags: :archive:\n")
+         :empty-lines-before 1
+         :unnarrowed t)
 
-      ("a" "Anime" plain
-       (file ,(concat SAFE_PLACE "/templates/anime.org"))
-       :target
-       (file+head "anime/%<%Y%m%d%H%M%S>-${slug}.org" "
-#+PROPERTY: CREATED %T
-#+category: ${title}
-#+title: ${title}
-#+startup: show2levels
-#+filetags: :Anime:\n")
-       :empty-lines-before 1
-       :unnarrowed t)
+        ("a" "Anime" plain
+         (file ,(concat SAFE_PLACE "/templates/anime.org"))
+         :target
+         (file+head "anime/%<%Y%m%d%H%M%S>-${slug}.org" "
+  #+PROPERTY: CREATED %T
+  #+category: ${title}
+  #+title: ${title}
+  #+startup: show2levels
+  #+filetags: :Anime:\n")
+         :empty-lines-before 1
+         :unnarrowed t)
 
-      ("g" "Gaming")
+        ("g" "Gaming")
 
-      ("gg" "Game" plain
-       (file ,(concat SAFE_PLACE "/templates/game.org"))
-       :target
-       (file+head "gaming/%<%Y%m%d%H%M%S>-${slug}.org" "
-#+PROPERTY: CREATED %T
-#+category: ${title}
-#+title: ${title}
-#+startup: show2levels
-#+filetags: :Gaming:\n")
-       :empty-lines-before 1
-       :unnarrowed t)
+        ("gg" "Game" plain
+         (file ,(concat SAFE_PLACE "/templates/game.org"))
+         :target
+         (file+head "gaming/%<%Y%m%d%H%M%S>-${slug}.org" "
+  #+PROPERTY: CREATED %T
+  #+category: ${title}
+  #+title: ${title}
+  #+startup: show2levels
+  #+filetags: :Gaming:\n")
+         :empty-lines-before 1
+         :unnarrowed t)
 
-      ("gn" "Game note" plain
-       (file ,(concat SAFE_PLACE "/templates/game-note.org"))
-       :target
-       (file+head "gaming/%<%Y%m%d%H%M%S>-${slug}.org" "
-#+PROPERTY: CREATED %T
-#+category: ${title}
-#+title: ${title}
-#+startup: show2levels
-#+filetags: :Gaming%^G\n")
-       :empty-lines-before 1
-       :unnarrowed t)
+        ("gn" "Game note" plain
+         (file ,(concat SAFE_PLACE "/templates/game-note.org"))
+         :target
+         (file+head "gaming/%<%Y%m%d%H%M%S>-${slug}.org" "
+  #+PROPERTY: CREATED %T
+  #+category: ${title}
+  #+title: ${title}
+  #+startup: show2levels
+  #+filetags: :Gaming%^G\n")
+         :empty-lines-before 1
+         :unnarrowed t)
 
-      ("b" "Book" plain
-       (file ,(concat SAFE_PLACE "/templates/book.org"))
-       :target
-       (file+head "reading/%<%Y%m%d%H%M%S>-${slug}.org" "
-#+PROPERTY: CREATED %T
-#+category: ${title}
-#+title: ${title}
-#+startup: show2levels
-#+filetags: :Reading:\n")
-       :empty-lines-before 1
-       :unnarrowed t)
+        ("b" "Book" plain
+         (file ,(concat SAFE_PLACE "/templates/book.org"))
+         :target
+         (file+head "reading/%<%Y%m%d%H%M%S>-${slug}.org" "
+  #+PROPERTY: CREATED %T
+  #+category: ${title}
+  #+title: ${title}
+  #+startup: show2levels
+  #+filetags: :Reading:\n")
+         :empty-lines-before 1
+         :unnarrowed t)
 
-      ("o" "Answer" plain
-       (file ,(concat SAFE_PLACE "/templates/answer.org"))
-       :target
-       (file+head "answers/%<%Y%m%d%H%M%S>-${slug}.org" "
-#+PROPERTY: CREATED %T
-#+category: ${title}
-#+title: ${title}
-#+startup: show2levels
-#+filetags: :Answer:\n")
-       :empty-lines-before 1
-       :unnarrowed t)))
+        ("o" "Answer" plain
+         (file ,(concat SAFE_PLACE "/templates/answer.org"))
+         :target
+         (file+head "answers/%<%Y%m%d%H%M%S>-${slug}.org" "
+  #+PROPERTY: CREATED %T
+  #+category: ${title}
+  #+title: ${title}
+  #+startup: show2levels
+  #+filetags: :Answer:\n")
+         :empty-lines-before 1
+         :unnarrowed t)))
 
-(use-package! websocket
-    :after org-roam)
+  (use-package! websocket
+      :after org-roam)
 
-(use-package! org-roam-ui
-    :after org;; or :after org-roam
-;;  if you don't care about startup time, use
-;;  :hook (after-init . org-roam-ui-mode)
-    :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
+  (use-package! org-roam-ui
+      :after org;; or :after org-roam
+  ;;  if you don't care about startup time, use
+  ;;  :hook (after-init . org-roam-ui-mode)
+      :config
+      (setq org-roam-ui-sync-theme t
+            org-roam-ui-follow t
+            org-roam-ui-update-on-save t
+            org-roam-ui-open-on-start t))
 
-;; Org-roam search with Deft (https://www.orgroam.com/manual.html#Full_002dtext-search-with-Deft)
-(setq deft-use-filter-string-for-filename t)
-(setq deft-directory org-roam-directory)
-(setq deft-recursive t)
-(setq deft-strip-summary-regexp
-  (concat "\\("
-          "^:.+:.*\n" ; any line with a :SOMETHING:
-          "\\|^#\\+.*\n" ; anyline starting with a #+
-          "\\|^\\*.+.*\n" ; anyline where an asterisk starts the line
-          "\\)"))
+  ;; Org-roam search with Deft (https://www.orgroam.com/manual.html#Full_002dtext-search-with-Deft)
+  (setq deft-use-filter-string-for-filename t)
+  (setq deft-directory org-roam-directory)
+  (setq deft-recursive t)
+  (setq deft-strip-summary-regexp
+    (concat "\\("
+            "^:.+:.*\n" ; any line with a :SOMETHING:
+            "\\|^#\\+.*\n" ; anyline starting with a #+
+            "\\|^\\*.+.*\n" ; anyline where an asterisk starts the line
+            "\\)"))
 
-(advice-add 'deft-parse-title :override
-    (lambda (file contents)
-      (if deft-use-filename-as-title
-      (deft-base-filename file)
-    (let* ((case-fold-search 't)
-           (begin (string-match "title: " contents))
-           (end-of-begin (match-end 0))
-           (end (string-match "\n" contents begin)))
-      (if begin
-          (substring contents end-of-begin end)
-        (format "%s" file))))))
+  (advice-add 'deft-parse-title :override
+      (lambda (file contents)
+        (if deft-use-filename-as-title
+        (deft-base-filename file)
+      (let* ((case-fold-search 't)
+             (begin (string-match "title: " contents))
+             (end-of-begin (match-end 0))
+             (end (string-match "\n" contents begin)))
+        (if begin
+            (substring contents end-of-begin end)
+          (format "%s" file)))))))
 
 
 ;;
@@ -250,8 +259,9 @@
   (add-to-list 'org-agenda-files (concat SAFE_PLACE "/emacs-org/")))
 
 ;; Update agenda file-list for new session
-(after! org-roam
-  (my/org-update-agenda-files))
+(if (eq place-is-open t)
+  (after! org-roam
+    (my/org-update-agenda-files)))
 
 
 ;;
@@ -259,19 +269,20 @@
 ;;
 
 (after! org
-    (use-package ox-gemini))
+  (use-package ox-gemini))
 
 (map! :leader (:prefix ("l" "custom")) :desc "Open Elpher" :n "l e" #'elpher)
 
-(add-to-list 'org-publish-project-alist
+(if (eq place-is-open t)
+  (add-to-list 'org-publish-project-alist
     (list "gemini"
-          :recursive t
-          :base-directory (concat SAFE_PLACE "/gemini/")
-          :publishing-directory "~/develop/other/gemini/"
-          :publishing-function 'org-gemini-publish-to-gemini
-          :with-author nil
-          :section-numbers nil
-          :with-creator nil))
+       :recursive t
+       :base-directory (concat SAFE_PLACE "/gemini/")
+       :publishing-directory "~/develop/other/gemini/"
+       :publishing-function 'org-gemini-publish-to-gemini
+       :with-author nil
+       :section-numbers nil
+       :with-creator nil)))
 
 
 ;;
@@ -279,14 +290,16 @@
 ;;
 
 (with-eval-after-load "ispell"
-        (add-to-list
-         'ispell-local-dictionary-alist
-         '("en_US-large,ru_RU" "[[:alpha:]]" "[^[:alpha:]]" "['0-9]" t
-           ("-d" "en_US-large,ru_RU")
-           nil utf-8))
+  (add-to-list
+   'ispell-local-dictionary-alist
+   '("en_US-large,ru_RU" "[[:alpha:]]" "[^[:alpha:]]" "['0-9]" t
+    ("-d" "en_US-large,ru_RU") nil
+    utf-8))
 
-        (setq ispell-dictionary "en_US-large,ru_RU")
-        (setq ispell-personal-dictionary (concat SAFE_PLACE "/files/ispell-dictionary.txt")))
+  (setq ispell-dictionary "en_US-large,ru_RU")
+
+  (if (eq place-is-open t)
+      (setq ispell-personal-dictionary (concat SAFE_PLACE "/files/ispell-dictionary.txt"))))
 
 ;;
 ;; Vterm
@@ -302,8 +315,8 @@
 (setq auto-save-default t)
 
 (defun save-all ()
-        (interactive)
-        (save-some-buffers t))
+  (interactive)
+  (save-some-buffers t))
 
 (add-function :after after-focus-change-function 'save-all)
 
