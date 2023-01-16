@@ -54,9 +54,10 @@
 ;; Org-mode
 ;;
 
+
 (if (eq place-is-open t)
-  (setq org-directory (concat SAFE_PLACE "/emacs-org/"))
   (setq org-attach-id-dir (concat SAFE_PLACE "/files/attachments/"))
+  (setq org-directory (concat SAFE_PLACE "/emacs-org/"))
   (after! org
     (setq org-image-actual-width 600)
     (setq org-todo-keywords
@@ -66,6 +67,15 @@
       '(("IDEA" . (:foreground "brightcyan"))
         ("REVIEW" . (:foreground "#FDFD96")))) ;; pastel-yellow
      (setq org-log-done 'time)))
+     (setq org-publish-project-alist (list
+       (list "emacs-org"
+           :recursive t
+           :base-directory org-directory
+           :publishing-directory (concat org-directory "public/")
+           :exclude "public"
+           :publishing-function 'org-html-publish-to-html
+           :with-author nil
+           :with-creator nil)))
 
 (setq org-startup-with-inline-images t)
 
@@ -73,16 +83,6 @@
 
 (add-hook 'org-mode-hook 'writeroom-mode)
 (add-hook 'org-mode-hook 'mixed-pitch-mode)
-
-(setq org-publish-project-alist (list
-    (list "emacs-org"
-          :recursive t
-          :base-directory org-directory
-          :publishing-directory (concat org-directory "public/")
-          :exclude "public"
-          :publishing-function 'org-html-publish-to-html
-          :with-author nil
-          :with-creator nil)))
 
 (setq org-html-head "<fink rel=\"stylesheet\" type=\"text/css\" href=\"https://gongzhitaao.org/orgcss/org.css\"/>")
 
