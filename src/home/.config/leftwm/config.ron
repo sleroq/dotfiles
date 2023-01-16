@@ -68,8 +68,8 @@
         (command: Execute, value: "thunar", modifier: ["modkey"], key: "e"),
         (command: Execute, value: "feh --bg-fill --randomize \"$HOME\"/Pictures/wallpapers", modifier: ["modkey"], key: "w"),
 
-        (command: Execute, value: "xbacklight -inc 5", key: "XF86XK_MonBrightnessUp"),
-        (command: Execute, value: "xbacklight -dec 5", key: "XF86XK_MonBrightnessDown"),
+        (command: Execute, value: "xbacklight -inc 2", key: "XF86XK_MonBrightnessUp"),
+        (command: Execute, value: "xbacklight -dec 2", key: "XF86XK_MonBrightnessDown"),
         (command: Execute, value: "color-temp -i 500", modifier: ["Control"], key: "F2"),
         (command: Execute, value: "color-temp -d 500", modifier: ["Control"], key: "F1"),
 
