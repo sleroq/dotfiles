@@ -39,9 +39,6 @@
 
 (setq place-is-open (file-directory-p SAFE_PLACE))
 
-(if (eq place-is-open nil)
-    (message "meow"))
-
 ;;
 ;; Treemacs
 ;;
@@ -55,7 +52,7 @@
 ;;
 
 
-(if (eq place-is-open t)
+(when (eq place-is-open t)
   (setq org-attach-id-dir (concat SAFE_PLACE "/files/attachments/"))
   (setq org-directory (concat SAFE_PLACE "/emacs-org/"))
   (after! org
@@ -91,7 +88,7 @@
 ;; Org-Roam
 ;;
 
-(if (eq place-is-open t)
+(when (eq place-is-open t)
   (setq org-roam-directory (concat SAFE_PLACE "/roam/"))
 
   (add-to-list 'org-publish-project-alist
@@ -107,22 +104,22 @@
   (setq org-roam-capture-templates
       `(("d" "default" plain "%?" :target
           (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
-  #+PROPERTY: CREATED %T
-  #+startup: show2levels
-  #+category: ${title}
-  #+title: ${title}\n")
+#+PROPERTY: CREATED %T
+#+startup: show2levels
+#+category: ${title}
+#+title: ${title}\n")
           :unnarrowed t)
 
         ("p" "Person" plain
          (file ,(concat SAFE_PLACE "/templates/person.org"))
          :target
          (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
-  #+PROPERTY: Birthday %^{Birthday|<0000-00-00>}
-  #+PROPERTY: CREATED %T
-  #+category: ${title}
-  #+title: ${title}
-  #+startup: show2levels
-  #+filetags: :Person%^G\n")
+#+PROPERTY: Birthday %^{Birthday|<0000-00-00>}
+#+PROPERTY: CREATED %T
+#+category: ${title}
+#+title: ${title}
+#+startup: show2levels
+#+filetags: :Person%^G\n")
          :empty-lines-before 1
          :unnarrowed t)
 
@@ -130,11 +127,11 @@
          (file ,(concat SAFE_PLACE "/templates/monthly-archive.org"))
          :target
          (file+head "monthly/%<%Y-%m> ${slug}.org" "
-  #+PROPERTY: CREATED %T
-  #+category: %<%Y-%m> ${title}
-  #+title: %<%Y-%m> ${title}
-  #+startup: show2levels
-  #+filetags: :archive:\n")
+#+PROPERTY: CREATED %T
+#+category: %<%Y-%m> ${title}
+#+title: %<%Y-%m> ${title}
+#+startup: show2levels
+#+filetags: :archive:\n")
          :empty-lines-before 1
          :unnarrowed t)
 
@@ -142,11 +139,11 @@
          (file ,(concat SAFE_PLACE "/templates/anime.org"))
          :target
          (file+head "anime/%<%Y%m%d%H%M%S>-${slug}.org" "
-  #+PROPERTY: CREATED %T
-  #+category: ${title}
-  #+title: ${title}
-  #+startup: show2levels
-  #+filetags: :Anime:\n")
+#+PROPERTY: CREATED %T
+#+category: ${title}
+#+title: ${title}
+#+startup: show2levels
+#+filetags: :Anime:\n")
          :empty-lines-before 1
          :unnarrowed t)
 
@@ -156,11 +153,11 @@
          (file ,(concat SAFE_PLACE "/templates/game.org"))
          :target
          (file+head "gaming/%<%Y%m%d%H%M%S>-${slug}.org" "
-  #+PROPERTY: CREATED %T
-  #+category: ${title}
-  #+title: ${title}
-  #+startup: show2levels
-  #+filetags: :Gaming:\n")
+#+PROPERTY: CREATED %T
+#+category: ${title}
+#+title: ${title}
+#+startup: show2levels
+#+filetags: :Gaming:\n")
          :empty-lines-before 1
          :unnarrowed t)
 
@@ -168,11 +165,11 @@
          (file ,(concat SAFE_PLACE "/templates/game-note.org"))
          :target
          (file+head "gaming/%<%Y%m%d%H%M%S>-${slug}.org" "
-  #+PROPERTY: CREATED %T
-  #+category: ${title}
-  #+title: ${title}
-  #+startup: show2levels
-  #+filetags: :Gaming%^G\n")
+#+PROPERTY: CREATED %T
+#+category: ${title}
+#+title: ${title}
+#+startup: show2levels
+#+filetags: :Gaming%^G\n")
          :empty-lines-before 1
          :unnarrowed t)
 
@@ -180,11 +177,11 @@
          (file ,(concat SAFE_PLACE "/templates/book.org"))
          :target
          (file+head "reading/%<%Y%m%d%H%M%S>-${slug}.org" "
-  #+PROPERTY: CREATED %T
-  #+category: ${title}
-  #+title: ${title}
-  #+startup: show2levels
-  #+filetags: :Reading:\n")
+#+PROPERTY: CREATED %T
+#+category: ${title}
+#+title: ${title}
+#+startup: show2levels
+#+filetags: :Reading:\n")
          :empty-lines-before 1
          :unnarrowed t)
 
@@ -192,11 +189,11 @@
          (file ,(concat SAFE_PLACE "/templates/answer.org"))
          :target
          (file+head "answers/%<%Y%m%d%H%M%S>-${slug}.org" "
-  #+PROPERTY: CREATED %T
-  #+category: ${title}
-  #+title: ${title}
-  #+startup: show2levels
-  #+filetags: :Answer:\n")
+#+PROPERTY: CREATED %T
+#+category: ${title}
+#+title: ${title}
+#+startup: show2levels
+#+filetags: :Answer:\n")
          :empty-lines-before 1
          :unnarrowed t)))
 
@@ -225,16 +222,16 @@
             "\\)"))
 
   (advice-add 'deft-parse-title :override
-      (lambda (file contents)
-        (if deft-use-filename-as-title
+    (lambda (file contents)
+      (if deft-use-filename-as-title
         (deft-base-filename file)
       (let* ((case-fold-search 't)
-             (begin (string-match "title: " contents))
-             (end-of-begin (match-end 0))
-             (end (string-match "\n" contents begin)))
-        (if begin
-            (substring contents end-of-begin end)
-          (format "%s" file)))))))
+          (begin (string-match "title: " contents))
+          (end-of-begin (match-end 0))
+          (end (string-match "\n" contents begin)))
+      (if begin
+        (substring contents end-of-begin end)
+        (format "%s" file)))))))
 
 
 ;;
