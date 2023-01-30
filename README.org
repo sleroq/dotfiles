@@ -7,7 +7,7 @@
 
 This will try to link configurations folder to your =$HOME=
 #+begin_src bash
-stow -d src home -t ~/
+stow home -t ~/
 #+end_src
 
 ** Nix
