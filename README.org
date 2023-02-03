@@ -1,18 +1,17 @@
 * Dotfiles
 
-- [[https://nixos.org/][Nix]] for ~~reproducible packages~~ everything
+- [[https://nixos.org/][Nix]] for +reproducible packages+ everything
 
 ** Install
 
-1. Install [[https://github.com/nix-community/home-manager][home manager]]
-2. Enable flakes
-3. git clone https://github.com/nix-community/home-manager.git ~/somewhere
-4. cp -r ~/somewhere/.config/nixpkgs ~/.config/
+1. Enable flakes
+2. =git clone https://github.com/nix-community/home-manager.git ~/somewhere=
+3. [[https://nix-community.github.io/home-manager/index.html#sec-flakes-standalone][Install home manager]]
+4. Remove =.git=, change username and make it your own
 
 Other configurations, which are not in nix yet, you can sync using [[https://www.gnu.org/software/stow/][Stow]].
 
 ** How to understand Nix?
 
-This repo really helped me - https://github.com/hlissner/dotfiles#frequently-asked-questions
-
-Most importantly - https://www.youtube.com/watch?v=Eni9PPPPBpg
+- [[https://github.com/hlissner/dotfiles#frequently-asked-questions][Read links at the buttom]]
+- [[https://www.youtube.com/watch?v=Eni9PPPPBpg][Listen to this]]
