@@ -9,7 +9,7 @@
 3. [[https://nix-community.github.io/home-manager/index.html#sec-flakes-standalone][Install home manager]]
 4. Remove =.git=, change username and make it your own
 
-Other configurations, which are not in nix yet, you can sync using [[https://www.gnu.org/software/stow/][Stow]].
+Other configurations, which are not in nix yet (=.config/=), you can sync using [[https://www.gnu.org/software/stow/][Stow]].
 
 ** How to understand Nix?
 
