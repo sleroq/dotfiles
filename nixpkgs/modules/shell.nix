@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, opts, ... }:
 
 {
   programs.zsh = {
@@ -25,7 +25,7 @@
       path+=("$HOME/.local/bin")
 
       # Scripts
-      path+=("$HOME/develop/other/dotfiles/scripts")
+      path+=("${opts.dotfiles}")
 
       # Safe place
       export SAFE_PLACE=/tmp/vault

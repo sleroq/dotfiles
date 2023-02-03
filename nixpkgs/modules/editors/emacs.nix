@@ -10,7 +10,7 @@ with lib;
 
   home.file.".doom.d" = {
     enable = true;
-    source = ../../config/.doom.d; # TODO: Fix this
+    source = opts.configs + /.doom.d;
   };
 
   home.sessionPath = [

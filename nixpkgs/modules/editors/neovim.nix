@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, opts, ... }:
 
 with config;
 {
@@ -8,7 +8,7 @@ with config;
 
   xdg.configFile.nvim = {
     enable = true;
-    source = ../../config/nvim;
+    source = opts.configs + /nvim;
   };
 
   home.packages = with pkgs; [

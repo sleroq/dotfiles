@@ -4,9 +4,6 @@ with lib;
 {
   programs.zsh = mkIf opts.zsh-integration {
     envExtra = ''
-      # Emacs
-      path+=("$HOME/.emacs.d/bin")
-
       # Node.js
       path+=("$HOME/develop/node.js/bin")
       export N_PREFIX="$HOME/develop/node.js"

@@ -24,6 +24,7 @@
       pkgs = import nixpkgs {
         inherit system;
       };
+      dotfiles = ../.;
     in
     {
       homeConfigurations."${user}" = home-manager.lib.homeManagerConfiguration {
@@ -46,7 +47,12 @@
         
         extraSpecialArgs = {
           emacs-overlay = self.inputs.emacs-overlay;
-          opts = { zsh-integration = true; };
+          opts = {
+            zsh-integration = true;
+            old-configs = dotfiles + /.config;
+            configs = dotfiles + /nixpkgs/config;
+            dotfiles = dotfiles;
+          };
         };
       };
     };
