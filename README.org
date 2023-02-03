@@ -1,16 +1,17 @@
 * Dotfiles
 
-- [[https://www.gnu.org/software/stow/][Stow]] for managing dotfiles
-- [[https://nixos.org/][Nix]] for reproducible packages
+- [[https://nixos.org/][Nix]] for +reproducible packages+ everything
 
 ** Install
 
-This will try to link configurations folder to your =$HOME=
-#+begin_src bash
-stow -d src home -t ~/
-#+end_src
+1. Enable flakes
+2. =git clone https://github.com/nix-community/home-manager.git ~/somewhere=
+3. [[https://nix-community.github.io/home-manager/index.html#sec-flakes-standalone][Install home manager]]
+4. Remove =.git=, change username and make it your own
 
-** Nix
+Other configurations, which are not in nix yet (=.config/=), you can sync using [[https://www.gnu.org/software/stow/][Stow]].
 
-Some of dependencies and apps installed with [[https://nixos.org/][nix]]
-here is my [[~/develop/other/dotfiles/src/home/.config/nixpkgs/config.nix][config.nix]]
+** How to understand Nix?
+
+- [[https://github.com/hlissner/dotfiles#frequently-asked-questions][Read links at the buttom]]
+- [[https://www.youtube.com/watch?v=Eni9PPPPBpg][Listen to this]]
