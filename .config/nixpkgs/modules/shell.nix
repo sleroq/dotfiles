@@ -7,6 +7,8 @@
       cd = "z";
       update = "sudo nixos-rebuild switch --upgrade";
       hmdate = "home-manager switch";
+      sudo = "sudo ";
+      tmus = "tmux -f ~/.config/tmux/tmux.conf";
     };
     history = {
       size = 100000000;
@@ -25,16 +27,20 @@
       # Scripts
       path+=("$HOME/develop/other/dotfiles/scripts")
 
-      # Node.js
-      path+=("$HOME/develop/node.js/bin")
-      export N_PREFIX="$HOME/develop/node.js"
-
-      # Golang
-      export GOPATH=$HOME/develop/go
-      path+=("$(go env GOPATH)/bin")
-
       # Safe place
       export SAFE_PLACE=/tmp/vault
+
+      # Wayland
+      if [[ -z $DESKTOP_SESSION || $XDG_SESSION_TYPE != 'x11' ]]
+      then
+        export MOZ_ENABLE_WAYLAND=1
+        export QT_QPA_PLATFORM=wayland-egl
+        export ELM_DISPLAY=wl
+        export SDL_VIDEODRIVER=wayland
+        export _JAVA_AWT_WM_NONREPARENTING=1
+        export XDG_CURRENT_DESKTOP=sway
+        export XDG_SESSION_DESKTOP=sway
+      fi
     '';
   };
 
@@ -42,4 +48,19 @@
     enable = true;
     enableZshIntegration = true;
   };
+
+  home.packages = with pkgs; [
+    zsh
+    nix-zsh-completions
+    zoxide
+    oh-my-zsh
+    bat
+    exa
+    fasd
+    fd
+    fzf
+    jq
+    ripgrep
+    tldr
+  ];
 }

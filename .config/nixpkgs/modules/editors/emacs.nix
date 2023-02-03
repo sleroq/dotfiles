@@ -1,4 +1,4 @@
-{ config, pkgs, lib, emacs-overlay, zsh-integration ? true, ... }:
+{ config, pkgs, lib, opts, emacs-overlay, ... }:
 
 with lib;
 {
@@ -17,7 +17,7 @@ with lib;
     "${config.xdg.configHome}/.emacs.d/bin"
   ];
 
-  programs.zsh = mkIf zsh-integration {
+  programs.zsh = mkIf opts.zsh-integration {
     envExtra = ''
       # Emacs
       path+=("$HOME/.emacs.d/bin")
@@ -31,8 +31,12 @@ with lib;
     binutils # native-comp needs 'as', provided by this
     # 28.2 + native-comp
     # ((emacsPackagesFor emacsUnstable).emacsWithPackages
-      # (epkgs: [ epkgs.vterm ]))
-    emacsUnstable
+    #   (epkgs: [ epkgs.vterm ]))
+    ((emacsPackagesFor emacs).emacsWithPackages (epkgs: [
+      epkgs.vterm
+    ]))
+    libvterm
+    libtool
 
     ## Doom dependencies
     git
@@ -58,6 +62,9 @@ with lib;
     # fava # HACK Momentarily broken on nixos-unstable
 
     shellcheck
+
+    # Nix
+    nixfmt
 
     emacs-all-the-icons-fonts
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })

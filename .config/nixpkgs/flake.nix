@@ -24,7 +24,6 @@
       pkgs = import nixpkgs {
         inherit system;
       };
-      # emacs-overlay = self.inputs.emacs-overlay;
     in
     {
       homeConfigurations."${user}" = home-manager.lib.homeManagerConfiguration {
@@ -39,6 +38,7 @@
           ./modules/editors/neovim.nix
           ./modules/shell.nix
           ./modules/gaming.nix
+          ./modules/development.nix
         ];
         
         # Optionally use extraSpecialArgs
@@ -46,7 +46,7 @@
         
         extraSpecialArgs = {
           emacs-overlay = self.inputs.emacs-overlay;
-          zsh-integration = true;
+          opts = { zsh-integration = true; };
         };
       };
     };

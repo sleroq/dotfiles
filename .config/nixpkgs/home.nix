@@ -31,14 +31,6 @@
     qbittorrent
     safeeyes
 
-    vscode-fhs
-    docker
-    go
-    nodejs
-    gcc
-    gnumake
-    zig
-
     skypeforlinux
     remmina
     nomachine-client
@@ -51,7 +43,6 @@
     xclip
     onefetch
     bpytop
-    zoxide
     bore
     ngrok
 
