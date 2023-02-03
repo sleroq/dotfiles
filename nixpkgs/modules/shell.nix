@@ -25,7 +25,15 @@
       path+=("$HOME/.local/bin")
 
       # Scripts
+<<<<<<< HEAD
+<<<<<<< HEAD
+      path+=("${opts.dotfiles}/scripts")
+=======
       path+=("${opts.dotfiles}")
+>>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
+=======
+      path+=("${opts.dotfiles}")
+>>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
 
       # Safe place
       export SAFE_PLACE=/tmp/vault

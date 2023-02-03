@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 hotkeysRC="$XDG_CONFIG_HOME/kglobalshortcutsrc"
 

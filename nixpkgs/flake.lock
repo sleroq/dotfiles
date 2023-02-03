@@ -6,11 +6,25 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
+<<<<<<< HEAD
+<<<<<<< HEAD
+        "lastModified": 1675419601,
+        "narHash": "sha256-Zt6VnU6CLxaISGmPNMGiD0A9BcgcXJTEuX196M11RYw=",
+        "owner": "nix-community",
+        "repo": "emacs-overlay",
+        "rev": "88dcf53013b1f8f0a6a1766fc76ed181e0a6a8db",
+=======
+=======
+>>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
         "lastModified": 1675362118,
         "narHash": "sha256-11CqDTkQA9P5I4InVCXmj/IaHvz4nUJaLNFiDiHVvIg=",
         "owner": "nix-community",
         "repo": "emacs-overlay",
         "rev": "a018577287e390e01654a8b44d57d183a51b72b2",
+<<<<<<< HEAD
+>>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
+=======
+>>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
         "type": "github"
       },
       "original": {
@@ -42,11 +56,25 @@
         "utils": "utils"
       },
       "locked": {
+<<<<<<< HEAD
+<<<<<<< HEAD
+        "lastModified": 1675371293,
+        "narHash": "sha256-LrCjtrAXj/WJphhGEMnHgZs7oTsfOlvPfOjFTIvg39k=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "d1c7730bb707bf8124d997952f7babd2a281ae68",
+=======
+=======
+>>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
         "lastModified": 1675303228,
         "narHash": "sha256-dHJbFg7gTuTyEUdJoNDp6l2bac6HXAT/bz9cVEqL+Uw=",
         "owner": "nix-community",
         "repo": "home-manager",
         "rev": "4a958524903e6019f5f69a23e0c0f16e5af01eb0",
+<<<<<<< HEAD
+>>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
+=======
+>>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
         "type": "github"
       },
       "original": {
@@ -73,11 +101,25 @@
     },
     "nixpkgs_2": {
       "locked": {
+<<<<<<< HEAD
+<<<<<<< HEAD
+        "lastModified": 1675273418,
+        "narHash": "sha256-tpYc4TEGvDzh9uRf44QemyQ4TpVuUbxb07b2P99XDbM=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "4d7c2644dbac9cf8282c0afe68fca8f0f3e7b2db",
+=======
+=======
+>>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
         "lastModified": 1675183161,
         "narHash": "sha256-Zq8sNgAxDckpn7tJo7V1afRSk2eoVbu3OjI1QklGLNg=",
         "owner": "nixos",
         "repo": "nixpkgs",
         "rev": "e1e1b192c1a5aab2960bf0a0bd53a2e8124fa18e",
+<<<<<<< HEAD
+>>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
+=======
+>>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
         "type": "github"
       },
       "original": {
