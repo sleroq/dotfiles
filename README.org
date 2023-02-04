@@ -1,12 +1,12 @@
 * Dotfiles
 
-- [[https://nixos.org/][Nix]] for +reproducible packages+ everything
+Using [[https://nixos.org/][nix]] for +reproducible packages+ everything I can
 
 ** Install
 
 1. Enable flakes
 2. =git clone https://github.com/nix-community/home-manager.git ~/somewhere=
-3. [[https://nix-community.github.io/home-manager/index.html#sec-flakes-standalone][Install home manager]]
+3. [[https://nix-community.github.io/home-manager/index.html#sec-flakes-standalone][Install home manager]] (with flakes)
 4. Configure in [[./nixpkgs/flake.nix][flake.nix]]
 5. Remove =.git= and make it your own
 
