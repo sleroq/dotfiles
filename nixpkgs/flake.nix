@@ -10,6 +10,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     emacs-overlay.url  = "github:nix-community/emacs-overlay";
+    nix-gaming.url = "github:fufexan/nix-gaming";
   };
 
   outputs = 

@@ -24,7 +24,6 @@
     exodus
     krita
     obs-studio
-    opentabletdriver
     mpv
     networkmanagerapplet
     networkmanager-openvpn
