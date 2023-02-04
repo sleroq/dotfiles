@@ -6,25 +6,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-<<<<<<< HEAD
-<<<<<<< HEAD
         "lastModified": 1675419601,
         "narHash": "sha256-Zt6VnU6CLxaISGmPNMGiD0A9BcgcXJTEuX196M11RYw=",
         "owner": "nix-community",
         "repo": "emacs-overlay",
         "rev": "88dcf53013b1f8f0a6a1766fc76ed181e0a6a8db",
-=======
-=======
->>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
-        "lastModified": 1675362118,
-        "narHash": "sha256-11CqDTkQA9P5I4InVCXmj/IaHvz4nUJaLNFiDiHVvIg=",
-        "owner": "nix-community",
-        "repo": "emacs-overlay",
-        "rev": "a018577287e390e01654a8b44d57d183a51b72b2",
-<<<<<<< HEAD
->>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
-=======
->>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
         "type": "github"
       },
       "original": {
@@ -56,30 +42,34 @@
         "utils": "utils"
       },
       "locked": {
-<<<<<<< HEAD
-<<<<<<< HEAD
         "lastModified": 1675371293,
         "narHash": "sha256-LrCjtrAXj/WJphhGEMnHgZs7oTsfOlvPfOjFTIvg39k=",
         "owner": "nix-community",
         "repo": "home-manager",
         "rev": "d1c7730bb707bf8124d997952f7babd2a281ae68",
-=======
-=======
->>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
-        "lastModified": 1675303228,
-        "narHash": "sha256-dHJbFg7gTuTyEUdJoNDp6l2bac6HXAT/bz9cVEqL+Uw=",
-        "owner": "nix-community",
-        "repo": "home-manager",
-        "rev": "4a958524903e6019f5f69a23e0c0f16e5af01eb0",
-<<<<<<< HEAD
->>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
-=======
->>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
         "type": "github"
       },
       "original": {
         "owner": "nix-community",
         "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "nix-gaming": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "lastModified": 1675100158,
+        "narHash": "sha256-B8Nhm28gfhjKQQJC3Za34pNrrgG0wCdrSwMwXq4W95k=",
+        "owner": "fufexan",
+        "repo": "nix-gaming",
+        "rev": "60c20c3c8682aaf55022e168b5b91f4dbd69849a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "fufexan",
+        "repo": "nix-gaming",
         "type": "github"
       }
     },
@@ -101,25 +91,27 @@
     },
     "nixpkgs_2": {
       "locked": {
-<<<<<<< HEAD
-<<<<<<< HEAD
+        "lastModified": 1663491030,
+        "narHash": "sha256-MVsfBhE9US5DvLtBAaTRjwYdv1tLO8xjahM8qLXTgTo=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "767542707d394ff15ac1981e903e005ba69528b5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
+      "locked": {
         "lastModified": 1675273418,
         "narHash": "sha256-tpYc4TEGvDzh9uRf44QemyQ4TpVuUbxb07b2P99XDbM=",
         "owner": "nixos",
         "repo": "nixpkgs",
         "rev": "4d7c2644dbac9cf8282c0afe68fca8f0f3e7b2db",
-=======
-=======
->>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
-        "lastModified": 1675183161,
-        "narHash": "sha256-Zq8sNgAxDckpn7tJo7V1afRSk2eoVbu3OjI1QklGLNg=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "e1e1b192c1a5aab2960bf0a0bd53a2e8124fa18e",
-<<<<<<< HEAD
->>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
-=======
->>>>>>> 9fa803c (Merge pull request #5 from sleroq/nixos)
         "type": "github"
       },
       "original": {
@@ -133,7 +125,8 @@
       "inputs": {
         "emacs-overlay": "emacs-overlay",
         "home-manager": "home-manager",
-        "nixpkgs": "nixpkgs_2"
+        "nix-gaming": "nix-gaming",
+        "nixpkgs": "nixpkgs_3"
       }
     },
     "utils": {
