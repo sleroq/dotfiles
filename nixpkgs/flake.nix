@@ -31,9 +31,6 @@
       homeConfigurations."${user}" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
 
-        # Specify your home configuration modules here, for example,
-        # the path to your home.nix.
-
         modules = [
           ./home.nix
           ./modules/editors/emacs.nix
@@ -43,16 +40,14 @@
           ./modules/development.nix
         ];
         
-        # Optionally use extraSpecialArgs
-        # to pass through arguments to home.nix
-        
         extraSpecialArgs = {
-          emacs-overlay = self.inputs.emacs-overlay;
+          inputs = self.inputs;
           opts = {
             zsh-integration = true;
             old-configs = dotfiles + /.config;
             configs = dotfiles + /nixpkgs/config;
             dotfiles = dotfiles;
+            realConfigs = "/home/" + user + "/develop/other/dotfiles/nixpkgs/config";
           };
         };
       };

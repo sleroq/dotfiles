@@ -1,8 +1,8 @@
-{ config, pkgs, lib, opts, emacs-overlay, ... }:
+{ config, pkgs, lib, opts, inputs, ... }:
 
 with lib;
 {
-  nixpkgs.overlays = [ emacs-overlay.overlay ];
+  nixpkgs.overlays = [ inputs.emacs-overlay.overlay ];
   services.emacs = {
     enable = true;
     package = pkgs.emacsUnstable;

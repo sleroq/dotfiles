@@ -16,7 +16,6 @@ with lib;
 
   home.packages = with pkgs; [
     vscode-fhs
-    docker
     go
     nodejs
     gcc
