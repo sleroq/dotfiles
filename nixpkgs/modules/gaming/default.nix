@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 {
-  imports = [ ./games/osu.nix ];
+  imports = [ ./osu.nix ];
 
   config = {
     home.packages = with pkgs; [

@@ -1,8 +1,6 @@
 { config, pkgs, ... }:
 
 {
-  # Home Manager needs a bit of information about you and the
-  # paths it should manage.
   home.username = "sleroq";
   home.homeDirectory = "/home/sleroq";
 
@@ -15,36 +13,6 @@
   fonts.fontconfig.enable = true;
 
   home.packages = with pkgs; [
-    tdesktop
-    discord
-    schildichat-desktop
-    keepassxc
-    flameshot
-    chromium
-    exodus
-    krita
-    obs-studio
-    mpv
-    networkmanagerapplet
-    networkmanager-openvpn
-    qbittorrent
-    safeeyes
-
-    skypeforlinux
-    remmina
-    nomachine-client
-    rustdesk
-
-    kitty
-    thefuck
-    gocryptfs
-    stow
-    xclip
-    onefetch
-    bpytop
-    bore
-    ngrok
-
     libsForQt5.ark
     libsForQt5.filelight
     libsForQt5.kdeconnect-kde
@@ -73,5 +41,6 @@
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
+
   nixpkgs.config.allowUnfreePredicate = (_: true);
 }

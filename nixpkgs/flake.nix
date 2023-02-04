@@ -33,11 +33,11 @@
 
         modules = [
           ./home.nix
-          ./modules/editors/emacs.nix
-          ./modules/editors/neovim.nix
-          ./modules/shell.nix
-          ./modules/gaming.nix
+          ./modules/editors/default.nix
+          ./modules/gaming/default.nix
           ./modules/development.nix
+          ./modules/shell.nix
+          ./modules/wm.nix
         ];
         
         extraSpecialArgs = {
