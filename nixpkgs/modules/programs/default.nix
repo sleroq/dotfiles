@@ -36,6 +36,7 @@ with config;
     bpytop
     bore
     ngrok
+    neofetch
 
     # Work
     skypeforlinux
