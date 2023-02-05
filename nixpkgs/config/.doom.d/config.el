@@ -37,7 +37,7 @@
 
 (setq SAFE_PLACE (getenv "SAFE_PLACE"))
 
-(setq place-is-open (file-directory-p SAFE_PLACE))
+(setq place-is-open (and (string-empty-p SAFE_PLACE) (file-directory-p SAFE_PLACE)))
 
 ;;
 ;; Treemacs
