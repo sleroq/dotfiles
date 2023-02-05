@@ -1,4 +1,4 @@
-{ config, pkgs, opts, ... }:
+{ config, pkgs, opts, lib, ... }:
 
 with config;
 {
@@ -6,10 +6,15 @@ with config;
     enable = true;
   };
 
-  xdg.configFile.nvim = {
-    enable = true;
-    source = opts.configs + /nvim;
-  };
+  home.activation.neovim = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+        ${opts.realConfigs}/nvim $HOME/.config
+  '';
+
+  # xdg.configFile.nvim = {
+  #   enable = true;
+  #   source = opts.configs + /nvim;
+  # };
 
   home.packages = with pkgs; [
     ripgrep

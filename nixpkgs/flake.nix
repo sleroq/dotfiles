@@ -9,11 +9,11 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    emacs-overlay.url  = "github:nix-community/emacs-overlay";
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
     nix-gaming.url = "github:fufexan/nix-gaming";
   };
 
-  outputs = 
+  outputs =
     { self
     , nixpkgs
     , home-manager
@@ -40,7 +40,7 @@
           ./modules/development.nix
           ./modules/shell.nix
         ];
-        
+
         extraSpecialArgs = {
           inputs = self.inputs;
           opts = {
