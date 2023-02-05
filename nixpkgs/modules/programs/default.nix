@@ -2,19 +2,24 @@
 
 with config;
 {
-  imports = [ ./tmux.nix ];
+  imports = [
+    ./tmux.nix
+    ./lf.nix
+  ];
+
+  services.flameshot.enable = true;
 
   home.packages = with pkgs; [
     tdesktop
     discord
     schildichat-desktop
     keepassxc
-    flameshot
     chromium
     exodus
     krita
-    obs-studio
+    libreoffice-fresh
     mpv
+    obs-studio
     networkmanager-openvpn
     qbittorrent
     safeeyes
