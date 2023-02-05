@@ -36,9 +36,9 @@
           ./modules/editors/default.nix
           ./modules/gaming/default.nix
           ./modules/programs/default.nix
+          ./modules/wms/default.nix
           ./modules/development.nix
           ./modules/shell.nix
-          ./modules/wm.nix
         ];
         
         extraSpecialArgs = {
