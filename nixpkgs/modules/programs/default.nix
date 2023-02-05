@@ -5,6 +5,7 @@ with config;
   imports = [
     ./tmux.nix
     ./lf.nix
+    ./zathura.nix
   ];
 
   services.flameshot.enable = true;
