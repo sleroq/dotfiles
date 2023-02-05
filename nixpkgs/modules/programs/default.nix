@@ -12,7 +12,6 @@ with config;
   services.flameshot.enable = true;
   services.safeeyes.enable = true;
   services.kdeconnect.enable = true;
-  services.keepassxc.enable = true;
 
   home.packages = with pkgs; [
     tdesktop
@@ -27,6 +26,7 @@ with config;
     obs-studio
     networkmanager-openvpn
     qbittorrent
+    keepassxc
 
     # CLI
     thefuck
