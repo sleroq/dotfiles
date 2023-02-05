@@ -6,6 +6,7 @@ with config;
     ./tmux.nix
     ./lf.nix
     ./zathura.nix
+    ./kitty.nix
   ];
 
   services.flameshot.enable = true;
@@ -25,7 +26,6 @@ with config;
     networkmanager-openvpn
     qbittorrent
     safeeyes
-    kitty
 
     # CLI
     thefuck
