@@ -9,14 +9,18 @@ with lib;
       export N_PREFIX="$HOME/develop/node.js"
 
       # Golang
-      export GOPATH=$HOME/develop/go
       path+=("$(go env GOPATH)/bin")
     '';
   };
 
+  programs.go = {
+    enable = true;
+    goPath = "develop/go";
+    goBin = "develop/go/bin";
+  };
+
   home.packages = with pkgs; [
     vscode-fhs
-    go
     nodejs
     gcc
     gnumake
