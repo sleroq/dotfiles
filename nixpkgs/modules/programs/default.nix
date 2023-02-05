@@ -10,12 +10,14 @@ with config;
   ];
 
   services.flameshot.enable = true;
+  services.safeeyes.enable = true;
+  services.kdeconnect.enable = true;
+  services.keepassxc.enable = true;
 
   home.packages = with pkgs; [
     tdesktop
     discord
     schildichat-desktop
-    keepassxc
     chromium
     exodus
     krita
@@ -25,7 +27,6 @@ with config;
     obs-studio
     networkmanager-openvpn
     qbittorrent
-    safeeyes
 
     # CLI
     thefuck

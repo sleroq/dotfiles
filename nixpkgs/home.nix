@@ -15,7 +15,6 @@
   home.packages = with pkgs; [
     libsForQt5.ark
     libsForQt5.filelight
-    libsForQt5.kdeconnect-kde
 
     p7zip
     unzip
