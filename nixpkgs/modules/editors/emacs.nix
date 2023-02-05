@@ -8,14 +8,10 @@ with lib;
     package = pkgs.emacsUnstable;
   };
 
- home.activation.emacs = hm.dag.entryAfter ["writeBoundary"] ''
-   $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
-       ${opts.realConfigs}/.doom.d $HOME
- '';
-
-  home.sessionPath = [
-    "${config.xdg.configHome}/.emacs.d/bin"
-  ];
+  home.activation.emacs = hm.dag.entryAfter [ "writeBoundary" ] ''
+    $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+        ${opts.realConfigs}/.doom.d $HOME
+  '';
 
   programs.zsh = mkIf opts.zsh-integration {
     envExtra = ''
