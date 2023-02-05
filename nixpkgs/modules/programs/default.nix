@@ -17,6 +17,7 @@ with config;
     chromium
     exodus
     krita
+    gimp
     libreoffice-fresh
     mpv
     obs-studio
