@@ -20,6 +20,8 @@ with config;
     chromium
     exodus
     krita
+    libsForQt5.kdenlive
+    ngrok
     gimp
     libreoffice-fresh
     mpv
@@ -35,9 +37,12 @@ with config;
     xclip
     onefetch
     bpytop
-    bore
+    bore-cli
     ngrok
     neofetch
+    ffmpeg
+    # shadowsocks-libev
+    # shadowsocks-v2ray-plugin
 
     # Work
     skypeforlinux
