@@ -2,10 +2,10 @@
 
 with config;
 {
-  nixpkgs.overlays = [ inputs.neovim-nightly-overlay.overlay ];
+  # nixpkgs.overlays = [ inputs.neovim-nightly-overlay.overlay ];
   programs.neovim = {
     enable = true;
-    package = pkgs.neovim-nightly;
+    # package = pkgs.neovim-nightly;
   };
 
   home.activation.neovim = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -24,6 +24,7 @@ with config;
     cargo
     shellcheck
     stylua
+    tree-sitter
     luajitPackages.luarocks
 
     emacs-all-the-icons-fonts
