@@ -1,9 +1,11 @@
-{ config, pkgs, opts, lib, ... }:
+{ config, pkgs, opts, lib, inputs, ... }:
 
 with config;
 {
+  nixpkgs.overlays = [ inputs.neovim-nightly-overlay.overlay ];
   programs.neovim = {
     enable = true;
+    package = pkgs.neovim-nightly;
   };
 
   home.activation.neovim = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -11,12 +13,9 @@ with config;
         ${opts.realConfigs}/nvim $HOME/.config
   '';
 
-  # xdg.configFile.nvim = {
-  #   enable = true;
-  #   source = opts.configs + /nvim;
-  # };
-
   home.packages = with pkgs; [
+    neovide
+
     ripgrep
     fd
     lazygit
@@ -24,6 +23,8 @@ with config;
     nodejs
     cargo
     shellcheck
+    stylua
+    luajitPackages.luarocks
 
     emacs-all-the-icons-fonts
   ];
