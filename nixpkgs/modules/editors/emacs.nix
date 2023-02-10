@@ -26,13 +26,9 @@ with lib;
     ## Emacs itself
     binutils # native-comp needs 'as', provided by this
     # 28.2 + native-comp
-    # ((emacsPackagesFor emacsUnstable).emacsWithPackages
-    #   (epkgs: [ epkgs.vterm ]))
-    ((emacsPackagesFor emacs).emacsWithPackages (epkgs: [
+    ((emacsPackagesFor emacsUnstable).emacsWithPackages (epkgs: [
       epkgs.vterm
     ]))
-    libvterm
-    libtool
 
     ## Doom dependencies
     git

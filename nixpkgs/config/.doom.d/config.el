@@ -33,11 +33,11 @@
 (setq display-line-numbers-type t)
 (setq undo-limit 50000000)
 
-(setq server-socket-dir "/tmp/emacs1000")
+;; (setq server-socket-dir "/tmp/emacs1000")
 
 (setq SAFE_PLACE (getenv "SAFE_PLACE"))
 
-(setq place-is-open (and (string-empty-p SAFE_PLACE) (file-directory-p SAFE_PLACE)))
+(setq place-is-open (and (not (string-empty-p SAFE_PLACE)) (file-directory-p SAFE_PLACE)))
 
 ;;
 ;; Treemacs

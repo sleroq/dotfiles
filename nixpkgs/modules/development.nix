@@ -22,8 +22,12 @@ with lib;
   home.packages = with pkgs; [
     vscode-fhs
     nodejs
+    nodePackages_latest.typescript
+    nodePackages_latest.typescript-language-server
+
     gcc
     gnumake
     zig
+    lapce
   ];
 }
