@@ -16,6 +16,9 @@ with config;
   home.packages = with pkgs; [
     neovide
 
+    tabnine
+    codeium
+
     ripgrep
     fd
     lazygit

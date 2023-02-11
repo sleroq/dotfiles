@@ -24,6 +24,7 @@
       user = "sleroq";
       pkgs = import nixpkgs {
         inherit system;
+        overlays = [ (import ./overlays.nix self.inputs) ];
       };
       dotfiles = ../.;
     in
