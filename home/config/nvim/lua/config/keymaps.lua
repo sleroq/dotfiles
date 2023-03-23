@@ -19,5 +19,6 @@ map("n", "<leader>tm", ":TZMinimalist<CR>")
 map("", "<leader>ft", "<nop>")
 map("", "<leader>fT", "<nop>")
 
+
 map("n", "<leader>tt", function() Util.float_term(nil, { cwd = Util.get_root() }) end, { desc = "Terminal (root dir)" })
 map("n", "<leader>tT", function() Util.float_term() end, { desc = "Terminal (cwd)" })

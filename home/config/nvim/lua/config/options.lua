@@ -8,3 +8,7 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 vim.opt.wildignore:append{ "*/node_modules/*" }
+
+vim.g.markdown_fenced_languages = {
+  "ts=typescript"
+}

@@ -101,4 +101,11 @@ return {
   --     opts.sources = cmp.config.sources(vim.list_extend(opts.sources, { { name = "codeium" } }))
   --   end,
   -- }
+ -- {
+ --   "neovim/nvim-lspconfig",
+ --   dependencies = { "jose-elias-alvarez/typescript.nvim" },
+ --   config = function()
+ --     require'lspconfig'.denols.setup{}
+ --   end,
+ -- },
 }
