@@ -20,11 +20,11 @@
 }:
 let
   pname = "jetbrains-toolbox";
-  version = "1.27.2.13801";
+  version = "1.27.3.14493";
   name = "jetbrains-toolbox";
   src = fetchzip {
     url = "https://download.jetbrains.com/toolbox/jetbrains-toolbox-${version}.tar.gz";
-    sha256 = "sha256-kgco+ch/TlNGQ53uBHgdOCO4dey23D5aufOzZ/XK7+A=";
+    sha256 = "sha256-aK5T95Yg8Us8vkznWlDHnPiPAKiUtlU0Eswl9rD01VY=";
     stripRoot = false;
   };
   libPath = lib.makeLibraryPath [ stdenv.cc.cc.lib glibc xorg.xcbutilkeysyms gcc zlib libsecret xorg.libXext ];
