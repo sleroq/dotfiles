@@ -13,7 +13,7 @@ in
   programs.git = {
     enable = true;
     userName = "Sleroq";
-    userEmail = "sleroq@sleroq.link";
+    userEmail = "hireme@sleroq.link";
   };
 
   xsession = {
@@ -61,4 +61,7 @@ in
   programs.home-manager.enable = true;
 
   nixpkgs.config.allowUnfreePredicate = (_: true);
+  nixpkgs.config.permittedInsecurePackages = [
+    "python-2.7.18.6"
+  ];
 }
