@@ -27,7 +27,7 @@ with lib;
     # Screen-locking:
     slock
     i3lock
-    # maim
+    maim
     imagemagick
   ];
 }
