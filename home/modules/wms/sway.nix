@@ -10,11 +10,10 @@ with lib;
         ${opts.realConfigs}/waybar $HOME/.config
   '';
 
- #  programs.zsh = mkIf opts.zsh-integration {
- #    envExtra = ''
- #      path+=("${opts.realConfigs}")
- #    '';
- #  };
+ # programs.zsh = mkIf opts.zsh-integration {
+ #   envExtra = ''
+ #   '';
+ # };
 
   services.gammastep = {
     enable = true;
@@ -44,5 +43,7 @@ with lib;
     wofi
     pulseaudioFull
     gammastep       # screen temperature
+    lxappearance
+    qt5ct
   ];
 }

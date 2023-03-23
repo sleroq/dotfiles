@@ -20,18 +20,21 @@ with lib;
   };
 
   home.packages = with pkgs; [
-    vscode-fhs
     nodejs
+    yarn
+    deno
     nodePackages_latest.typescript
     nodePackages_latest.typescript-language-server
+    niv
 
     mongodb-compass
+    pgadmin4
+    postgresql_15
     # radicle-cli
 
+    exiftool
     gcc
     gnumake
     zig
-    lapce
-    jetbrains-toolbox
   ];
 }
