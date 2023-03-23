@@ -20,6 +20,7 @@
       # Waiting for https://github.com/NixOS/nixpkgs/pull/208559
       # ctpv
 
+      picom
       exiftool
       atool
       ffmpegthumbnailer
