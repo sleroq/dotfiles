@@ -8,9 +8,14 @@ with lib;
   #   package = pkgs.emacsUnstable;
   # };
 
-  home.activation.emacs = hm.dag.entryAfter [ "writeBoundary" ] ''
+  # home.activation.emacs = hm.dag.entryAfter [ "writeBoundary" ] ''
+  #   $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+  #       ${opts.realConfigs}/.doom.d $HOME
+  # '';
+
+  home.activation.emacs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
-        ${opts.realConfigs}/.doom.d $HOME
+        ${opts.realConfigs}/emacs $HOME/.config
   '';
 
   programs.zsh = mkIf opts.zsh-integration {
@@ -43,6 +48,7 @@ with lib;
     ## Module dependencies
     # :checkers spell
     (aspellWithDicts (ds: with ds; [ en en-computers en-science ]))
+    hunspell
     # :tools editorconfig
     editorconfig-core-c # per-project style config
     # :tools lookup & :lang org +roam
