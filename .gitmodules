@@ -1,3 +1,0 @@
-[submodule "src/home/.config/awesome"]
-	path = src/home/.config/awesome
-	url = https://github.com/sleroq/awesomewm-config.git
