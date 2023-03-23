@@ -34,8 +34,19 @@
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
+  networking.nameservers = [ "1.1.1.1" "1.1.0.1" ];
+
+  networking.wireless.iwd.enable = true;
   # Enable networking
-  networking.networkmanager.enable = true;
+  networking.networkmanager = { 
+    enable = true;
+    wifi = {
+      backend = "iwd";
+    };
+  };
+
+
+  services.nixops-dns.domain = "1.1.1.1";
 
   # Set your time zone.
   time.timeZone = "Europe/Moscow";
@@ -44,19 +55,19 @@
   i18n.defaultLocale = "en_US.UTF-8";
 
   services.shadowsocks = {
-    enable = true;
-    mode = "tcp_and_udp";
-    password = "sleroqgay";
-    fastOpen = false;
-    encryptionMethod = "chacha20-ietf-poly1305";
-    extraConfig = {
-      nameserver = "8.8.8.8";
-      server = ["127.0.0.1"]; # "0.0.0.0"];
-      server_port = 8666;
-      timeout = 300;
-      reuse_port = true;
-    };
-  };
+     enable = true;
+     mode = "tcp_and_udp";
+     password = "sleroqgay";
+     fastOpen = false;
+     encryptionMethod = "chacha20-ietf-poly1305";
+     extraConfig = {
+       nameserver = "8.8.8.8";
+       server = ["127.0.0.1"]; # "0.0.0.0"];
+       server_port = 8666;
+       timeout = 300;
+       reuse_port = true;
+     };
+   };
 
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "en_US.UTF-8";
@@ -71,30 +82,41 @@
   };
 
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
-  # Enable the KDE Plasma Desktop Environment.
-  services.xserver.displayManager.sddm.enable = true;
-
-  services.xserver.desktopManager.plasma5 = {
+  services.xserver = {
     enable = true;
-    excludePackages = with pkgs.libsForQt5; [
-      konsole
-      elisa
-      khelpcenter
-      print-manager
-      spectacle
-    ];
+    # Enable the KDE Plasma Desktop Environment.
+    displayManager.sddm.enable = true;
+
+    desktopManager.plasma5 = {
+      enable = true;
+      excludePackages = with pkgs.libsForQt5; [
+        konsole
+        elisa
+        khelpcenter
+        print-manager
+        spectacle
+      ];
+    };
+
+    desktopManager = {
+      xterm.enable = false;
+      xfce.enable = true;
+    };
+    displayManager.defaultSession = "xfce";
+
+    windowManager.leftwm.enable = true;
   };
-
-  services.xserver.windowManager.leftwm.enable = true;
-
-  virtualisation.docker.enable = true;
 
   # Configure keymap in X11
   services.xserver = {
     layout = "us";
     xkbVariant = "";
+  };
+
+  virtualisation = {
+    docker.enable = true;
+    waydroid.enable = true;
+    lxd.enable = true;
   };
 
   # Enable sound with pipewire.
