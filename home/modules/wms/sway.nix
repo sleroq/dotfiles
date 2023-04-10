@@ -15,18 +15,6 @@ with lib;
  #   '';
  # };
 
-  services.gammastep = {
-    enable = true;
-    temperature = {
-      day = 5000;
-      night = 4000;
-    };
-    provider = "manual";
-    latitude = 43.2;
-    longitude = 76.8;
-    tray = true;
-  };
-
   home.packages = with pkgs; [
     wayland
     xdg-utils       # for opening default programs when clicking links
@@ -42,7 +30,6 @@ with lib;
     waybar
     wofi
     pulseaudioFull
-    gammastep       # screen temperature
     lxappearance
     qt5ct
   ];

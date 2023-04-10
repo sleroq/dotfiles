@@ -3,10 +3,10 @@
 with lib;
 {
   nixpkgs.overlays = [ inputs.emacs-overlay.overlay ];
-  # services.emacs = {
-  #   enable = true;
-  #   package = pkgs.emacsUnstable;
-  # };
+  services.emacs = {
+    enable = true;
+    package = pkgs.emacs;
+  };
 
   # home.activation.emacs = hm.dag.entryAfter [ "writeBoundary" ] ''
   #   $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
@@ -31,7 +31,7 @@ with lib;
     ## Emacs itself
     binutils # native-comp needs 'as', provided by this
     # 28.2 + native-comp
-    ((emacsPackagesFor emacsUnstable).emacsWithPackages (epkgs: [
+    ((emacsPackagesFor emacs).emacsWithPackages (epkgs: [
       epkgs.vterm
     ]))
 

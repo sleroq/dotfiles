@@ -26,6 +26,7 @@ with lib;
     nodePackages_latest.typescript
     nodePackages_latest.typescript-language-server
     niv
+    helix
 
     mongodb-compass
     pgadmin4

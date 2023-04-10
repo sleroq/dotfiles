@@ -24,24 +24,24 @@ with config;
 
   home.packages = with pkgs; [
     sonixd
-    filezilla
-    tor-browser-bundle-bin
+    # filezilla
     tdesktop
     discord
     schildichat-desktop
     chromium
     exodus
     krita
-    libsForQt5.kdenlive
     ngrok
     gimp
-    libreoffice-fresh
+    # libreoffice-fresh
+    libsForQt5.kdenlive
     mpv
     obs-studio
     networkmanager-openvpn
     qbittorrent
     keepassxc
     logseq
+    syncplay
 
     # CLI
     gdb
@@ -62,12 +62,12 @@ with config;
     skypeforlinux
     remmina
     nomachine-client
-    rustdesk
+    # rustdesk
 
     # Hacking
-    pyrit2
-    wifite2
-    macchanger
+    # pyrit2
+    # wifite2
+    # macchanger
     iw
   ];
 }

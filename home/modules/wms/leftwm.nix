@@ -17,7 +17,6 @@ with lib;
 
   home.packages = with pkgs; [
     xss-lock
-    pavucontrol
     rofi
     alsa-utils
 

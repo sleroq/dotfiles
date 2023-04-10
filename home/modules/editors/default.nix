@@ -7,9 +7,9 @@
   ];
 
   home.packages = with pkgs; [
-    helix
+    # helix
     vscode-fhs
-    lapce
+    # lapce
     jetbrains-toolbox
   ];
 }
