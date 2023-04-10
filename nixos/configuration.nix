@@ -45,6 +45,12 @@
     };
   };
 
+  nix.settings.auto-optimise-store = true;
+  nix.gc = {
+    automatic = true;
+    dates = "daily";
+    options = "--delete-older-than 7d";
+  };
 
   services.nixops-dns.domain = "1.1.1.1";
 
@@ -87,16 +93,16 @@
     # Enable the KDE Plasma Desktop Environment.
     displayManager.sddm.enable = true;
 
-    desktopManager.plasma5 = {
-      enable = true;
-      excludePackages = with pkgs.libsForQt5; [
-        konsole
-        elisa
-        khelpcenter
-        print-manager
-        spectacle
-      ];
-    };
+    # desktopManager.plasma5 = {
+    #   enable = true;
+    #   excludePackages = with pkgs.libsForQt5; [
+    #     konsole
+    #     elisa
+    #     khelpcenter
+    #     print-manager
+    #     spectacle
+    #   ];
+    # };
 
     desktopManager = {
       xterm.enable = false;
@@ -111,12 +117,6 @@
   services.xserver = {
     layout = "us";
     xkbVariant = "";
-  };
-
-  virtualisation = {
-    docker.enable = true;
-    waydroid.enable = true;
-    lxd.enable = true;
   };
 
   # Enable sound with pipewire.
@@ -145,7 +145,7 @@
   users.users.sleroq = {
     isNormalUser = true;
     description = "sleroq";
-    extraGroups = [ "networkmanager" "wheel" "docker" "video" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "video" "libvirtd" ];
   };
 
   # Allow unfree packages
