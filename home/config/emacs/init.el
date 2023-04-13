@@ -1,23 +1,52 @@
-(setq user-full-name "Sleroq"
-      user-mail-address "cantundo@pm.me")
+(setq
+ user-full-name "Sleroq"
+ user-mail-address "hireme@pm.me")
 
-(setq undo-limit 50000000)
+;; Emacs window size and position
+(setq default-frame-alist '((width . 120) (height . 40)))
+(setq initial-frame-alist '((top . 0) (left . 300)))
+
+(setq
+ undo-limit 50000000
+ evil-want-fine-undo t
+ auto-save-default t)
+
+;; Save history
+(savehist-mode 1)
+(add-to-list 'savehist-additional-variables 'kill-ring) ;; for example
+
+;; Define the init file
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
+;; Font
+(set-face-attribute 'default nil
+                    :font "JetBrainsMono Nerd Font"
+                    :height 140)
+
+;; Encrypted directory with my notes, dictionary and other stuff
 (setq SAFE_PLACE (getenv "SAFE_PLACE"))
+(setq place-is-open
+      (and (not (string-empty-p SAFE_PLACE))
+           (file-directory-p SAFE_PLACE)))
 
-(setq place-is-open (and (not (string-empty-p SAFE_PLACE)) (file-directory-p SAFE_PLACE)))
+(defalias 'yes-or-no-p 'y-or-n-p)
 
-;
-; Packages I guess:
-;
+;;
+;; Packages:
+;;
 (defvar bootstrap-version)
 (let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+       (expand-file-name "straight/repos/straight.el/bootstrap.el"
+                         user-emacs-directory))
       (bootstrap-version 6))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
         (url-retrieve-synchronously
          "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
+         'silent
+         'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
@@ -26,17 +55,75 @@
 (straight-use-package 'use-package)
 (straight-use-package 'org)
 
-; Install evil-mode 
+;; Coding
+(straight-use-package 'elisp-autofmt)
+(straight-use-package 'typescript-mode)
+
+;; General must-have packages
+(straight-use-package 'neotree)
+(straight-use-package 'all-the-icons)
+(setq neo-theme 'icons)
+
+(straight-use-package 'magit)
+
+(straight-use-package 'helm)
+(straight-use-package 'helm-projectile)
+(helm-projectile-on)
+
+(straight-use-package 'projectile)
+(projectile-mode +1)
+(setq projectile-complete-system 'ivy)
+
+(straight-use-package 'sis)
+(sis-ism-lazyman-config "1" "2" 'fcitx5)
+
+(sis-global-cursor-color-mode t)
+;; enable the /respect/ mode
+(sis-global-respect-mode t)
+;; enable the /context/ mode for all buffers
+(sis-global-context-mode t)
+;; enable the /inline english/ mode for all buffers
+(sis-global-inline-mode t)
+
+
+; Evil-mode 
 (setq evil-want-keybinding nil)
 (straight-use-package 'evil)
 (straight-use-package 'evil-collection)
 (evil-collection-init)
+(evil-set-undo-system 'undo-redo)
 (evil-mode 1)
 
-(straight-use-package 'writeroom-mode)
+;; Completion
+(straight-use-package 'company)
+(company-mode 1)
 
-; Look and feel
-;
+(with-eval-after-load 'company
+  ;; disable inline previews
+  (delq 'company-preview-if-just-one-frontend company-frontends))
+
+;; format: off
+(use-package copilot
+             :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+             :ensure t
+             :hook (prog-mode . copilot-mode)
+             :bind (("C-c M-f" . copilot-complete)
+                    :map copilot-completion-map
+                    ("C-g" . 'copilot-clear-overlay)
+                    ("M-p" . 'copilot-previous-completion)
+                    ("M-n" . 'copilot-next-completion)
+                    ("<tab>" . 'copilot-accept-completion)))
+;; format: on
+
+;;
+;; Look and feel
+;;
+
+;; Case-insensitive and partial completion in searches
+(straight-use-package 'orderless)
+(setq
+ completion-styles '(orderless basic)
+ completion-category-overrides '((file (styles basic partial-completion))))
 
 ; Keyboard-centric user interface
 (setq inhibit-startup-message t)
@@ -44,262 +131,341 @@
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (global-display-line-numbers-mode t)
-(defalias 'yes-or-no-p 'y-or-n-p)
 
 ; Theme
 (straight-use-package
  '(zeno-theme :type git :host github :repo "zenobht/zeno-theme"))
 (load-theme 'zeno t)
 
-; 
-; Org-mode
-;
+; Ido - switching between buffers
+(require 'ido)
+(ido-mode t)
+(setq
+ ido-everywhere t
+ ido-enable-prefix nil
+ ido-enable-flex-matching t
+ ido-auto-merge-work-directories-length nil
+ ;;ido-use-filename-at-point t
+ ido-max-prospects 10
+ ido-create-new-buffer 'always
+ ;; ido-use-virtual-buffers   t
+ ;; ido-handle-duplicate-virtual-buffers 2
+ ido-default-buffer-method 'selected-window
+ ido-default-file-method 'selected-window)
 
-; Open link in the same frame
+(add-hook
+ 'ido-make-file-list-hook
+ (lambda ()
+   (define-key
+    ido-file-dir-completion-map (kbd "SPC") 'self-insert-command)))
+
+(setq ido-decorations (quote ("\n-> " "" "\n " "\n ..." "[" "]" "
+  [No match]"
+              " [Matched]" " [Not readable]" " [Too big]" "
+  [Confirm]")))
+(defun ido-disable-line-truncation ()
+  (set (make-local-variable 'truncate-lines) nil))
+(add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-truncation)
+
+;; Using ido for M-x
+(straight-use-package 'smex)
+(smex-initialize)
+(global-set-key (kbd "M-x") 'smex)
+
+;; 
+;; Org-mode
+;;
+
+;; Enable templates
+(require 'org-tempo)
+
+;; Open link in the same frame
 (setq org-link-frame-setup
       '((vm . vm-visit-folder-other-frame)
         (vm-imap . vm-visit-imap-folder-other-frame)
         (gnus . org-gnus-no-new-news)
-        (file . find-file) ; changed this line
+        (file . find-file)
         (wl . wl-other-frame)))
 
-; Babel
+;; Improve org mode looks
+(setq
+ org-startup-indented t
+ org-startup-truncated t
+ org-hide-emphasis-markers t
+ org-startup-with-inline-images t
+ org-image-actual-width '(400))
+
+
+(straight-use-package 'writeroom-mode)
+(setq writeroom-fullscreen-effect nil)
+(setq writeroom-width 50)
+
+(straight-use-package 'org-superstar)
+(straight-use-package 'org-appear)
+(straight-use-package 'org-fragtog)
+(straight-use-package 'org-pretty-tags)
+
+(defun my-org-mode-hook ()
+  (org-indent-mode)
+  (org-superstar-mode)
+  (org-appear-mode) ;; Show emphasis markers only on mouse hover
+  (org-fragtog-mode) ;; Show latex fragments on mouse hover
+  (org-pretty-tags-mode) ;; Show tags in a pretty way
+  (text-scale-set 2) ;; Increase font size
+  (writeroom-mode)) ;; Enable writeroom mode
+(add-hook 'org-mode-hook 'my-org-mode-hook)
+
+;; Org-babel
+
 (straight-use-package 'ob-go)
+
+;; Typescript
+(straight-use-package 'ob-typescript)
 
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((js . t)
+ '((emacs-lisp . t)
+   (python . t)
    (go . t)
-   (python . t)))
+   (typescript . t)
+   (js . t)
+   (shell . t)
+   (plantuml . t)
+   (dot . t)
+   (ditaa . t)
+   (org . t)))
 
 (when (eq place-is-open t)
   (setq org-attach-id-dir (concat SAFE_PLACE "/files/attachments/"))
   (setq org-directory (concat SAFE_PLACE "/emacs-org/"))
-   ; (after! org
-    (setq org-image-actual-width 600)
-    (setq org-todo-keywords
-      '((sequence "TODO(t)" "HOLD(h)" "IDEA(i)" "|" "DONE(d!)" "KILL(k!)" "NO(n!)")
-        (sequence "[ ](T)" "[-](S)" "|" "[X](D)")))
-     (setq org-todo-keyword-faces
-      '(("IDEA" . (:foreground "brightcyan"))
-        ("REVIEW" . (:foreground "#FDFD96")))) ;; pastel-yellow
-     (setq org-log-done 'time););)
-     (setq org-publish-project-alist (list
-       (list "emacs-org"
-           :recursive t
-           :base-directory org-directory
-           :publishing-directory (concat org-directory "public/")
-           :exclude "public"
-           :publishing-function 'org-html-publish-to-html
-           :with-author nil
-           :with-creator nil))))
 
-(setq org-startup-with-inline-images t)
-
-(setq writeroom-fullscreen-effect nil)
-(add-hook 'org-mode-hook 'writeroom-mode)
-
-(add-hook 'org-mode-hook
-	  (lambda ()
-	    (text-scale-set 2)))
-
-; Default file to open:
-(find-file "~/.config/emacs/init.el")
-
-; Restore previos session
-;   I need this just to preserve my command history.
-;   TODO: Figure out how to do this without saving everything else
-(desktop-save-mode 1)
-(savehist-mode 1)
-(add-to-list 'savehist-additional-variables 'kill-ring) ;; for example
-
-
-
-;;
-;; Agenda
-;;
-
-(defun my/org-roam-filter-by-tag (tag-name)
-  (lambda (node)
-    (member tag-name (org-roam-node-tags node))))
-
-(defun my/org-roam-list-notes-by-tag (tag-name)
-  (mapcar #'org-roam-node-file
-    (seq-filter
-      (my/org-roam-filter-by-tag tag-name)
-      (org-roam-node-list))))
-
-(defun my/org-update-agenda-files ()
-  (interactive)
-  ;; Add to agenda only files with tag Board:
-  (setq org-agenda-files (my/org-roam-list-notes-by-tag "Board"))
-  (add-to-list 'org-agenda-files "~/Sync/Shared org/")
-  (add-to-list 'org-agenda-files (concat SAFE_PLACE "/emacs-org/")))
+  (setq org-todo-keywords
+        '((sequence
+           "TODO(t)"
+           "HOLD(h)"
+           "IDEA(i)"
+           "|"
+           "DONE(d!)"
+           "KILL(k!)"
+           "NO(n!)")
+          (sequence "[ ](T)" "[-](S)" "|" "[X](D)")))
+  (setq org-todo-keyword-faces
+        '(("IDEA" . (:foreground "brightcyan"))
+          ("REVIEW" . (:foreground "#FDFD96")))) ;; pastel-yellow
+  (setq org-log-done 'time)
+  (setq org-publish-project-alist
+        (list
+         (list
+          "emacs-org"
+          :recursive t
+          :base-directory org-directory
+          :publishing-directory (concat org-directory "public/")
+          :exclude "public"
+          :publishing-function 'org-html-publish-to-html
+          :with-author nil
+          :with-creator nil))))
 
 ;;
 ;; Org-Roam
 ;;
 
 (straight-use-package 'emacsql-sqlite3)
-
 (straight-use-package 'org-roam)
 
+; Search
 (straight-use-package 'deft)
 
 (when (eq place-is-open t)
   (setq org-roam-directory (concat SAFE_PLACE "/roam/"))
 
-  (add-to-list 'org-publish-project-alist
-      (list "roam"
-            :recursive t
-            :base-directory org-roam-directory
-            :publishing-directory (concat SAFE_PLACE "/public/roam/")
-            :publishing-function 'org-html-publish-to-html
-            :with-author nil
-            :section-numbers nil
-            :with-creator nil))
+  (add-to-list
+   'org-publish-project-alist
+   (list
+    "roam"
+    :recursive t
+    :base-directory org-roam-directory
+    :publishing-directory (concat SAFE_PLACE "/public/roam/")
+    :publishing-function 'org-html-publish-to-html
+    :with-author nil
+    :section-numbers nil
+    :with-creator nil))
 
   (setq org-roam-capture-templates
-      `(("d" "default" plain "%?" :target
-          (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
+        `(("d"
+           "default"
+           plain
+           "%?"
+           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
 #+PROPERTY: CREATED %T
 #+startup: show2levels
 #+category: ${title}
 #+title: ${title}\n")
-          :unnarrowed t)
+           :unnarrowed t)
 
-        ("p" "Person" plain
-         (file ,(concat SAFE_PLACE "/templates/person.org"))
-         :target
-         (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
+          ("p"
+           "Person"
+           plain
+           (file ,(concat SAFE_PLACE "/templates/person.org"))
+           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "
 #+PROPERTY: Birthday %^{Birthday|<0000-00-00>}
 #+PROPERTY: CREATED %T
 #+category: ${title}
 #+title: ${title}
 #+startup: show2levels
 #+filetags: :Person%^G\n")
-         :empty-lines-before 1
-         :unnarrowed t)
+           :empty-lines-before 1
+           :unnarrowed t)
 
-        ("m" "Monthly archive" plain
-         (file ,(concat SAFE_PLACE "/templates/monthly-archive.org"))
-         :target
-         (file+head "monthly/%<%Y-%m> ${slug}.org" "
+          ("m" "Monthly archive" plain
+           (file
+            ,(concat SAFE_PLACE "/templates/monthly-archive.org"))
+           :target (file+head "monthly/%<%Y-%m> ${slug}.org" "
 #+PROPERTY: CREATED %T
 #+category: %<%Y-%m> ${title}
 #+title: %<%Y-%m> ${title}
 #+startup: show2levels
 #+filetags: :archive:\n")
-         :empty-lines-before 1
-         :unnarrowed t)
+           :empty-lines-before 1
+           :unnarrowed t)
 
-        ("a" "Anime" plain
-         (file ,(concat SAFE_PLACE "/templates/anime.org"))
-         :target
-         (file+head "anime/%<%Y%m%d%H%M%S>-${slug}.org" "
+          ("a"
+           "Anime"
+           plain
+           (file ,(concat SAFE_PLACE "/templates/anime.org"))
+           :target (file+head "anime/%<%Y%m%d%H%M%S>-${slug}.org" "
 #+PROPERTY: CREATED %T
 #+category: ${title}
 #+title: ${title}
 #+startup: show2levels
 #+filetags: :Anime:\n")
-         :empty-lines-before 1
-         :unnarrowed t)
+           :empty-lines-before 1
+           :unnarrowed t)
 
-        ("g" "Gaming")
+          ("g" "Gaming")
 
-        ("gg" "Game" plain
-         (file ,(concat SAFE_PLACE "/templates/game.org"))
-         :target
-         (file+head "gaming/%<%Y%m%d%H%M%S>-${slug}.org" "
+          ("gg"
+           "Game"
+           plain
+           (file ,(concat SAFE_PLACE "/templates/game.org"))
+           :target (file+head "gaming/%<%Y%m%d%H%M%S>-${slug}.org" "
 #+PROPERTY: CREATED %T
 #+category: ${title}
 #+title: ${title}
 #+startup: show2levels
 #+filetags: :Gaming:\n")
-         :empty-lines-before 1
-         :unnarrowed t)
+           :empty-lines-before 1
+           :unnarrowed t)
 
-        ("gn" "Game note" plain
-         (file ,(concat SAFE_PLACE "/templates/game-note.org"))
-         :target
-         (file+head "gaming/%<%Y%m%d%H%M%S>-${slug}.org" "
+          ("gn"
+           "Game note"
+           plain
+           (file ,(concat SAFE_PLACE "/templates/game-note.org"))
+           :target (file+head "gaming/%<%Y%m%d%H%M%S>-${slug}.org" "
 #+PROPERTY: CREATED %T
 #+category: ${title}
 #+title: ${title}
 #+startup: show2levels
 #+filetags: :Gaming%^G\n")
-         :empty-lines-before 1
-         :unnarrowed t)
+           :empty-lines-before 1
+           :unnarrowed t)
 
-        ("b" "Book" plain
-         (file ,(concat SAFE_PLACE "/templates/book.org"))
-         :target
-         (file+head "reading/%<%Y%m%d%H%M%S>-${slug}.org" "
+          ("b"
+           "Book"
+           plain
+           (file ,(concat SAFE_PLACE "/templates/book.org"))
+           :target (file+head "reading/%<%Y%m%d%H%M%S>-${slug}.org" "
 #+PROPERTY: CREATED %T
 #+category: ${title}
 #+title: ${title}
 #+startup: show2levels
 #+filetags: :Reading:\n")
-         :empty-lines-before 1
-         :unnarrowed t)
+           :empty-lines-before 1
+           :unnarrowed t)
 
-        ("o" "Answer" plain
-         (file ,(concat SAFE_PLACE "/templates/answer.org"))
-         :target
-         (file+head "answers/%<%Y%m%d%H%M%S>-${slug}.org" "
+          ("o"
+           "Answer"
+           plain
+           (file ,(concat SAFE_PLACE "/templates/answer.org"))
+           :target (file+head "answers/%<%Y%m%d%H%M%S>-${slug}.org" "
 #+PROPERTY: CREATED %T
 #+category: ${title}
 #+title: ${title}
 #+startup: show2levels
 #+filetags: :Answer:\n")
-         :empty-lines-before 1
-         :unnarrowed t)))
+           :empty-lines-before 1
+           :unnarrowed t)))
 
-    (org-roam-db-autosync-mode)
+  (org-roam-db-autosync-mode)
 
 
-;   (use-package! websocket
-;       :after org-roam)
-; 
-;   (use-package! org-roam-ui
-;       :after org;; or :after org-roam
-;   ;;  if you don't care about startup time, use
-;   ;;  :hook (after-init . org-roam-ui-mode)
-;       :config
-;       (setq org-roam-ui-sync-theme t
-;             org-roam-ui-follow t
-;             org-roam-ui-update-on-save t
-;             org-roam-ui-open-on-start t))
-    
-    ;; Update agenda file-list for new session
-    (my/org-update-agenda-files)
-    
-      ;; Org-roam search with Deft (https://www.orgroam.com/manual.html#Full_002dtext-search-with-Deft)
-      (setq deft-use-filter-string-for-filename t)
-      (setq deft-directory org-roam-directory)
-      (setq deft-recursive t)
-      (setq deft-strip-summary-regexp
-        (concat "\\("
-                "^:.+:.*\n" ; any line with a :SOMETHING:
-                "\\|^#\\+.*\n" ; anyline starting with a #+
-                "\\|^\\*.+.*\n" ; anyline where an asterisk starts the line
-                "\\)"))
-    
-      (advice-add 'deft-parse-title :override
-        (lambda (file contents)
-          (if deft-use-filename-as-title
-            (deft-base-filename file)
-          (let* ((case-fold-search 't)
+  ;;
+  ;; Agenda
+  ;;
+
+  (defun my/org-roam-filter-by-tag (tag-name)
+    (lambda (node) (member tag-name (org-roam-node-tags node))))
+
+  (defun my/org-roam-list-notes-by-tag (tag-name)
+    (mapcar
+     #'org-roam-node-file
+     (seq-filter
+      (my/org-roam-filter-by-tag tag-name) (org-roam-node-list))))
+
+  (defun my/org-update-agenda-files ()
+    (interactive)
+    ;; Add to agenda only files with tag Board:
+    (setq org-agenda-files (my/org-roam-list-notes-by-tag "Board"))
+    (add-to-list 'org-agenda-files "~/Sync/Shared org/")
+    (add-to-list 'org-agenda-files (concat SAFE_PLACE "/emacs-org/")))
+
+  ;; Update agenda file-list for new session
+  (my/org-update-agenda-files)
+
+
+  ;; format: off
+  (use-package org-roam-ui
+     :straight
+       (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+       :after org-roam
+       ;; normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+       ;; a hookable mode anymore, you're advised to pick something yourself
+       ;; if you don't care about startup time, use
+       ;; :hook (after-init . org-roam-ui-mode)
+       :config
+       (setq org-roam-ui-sync-theme t
+             org-roam-ui-follow t
+             org-roam-ui-update-on-save t
+             org-roam-ui-open-on-start t))
+  ;; format: on
+
+  ;; Org-roam search with Deft (https://www.orgroam.com/manual.html#Full_002dtext-search-with-Deft)
+  (setq deft-use-filter-string-for-filename t)
+  (setq deft-directory org-roam-directory)
+  (setq deft-recursive t)
+  (setq deft-strip-summary-regexp
+        (concat
+         "\\("
+         "^:.+:.*\n" ; any line with a :SOMETHING:
+         "\\|^#\\+.*\n" ; anyline starting with a #+
+         "\\|^\\*.+.*\n" ; anyline where an asterisk starts the line
+         "\\)"))
+
+  (advice-add
+   'deft-parse-title
+   :override
+   (lambda (file contents)
+     (if deft-use-filename-as-title
+         (deft-base-filename file)
+       (let* ((case-fold-search 't)
               (begin (string-match "title: " contents))
               (end-of-begin (match-end 0))
               (end (string-match "\n" contents begin)))
-          (if begin
-            (substring contents end-of-begin end)
-            (format "%s" file)))))))
-
+         (if begin
+             (substring contents end-of-begin end)
+           (format "%s" file)))))))
 
 ;;
-;; Autosave
+;; Auto-save
 ;;
 
 (setq auto-save-visited-mode t)
@@ -307,7 +473,8 @@
 
 (defun save-all ()
   (interactive)
-  (save-some-buffers t))
+  (save-some-buffers t)
+  (message "All Saved"))
 
 (add-function :after after-focus-change-function 'save-all)
 
@@ -315,146 +482,241 @@
 ;; Spellcheck
 ;;
 
+(straight-use-package 'flyspell)
+(add-hook 'org-mode-hook 'flyspell-mode)
+(add-hook 'text-mode-hook 'flyspell-mode)
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
 (with-eval-after-load "ispell"
-  (add-to-list
-   'ispell-local-dictionary-alist
-   '("en_US-large,ru_RU" "[[:alpha:]]" "[^[:alpha:]]" "['0-9]" t
-    ("-d" "en_US-large,ru_RU") nil
-    utf-8))
+  ;; Configure `LANG`, otherwise ispell.el cannot find a 'default
+  ;; dictionary' even though multiple dictionaries will be configured
+  ;; in next line.
+  (setenv "LANG" "en_US.UTF-8")
+  (setq ispell-program-name "hunspell")
+  ;; Configure German, Swiss German, and two variants of English.
+  (setq ispell-dictionary "en_GB,en_US,ru_RU")
+  ;; ispell-set-spellchecker-params has to be called
+  ;; before ispell-hunspell-add-multi-dic will work
+  (ispell-set-spellchecker-params)
+  (ispell-hunspell-add-multi-dic "en_GB,en_US,ru_RU")
 
-  (setq ispell-dictionary "en_US-large,ru_RU")
+  (when (eq place-is-open t)
+    (setq ispell-personal-dictionary
+          (concat SAFE_PLACE "/files/hunspell-dictionary.txt"))))
 
-  (if (eq place-is-open t)
-      (setq ispell-personal-dictionary (concat SAFE_PLACE "/files/ispell-dictionary.txt"))))
-
-
-; Define the init file
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(when (file-exists-p custom-file)
- (load custom-file))
-
-; Font
-(set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 140)
-
-; Keybindings
+; Keybindings / Shortcuts
 
 (straight-use-package 'which-key)
 (setq which-key-idle-secondary-delay 0.02)
 (which-key-mode 1)
 
-(defvar my-space-map (make-sparse-keymap)
-  "Keymap for space-oriented keybindings.")
+(straight-use-package 'general)
 
-(define-key evil-normal-state-map (kbd "SPC") my-space-map)
-
-
-(defvar my-space-b-map (make-sparse-keymap)
-  "Sub-keymap for SPC b (buffer related).")
-
-(define-key my-space-map (kbd "b") my-space-b-map)
-
-(define-key my-space-b-map (kbd "q") 'kill-buffer)
-(define-key my-space-b-map (kbd "b") 'switch-to-buffer)
-(define-key my-space-b-map (kbd "e") 'eval-buffer)
-
-(defvar my-space-w-map (make-sparse-keymap)
-  "Sub-keymap for SPC w (window related).")
-
-(define-key my-space-map (kbd "w") my-space-w-map)
-
-(define-key my-space-w-map (kbd "q") 'kill-buffer-and-window)
-
-(defvar my-space-f-map (make-sparse-keymap)
-  "Sub-keymap for SPC f.")
-
-(define-key my-space-map (kbd "f") my-space-f-map)
-
-; (defun delete-if-file ()
-;   (interactive)
-;   (if (buffer-file-name)
-;       (if (y-or-n-p (format "Delete file %s? " (buffer-file-name)))
-;       (delete-file (buffer-file-name))
-;       (message "File not deleted"))
-;     (kill-buffer)))
-
-; (defun delete-file-and-close-buffer ()
-;   "Delete the current file and close the buffer."
-;   (interactive)
-;   (let ((filename (buffer-file-name)))
-;     (if (and filename (file-exists-p filename))
-;         (when (yes-or-no-p (format "Are you sure you want to delete %s? " filename))
-;           (delete-file filename)
-;           (kill-buffer))
-;       (message "No file is associated with this buffer."))))
+(general-create-definer
+ space-leader-def
+ :keymaps 'override
+ :prefix "SPC"
+ :global-prefix "C-SPC")
 
 (defun delete-file-and-close-buffer ()
   "Delete the current file and close the buffer."
   (interactive)
   (let ((filename (buffer-file-name)))
     (if (and filename (file-exists-p filename))
-        (when (yes-or-no-p (format "Are you sure you want to delete %s? " filename))
+        (when (yes-or-no-p
+               (format "Are you sure you want to delete %s? "
+                       filename))
           (delete-file filename)
           (kill-buffer))
       (message "No file is associated with this buffer."))))
 
-(define-key my-space-f-map (kbd "f") 'find-file)
-(define-key my-space-f-map (kbd "s") 'save-all)
-(define-key my-space-f-map (kbd "d") 'delete-file-and-close-buffer)
 
-(straight-use-package 'neotree)
-(define-key my-space-f-map (kbd "p") 'neotree-toggle)
+(defun launch-separate-emacs-in-terminal ()
+  (suspend-emacs "fg ; emacs -nw"))
 
-(defvar my-space-r-map (make-sparse-keymap)
-  "Sub-keymap for SPC f (for org-roam).")
+(defun launch-separate-emacs-under-x ()
+  (call-process "sh" nil nil nil "-c" "emacs &"))
 
-(define-key my-space-map (kbd "r") my-space-r-map)
+(defun restart-emacs ()
+  (interactive)
+  ;; We need the new emacs to be spawned after all kill-emacs-hooks
+  ;; have been processed and there is nothing interesting left
+  (let ((kill-emacs-hook
+         (append
+          kill-emacs-hook
+          (list
+           (if (display-graphic-p)
+               #'launch-separate-emacs-under-x
+             #'launch-separate-emacs-in-terminal)))))
+    (save-buffers-kill-emacs)))
 
-(define-key my-space-r-map (kbd "f") 'org-roam-node-find)
-(define-key my-space-r-map (kbd "i") 'org-roam-node-insert)
-(define-key my-space-r-map (kbd "c") 'org-roam-capture)
-(define-key my-space-r-map (kbd "r") 'org-roam-buffer-toggle)
-(define-key my-space-r-map (kbd "d") 'deft)
+(defun lt/eshell-pop-show (name)
+  "Create a pop up window with eshell named NAME."
+  (let\* ((window (split-window
+                  (frame-root-window)
+                  '30
+                  'below))
+         (buffer (get-buffer name)))
+    ;; make sure we are on the current window (pop-up)
+    (select-window window)
+    (if buffer
+        (set-window-buffer window name)
+      (progn
+        (eshell window)
+        (rename-buffer name)))
+    ))
 
-(defvar my-space-g-map (make-sparse-keymap)
-  "Sub-keymap for SPC g (git).")
+(defun lt/eshell-pop-hide (name)
+  "Hide the existing pop up window with eshell named NAME."
+  (let ((shell-buffer (get-buffer-window name)))
+    (select-window shell-buffer)
+    (bury-buffer)
+    (delete-window)))
 
-(define-key my-space-map (kbd "g") my-space-g-map)
+(defun toggle-shell-buffer ()
+  "Toggle eshell pop up window."
+  (interactive)
+  (let ((name "shell-buffer"))
+    (if (get-buffer-window name)
+        (lt/eshell-pop-hide name)
+      (lt/eshell-pop-show name))
+    ))
 
-(straight-use-package 'magit)
-(define-key my-space-g-map (kbd "g") 'magit)
+;; format: off
+(space-leader-def
+ :states '(normal)
 
-(defvar my-space-o-map (make-sparse-keymap)
-  "Sub-keymap for SPC o (org-mode).")
+ "b" '(:ignore t :which-key "buffer")
+ "bb" '(switch-to-buffer :which-key "switch to buffer")
+ "bd" '(kill-buffer :which-key "kill buffer")
+ "bD" '(kill-some-buffers :which-key "kill some buffers")
+ "be" '(eval-buffer :which-key "eval buffer")
 
-(define-key my-space-map (kbd "o") my-space-o-map)
+ "w" '(:ignore t :which-key "window")
+ "ws" '(split-window-below :which-key "split window below")
+ "wv" '(split-window-right :which-key "split window right")
+ "w=" '(balance-windows :which-key "balance windows")
+ "wk" '(evil-window-up :which-key "move window up")
+ "wj" '(evil-window-down :which-key "move window down")
+ "wh" '(evil-window-left :which-key "move window left")
+ "wl" '(evil-window-right :which-key "move window right")
+ "wK" '(evil-window-decrease-height :which-key "decrease window height")
+ "wJ" '(evil-window-increase-height :which-key "increase window height")
+ "wH" '(evil-window-decrease-width :which-key "decrease window width")
+ "wL" '(evil-window-increase-width :which-key "increase window width")
+ "wd" '(delete-window :which-key "delete window")
+ "wD" '(kill-buffer-and-window :which-key "kill buffer and window")
 
-(defvar my-space-o-l-map (make-sparse-keymap)
-  "Sub-keymap for SPC o t (org-mode).")
+ "f" '(:ignore t :which-key "file")
+ "ff" '(find-file :which-key "find file")
+ "fs" '(save-all :which-key "save buffer")
+ "fd" '(delete-file-and-close-buffer :which-key "delete file and close buffer")
 
-(define-key my-space-o-map (kbd "l") my-space-o-l-map)
+ "t" '(toggle-shell-buffer :which-key "toggle shell")
 
-(straight-use-package 'org-cliplink)
-(define-key my-space-o-l-map (kbd "c") 'org-cliplink)
-(define-key my-space-o-l-map (kbd "s") 'org-store-link)
-(define-key my-space-o-l-map (kbd "i") 'org-insert-last-stored-link)
-(define-key my-space-o-l-map (kbd "") 'org-insert-link)
+ "n" '(:ignore t :which-key "org-roam")
+ "nf" '(org-roam-node-find :which-key "find node")
+ "ni" '(org-roam-node-insert :which-key "insert node")
+ "nc" '(org-roam-capture :which-key "capture node")
+ "nr" '(org-roam-buffer-toggle :which-key "toggle roam buffer")
+ "nd" '(deft :which-key "open deft")
+ "nu" '(org-roam-ui-open :which-key "open ui")
 
-(defvar my-space-o-t-map (make-sparse-keymap)
-  "Sub-keymap for SPC o t (org-mode).")
+ "g" '(:ignore t :which-key "git")
+ "gg" '(magit :which-key "magit")
+ "gs" '(magit-status :which-key "magit status")
+ "gd" '(magit-diff :which-key "magit diff")
+ "gl" '(magit-log :which-key "magit log")
+ "gc" '(magit-commit :which-key "magit commit")
+ "gp" '(magit-push :which-key "magit push")
+ "gP" '(magit-pull :which-key "magit pull")
 
-(define-key my-space-o-map (kbd "t") my-space-o-t-map)
+ "s" '(:ignore t :which-key "spell")
+ "sc" '(ispell-word :which-key "check word")
+ "sb" '(ispell-buffer :which-key "check buffer")
+ "sr" '(ispell-region :which-key "check region")
+ "sa" '(flyspell-auto-correct-word :which-key "auto correct word")
 
-(define-key my-space-o-t-map (kbd "t") 'org-time-stamp)
-(define-key my-space-o-t-map (kbd "i") 'org-time-stamp-inactive)
-(define-key my-space-o-t-map (kbd "i") 'org-time-stamp-inactive)
+ "e" '(:ignore t :which-key "emacs")
+ "ei" '(lambda () (interactive) (find-file user-init-file) :which-key "open init file")
 
+ "p" '(:ignore t :which-key "project")
+ "/" '(helm-projectile :which-key "find file")
+ "." '(helm-projectile-grep :which-key "find file")
+ "pp" '(projectile-switch-project :which-key "switch project")
+ "pa" '(projectile-add-known-project :which-key "add known project")
+ "pd" '(projectile-dired :which-key "dired")
+ "pb" '(projectile-switch-to-buffer :which-key "switch to buffer")
+ "pr" '(projectile-recentf :which-key "recent files")
+ "ps" '(projectile-save-project-buffers :which-key "save project buffers")
+ "pk" '(projectile-kill-buffers :which-key "kill project buffers")
 
-(defvar my-space-q-map (make-sparse-keymap)
-  "Sub-keymap for SPC q.")
+ "N" '(neotree-toggle :which-key "toggle neotree")
 
-(define-key my-space-map (kbd "q") my-space-q-map)
+ "q" '(:ignore t :which-key "quit")
+ "qq" '(save-buffers-kill-terminal :which-key "quit emacs")
+ "qQ" '(kill-emacs :which-key "kill emacs")
+ "qr" '(restart-emacs :which-key "restart emacs"))
 
-(define-key my-space-q-map (kbd "q") 'save-buffers-kill-terminal)
+;; Org-mode only keybindings
+(general-create-definer
+ org-leader-def
+ :keymaps 'org-mode-map
+ :prefix "SPC o"
+ :global-prefix "C-SPC")
+;; format: on
 
-; Open links with Enter in org-mode
+;; format: off
+(org-leader-def
+ "" '(nil :which-key "org-mode")
+ :states '(normal)
+
+ "a" '(org-agenda :which-key "org agenda")
+ "c" '(org-capture :which-key "org capture")
+ "b" '(org-insert-structure-template :which-key "org insert structure template")
+
+ "l" '(:ignore t :which-key "org links")
+ "ls" '(org-store-link :which-key "org store link")
+ "ll" '(org-insert-link :which-key "org insert link")
+ "li" '(org-insert-stored-link :which-key "org insert stored link")
+ "lc" '(org-cliplink :which-key "org clip link")
+
+ "t" '(org-todo :which-key "org todo")
+ "p" '(org-priority :which-key "org priority")
+
+ "s" '(:ignore t :which-key "org time")
+ "ss" '(org-schedule :which-key "org schedule")
+ "sd" '(org-deadline :which-key "org deadline")
+ "st" '(org-time-stamp :which-key "org time stamp")
+ "sT" '(org-time-stamp-inactive :which-key "org time stamp inactive")
+ "sr" '(org-time-stamp :which-key "org time stamp range")
+ "sR" '(org-time-stamp-inactive :which-key "org time stamp range inactive"))
+;; format: on
+
+;; NeoTree can be opened (toggled) at projectile project root
+(defun neotree-project-dir ()
+    "Open NeoTree using the git root."
+    (interactive)
+    (let ((project-dir (projectile-project-root))
+          (file-name (buffer-file-name)))
+      (neotree-toggle)
+      (if project-dir
+          (if (neo-global--window-exists-p)
+              (progn
+                (neotree-dir project-dir)
+                (neotree-find file-name)))
+        (message "Could not find git project root."))))
+
+(global-set-key (kbd "C-c C-p") 'neotree-project-dir)
+
+;; Open links with RET in org-mode
 (evil-define-key 'normal org-mode-map (kbd "RET") 'org-open-at-point)
+
+;; Vim-like navigation in ido
+(defun ido-my-keys ()
+  (define-key ido-completion-map (kbd "C-k") 'ido-prev-match)
+  (define-key ido-completion-map (kbd "C-j") 'ido-next-match))
+(add-hook 'ido-setup-hook 'ido-my-keys)
+
+; Default file to open:
+(find-file "~/.config/emacs/init.el")

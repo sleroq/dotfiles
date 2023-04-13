@@ -45,10 +45,17 @@ with lib;
     imagemagick # for image-dired
     zstd # for undo-fu-session/undo-tree compression
 
+    # hunspell
+    ( hunspellWithDicts (with pkgs.hunspellDicts; [
+      en-us
+      ru_RU
+      en_GB-ize
+      en_US-large
+    ]))
+
     ## Module dependencies
     # :checkers spell
-    (aspellWithDicts (ds: with ds; [ en en-computers en-science ]))
-    hunspell
+    (aspellWithDicts (ds: with ds; [ en en-computers en-science ru ]))
     # :tools editorconfig
     editorconfig-core-c # per-project style config
     # :tools lookup & :lang org +roam
@@ -63,6 +70,11 @@ with lib;
 
     # Nix
     nixfmt
+
+    # for emacs-lisp-autofmt
+    python3
+
+    # fcitx5-with-addons
 
     emacs-all-the-icons-fonts
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
