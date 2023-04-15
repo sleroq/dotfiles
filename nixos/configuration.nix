@@ -93,24 +93,24 @@
     # Enable the KDE Plasma Desktop Environment.
     displayManager.sddm.enable = true;
 
-    # desktopManager.plasma5 = {
-    #   enable = true;
-    #   excludePackages = with pkgs.libsForQt5; [
-    #     konsole
-    #     elisa
-    #     khelpcenter
-    #     print-manager
-    #     spectacle
-    #   ];
-    # };
-
-    desktopManager = {
-      xterm.enable = false;
-      xfce.enable = true;
+    desktopManager.plasma5 = {
+      enable = true;
+      excludePackages = with pkgs.libsForQt5; [
+        konsole
+        elisa
+        khelpcenter
+        print-manager
+        spectacle
+      ];
     };
-    displayManager.defaultSession = "xfce";
 
-    windowManager.leftwm.enable = true;
+    # desktopManager = {
+    #   xterm.enable = false;
+    #   xfce.enable = true;
+    # };
+    # displayManager.defaultSession = "xfce";
+
+    # windowManager.leftwm.enable = true;
   };
 
   # Configure keymap in X11
