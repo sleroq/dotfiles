@@ -209,6 +209,9 @@
 ;; Enable templates
 (require 'org-tempo)
 
+;; Capture from clipboard
+(straight-use-package 'org-cliplink)
+
 ;; Open link in the same frame
 (setq org-link-frame-setup
       '((vm . vm-visit-folder-other-frame)
@@ -636,7 +639,7 @@
 
 ;; format: off
 (space-leader-def
- :states '(normal)
+ :states '(normal visual)
 
  "b" '(:ignore t :which-key "buffer")
  "bb" '(switch-to-buffer :which-key "switch to buffer")
@@ -785,6 +788,16 @@
 ;; Vim like navigation in helm
 (define-key helm-map (kbd "C-j") 'helm-next-line)
 (define-key helm-map (kbd "C-k") 'helm-previous-line)
+
+;; Vim-like navigation in Agenda
+(defun org-agenda-my-keys ()
+  (define-key org-agenda-mode-map (kbd "k") 'org-agenda-previous-line)
+  (define-key org-agenda-mode-map (kbd "j") 'org-agenda-next-line)
+  (define-key org-agenda-mode-map (kbd "C-k") 'org-agenda-previous-item)
+  (define-key org-agenda-mode-map (kbd "C-j") 'org-agenda-next-item)
+  (define-key org-agenda-mode-map (kbd "C-l") 'org-agenda-later)
+  (define-key org-agenda-mode-map (kbd "C-h") 'org-agenda-earlier))
+(add-hook 'org-agenda-mode-hook 'org-agenda-my-keys)
 
 ;; TODO:
 ;; Why the hell I have so many completion frameworks?
