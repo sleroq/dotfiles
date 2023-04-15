@@ -65,6 +65,25 @@
 (setq neo-theme 'icons)
 
 (straight-use-package 'magit)
+;; format: off
+(use-package blamer
+             :straight (:host github :repo "artawower/blamer.el")
+             :custom
+             (blamer-idle-time 0.3)
+             (blamer-min-offset 70)
+             :custom-face
+             (blamer-face ((t :foreground "#7a88cf"
+                              :background nil
+                              :height 140
+                              :italic t))))
+;; format: on
+(add-hook 'prog-mode-hook 'blamer-mode)
+
+(use-package diff-hl
+             :straight (:host github :repo "dgutov/diff-hl"))
+(global-diff-hl-mode)
+
+(straight-use-package 'ivy)
 
 (straight-use-package 'helm)
 (straight-use-package 'helm-projectile)
@@ -85,8 +104,16 @@
 ;; enable the /inline english/ mode for all buffers
 (sis-global-inline-mode t)
 
+(straight-use-package 'highlight-thing)
+(add-hook 'prog-mode-hook 'highlight-thing-mode)
+;; Change hi-yellow face to make it more readable
+(custom-set-faces
+   '(highlight-thing ((t (:background "#8a846a" :foreground "black")))))
+(setq highlight-thing-limit-to-region-in-large-buffers-p nil
+    highlight-thing-narrow-region-lines 15
+    highlight-thing-large-buffer-limit 5000)
 
-; Evil-mode 
+;; Evil-mode 
 (setq evil-want-keybinding nil)
 (straight-use-package 'evil)
 (straight-use-package 'evil-collection)
@@ -114,6 +141,7 @@
                     ("M-n" . 'copilot-next-completion)
                     ("<tab>" . 'copilot-accept-completion)))
 ;; format: on
+(add-hook 'text-mode-hook 'copilot-mode )
 
 ;;
 ;; Look and feel
@@ -168,9 +196,11 @@
 (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-truncation)
 
 ;; Using ido for M-x
-(straight-use-package 'smex)
-(smex-initialize)
-(global-set-key (kbd "M-x") 'smex)
+(use-package smex
+  :straight (:host github :repo "nonsequitur/smex" :branch "master" :files ("*.el" "out"))
+  :bind (("M-x" . smex)
+         ("M-X" . smex-major-mode-commands))
+  :config (smex-initialize))
 
 ;; 
 ;; Org-mode
@@ -198,12 +228,13 @@
 
 (straight-use-package 'writeroom-mode)
 (setq writeroom-fullscreen-effect nil)
-(setq writeroom-width 50)
+(setq writeroom-width 90)
 
 (straight-use-package 'org-superstar)
 (straight-use-package 'org-appear)
 (straight-use-package 'org-fragtog)
 (straight-use-package 'org-pretty-tags)
+(straight-use-package 'olivetti)
 
 (defun my-org-mode-hook ()
   (org-indent-mode)
@@ -212,7 +243,7 @@
   (org-fragtog-mode) ;; Show latex fragments on mouse hover
   (org-pretty-tags-mode) ;; Show tags in a pretty way
   (text-scale-set 2) ;; Increase font size
-  (writeroom-mode)) ;; Enable writeroom mode
+  (olivetti-mode)) 
 (add-hook 'org-mode-hook 'my-org-mode-hook)
 
 ;; Org-babel
@@ -271,6 +302,7 @@
 
 (straight-use-package 'emacsql-sqlite3)
 (straight-use-package 'org-roam)
+(setq org-roam-completion-everywhere t)
 
 ; Search
 (straight-use-package 'deft)
@@ -395,7 +427,7 @@
            :empty-lines-before 1
            :unnarrowed t)))
 
-  (org-roam-db-autosync-mode)
+  (org-roam-db-autosync-mode 1)
 
 
   ;;
@@ -582,6 +614,26 @@
       (lt/eshell-pop-show name))
     ))
 
+(defun my/org-roam-node-find ()
+  (interactive)
+  (unwind-protect
+;; unwind-protect is required to turn off ivy
+;; even when you cancel without choosing a node
+      (progn
+       (ivy-mode +1)
+       (org-roam-node-find))  
+    (ivy-mode -1)))
+
+(defun my/org-roam-node-insert ()
+  (interactive)
+  (unwind-protect
+;; unwind-protect is required to turn off ivy
+;; even when you cancel without choosing a node
+      (progn
+       (ivy-mode +1)
+       (org-roam-node-insert))
+    (ivy-mode -1)))
+
 ;; format: off
 (space-leader-def
  :states '(normal)
@@ -612,13 +664,17 @@
  "fs" '(save-all :which-key "save buffer")
  "fd" '(delete-file-and-close-buffer :which-key "delete file and close buffer")
 
- "t" '(toggle-shell-buffer :which-key "toggle shell")
+ "t" '(:ignore t :which-key "tools")
+ "tt" '(toggle-shell-buffer :which-key "toggle shell")
+ "tz" '(writeroom-mode :which-key "writeroom mode")
 
  "n" '(:ignore t :which-key "org-roam")
- "nf" '(org-roam-node-find :which-key "find node")
- "ni" '(org-roam-node-insert :which-key "insert node")
+ "nf" '(my/org-roam-node-find :which-key "find node")
+ "ni" '(my/org-roam-node-insert :which-key "insert node")
  "nc" '(org-roam-capture :which-key "capture node")
  "nr" '(org-roam-buffer-toggle :which-key "toggle roam buffer")
+ "nt" '(org-roam-tag-add :which-key "add tag")
+ "nT" '(org-roam-tag-remove :which-key "remove tag")
  "nd" '(deft :which-key "open deft")
  "nu" '(org-roam-ui-open :which-key "open ui")
 
@@ -630,6 +686,7 @@
  "gc" '(magit-commit :which-key "magit commit")
  "gp" '(magit-push :which-key "magit push")
  "gP" '(magit-pull :which-key "magit pull")
+ "gb" '(magit-blame :which-key "magit blame")
 
  "s" '(:ignore t :which-key "spell")
  "sc" '(ispell-word :which-key "check word")
@@ -657,6 +714,7 @@
  "qq" '(save-buffers-kill-terminal :which-key "quit emacs")
  "qQ" '(kill-emacs :which-key "kill emacs")
  "qr" '(restart-emacs :which-key "restart emacs"))
+;; format: on
 
 ;; Org-mode only keybindings
 (general-create-definer
@@ -664,7 +722,6 @@
  :keymaps 'org-mode-map
  :prefix "SPC o"
  :global-prefix "C-SPC")
-;; format: on
 
 ;; format: off
 (org-leader-def
@@ -672,6 +729,7 @@
  :states '(normal)
 
  "a" '(org-agenda :which-key "org agenda")
+ "A" '(org-attach :which-key "org attach")
  "c" '(org-capture :which-key "org capture")
  "b" '(org-insert-structure-template :which-key "org insert structure template")
 
@@ -718,5 +776,18 @@
   (define-key ido-completion-map (kbd "C-j") 'ido-next-match))
 (add-hook 'ido-setup-hook 'ido-my-keys)
 
-; Default file to open:
+;; Vim-like navigation in ivy
+(defun ivy-my-keys ()
+  (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
+  (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line))
+(add-hook 'ivy-mode-hook 'ivy-my-keys)
+
+;; Vim like navigation in helm
+(define-key helm-map (kbd "C-j") 'helm-next-line)
+(define-key helm-map (kbd "C-k") 'helm-previous-line)
+
+;; TODO:
+;; Why the hell I have so many completion frameworks?
+
+;; Default file to open:
 (find-file "~/.config/emacs/init.el")
