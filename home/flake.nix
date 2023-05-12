@@ -11,6 +11,11 @@
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     nix-gaming.url = "github:fufexan/nix-gaming";
+    prismlauncher.url = "github:PrismLauncher/PrismLauncher";
+    hyprland = {
+      url = "github:hyprwm/Hyprland";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
