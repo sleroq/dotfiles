@@ -16,9 +16,6 @@ with config;
   home.packages = with pkgs; [
     neovide
 
-    tabnine
-    # codeium
-
     ripgrep
     fd
     lazygit
@@ -29,6 +26,7 @@ with config;
     stylua
     tree-sitter
     luajitPackages.luarocks
+    luajitPackages.jsregexp
 
     emacs-all-the-icons-fonts
   ];
