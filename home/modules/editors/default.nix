@@ -4,12 +4,13 @@
   imports = [
     ./emacs.nix
     ./neovim.nix
+    ./helix.nix
   ];
 
+  programs.vscode.enable = true;
+
   home.packages = with pkgs; [
-    # helix
-    vscode-fhs
-    # lapce
+    lapce
     jetbrains-toolbox
   ];
 }
