@@ -30,18 +30,6 @@
 
       # Scripts
       path+=("${opts.dotfiles}/scripts")
-
-      # Wayland
-      if [[ -z $DESKTOP_SESSION || $XDG_SESSION_TYPE != 'x11' ]]
-      then
-        export MOZ_ENABLE_WAYLAND=1
-        export QT_QPA_PLATFORM=wayland-egl
-        export ELM_DISPLAY=wl
-        export SDL_VIDEODRIVER=wayland
-        export _JAVA_AWT_WM_NONREPARENTING=1
-        export XDG_CURRENT_DESKTOP=KDE
-        export XDG_SESSION_DESKTOP=KDE
-      fi
     '';
   };
 
@@ -52,6 +40,7 @@
 
   home.packages = with pkgs; [
     zsh
+    thefuck
     nix-zsh-completions
     zoxide
     oh-my-zsh
@@ -63,5 +52,7 @@
     jq
     ripgrep
     tldr
+    onefetch
+    btop
   ];
 }

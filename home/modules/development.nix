@@ -1,4 +1,4 @@
-{ config, pkgs, lib, opts, ... }:
+{ pkgs, lib, opts, ... }:
 
 with lib;
 {
@@ -26,11 +26,11 @@ with lib;
     nodePackages_latest.typescript
     nodePackages_latest.typescript-language-server
     niv
-    helix
+    rnix-lsp
 
     mongodb-compass
-    pgadmin4
-    postgresql_15
+    # pgadmin4
+    # postgresql_15
     # radicle-cli
 
     exiftool
