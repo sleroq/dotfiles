@@ -1,23 +1,14 @@
-{ pkgs, ... }:
+{ pkgs, lib, opts, ... }:
 
+with lib;
 {
-  config = {
-    programs.kitty = {
-        enable = true;
-        font = {
-          name = "JetBrainsMono";
-          size = 14;
-        };
-        theme = "Chalk";
-        settings = {
-          confirm_os_window_close = 0;
-          enable_audio_bell = false;
-        };
-    };
+  home.activation.kitty = hm.dag.entryAfter [ "writeBoundary" ] ''
+    $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+        ${opts.realConfigs}/kitty $HOME/.config
+  '';
 
-    fonts.fontconfig.enable = true;
-    home.packages = with pkgs; [
-      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-    ];
-  };
+  fonts.fontconfig.enable = true;
+  home.packages = with pkgs; [
+    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+  ];
 }
