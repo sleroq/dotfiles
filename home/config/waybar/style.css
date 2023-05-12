@@ -1,272 +1,136 @@
-@define-color polar0  #2e3440;
-@define-color polar1  #3b4252;
-@define-color polar2  #434c5e;
-@define-color polar3  #404859;
-@define-color polar4  #4c566a;
+@define-color bright-txt #abc6fc;
 
-/* Snow Storm */
-@define-color snow0  #d8dee9;
-@define-color snow1  #e5e9f0;
-@define-color snow2  #eceff4;
-
-/* Frost */
-@define-color frost0  #8db0AE;
-@define-color frost1  #8fbcbb;
-@define-color frost2  #5c8286;
-@define-color frost3  #88c0d0;
-@define-color frost4  #5e81ac;
-
-/* Aurora */
-@define-color aur1 #bf616a;
-@define-color aur2 #d08770;
-@define-color aur3 #ebcb8b;
-@define-color aur4 #a3be8c;
-@define-color aur5 #b48ead;
-
-/* DARK */
-@define-color bg       @polar0;
-@define-color bg-light @polar3;
-@define-color accent   @frost1;
-@define-color font     @snow2;
-
-/* Reset all styles */
 * {
-    color: @font;
-    border: none;
-    border-radius: 0px;
-    padding: 1px 1px;
-    font-family:Hack;
-    font-size: 14px;
+    font-family: Noto Sans, FontAwesome, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
 }
 
 window#waybar {
-    background: alpha(@bg, 0.8);
-    border-radius: 5px;
-    /* background-color: rgba(100, 100, 100, 0); */
-    transition-property: background-color;
-    transition-duration: .5s;
-    margin-top: 8px;
-    padding: 2px 2px;
+    background-color: transparent;
 }
 
-tooltip {
-     background: rgba(43, 48, 59, 0.95);
-     border: 1px solid rgba(100, 114, 125, 0.8);
-     border-radius: 7px;
-     border-color: shade(alpha(@borders, 0.9), 2.25);
+#clock,
+#battery,
+#cpu,
+#backlight,
+#network,
+#memory,
+#temperature,
+#tray {
+    font-weight: bolder;
+    padding: 0 10px;
+    border-radius: 15px;
+    color: @bright-txt;
+    margin: 10px 10px 10px 0px;
+    background-color: #11111b;
+    min-width: 50px;
+}
+
+#workspaces button.active label,
+#workspaces button.focused label {
+    color: #11111b;
 }
 
 #workspaces {
-   padding: 0px;
-   margin: 0px;
+    margin: 10px;
 }
 
 #workspaces button {
-    color: @font;
-    min-height: 0px;
-    border-color: shade(alpha(@borders, 0.9), 2.25);
-    padding: 0 7px;
-    margin: 0px;
-    border-bottom: 2px solid transparent;
+    font-weight: bolder;
+    color: @bright-txt;
+    background-color: #11111b;
+    border-radius: 15px;
+    margin-right: 10px;
+    padding: 10px;
+    padding-top: 4px;
+    padding-bottom: 2px;
+    transition: all 0.5s cubic-bezier(.55,-0.68,.48,1.68);
 }
 
+#workspaces button.active,
 #workspaces button.focused {
-    border-color: @accent;
+    padding-right: 20px;
+    box-shadow: rgba(0, 0, 0, 0.288) 2px 2px 5px 2px;
+    padding-left: 20px;
+    padding-bottom: 3px;
+    background: rgb(203,166,247);
+    background: radial-gradient(circle, rgba(203,166,247,1) 0%, rgba(193,168,247,1) 12%, rgba(249,226,175,1) 19%, rgba(189,169,247,1) 20%, rgba(182,171,247,1) 24%, rgba(198,255,194,1) 36%, rgba(177,172,247,1) 37%, rgba(170,173,248,1) 48%, rgba(255,255,255,1) 52%, rgba(166,174,248,1) 52%, rgba(160,175,248,1) 59%, rgba(148,226,213,1) 66%, rgba(155,176,248,1) 67%, rgba(152,177,248,1) 68%, rgba(205,214,244,1) 77%, rgba(148,178,249,1) 78%, rgba(144,179,250,1) 82%, rgba(180,190,254,1) 83%, rgba(141,179,250,1) 90%, rgba(137,180,250,1) 100%); 
+    background-size: 400% 400%;
+    animation: gradient_f 20s ease-in-out infinite;
+    transition: all 0.3s cubic-bezier(.55,-0.68,.48,1.682);
 }
 
-#workspaces button.urgent {
-    background: @aur1;
-    color: @font;
-    animation-name: blink;
-    animation-duration: 0.5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-    border-radius: 4px;
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 30%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
 }
 
-#workspaces button:hover {
-   background: rgba(255, 255, 255, 0.3);
-   border-radius: 4px;
+@keyframes gradient_f {
+	0% {
+		background-position: 0% 200%;
+	}
+    50% {
+        background-position: 200% 0%;
+    }
+	100% {
+		background-position: 400% 200%;
+	}
 }
 
-#mode {
-   color: @font;
+@keyframes gradient_f_nh {
+	0% {
+		background-position: 0% 200%;
+	}
+	100% {
+		background-position: 200% 200%;
+	}
 }
 
-#clock, #custom-power, #battery, #cpu, #memory, #idle_inhibitor, #temperature, #custom-keyboard-layout, #backlight, #network, #pulseaudio, #mode, #custom-pacman {
-    margin-right: 2px;
-    margin-left: 2px;
-
-    background-color: @bg-light;
-    border-radius: 4px;
-
-    padding-left:10px;
-    padding-right:10px;
+#clock {
+    font-size: 16px;
 }
 
-#window {
-   padding-left: 5px;
-   margin-right: 20px;
-   border-style: hidden;
-   color: @font;
-}
-
-#custom-power {
-   border-radius: 4px 0 0 4px;
-   margin-right: 0px;
+#battery.charging, #battery.plugged {
+    background: rgb(203,166,247);
+    background: radial-gradient(circle, rgba(203,166,247,1) 0%, rgba(193,168,247,1) 12%, rgba(249,226,175,1) 19%, rgba(189,169,247,1) 20%, rgba(182,171,247,1) 24%, rgba(198,255,194,1) 36%, rgba(177,172,247,1) 37%, rgba(170,173,248,1) 48%, rgba(255,255,255,1) 52%, rgba(166,174,248,1) 52%, rgba(160,175,248,1) 59%, rgba(148,226,213,1) 66%, rgba(155,176,248,1) 67%, rgba(152,177,248,1) 68%, rgba(205,214,244,1) 77%, rgba(148,178,249,1) 78%, rgba(144,179,250,1) 82%, rgba(180,190,254,1) 83%, rgba(141,179,250,1) 90%, rgba(137,180,250,1) 100%); 
+    background-size: 400% 400%;
+    animation: gradient_f 20s ease-in-out infinite;
+    transition: all 0.3s cubic-bezier(.55,-0.68,.48,1.682);
+    color: #11111b;
 }
 
 @keyframes blink {
     to {
-        color: @aur1;
-        background-color: @font;
+        background-color: #f9e2af;
+        color: #96804e;
     }
 }
 
 #battery.critical:not(.charging) {
-    background: @aur1;
-    color: @font;
+    background-color:  #f38ba8;
     animation-name: blink;
     animation-duration: 0.5s;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
     animation-direction: alternate;
-}
-
-#battery.warning:not(.charging) {
-    background: #f53c3c;
-    color: white;
-    animation-name: blink;
-    animation-duration: 0.5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-}
-
-
-#custom-arrowL0,#custom-arrowR0 {
-   background-color: @bg;
-   /* color: shade(alpha(@borders, 1.0), 2.25); */
-   color: @accent;
-}
-
-#mode {
-    margin-bottom:0px;
-}
-
-#pulseaudio.muted {
-    color: @aur1;
-}
-
-#temperature.critical {
-    color: @aur1;
-}
-
-#network.disabled {
-    color: @aur1;
-}
-
-
-
-
-/* ---------------------------------------------------------
- *
- *  										GAPS
- *
- * --------------------------------------------------------- */
-
-
-
-* {
-    color: @font;
-    border: none;
-    border-radius: 0px;
-    padding: 0 0;
-    font-family:Hack;
-    font-size: 12px;
-}
-
-window#waybar {
-    background-color: rgba(100, 100, 100, 0);
-    /* background: shade(alpha(@borders, 0.9), 2.25); */
-}
-
-.modules-left,.modules-right,.modules-center {
-    background: alpha(@bg, 0.8);
-    margin: 6px 6px 0 6px;
-    border-radius: 2px;
-    padding: 4px;
-}
-
-#workspaces {
-   padding: 0px;
-   margin: 0px;
-}
-
-#workspaces button {
-    color: @font;
-    min-height: 0px;
-    border-color: shade(alpha(@borders, 0.9), 2.25);
-    padding: 0 7px;
-    margin: 0px;
-    border-bottom: 2px solid transparent;
-}
-
-#workspaces button.focused {
-    border-color: #8db0AE;
-}
-
-#workspaces button.urgent {
-    background: @aur1;
-    color: @font;
-    animation-name: blink;
-    animation-duration: 0.5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-}
-
-#mode {
-    color: @font;
-}
-
-#clock, #battery, #cpu, #memory, #idle_inhibitor, #temperature, #custom-keyboard-layout, #backlight, #network, #pulseaudio, #mode, #window, #custom-pacman, #language {
-    margin-right: 5px;
-    margin-left: 5px;
-    background-color: transparent;
-}
-
-/* -----------------------------------------------------------------------------
- * Module styles
- * -------------------------------------------------------------------------- */
-@keyframes blink {
-    to {
-        color: @aur1;
-        background-color: @font;
-    }
-}
-
-#language {
-    background-color: transparent;
 }
 
 #tray {
-    padding: 0 6px 0 6px;
+    background: radial-gradient(circle, rgba(30,30,46,1) 30%, rgba(17,17,27,1) 100%); 
 }
 
-#window{
-    border-style: hidden;
+#tray > .passive {
+    -gtk-icon-effect: dim;
 }
 
-#pulseaudio.muted {
-    color: @aur1;
-}
-
-#temperature.critical {
-    color: @aur1;
-}
-
-#network.disabled {
-    color: @aur1;
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background-color: #eb4d4b;
 }
