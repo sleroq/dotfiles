@@ -1,18 +1,19 @@
 { config, pkgs, lib, ... }:
 
 {
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
   environment.systemPackages = with pkgs; [
-    networkmanager-openvpn
     kitty
-    firefox
-    virt-manager
+    librewolf
+    networkmanager-openvpn
 
-    # For XFCE
-    xfce.xfce4-xkb-plugin
-    xfce.xfce4-systemload-plugin
+    virt-manager
+    virtiofsd
+
+    libsForQt5.polkit-kde-agent
   ];
+
+  # For samba and other stuff in thunar
+  services.gvfs.enable = true;
 
   programs.neovim = {
     enable = true;
@@ -29,30 +30,5 @@
     # dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
 
-  virtualisation = {
-    docker.enable = true;
-    waydroid.enable = true;
-    lxd.enable = true;
-    libvirtd.enable = true;
-  };
-
-  programs.dconf.enable = true;
-
-  # virtualisation.virtualbox.host.enable = true;
-  # virtualisation.virtualbox.host.enableExtensionPack = true;
-  # virtualisation.virtualbox.guest.enable = true;
-  # virtualisation.virtualbox.guest.x11 = true;
-  # users.extraGroups.vboxusers.members = [ "sleroq" ];
-
-  nixpkgs.config.packageOverrides = pkgs: {
-    steam = pkgs.steam.override {
-      withPrimus = true;
-      withJava = true;
-      extraPkgs = pkgs: with pkgs; [
-        libgdiplus
-	      bumblebee
-	      glxinfo
-      ];
-    };
-  };
+  programs.dconf.enable = true; # Backend for gtk settings or something like that
 }
