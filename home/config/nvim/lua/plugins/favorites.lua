@@ -36,20 +36,6 @@ return {
   },
 
   {
-    "codota/tabnine-nvim",
-    config = function()
-      require('tabnine').setup({
-        disable_auto_comment = true, 
-        accept_keymap = "<C-a>",
-        dismiss_keymap = "<C-]>",
-        debounce_ms = 800,
-        suggestion_color = { gui = "#808080", cterm = 244 },
-        execlude_filetypes = { "TelescopePrompt" }
-      })
-    end,
-  },
-
-  {
     "MunifTanjim/eslint.nvim",
     opts = {
       bin = 'eslint_d',
@@ -73,25 +59,6 @@ return {
   },
 
   { "tpope/vim-fugitive" },
-
-  -- {
-  --   "jcdickinson/codeium.nvim",
-  --   dependencies = {
-  --       "nvim-lua/plenary.nvim",
-  --       "MunifTanjim/nui.nvim",
-  --       "hrsh7th/nvim-cmp",
-  --   },
-  --   config = function()
-  --     require("codeium").setup({
-  --       tools = {
-  --           curl = "curl",
-  --           gzip = "gzip",
-  --           language_server = "language_server",
-  --         },
-  --     })
-  --   end
-  -- },
-
   -- {
   --   "hrsh7th/nvim-cmp",
   --   dependencies = { "jcdickinson/codeium.nvim" },
