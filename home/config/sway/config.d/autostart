@@ -1,0 +1,13 @@
+# Autostart
+exec dbus-sway-environment
+exec configure-gtk
+
+exec flameshot
+exec wl-paste --watch cliphist store
+exec nm-applet --indicator
+exec gammastep-indicator
+
+workspace 4
+exec keepassxc
+
+workspace 1

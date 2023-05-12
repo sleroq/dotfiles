@@ -1,33 +1,30 @@
 ### Variables
-#
-# Logo key. Use Mod1 for Alt.
 set $mod Mod4
 # Home row direction keys, like vim
 set $left h
 set $down j
 set $up k
 set $right l
-# Your preferred terminal emulator
-set $term foot
-# Your preferred application launcher
-# Note: pass the final command to swaymsg so that the resulting window can be opened
-# on the original workspace that the command was run on.
-# set $menu dmenu_run | xargs swaymsg exec --
-set $menu wofi --show drun -i | xargs swaymsg exec --
 
-default_border pixel 2
+set $term kitty
+set $filemanager nemo
+set $menu wofi -i | xargs swaymsg exec --
+set $menu-run wofi -S run
+set $scripts $HOME/.config/sway/scripts/
+
+default_border pixel 3
 default_floating_border pixel 2
+hide_edge_borders smart
 gaps inner 6
 
 ### Idle configuration
+# This will lock your screen after 300 seconds of inactivity, then turn off
+# your displays after another 300 seconds, and turn your screens back on when
+# resumed. It will also lock your screen before your computer goes to sleep.
 exec swayidle -w \
          timeout 300 'swaylock -f -c 000000' \
          timeout 600 'swaymsg 'output * dpms off'' resume 'swaymsg 'output * dpms on'' \
          before-sleep 'swaylock -f -c 000000'
-
-# This will lock your screen after 300 seconds of inactivity, then turn off
-# your displays after another 300 seconds, and turn your screens back on when
-# resumed. It will also lock your screen before your computer goes to sleep.
 
 ### Input configuration
 
@@ -47,13 +44,12 @@ input * {
   xkb_options 'grp:lctrl_lwin_toggle'
 }
 
+client.focused "#8aadf4" "#8aadf4" "#ffffff" "#8aadf4"
+
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
 
 ### Key bindings
-#
-# Basics:
-#
 bindsym {
   # Start a terminal
   $mod+Return exec $term
@@ -62,13 +58,21 @@ bindsym {
   $mod+Shift+c kill
   
   # Start your launcher
-  $mod+p exec $menu
+  Control+space exec $menu
+  # Kill focused window
+  $mod+p exec $menu-run
   
   # Start filemanager
-  $mod+e exec $menu
+  $mod+e exec $filemanager
   
   # Screenshot
-  Print exec 'grim -g "$(slurp)" - | wl-copy'
+  # FIXME: https://github.com/flameshot-org/flameshot/issues/2848
+  Print exec 'flameshot gui --raw | wl-copy'
+  # Fallback:
+  # Print exec 'grim -g "$(slurp)" - | wl-copy'
+  
+
+  $mod+z exec 'cliphist list | wofi -d | cliphist decode | wl-copy'
 }
 
 # Drag floating windows by holding down $mod and left mouse button.
@@ -82,15 +86,7 @@ floating_modifier $mod normal
 bindsym $mod+Shift+r reload
 
 # Exit sway (logs you out of your Wayland session)
-bindsym $mod+Shift+q exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
-#
-# Volume
-#
-# bindsym {
-#    XF86AudioRaiseVolume exec pamixer -ui 5
-#    XF86AudioLowerVolume exec pamixer -ud 5
-#    XF86AudioMute exec pamixer -t
-# } 
+bindsym $mod+Shift+q exec swaynag -t warning -m 'Do you really want to exit sway?' -B 'Yes, exit sway' 'swaymsg exit'
 
 
 # Brightness
@@ -205,9 +201,8 @@ bindsym $mod+a focus parent
     # Show the next scratchpad window or hide the focused scratchpad window.
     # If there are multiple scratchpad windows, this command cycles through them.
     bindsym $mod+minus scratchpad show
-#
+
 # Resizing containers:
-#
 mode 'resize' {
     # left will shrink the containers width
     # right will grow the containers width
@@ -227,6 +222,7 @@ mode 'resize' {
     # Return to default mode
     bindsym Return mode 'default'
     bindsym Escape mode 'default'
+    bindsym $mod+r mode 'default'
 }
 bindsym $mod+r mode 'resize'
 
@@ -249,34 +245,23 @@ mode 'restore' {
     bindsym $mod+n exec 'swaymsg mode 'default'; swaymsg workspace back_and_forth'
 }
 
-# Fullscreen
-bindsym $mod+Shift+f exec '$HOME/.config/sway/scripts/fullscreen-window.bash'
-mode 'fake-fullscreen' {
-    bindsym $mod+Shift+f exec '$HOME/.config/sway/scripts/unfullscreen-window.bash'
-    bindsym $mod+Escape exec '$HOME/.config/sway/scripts/unfullscreen-window.bash'
-
+# Maximize
+bindsym $mod+Shift+f exec $scripts/maximize.bash
+mode 'maximize' {
+    bindsym $mod+Shift+f exec $scripts/unmaximize.bash
     bindsym $mod+Shift+c kill
 }
 
-#
 # Status Bar:
-#
-# Read `man 5 sway-bar` for more information about this section.
 bar {
     swaybar_command waybar
 }
 
+# Rules
+include config.d/rules
+
 # Autostart
-exec dbus-sway-environment
-exec configure-gtk
+include config.d/autostart
 
-exec flameshot
-exec nm-applet --indicator
-exec gammastep-indicator
-
-workspace 4
-exec keepassxc
-
-workspace 1
-
+# Fallback
 include /etc/sway/config.d/*
