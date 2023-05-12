@@ -4,3 +4,6 @@
 
 
 vim.cmd [[ colorscheme tokyonight-night ]]
+
+-- Highlighting .conf files
+vim.cmd [[ autocmd BufRead,BufNewFile *.conf setf dosini ]]
