@@ -7,15 +7,10 @@
     ./zathura.nix
     ./kitty.nix
     ./neofetch.nix
+    ./mpv.nix
   ];
 
   services.flameshot.enable = true;
-  programs.mpv = {
-    enable = true;
-    config = {
-      volume = 50;
-    };
-  };
 
   home.packages = with pkgs; [
     # feishin waiting for merge request to be accepted
