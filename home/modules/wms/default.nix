@@ -1,17 +1,28 @@
-{ config, pkgs, opts, lib, ... }:
+{ pkgs, ... }:
 
-with lib;
-with config;
 {
   imports = [
-    # ./leftwm.nix
-    # ./sway.nix
+    ./wayland/default.nix
+    ./x11/default.nix
   ];
 
-  home.activation.picom = hm.dag.entryAfter ["writeBoundary"] ''
-    $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
-        ${opts.realConfigs}/picom.conf $HOME/.config
-  '';
+  # Packages universal for all window managers
+  home.packages = with pkgs; [
+    networkmanagerapplet # TODO: Find better solution
+    pavucontrol # TODO: Find better volume control
+    gammastep # screen temperature
+    libnotify
+    glib # gsettings
+    pulseaudioFull
+
+    # Theming
+    lxappearance
+    qt5ct
+
+    dracula-theme # gtk theme
+    kora-icon-theme
+    libsForQt5.breeze-qt5 # qt theme
+  ];
 
   services.gammastep = {
     enable = true;
@@ -24,12 +35,5 @@ with config;
     longitude = 76.8;
     tray = true;
   };
-
-  home.packages = with pkgs; [
-    networkmanagerapplet
-    ulauncher
-    picom
-    pavucontrol
-    gammastep       # screen temperature
-  ];
 }
+

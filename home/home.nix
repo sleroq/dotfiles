@@ -1,6 +1,6 @@
-{ config, pkgs, opts, lib, ... }:
+{ pkgs, opts, lib, ... }:
 
-let 
+let
   safe-place = ''
     # Safe place
     export SAFE_PLACE="/tmp/vault"
@@ -14,6 +14,12 @@ in
     enable = true;
     userName = "Sleroq";
     userEmail = "hireme@sleroq.link";
+  };
+
+  home.sessionVariables = {
+    EDITOR = "nvim";
+    BROWSER = "librewolf";
+    TERMINAL = "kitty";
   };
 
   xsession = {
@@ -34,7 +40,8 @@ in
     p7zip
     unzip
 
-    (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
+    (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" "JetBrainsMono" ]; })
+    powerline-fonts
     noto-fonts
     noto-fonts-extra
     noto-fonts-cjk
@@ -61,7 +68,4 @@ in
   programs.home-manager.enable = true;
 
   nixpkgs.config.allowUnfreePredicate = (_: true);
-  nixpkgs.config.permittedInsecurePackages = [
-    "python-2.7.18.6"
-  ];
 }
