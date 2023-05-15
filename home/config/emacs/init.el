@@ -751,7 +751,7 @@
 ;; format: off
 (org-leader-def
  "" '(nil :which-key "org-mode")
- :states '(normal)
+ :states '(normal visual)
 
  "a" '(org-agenda :which-key "org agenda")
  "A" '(org-attach :which-key "org attach")
