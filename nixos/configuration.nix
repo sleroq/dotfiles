@@ -65,12 +65,20 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+  environment.plasma5.excludePackages = with pkgs.libsForQt5; [
+    oxygen
+    # khelpcenter
+    konsole
+    # plasma-browser-integration
+    # print-manager
+  ];
+
   # Enable the X11 windowing system.
   services.xserver = {
     enable = true;
     desktopManager = {
       xterm.enable = false;
-      cinnamon.enable = true;
+      plasma5.enable = true;
     };
     displayManager.sddm.enable = true;
     windowManager.leftwm.enable = true;
@@ -114,6 +122,9 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+
+  # About fonts - nixos.wiki/wiki/Fonts
+  fonts.fontDir.enable = true;
   fonts.fonts = with pkgs; [
     (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
   ];
