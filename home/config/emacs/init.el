@@ -373,6 +373,18 @@
            :empty-lines-before 1
            :unnarrowed t)
 
+          ("w" "Weekly archive" plain
+           (file
+            ,(concat SAFE_PLACE "/templates/weekly-archive.org"))
+           :target (file+head "weekly/%<%Y-%m-%d> ${slug}.org" "
+#+PROPERTY: CREATED %T
+#+category: %<%Y-%m-%d> ${title}
+#+title: %<%Y-%m-%d> ${title}
+#+startup: show2levels
+#+filetags: :archive:\n")
+           :empty-lines-before 1
+           :unnarrowed t)
+
           ("a"
            "Anime"
            plain
