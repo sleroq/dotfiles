@@ -55,6 +55,16 @@
 (straight-use-package 'use-package)
 (straight-use-package 'org)
 
+(use-package auto-package-update
+  :straight (:host github :repo "rranelli/auto-package-update.el")
+  :custom
+  (auto-package-update-interval 7)
+  (auto-package-update-prompt-before-update t)
+  (auto-package-update-hide-results t)
+  :config
+  (auto-package-update-maybe)
+  (auto-package-update-at-time "09:00"))
+
 ;; Coding
 (straight-use-package 'elisp-autofmt)
 (straight-use-package 'typescript-mode)
