@@ -46,7 +46,7 @@ with lib;
     zstd # for undo-fu-session/undo-tree compression
 
     # hunspell
-    ( hunspellWithDicts (with pkgs.hunspellDicts; [
+    (hunspellWithDicts (with pkgs.hunspellDicts; [
       en-us
       ru_RU
       en_GB-ize
@@ -55,15 +55,15 @@ with lib;
 
     ## Module dependencies
     # :checkers spell
-    (aspellWithDicts (ds: with ds; [ en en-computers en-science ru ]))
+    # (aspellWithDicts (ds: with ds; [ en en-computers en-science ru ]))
     # :tools editorconfig
     editorconfig-core-c # per-project style config
     # :tools lookup & :lang org +roam
     sqlite
     # :lang latex & :lang org (latex previews)
-    texlive.combined.scheme-medium
+    # texlive.combined.scheme-medium
     # :lang beancount
-    beancount
+    # beancount
     # fava # HACK Momentarily broken on nixos-unstable
 
     shellcheck
