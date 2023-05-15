@@ -191,12 +191,6 @@
  ido-default-buffer-method 'selected-window
  ido-default-file-method 'selected-window)
 
-(add-hook
- 'ido-make-file-list-hook
- (lambda ()
-   (define-key
-    ido-file-dir-completion-map (kbd "SPC") 'self-insert-command)))
-
 (setq ido-decorations (quote ("\n-> " "" "\n " "\n ..." "[" "]" "
   [No match]"
               " [Matched]" " [Not readable]" " [Too big]" "
