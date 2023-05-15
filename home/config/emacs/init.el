@@ -1,6 +1,6 @@
 (setq
  user-full-name "Sleroq"
- user-mail-address "hireme@pm.me")
+ user-mail-address "hireme@sleroq.link")
 
 ;; Emacs window size and position
 (setq default-frame-alist '((width . 120) (height . 40)))
