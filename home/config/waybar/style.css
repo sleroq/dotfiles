@@ -1,7 +1,7 @@
 @define-color bright-txt #abc6fc;
 
 * {
-    font-family: Noto Sans, FontAwesome, Roboto, Helvetica, Arial, sans-serif;
+    font-family: Ubuntu Nerd Font, sans-serif;
     font-size: 13px;
 }
 

@@ -40,7 +40,9 @@ in
     p7zip
     unzip
 
-    (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" "JetBrainsMono" ]; })
+    helvetica-neue-lt-std
+    arkpandora_ttf
+    (nerdfonts.override { fonts = [ "JetBrainsMono" "Ubuntu" "Agave" ]; })
     powerline-fonts
     noto-fonts
     noto-fonts-extra
