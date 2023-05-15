@@ -23,6 +23,15 @@ window#waybar {
     color: @bright-txt;
     margin: 10px 10px 10px 0px;
     background-color: #11111b;
+}
+
+#clock,
+#battery,
+#cpu,
+#backlight,
+#network,
+#memory,
+#temperature {
     min-width: 50px;
 }
 
