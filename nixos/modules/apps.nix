@@ -10,6 +10,10 @@
     virtiofsd
 
     libsForQt5.polkit-kde-agent
+
+    (steam.override {
+      extraPkgs = pkgs: [ bumblebee glxinfo ];
+    }).run
   ];
 
   # For samba and other stuff in thunar
@@ -29,6 +33,9 @@
     # remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
     # dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
+
+
+
 
   programs.dconf.enable = true; # Backend for gtk settings or something like that
 }
