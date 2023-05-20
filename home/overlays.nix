@@ -6,7 +6,6 @@ let
 in
 self: super: {
   # codeium = super.callPackage ./packages/codeium.nix { };
-  # jetbrains-toolbox = super.callPackage ./packages/jetbrains-toolbox.nix { };
   # pyrit2 = super.callPackage ./packages/pyrit.nix { };
   waybar-hyprland = super.waybar.overrideAttrs (oldAttrs: {
     postPatch = ''
