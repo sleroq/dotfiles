@@ -11,6 +11,7 @@
 
   home.packages = with pkgs; [
     lapce
-    jetbrains-toolbox
+    jetbrains.goland
+    jetbrains.gateway
   ];
 }

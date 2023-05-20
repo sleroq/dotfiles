@@ -13,6 +13,9 @@
   services.flameshot.enable = true;
 
   home.packages = with pkgs; [
+    appimage-run
+
+    # tor-browser-bundle-bin
     # feishin waiting for merge request to be accepted
     picard
     rclone
