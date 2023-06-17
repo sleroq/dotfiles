@@ -67,9 +67,9 @@ bindsym {
   
   # Screenshot
   # FIXME: https://github.com/flameshot-org/flameshot/issues/2848
-  Print exec 'flameshot gui --raw | wl-copy'
+  # Print exec 'flameshot gui --raw | wl-copy'
   # Fallback:
-  # Print exec 'grim -g "$(slurp)" - | wl-copy'
+  Print exec 'grim -g "$(slurp)" - | wl-copy'
   
 
   $mod+z exec 'cliphist list | wofi -d | cliphist decode | wl-copy'
