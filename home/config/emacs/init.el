@@ -77,6 +77,15 @@
 (straight-use-package 'all-the-icons)
 (setq neo-theme 'icons)
 
+(use-package highlight-indent-guides
+  :hook (prog-mode . highlight-indent-guides-mode)
+  :custom
+  (highlight-indent-guides-responsive 'top)
+  (highlight-indent-guides-method 'character))
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
 (straight-use-package 'magit)
 ;; format: off
 (use-package blamer
