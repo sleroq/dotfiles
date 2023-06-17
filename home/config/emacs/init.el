@@ -22,7 +22,7 @@
 
 ;; Font
 (set-face-attribute 'default nil
-                    :font "JetBrainsMonoNL Nerd Font"
+                    :font "JetBrainsMono Nerd Font Propo"
                     :height 140)
 
 ;; Encrypted directory with my notes, dictionary and other stuff
