@@ -331,6 +331,25 @@
    (ditaa . t)
    (org . t)))
 
+;; Major mode for editing JSON files.
+(use-package json-mode
+  :mode "\\.json\\'"
+  :preface
+  (defun king/json-mode-before-save-hook ()
+    (when (eq major-mode 'json-mode)
+      (json-pretty-print-buffer)))
+  :hook (before-save . king/json-mode-before-save-hook))
+
+;; Major mode for editing Markdown files.
+(use-package markdown-mode
+  :init
+  (setq markdown-command "multimarkdown")
+  :hook (markdown-mode . (lambda () (display-line-numbers-mode -1)))
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'"       . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode)))
+
+
 (when (eq place-is-open t)
   (setq org-attach-id-dir (concat SAFE_PLACE "/files/attachments/"))
   (setq org-directory (concat SAFE_PLACE "/emacs-org/"))
