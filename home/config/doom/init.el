@@ -1,5 +1,8 @@
 ;;; init.el -*- lexical-binding: t; -*-
 
+;; This file controls what Doom modules are enabled and what order they load
+;; in. Remember to run 'doom sync' after modifying it!
+
 ;; NOTE Press 'SPC h d h' (or 'C-h d h' for non-vim users) to access Doom's
 ;;      documentation. There you'll find a link to Doom's Module Index where all
 ;;      of our modules are listed, including what flags they support.
@@ -25,7 +28,7 @@
        vertico           ; the search engine of the future
 
        :ui
-       deft              ; notational velocity for Emacs
+       ;;deft              ; notational velocity for Emacs
        doom              ; what makes DOOM look the way it does
        doom-dashboard    ; a nifty splash screen for Emacs
        ;;doom-quit         ; DOOM quit-message prompts when you quit Emacs
@@ -36,13 +39,13 @@
        ligatures         ; ligatures and symbols to make your code pretty again
        ;;minimap           ; show a map of the code on the side
        modeline          ; snazzy, Atom-inspired modeline, plus API
-       nav-flash         ; blink cursor line after big motions
+       ;;nav-flash         ; blink cursor line after big motions
        ;;neotree           ; a project drawer, like NERDTree for vim
        ophints           ; highlight the region an operation acts on
        (popup +defaults)   ; tame sudden yet inevitable temporary windows
        ;;tabs              ; a tab bar for Emacs
        treemacs          ; a project drawer, like neotree but cooler
-       unicode           ; extended unicode support for various languages
+       ;;unicode           ; extended unicode support for various languages
        (vc-gutter +pretty) ; vcs diff in the fringe
        vi-tilde-fringe   ; fringe tildes to mark beyond EOB
        ;;window-select     ; visually switch windows
@@ -56,7 +59,7 @@
        ;;(format +onsave)  ; automated prettiness
        ;;god               ; run Emacs commands without modifier keys
        ;;lispy             ; vim for lisp, for people who don't like vim
-       multiple-cursors  ; editing in many places at once
+       ;;multiple-cursors  ; editing in many places at once
        ;;objed             ; text object editing for the innocent
        ;;parinfer          ; turn lisp into python, sort of
        ;;rotate-text       ; cycle region at point between text candidates
@@ -78,54 +81,52 @@
 
        :checkers
        syntax              ; tasing you for every semicolon you forget
-       (spell
-        +flyspell
-        +hunspell) ; tasing you for misspelling mispelling
-       ;;grammar           ; tasing grammar mistake every you make (languagetool)
+       (spell +flyspell)   ; tasing you for misspelling mispelling
+       ;;grammar           ; tasing grammar mistake every you make
 
        :tools
        ;;ansible
        ;;biblio            ; Writes a PhD for you (citation needed)
        ;;debugger          ; FIXME stepping through code, to help you add bugs
        ;;direnv
-       docker
-       editorconfig      ; let someone else argue about tabs vs spaces
+       ;;docker
+       editorconfig        ; let someone else argue about tabs vs spaces
        ;;ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
        ;;gist              ; interacting with github gists
        lookup              ; navigate your code and its documentation
-       lsp               ; M-x vscode
-       magit             ; a git porcelain for Emacs
+       lsp                 ; M-x vscode
+       magit               ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
-       pdf               ; pdf enhancements
+       pdf                 ; pdf enhancements
        ;;prodigy           ; FIXME managing external services & code builders
        ;;rgb               ; creating color strings
        ;;taskrunner        ; taskrunner for all your projects
        ;;terraform         ; infrastructure as code
        ;;tmux              ; an API for interacting with tmux
-       tree-sitter       ; syntax and parsing, sitting in a tree...
+       tree-sitter         ; syntax and parsing, sitting in a tree...
        ;;upload            ; map local to remote projects via ssh/ftp
 
        :os
        (:if IS-MAC macos)  ; improve compatibility with macOS
-       tty               ; improve the terminal Emacs experience
+       ;;tty               ; improve the terminal Emacs experience
 
        :lang
        ;;agda              ; types of types of types of types...
-       ;;beancount         ; mind the GAAP
+       beancount           ; mind the GAAP
        ;;(cc +lsp)         ; C > C++ == 1
-       ;;(clojure +lsp)           ; java with a lisp
-       (common-lisp +sly)       ; if you've seen one lisp, you've seen them all
+       ;;clojure           ; java with a lisp
+       ;;common-lisp       ; if you've seen one lisp, you've seen them all
        ;;coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c
        ;;csharp            ; unity, .NET, and mono shenanigans
-       data              ; config/data formats
+       ;;data              ; config/data formats
        ;;(dart +flutter)   ; paint ui and not much else
        ;;dhall
        ;;elixir            ; erlang done right
        ;;elm               ; care for a cup of TEA?
-       emacs-lisp        ; drown in parentheses
+       emacs-lisp          ; drown in parentheses
        ;;erlang            ; an elegant language for a more civilized age
        ;;ess               ; emacs speaks statistics
        ;;factor
@@ -134,12 +135,14 @@
        ;;fsharp            ; ML stands for Microsoft's Language
        ;;fstar             ; (dependent) types and (monadic) effects and Z3
        ;;gdscript          ; the language you waited for
-       (go +lsp)         ; the hipster dialect
+       (go                 ; the hipster dialect
+        +tree-sitter
+        +lsp)
        ;;(graphql +lsp)    ; Give queries a REST
        ;;(haskell +lsp)    ; a language that's lazier than I am
        ;;hy                ; readability of scheme w/ speed of python
        ;;idris             ; a language you can depend on
-       (json +lsp)              ; At least it ain't XML
+       ;;json              ; At least it ain't XML
        ;;(java +lsp)       ; the poster child for carpal tunnel syndrome
        (javascript +lsp)        ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia             ; a better, faster MATLAB
@@ -147,14 +150,16 @@
        ;;latex             ; writing papers in Emacs has never been so fun
        ;;lean              ; for folks with too much to prove
        ;;ledger            ; be audit you can be
-       (lua +lsp)               ; one-based indices? one-based indices
-       markdown          ; writing docs for people to ignore
+       ;;lua               ; one-based indices? one-based indices
+       markdown            ; writing docs for people to ignore
        ;;nim               ; python + lisp at the speed of c
-       nix               ; I hereby declare "nix geht mehr!"
+       (nix +tree-sitter)  ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
-       (org
+       (org                ; organize your plain life in plain text
         +dragndrop
-        +roam2)        ; organize your plain life in plain text
+        +pandoc
+        +pretty
+        +roam2)
        ;;php               ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
@@ -168,14 +173,14 @@
        ;;(rust +lsp)       ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
        ;;(scheme +guile)   ; a fully conniving family of lisps
-       (sh + lsp)                ; she sells {ba,z,fi}sh shells on the C xor
+       sh                  ; she sells {ba,z,fi}sh shells on the C xor
        ;;sml
        ;;solidity          ; do you need a blockchain? No.
        ;;swift             ; who asked for emoji variables?
        ;;terra             ; Earth and Moon in alignment for performance.
-       web               ; the tubes
-       yaml              ; JSON, but readable
-       zig               ; C, but simpler
+       web                 ; the tubes
+       ;;yaml              ; JSON, but readable
+       ;;zig               ; C, but simpler
 
        :email
        ;;(mu4e +org +gmail)
@@ -183,7 +188,7 @@
        ;;(wanderlust +gmail)
 
        :app
-       calendar
+       ;;calendar
        ;;emms
        ;;everywhere        ; *leave* Emacs!? You must be joking
        ;;irc               ; how neckbeards socialize

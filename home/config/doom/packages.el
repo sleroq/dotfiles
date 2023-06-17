@@ -5,21 +5,16 @@
 ;; on the command line, then restart Emacs for the changes to take effect -- or
 ;; use 'M-x doom/reload'.
 
+
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
-;; (package! some-package)
+;(package! some-package)
 
 ;; https://github.com/org-roam/org-roam-ui#installation
 (unpin! org-roam)
 (package! org-roam-ui)
 
-;; Gemini
-(package! gemini-mode)
-(package! ox-gemini)
-(package! elpher)
-
-(package! yuck-mode)
-
-(package! company-tabnine)
+(package! org-super-agenda)
+(package! origami)
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
