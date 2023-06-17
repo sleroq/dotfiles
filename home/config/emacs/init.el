@@ -282,8 +282,14 @@
  org-startup-truncated t
  org-hide-emphasis-markers t
  org-startup-with-inline-images t
+ org-indent-indentation-per-level 1
+ org-adapt-indentation nil
  org-image-actual-width '(400))
 
+(customize-set-variable 'org-blank-before-new-entry 
+                        '((heading . nil)
+                          (plain-list-item . nil)))
+(setq org-cycle-separator-lines 1)
 
 (straight-use-package 'writeroom-mode)
 (setq writeroom-fullscreen-effect nil)
