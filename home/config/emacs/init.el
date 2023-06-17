@@ -308,7 +308,7 @@
   (org-fragtog-mode) ;; Show latex fragments on mouse hover
   (org-pretty-tags-mode) ;; Show tags in a pretty way
   (text-scale-set 2) ;; Increase font size
-  (olivetti-mode)) 
+  (olivetti-mode))
 (add-hook 'org-mode-hook 'my-org-mode-hook)
 
 ;; Org-babel
