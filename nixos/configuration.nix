@@ -39,6 +39,12 @@
     wifi.backend = "iwd";
   };
 
+  hardware.bluetooth.enable = true;
+  services.blueman.enable = true;
+
+  hardware.opentabletdriver.enable = true;
+  hardware.opentabletdriver.daemon.enable = true;
+
   nix.settings.auto-optimise-store = true;
   nix.gc = {
     automatic = true;
