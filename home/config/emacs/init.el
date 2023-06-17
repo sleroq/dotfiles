@@ -165,6 +165,46 @@
 ;; format: on
 (add-hook 'text-mode-hook 'copilot-mode )
 
+(use-package calendar
+  :ensure nil
+  :custom
+  (calendar-mark-holidays-flag t))
+
+;; format: off
+(use-package holidays
+  :ensure nil
+  :custom
+  (holiday-bahai-holidays nil)
+  (holiday-christian-holidays
+   '((holiday-fixed  1  6     "Epiphany (Vízkereszt)")
+     (holiday-easter-etc -46  "Ash Wednesday (Hamvazószerda)")
+     (holiday-easter-etc -7   "Palm Sunday (Virágvasárnap)")
+     (holiday-easter-etc -2   "Holy Friday (Nagypéntek)")
+     (holiday-easter-etc  0   "Easter Sunday (Húsvétvasárnap)")
+     (holiday-easter-etc  1   "Easter Monday (Húsvéthétfő)")
+     (holiday-easter-etc 39   "Ascension (Áldozócsütörtök)")
+     (holiday-easter-etc 49   "Pentecost (Pünkösd)")
+     (holiday-easter-etc 56   "Trinity Sunday (Szentháromság Vasárnapja)")
+     (holiday-easter-etc 60   "Corpus Christi (Úrnapja)")
+     (holiday-greek-orthodox-easter)
+     (holiday-fixed  8 15     "Assumption (Nagyboldogasszony)")
+     (holiday-fixed 11  1     "All Saints' Day (Mindenszentek Napja)")
+     (holiday-fixed 11  2     "Day of the Dead (Hallotak Napja)")
+     (holiday-fixed 12 25     "Christmas Day (Karácsony Napja)")))
+  (holiday-general-holidays
+   '((holiday-fixed  1  1     "New Year's Day (Újév)")
+     (holiday-fixed  2 14     "Valentine's Day (Valentin Nap)")
+     (holiday-fixed  3  8     "International Women's Day (Nemzetközi Nőnap)")
+     (holiday-fixed 10 31     "Halloween (Észak-Amerikai Ünnep)")
+     (holiday-float 11  4  4  "Thanksgiving (Észak-Amerikai Ünnep)")))
+  (holiday-local-holidays
+   '((holiday-fixed  5  1     "Labor Day (A Munka Ünnepe)")
+     (holiday-float  5  0  1  "Mother's Day (Anyák Napja)")))
+  (holiday-hebrew-holidays nil)
+  (holiday-islamic-holidays nil)
+  (holiday-oriental-holidays nil))
+;; format: on
+
 ;;
 ;; Look and feel
 ;;
