@@ -25,6 +25,9 @@
                     :font "JetBrainsMono Nerd Font Propo"
                     :height 140)
 
+;; Variable-pitch
+(set-face-attribute 'variable-pitch nil :family "Merriweather")
+
 ;; Encrypted directory with my notes, dictionary and other stuff
 (setq SAFE_PLACE (getenv "SAFE_PLACE"))
 (setq place-is-open
