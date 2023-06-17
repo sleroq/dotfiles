@@ -7,6 +7,7 @@ in
 self: super: {
   # codeium = super.callPackage ./packages/codeium.nix { };
   # pyrit2 = super.callPackage ./packages/pyrit.nix { };
+  obinskit = super.callPackage ./packages/obinskit.nix { };
   waybar-hyprland = super.waybar.overrideAttrs (oldAttrs: {
     postPatch = ''
       # use hyprctl to switch workspaces

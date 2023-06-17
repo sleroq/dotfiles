@@ -12,8 +12,13 @@
 
   services.flameshot.enable = true;
 
+  nixpkgs.config.permittedInsecurePackages = [
+    "electron-13.6.9"
+  ];
+
   home.packages = with pkgs; [
     appimage-run
+    obinskit
 
     # tor-browser-bundle-bin
     # feishin waiting for merge request to be accepted
