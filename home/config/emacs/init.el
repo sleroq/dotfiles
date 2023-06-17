@@ -873,9 +873,13 @@
 (add-hook 'ido-setup-hook 'ido-my-keys)
 
 ;; Vim-like navigation in ivy
-(defun ivy-my-keys ()
+(defun ivy-vim-keys ()
   (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
   (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line))
+(add-hook 'ivy-mode-hook 'ivy-vim-keys)
+
+(defun ivy-my-keys ()
+  (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-immediate-done))
 (add-hook 'ivy-mode-hook 'ivy-my-keys)
 
 ;; Vim like navigation in helm
