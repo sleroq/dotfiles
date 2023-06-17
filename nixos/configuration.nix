@@ -12,6 +12,7 @@
     ./modules/virtualisation.nix
     ./modules/wms/default.nix
     ./modules/apps.nix
+    ./modules/flatpak-workaround.nix
   ];
 
   # Bootloader.
