@@ -27,6 +27,8 @@ with lib;
     nodePackages_latest.typescript-language-server
     niv
     rnix-lsp
+    cargo
+    rustc
 
     mongodb-compass
     # pgadmin4

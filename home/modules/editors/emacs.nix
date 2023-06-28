@@ -57,6 +57,9 @@ in
       gotools
       # :lang nix
       nixfmt
+      # :lang rust
+      rustfmt
+      rust-analyzer
       # :lang beancount
       beancount
       fava

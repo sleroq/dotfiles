@@ -60,7 +60,7 @@
     auto_derive_workspaces: true,
 
     keybind: [
-        (command: Execute, value: "rofi -show drun", modifier: ["modkey"], key: "p"),
+        (command: Execute, value: "rofi -show drun", modifier: ["modkey"], key: "space"),
         (command: Execute, value: "rofi -show window -modi windowcd,window", modifier: ["modkey"], key: "Tab"),
         (command: Execute, value: "rofi -show windowcd -modi windowcd,window", modifier: ["modkey", "Shift"], key: "Tab"),
         (command: Execute, value: "kitty", modifier: ["modkey"], key: "Return"),
@@ -68,8 +68,8 @@
         (command: Execute, value: "nemo", modifier: ["modkey"], key: "e"),
         (command: Execute, value: "feh --bg-fill --randomize \"$HOME\"/Pictures/wallpapers", modifier: ["modkey"], key: "w"),
 
-        (command: Execute, value: "xbacklight -inc 2", key: "XF86XK_MonBrightnessUp"),
-        (command: Execute, value: "xbacklight -dec 2", key: "XF86XK_MonBrightnessDown"),
+        (command: Execute, value: "light -U 10", key: "XF86XK_MonBrightnessUp"),
+        (command: Execute, value: "light -A 10", key: "XF86XK_MonBrightnessDown"),
         (command: Execute, value: "color-temp -i 500", modifier: ["Control"], key: "F2"),
         (command: Execute, value: "color-temp -d 500", modifier: ["Control"], key: "F1"),
 
@@ -91,6 +91,7 @@
         (command: FocusWindowDown, modifier: ["modkey"], key: "j"),
         (command: NextLayout, modifier: ["modkey", "Control"], key: "k"),
         (command: PreviousLayout, modifier: ["modkey", "Control"], key: "j"),
+
         (command: IncreaseMainWidth, value: "1", modifier: ["modkey"], key: "l"),
         (command: DecreaseMainWidth, value: "1", modifier: ["modkey"], key: "h"),
         (command: MoveWindowUp, modifier: ["modkey", "Shift"], key: "Up"),

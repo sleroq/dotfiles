@@ -20,12 +20,12 @@
     appimage-run
     obinskit
 
-    # tor-browser-bundle-bin
+    tor-browser-bundle-bin
     # feishin waiting for merge request to be accepted
     picard
-    rclone
     tdesktop
     discord
+    nheko
     schildichat-desktop
     chromium
     exodus
@@ -44,6 +44,7 @@
     cinnamon.nemo-with-extensions
 
     # CLI
+    rclone
     gdb
     gocryptfs
     xclip
