@@ -15,9 +15,10 @@ with lib;
 
     xorg.xbacklight
     sct
+    feh
 
     # Screen-locking:
-    slock
+    # slock - must be enabled on system level
     i3lock
     maim
     imagemagick
