@@ -18,11 +18,11 @@
 
   home.packages = with pkgs; [
     appimage-run
-    obinskit
+    obinskit # proprietary keyboard software
 
     tor-browser-bundle-bin
     # feishin waiting for merge request to be accepted
-    picard
+    picard # music tagger
     tdesktop
     discord
     nheko
@@ -39,6 +39,7 @@
     keepassxc
     syncplay
     rustdesk
+    scrcpy # android screen mirroring
 
     ffmpegthumbnailer
     cinnamon.nemo-with-extensions
