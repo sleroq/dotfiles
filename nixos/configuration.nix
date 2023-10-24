@@ -25,9 +25,18 @@
     "/crypto_keyfile.bin" = null;
   };
 
-  # Enable swap on luks
-  boot.initrd.luks.devices."luks-47f43abe-5bff-40e7-9484-5766d62e9b77".device = "/dev/disk/by-uuid/47f43abe-5bff-40e7-9484-5766d62e9b77";
-  boot.initrd.luks.devices."luks-47f43abe-5bff-40e7-9484-5766d62e9b77".keyFile = "/crypto_keyfile.bin";
+  boot.initrd.luks.devices."luks-47f43abe-5bff-40e7-9484-5766d62e9b77" = {
+    # Enable swap on luks
+    device = "/dev/disk/by-uuid/47f43abe-5bff-40e7-9484-5766d62e9b77";
+    keyFile = "/crypto_keyfile.bin";
+    # Enable trimming
+    allowDiscards = true;
+  };
+
+  boot.initrd.luks.devices."luks-d8faed41-c117-470b-aa32-b7dd33331e62" = {
+    # Enable trimming
+    allowDiscards = true;
+  };
 
   networking.hostName = "sleroq-international";
   networking.nameservers = [ "1.1.1.1" "1.1.0.1" ];
@@ -79,6 +88,7 @@
     # plasma-browser-integration
     # print-manager
   ];
+  services.fstrim.enable = true;
 
   # Enable the X11 windowing system.
   services.xserver = {
