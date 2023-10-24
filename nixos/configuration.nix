@@ -9,7 +9,7 @@
     ./hardware-configuration.nix # Include the results of the hardware scan.
     ./cachix.nix # Community cache
 
-    ./modules/virtualisation.nix
+    # ./modules/virtualisation.nix
     ./modules/wms/default.nix
     ./modules/apps.nix
     ./modules/flatpak-workaround.nix

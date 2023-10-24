@@ -7,8 +7,8 @@
   ];
 
   virtualisation = {
-    docker.enable = true;
-    waydroid.enable = true;
+    # docker.enable = true;
+    # waydroid.enable = true;
     lxd.enable = true;
     libvirtd.enable = true;
     spiceUSBRedirection.enable = true;
