@@ -1,5 +1,16 @@
 (setq org-directory "~/Sync/Shared org")
 
+(setq org-hide-emphasis-markers t)
+(setq org-startup-indented t)
+
+(setq writeroom-extra-line-spacing 4)
+
+;; https://explog.in/notes/writingsetup.html#org51a5dfe
+(customize-set-variable 'org-blank-before-new-entry
+                        '((heading . nil)
+                          (plain-list-item . nil)))
+(setq org-cycle-separator-lines 1)
+
 (add-hook 'org-mode-hook '+zen/toggle)
 (add-hook 'org-agenda-mode-hook #'origami-mode)
 (add-hook 'org-agenda-mode-hook #'org-super-agenda-mode)
