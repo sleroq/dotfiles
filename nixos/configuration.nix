@@ -81,23 +81,11 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  environment.plasma5.excludePackages = with pkgs.libsForQt5; [
-    oxygen
-    # khelpcenter
-    konsole
-    # plasma-browser-integration
-    # print-manager
-  ];
   services.fstrim.enable = true;
 
   # Enable the X11 windowing system.
   services.xserver = {
     enable = true;
-    desktopManager = {
-      xterm.enable = false;
-      plasma5.enable = true;
-    };
-    displayManager.sddm.enable = true;
     windowManager.leftwm.enable = true;
   };
 
