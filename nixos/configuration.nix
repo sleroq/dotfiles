@@ -152,6 +152,7 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.nvidia.acceptLicense = true; # Why do I need this? I don't even have nvidia
 
 
   # About fonts - nixos.wiki/wiki/Fonts
