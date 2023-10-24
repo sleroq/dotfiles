@@ -2,12 +2,9 @@
 
 {
   environment.systemPackages = with pkgs; [
-    kitty
+    foot
     librewolf
     networkmanager-openvpn
-
-    virt-manager
-    virtiofsd
 
     libsForQt5.polkit-kde-agent
 
@@ -16,7 +13,7 @@
     }).run
   ];
 
-  # For samba and other stuff in thunar
+  # For samba and other stuff
   services.gvfs.enable = true;
 
   programs.neovim = {
@@ -34,8 +31,7 @@
     # dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
 
-
-
+  # programs.adb.enable = true; # Phone stuff
 
   programs.dconf.enable = true; # Backend for gtk settings or something like that
 }
