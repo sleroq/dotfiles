@@ -178,8 +178,13 @@
 
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 8666 8667 ];
-  networking.firewall.allowedUDPPorts = [ 8666 8667 ];
+  networking.firewall.allowedTCPPorts = [
+    25565 # Minecraft
+  ];
+
+
+  # About polkit - https://nixos.wiki/wiki/Polkit
+  security.polkit.enable = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -191,6 +196,4 @@
 
   # Enable flakes:
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-  security.polkit.enable = true;
 }
