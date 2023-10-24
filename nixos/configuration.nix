@@ -142,12 +142,12 @@
   # services.xserver.libinput.enable = true;
   services.flatpak.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  # Define a user account
   users.defaultUserShell = pkgs.zsh;
   users.users.sleroq = {
     isNormalUser = true;
     description = "sleroq";
-    extraGroups = [ "networkmanager" "input" "wheel" "docker" "video" "libvirtd" ];
+    extraGroups = [ "networkmanager" "input" "wheel" "docker" "video" "libvirtd" "adbusers" ];
   };
 
   # Allow unfree packages
