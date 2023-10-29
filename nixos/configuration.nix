@@ -82,20 +82,6 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  services.fstrim.enable = true;
-
-  # Enable the X11 windowing system.
-  services.xserver = {
-    enable = true;
-    windowManager.leftwm.enable = true;
-  };
-
-  # Configure keymap in X11
-  services.xserver = {
-    layout = "us";
-    xkbVariant = "";
-  };
-
   # Battery life
   services.power-profiles-daemon.enable = false;
   services.thermald.enable = true;

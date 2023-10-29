@@ -44,7 +44,7 @@ in {
         --user-menu \
         --cmd ${greetd-sway-wrapper}/bin/greetd-sway-wrapper
     '';
-     hyprland_session.command = ''
+     hyprland.command = ''
       ${pkgs.greetd.tuigreet}/bin/tuigreet \
         --time \
         --asterisks \
@@ -57,6 +57,7 @@ in {
   environment.etc."greetd/environments".text = ''
     sway
     hyprland
+    leftwm
   '';
 
   environment.systemPackages = with pkgs; [
