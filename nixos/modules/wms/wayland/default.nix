@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{ pkgs, ... }: {
   # xdg-desktop-portal works by exposing a series of D-Bus interfaces
   # known as portals under a well-known name
   # (org.freedesktop.portal.Desktop) and object path
@@ -11,11 +10,11 @@
   xdg.portal = {
     enable = true;
     wlr.enable = true;
-    # TODO: Figure out what each portal does
     extraPortals = [
-      # pkgs.xdg-desktop-portal-wlr
+      # TODO: Figure out what each portal does
+      pkgs.xdg-desktop-portal-wlr
       pkgs.xdg-desktop-portal-gtk # gtk portal needed to make gtk apps happy
-      # pkgs.xdg-desktop-portal
+      pkgs.xdg-desktop-portal
     ];
   };
 

@@ -3,7 +3,7 @@
 {
   imports = [
     ./wayland/default.nix
-    ./x11/default.nix
+    # ./x11/default.nix
   ];
 
   # Packages universal for all window managers
@@ -36,4 +36,3 @@
     tray = true;
   };
 }
-
