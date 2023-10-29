@@ -26,6 +26,8 @@
     "/crypto_keyfile.bin" = null;
   };
 
+  services.fstrim.enable = true;
+
   boot.initrd.luks.devices."luks-47f43abe-5bff-40e7-9484-5766d62e9b77" = {
     # Enable swap on luks
     device = "/dev/disk/by-uuid/47f43abe-5bff-40e7-9484-5766d62e9b77";
