@@ -116,7 +116,7 @@
   # About fonts - nixos.wiki/wiki/Fonts
   fonts.fontDir.enable = true;
   fonts.packages = with pkgs; [
-    (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
+    (nerdfonts.override { fonts = [ "JetBrainsMono" "FiraCode" "DroidSansMono" ]; })
   ];
 
   programs.zsh.enable = true;
