@@ -59,5 +59,9 @@
     nomachine-client
 
     iw
+
+    activitywatch
+    aw-watcher-afk
+    aw-watcher-window
   ];
 }
