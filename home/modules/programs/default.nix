@@ -5,7 +5,7 @@
     ./tmux.nix
     ./lf.nix
     ./zathura.nix
-    ./kitty.nix
+    ./foot.nix
     ./neofetch.nix
     ./mpv.nix
   ];

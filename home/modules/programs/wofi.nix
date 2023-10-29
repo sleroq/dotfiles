@@ -5,7 +5,7 @@
     enable = true;
     settings = {
       show = "drun";
-      term = "kitty";
+      term = "foot";
       prompt = "Looking for…";
       layer = "overlay";
       always_parse_args = true;

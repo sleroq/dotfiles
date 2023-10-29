@@ -82,7 +82,7 @@
     "format-ethernet": "󰈀 {ifname}", // Icon: ethernet
     "format-disconnected": " Disconnected",
     "tooltip-format": "{essid} ({ifname}): {ipaddr}",
-    "on-click": "kitty --title fly_is_kitty nmtui"
+    "on-click": "foot --title fly_is_kitty nmtui"
   },
 
  "memory": {
@@ -92,7 +92,7 @@
         "warning": 70,
         "critical": 90
     },
-    "on-click": "kitty btop"
+    "on-click": "foot btop"
  },
 
 
