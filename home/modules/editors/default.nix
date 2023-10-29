@@ -10,7 +10,6 @@
   programs.vscode.enable = true;
 
   home.packages = with pkgs; [
-    lapce
     jetbrains.goland
     jetbrains.gateway
   ];

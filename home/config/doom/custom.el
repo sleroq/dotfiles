@@ -94,8 +94,11 @@
       (magit-section-case . 0)
       (org-roam-with-file . 2))
      (elisp-lint-ignored-validators "byte-compile" "package-lint")))
+ '(magit-todos-insert-after '(bottom) nil nil "Changed by setter of obsolete option `magit-todos-insert-at'")
  '(org-agenda-files
-   '("/tmp/vault/emacs-org/journal.org" "/home/sleroq/Sync/Shared org/Notes.org" "/home/sleroq/Sync/Shared org/tasks.org" "/tmp/vault/roam/20221107160217-work_journal.org" "/tmp/vault/roam/20221111135059-technical_journal.org" "/tmp/vault/roam/anime/20221108145922-anime_journal.org" "/tmp/vault/roam/gaming/20221116114015-gaming_journal.org" "/tmp/vault/roam/20221021234437-general_journal.org" "/tmp/vault/roam/gaming/20221115131355-games.org" "/tmp/vault/roam/reading/20221103202415-books.org" "/tmp/vault/roam/journals/20230612")))
+   '("/tmp/vault/emacs-org/journal.org" "/home/sleroq/Sync/Shared org/Notes.org" "/home/sleroq/Sync/Shared org/tasks.org" "/tmp/vault/roam/20221107160217-work_journal.org" "/tmp/vault/roam/20221111135059-technical_journal.org" "/tmp/vault/roam/anime/20221108145922-anime_journal.org" "/tmp/vault/roam/gaming/20221116114015-gaming_journal.org" "/tmp/vault/roam/20221021234437-general_journal.org" "/tmp/vault/roam/gaming/20221115131355-games.org" "/tmp/vault/roam/reading/20221103202415-books.org" "/tmp/vault/roam/journals/20230612"))
+ '(org-safe-remote-resources
+   '("\\`https://gitlab\\.com/OlMon/org-themes/-/raw/master/src/white_clean/white_clean\\.theme\\'")))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

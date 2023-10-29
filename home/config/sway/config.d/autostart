@@ -2,10 +2,15 @@
 exec dbus-sway-environment
 exec configure-gtk
 
+exec aw-server # Activity watch server
 exec flameshot
 exec wl-paste --watch cliphist store
 exec nm-applet --indicator
-exec gammastep-indicator
+
+# Tabbed layout for 1 and 2nd workspaces
+exec swaymsg layout tabbed
+workspace 2
+exec swaymsg layout tabbed
 
 workspace 4
 exec keepassxc

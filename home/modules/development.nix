@@ -26,6 +26,7 @@ with lib;
     deno
     nodePackages_latest.typescript
     nodePackages_latest.typescript-language-server
+    gopls
     niv
     rnix-lsp
     cargo
@@ -36,9 +37,9 @@ with lib;
     # postgresql_15
     # radicle-cli
 
+    # TODO: Remove if nothing breaks
     exiftool
     gcc
     gnumake
-    zig
   ];
 }
