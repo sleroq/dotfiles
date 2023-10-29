@@ -6,16 +6,20 @@ set $down j
 set $up k
 set $right l
 
-set $term kitty
-set $filemanager nemo
+set $term foot
+set $filemanager pcmanfm-qt
 set $menu wofi -i | xargs swaymsg exec --
 set $menu-run wofi -S run
-set $scripts $HOME/.config/sway/scripts/
+set $scripts $HOME/.config/sway/scripts
 
 default_border pixel 3
 default_floating_border pixel 2
 hide_edge_borders smart
 gaps inner 6
+
+# Swayfx options
+corner_radius 4
+titlebar_separator disable
 
 ### Idle configuration
 # This will lock your screen after 300 seconds of inactivity, then turn off
@@ -34,8 +38,8 @@ input "type:touchpad" {
 }
 
 input * {
-  repeat_delay 300
-  repeat_rate 50
+  repeat_delay 250
+  repeat_rate 25
   accel_profile 'flat'
   pointer_accel 0
   scroll_factor 1
@@ -66,10 +70,9 @@ bindsym {
   $mod+e exec $filemanager
   
   # Screenshot
-  # FIXME: https://github.com/flameshot-org/flameshot/issues/2848
-  # Print exec 'flameshot gui --raw | wl-copy'
+  Print exec 'flameshot gui --raw | wl-copy'
   # Fallback:
-  Print exec 'grim -g "$(slurp)" - | wl-copy'
+  # Print exec 'grim -g "$(slurp)" - | wl-copy'
   
 
   $mod+z exec 'cliphist list | wofi -d | cliphist decode | wl-copy'
@@ -184,7 +187,7 @@ bindsym $mod+f fullscreen
 bindsym $mod+Shift+space floating toggle
 
 # Swap focus between the tiling area and the floating area
-bindsym $mod+Tab focus mode_toggle
+bindsym $mod+Shift+Tab focus mode_toggle
 
 # Move focus to the parent container
 bindsym $mod+a focus parent
@@ -247,10 +250,13 @@ mode 'restore' {
 
 # Maximize
 bindsym $mod+Shift+f exec $scripts/maximize.bash
+
 mode 'maximize' {
     bindsym $mod+Shift+f exec $scripts/unmaximize.bash
     bindsym $mod+Shift+c kill
 }
+
+bindsym $mod+Tab exec $scripts/switch-window.bash
 
 # Status Bar:
 bar {
@@ -262,6 +268,3 @@ include config.d/rules
 
 # Autostart
 include config.d/autostart
-
-# Fallback
-include /etc/sway/config.d/*
