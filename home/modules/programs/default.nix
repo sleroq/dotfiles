@@ -42,7 +42,9 @@
     scrcpy # android screen mirroring
 
     ffmpegthumbnailer
-    cinnamon.nemo-with-extensions
+    lxqt.pcmanfm-qt
+    lxmenu-data
+    shared-mime-info
 
     # CLI
     rclone

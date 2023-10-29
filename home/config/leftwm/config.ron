@@ -65,7 +65,7 @@
         (command: Execute, value: "rofi -show windowcd -modi windowcd,window", modifier: ["modkey", "Shift"], key: "Tab"),
         (command: Execute, value: "kitty", modifier: ["modkey"], key: "Return"),
         (command: Execute, value: "flameshot gui", key: "Print"),
-        (command: Execute, value: "nemo", modifier: ["modkey"], key: "e"),
+        (command: Execute, value: "pcmanfm-qt", modifier: ["modkey"], key: "e"),
         (command: Execute, value: "feh --bg-fill --randomize \"$HOME\"/Pictures/wallpapers", modifier: ["modkey"], key: "w"),
 
         (command: Execute, value: "light -U 10", key: "XF86XK_MonBrightnessUp"),

@@ -10,6 +10,7 @@ for_window [class="(?i)Lxappearance$"] floating enable
 for_window [app_id="(?i)mpv"] floating enable
 for_window [app_id="pavucontrol"] floating enable
 for_window [app_id="(?i)thunar"] floating enable
+for_window [app_id="(?i)pcmanfm"] floating enable
 for_window [app_id="nemo"] floating enable
 for_window [app_id="vlc"] floating enable
 for_window [app_id="tlp-ui"] floating enable
