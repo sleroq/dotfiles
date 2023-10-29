@@ -6,8 +6,9 @@
 
     shellAliases = {
       cd = "z";
+      ls = "eza";
       update = "sudo nixos-rebuild switch --upgrade";
-      hmdate = "home-manager switch";
+      hmdate = "home-manager switch"; # TODO: fix to work with nix flakes
       sudo = "sudo ";
       tmus = "tmux -f ~/.config/tmux/tmux.conf";
     };
@@ -45,7 +46,7 @@
     zoxide
     oh-my-zsh
     bat
-    exa
+    eza
     fasd
     fd
     fzf
