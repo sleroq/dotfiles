@@ -18,6 +18,12 @@
     ];
   };
 
+  security.pam.services.swaylock = {
+    text = ''
+      auth include login
+    '';
+  };
+
   # Brightness cli tool
   programs.light.enable = true;
 

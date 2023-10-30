@@ -61,9 +61,6 @@ with lib; {
     cliphist.enable = true;
   };
 
-  home.sessionVariables = {
-  };
-
   wayland.windowManager.sway = {
     enable = true;
     package = null;
@@ -85,5 +82,6 @@ with lib; {
 
     cliphist
     swayfx
+    swayidle
   ];
 }
