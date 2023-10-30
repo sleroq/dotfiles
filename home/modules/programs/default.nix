@@ -24,7 +24,7 @@
     tor-browser-bundle-bin
     # feishin waiting for merge request to be accepted
     picard # music tagger
-    discord
+    gtkcord4
     schildichat-desktop
     chromium
     brave
