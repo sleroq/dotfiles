@@ -16,6 +16,7 @@ let
     destination = "/bin/greetd-sway-wrapper";
     executable = true;
     text = wayland-environment + ''
+      export XDG_CURRENT_DESKTOP=sway
       exec sway $@
     '';
   };
@@ -24,6 +25,7 @@ let
     destination = "/bin/greetd-sway-wrapper";
     executable = true;
     text = wayland-environment + ''
+      export XDG_CURRENT_DESKTOP=hyprland
       exec hyprland $@
     '';
   };
