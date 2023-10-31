@@ -54,7 +54,7 @@ client.focused "#8aadf4" "#8aadf4" "#ffffff" "#8aadf4"
 # Read `man 5 sway-input` for more information about this section.
 
 ### Key bindings
-bindsym {
+bindsym --to-code {
   # Start a terminal
   $mod+Return exec $term
   
@@ -86,10 +86,10 @@ bindsym {
 floating_modifier $mod normal
 
 # Reload the configuration file
-bindsym $mod+Shift+r reload
+bindsym --to-code $mod+Shift+r reload
 
 # Exit sway (logs you out of your Wayland session)
-bindsym $mod+Shift+q exec swaynag -t warning -m 'Do you really want to exit sway?' -B 'Yes, exit sway' 'swaymsg exit'
+bindsym --to-code $mod+Shift+q exec swaynag -t warning -m 'Do you really want to exit sway?' -B 'Yes, exit sway' 'swaymsg exit'
 
 
 # Brightness
@@ -108,7 +108,7 @@ bindsym {
 #
 # Moving around:
 #
-bindsym {
+bindsym --to-code {
     # Move your focus around
   $mod+$left focus left
   $mod+$down focus down
@@ -171,26 +171,27 @@ bindsym {
 # You can 'split' the current object of your focus with
 # $mod+b or $mod+v, for horizontal and vertical splits
 # respectively.
-bindsym $mod+b splith
-bindsym $mod+v splitv
+bindsym --to-code {
+  $mod+b splith
+  $mod+v splitv
+  # Switch the current container between different layout styles
+  $mod+f1 layout stacking
+  $mod+f2 layout tabbed
+  $mod+f3 layout toggle split
+  $mod+f4 floating toggle, floating toggle
 
-# Switch the current container between different layout styles
-bindsym $mod+f1 layout stacking
-bindsym $mod+f2 layout tabbed
-bindsym $mod+f3 layout toggle split
-bindsym $mod+f4 floating toggle, floating toggle
+  # Make the current focus fullscreen
+  $mod+f fullscreen
 
-# Make the current focus fullscreen
-bindsym $mod+f fullscreen
+  # Toggle the current focus between tiling and floating mode
+  $mod+Shift+space floating toggle
 
-# Toggle the current focus between tiling and floating mode
-bindsym $mod+Shift+space floating toggle
+  # Swap focus between the tiling area and the floating area
+  $mod+Shift+Tab focus mode_toggle
 
-# Swap focus between the tiling area and the floating area
-bindsym $mod+Shift+Tab focus mode_toggle
-
-# Move focus to the parent container
-bindsym $mod+a focus parent
+  # Move focus to the parent container
+  $mod+a focus parent
+}
 
 #
 # Scratchpad:
@@ -225,43 +226,49 @@ mode 'resize' {
     # Return to default mode
     bindsym Return mode 'default'
     bindsym Escape mode 'default'
-    bindsym $mod+r mode 'default'
+    bindsym --to-code $mod+r mode 'default'
 }
-bindsym $mod+r mode 'resize'
+bindsym --to-code $mod+r mode 'resize'
 
 # Kinda like hiding windows (stash)
 set $hiddenws '99'
 bindsym $mod+Shift+n move container to workspace number $hiddenws
 bindsym $mod+n exec 'swaymsg workspace number 99; swaymsg mode restore'
 mode 'restore' {
-    bindsym h focus left
-    bindsym j focus down
-    bindsym k focus up
-    bindsym l focus right
+  bindsym --to-code {
+    h focus left
+    j focus down
+    k focus up
+    l focus right
 
-    bindsym $mod+Shift+c kill
+    $mod+Shift+c kill
 
-    bindsym Return exec 'swaymsg move container to workspace back_and_forth; swaymsg mode 'default'; swaymsg workspace back_and_forth'
-    bindsym Escape exec 'swaymsg mode 'default'; swaymsg workspace back_and_forth'
+    Return exec 'swaymsg move container to workspace back_and_forth; swaymsg mode 'default'; swaymsg workspace back_and_forth'
+    Escape exec 'swaymsg mode 'default'; swaymsg workspace back_and_forth'
 
-    bindsym $mod+Shift+n exec 'swaymsg move container to workspace back_and_forth; swaymsg mode 'default'; swaymsg workspace back_and_forth'
-    bindsym $mod+n exec 'swaymsg mode 'default'; swaymsg workspace back_and_forth'
+    $mod+Shift+n exec 'swaymsg move container to workspace back_and_forth; swaymsg mode 'default'; swaymsg workspace back_and_forth'
+    $mod+n exec 'swaymsg mode 'default'; swaymsg workspace back_and_forth'
+  }
 }
 
 # Maximize
 bindsym $mod+Shift+f exec $scripts/maximize.bash
 
 mode 'maximize' {
-    bindsym $mod+Shift+f exec $scripts/unmaximize.bash
-    bindsym $mod+Shift+c kill
+  bindsym --to-code {
+    $mod+Shift+f exec $scripts/unmaximize.bash
+    $mod+Shift+c kill
+  }
 }
 
-bindsym $mod+Tab exec $scripts/switch-window.bash
+bindsym $mod+Tab exec swayr switch-window
+bindsym --to-code $mod+grave exec swayr next-window current-workspace
+bindsym --to-code $mod+Shift+grave exec swayr next-window current-workspace
 
 # Status Bar:
-bar {
-    swaybar_command waybar
-}
+# bar {
+#     swaybar_command waybar
+# }
 
 # Rules
 include config.d/rules

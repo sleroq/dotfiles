@@ -43,12 +43,17 @@ with lib; {
   imports = [
     ../../programs/mako.nix
     ../../programs/wofi.nix
+    ../../programs/eww.nix
   ];
 
   home.activation.sway = hm.dag.entryAfter [ "writeBoundary" ] ''
     $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
         ${opts.realConfigs}/sway/* $HOME/.config/sway/
   '';
+
+  home.sessionVariables = {
+    XDG_CURRENT_DESKTOP = "sway";
+  };
 
   programs = {
     waybar.enable = true;
@@ -83,5 +88,7 @@ with lib; {
     cliphist
     swayfx
     swayidle
+    swaykbdd
+    swayr
   ];
 }
