@@ -9,6 +9,7 @@ with lib;
 
   fonts.fontconfig.enable = true;
   home.packages = with pkgs; [
+    kitty
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 }
