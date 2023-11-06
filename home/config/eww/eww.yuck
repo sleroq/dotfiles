@@ -16,13 +16,13 @@
             :value {round((1 - (EWW_DISK["/"].free / EWW_DISK["/"].total)) * 100, 0)}
             :onchange "")))
 
-(deflisten SPACES :initial '{"active":1,"workspaces":[]}' "scripts/eww-ws")
+(deflisten SPACES :initial '{"active":0,"workspaces":[]}' "scripts/eww-ws")
 
 (defwidget workspaces []
   (box :class "workspaces"
-    (for entry in "${SPACES.workspaces}"
-        (button :class "bb" :onclick "sway workspace ${entry.id}"
-            {"${entry.is_active}" ? ">${entry.id}<" : "${entry.id}"}))))
+  (for entry in "${SPACES.workspaces}"
+    (button :onclick "hyprctl dispatch workspace ${entry.id}"
+      "${entry.name}"))))
 
 (defwidget metric [label value onchange]
   (box :orientation "h"
@@ -32,7 +32,6 @@
     (scale :min 0
            :max 101
            :active {onchange != ""}
-           :value value
            :onchange onchange)))
 
 (defpoll volume :interval "1s"
