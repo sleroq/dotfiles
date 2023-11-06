@@ -8,7 +8,7 @@
   (box :class "sidestuff" :orientation "h" :space-evenly false :halign "end"
     (metric :label "󰕾"
             :value volume
-            :onchange "amixer -D pulse sset Master {}%")
+            :onchange "scripts/getvol")
     (metric :label "󰍛"
             :value {EWW_RAM.used_mem_perc}
             :onchange "")
@@ -31,10 +31,11 @@
     (box :class "label" label)
     (scale :min 0
            :max 101
+           :value value
            :active {onchange != ""}
            :onchange onchange)))
 
-(defpoll volume :interval "1s"
+(defpoll volume :initial 0.0 :interval "1s"
   "scripts/getvol")
 
 (defpoll time :interval "10s"
