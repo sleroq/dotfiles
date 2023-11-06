@@ -17,7 +17,6 @@ with lib;
     gawk
     pamixer
 
-    font-awesome
-    (nerdfonts.override { fonts = [ "JetBrainsMono" "Ubuntu" "Agave" ]; })
+    (nerdfonts.override { fonts = [ "Noto" ]; })
   ];
 }
