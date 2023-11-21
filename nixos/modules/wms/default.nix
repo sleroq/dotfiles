@@ -10,59 +10,38 @@ let
     export SDL_VIDEODRIVER=wayland;
     export MOZ_ENABLE_WAYLAND=1;
   '';
+
   # https://man.sr.ht/%7Ekennylevinsen/greetd/#how-to-set-xdg_session_typewayland
-  greetd-sway-wrapper = pkgs.writeTextFile {
-    name = "greetd-sway-wrapper";
-    destination = "/bin/greetd-sway-wrapper";
+  sway-wrapper = pkgs.writeTextFile {
+    name = "sway-wrapper";
+    destination = "/bin/sway-wrapper";
     executable = true;
     text = wayland-environment + ''
       export XDG_CURRENT_DESKTOP=sway
       exec sway $@
     '';
   };
-  greetd-hyprland-wrapper = pkgs.writeTextFile {
-    name = "greetd-sway-wrapper";
-    destination = "/bin/greetd-sway-wrapper";
+
+  hyprland-wrapper = pkgs.writeTextFile {
+    name = "sway-wrapper";
+    destination = "/bin/sway-wrapper";
     executable = true;
     text = wayland-environment + ''
       export XDG_CURRENT_DESKTOP=hyprland
       exec hyprland $@
     '';
   };
-in {
-
+in
+{
   imports = [
+    ./lemurs.nix
     ./wayland/default.nix
     ./x11/leftwm.nix
+    ./x11/default.nix
   ];
 
-  services.greetd = {
-    enable = true;
-    settings = {
-     default_session.command = ''
-      ${pkgs.greetd.tuigreet}/bin/tuigreet \
-        --time \
-        --asterisks \
-        --user-menu \
-        --cmd ${greetd-sway-wrapper}/bin/greetd-sway-wrapper
-    '';
-     hyprland.command = ''
-      ${pkgs.greetd.tuigreet}/bin/tuigreet \
-        --time \
-        --asterisks \
-        --user-menu \
-        --cmd ${greetd-hyprland-wrapper}/bin/greetd-hyprland-wrapper
-    '';
-    };
-  };
-
-  environment.etc."greetd/environments".text = ''
-    sway
-    hyprland
-    leftwm
-  '';
-
   environment.systemPackages = with pkgs; [
-    greetd-sway-wrapper
+    sway-wrapper
+    hyprland-wrapper
   ];
 }
