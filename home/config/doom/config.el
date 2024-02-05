@@ -81,6 +81,9 @@
               ("C-TAB" . 'copilot-accept-completion-by-word)
               ("C-<tab>" . 'copilot-accept-completion-by-word)))
 
+;; Enable sway-lang-mode for sway config files
+(add-to-list 'auto-mode-alist '(".*/sway/.*'" . conf-mode))
+
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;

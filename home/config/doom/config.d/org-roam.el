@@ -246,6 +246,18 @@
                      (:auto-category)))))))))
 
 ;;`Journal'
+(if (eq place-is-open t)
+    (setq org-roam-dailies-directory "journals/")
+
+    ;; Weekly journal
+    (setq org-roam-dailies-capture-templates
+    '(("d" "default" entry
+    #'org-roam-capture--get-point
+    "* %?"
+    :file-name "%<%Y-%m>"
+    :head "#+TITLE: %<%Y-%m>\n\n\n"
+    :olp ("%<%Y-%m-%d>")))))
+
 ; (if (eq place-is-open t)
 ;     (setq org-journal-dir (concat org-roam-directory "/journals/")
 ;           org-journal-file-type 'weekly
