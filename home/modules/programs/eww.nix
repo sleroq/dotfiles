@@ -1,4 +1,4 @@
-{ pkgs, lib, opts, ... }:
+{ pkgs, lib, opts, inputs, ... }:
 
 with lib;
 {
@@ -7,16 +7,13 @@ with lib;
         ${opts.realConfigs}/eww $HOME/.config
   '';
 
-  programs.ncmpcpp = {
-    enable = true;
-  };
-
   fonts.fontconfig.enable = true;
   home.packages = with pkgs; [
-    eww-wayland
+    inputs.eww.packages.${pkgs.system}.eww-wayland
     gawk
     pamixer
+    killall
 
-    (nerdfonts.override { fonts = [ "Noto" ]; })
+    (nerdfonts.override { fonts = [ "Noto" "DaddyTimeMono" ]; })
   ];
 }

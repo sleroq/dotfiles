@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+EWW="$(which eww)"
+export EWW
+BAR_CMD="${EWW} -c $HOME/.config/eww/bar"
+FILE="$HOME/.cache/toggle.bar"
+
+## Run eww daemon if not running already
+if [[ ! $(pidof eww) ]]; then
+	${BAR_CMD} daemon
+	sleep 1
+fi
+
+## Open widgets 
+run_eww() {
+	${BAR_CMD} open-many \
+         bar
+        
+}
+
+## Launch or close widgets accordingly
+if [[ ! -f "$FILE" ]]; then
+	touch "$FILE"
+	run_eww
+else
+	${EWW} close-all && killall eww
+	rm "$FILE"
+fi

@@ -1,0 +1,55 @@
+* {
+  all: unset;
+	font-family: DaddyTimeMono NF;
+}
+
+.bar {
+  background-color: #3a3a3a;
+  color: #b0b4bc;
+}
+
+.metric scale trough {
+  background-color: #4e4e4e;
+  border-radius: 50px;
+  min-height: 3px;
+  min-width: 50px;
+  margin-left: 10px;
+  margin-right: 20px;
+}
+
+.metric scale trough highlight {
+  background-color: #8aadf4;
+}
+
+.workspaces .bb:hover {
+  color: #8aadf4;
+}
+
+
+.tray > menuitem {
+  margin-right: 4px;
+}
+.tray menu {
+  background-color: #3a3a3a;
+  padding: 4px;
+  border-radius: 4px;
+}
+.tray menu menuitem:hover {
+  background-color: #4e4e4e;
+}
+
+.volume button {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.volbar trough {
+  background-color: #4e4e4e;
+  min-height: 3px;
+  min-width: 50px;
+  margin-right: 8px;
+}
+
+.volbar trough highlight {
+  background-color: #8aadf4;
+}
