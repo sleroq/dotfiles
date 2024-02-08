@@ -271,7 +271,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 -- [[ Configure Telescope ]]
-require("custom/plugins/telescope")
+require('setups/telescope')
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
