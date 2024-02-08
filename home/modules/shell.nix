@@ -31,6 +31,15 @@
 
       # Scripts
       path+=("${opts.dotfiles}/scripts")
+
+      # Download Znap, if it's not there yet.
+      [[ -r "$HOME/develop/other/znap/znap.zsh" ]] ||
+        git clone --depth 1 -- \
+          https://github.com/marlonrichert/zsh-snap.git "$HOME/develop/other/znap"
+
+      source "$HOME/develop/other/znap/znap.zsh"
+
+      znap source marlonrichert/zsh-autocomplete
     '';
   };
 
