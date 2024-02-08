@@ -38,3 +38,9 @@ vim.o.completeopt = 'menuone,noselect'
 vim.o.termguicolors = true
 vim.o.foldmethod = "indent"
 vim.o.foldlevel = 999
+
+-- Indent
+vim.o.tabstop = 4
+
+-- Disable wrap
+vim.o.wrap = false
