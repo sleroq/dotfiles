@@ -251,6 +251,26 @@ require('lazy').setup({
   --
   --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
   -- { import = 'custom.plugins' },
+  {
+    'zbirenbaum/copilot.lua',
+    config = function()
+      require("copilot").setup({
+        suggestion = {
+          enabled = true,
+          auto_trigger = true,
+          debounce = 75,
+          keymap = {
+            accept = "<M-l>",
+            accept_word = false,
+            accept_line = false,
+            next = "<M-]>",
+            prev = "<M-[>",
+            dismiss = "<C-]>",
+          },
+        },
+      })
+    end,
+  },
 }, {})
 
 -- [[ Setting options ]]
