@@ -399,6 +399,7 @@ end)
 
 require('lspconfig').tsserver.setup({})
 require('lspconfig').gopls.setup({})
+require('lspconfig').rnix.setup({})
 
 -- document existing key chains
 require('which-key').register {
