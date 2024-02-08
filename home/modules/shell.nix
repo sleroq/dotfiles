@@ -3,14 +3,25 @@
 {
   programs.zsh = {
     enable = true;
+    enableCompletion = true;
+    enableAutosuggestions = true;
+    syntaxHighlighting.enable = true;
 
     shellAliases = {
       cd = "z";
       ls = "eza";
-      update = "sudo nixos-rebuild switch --upgrade";
-      hmdate = "home-manager switch"; # TODO: fix to work with nix flakes
+      up = "sudo nix-channel --update && sudo nixos-rebuild switch --upgrade";
+      hu = "home-manager switch --flake ${opts.realDotfiles}/home#sleroq";
       sudo = "sudo ";
       tmus = "tmux -f ~/.config/tmux/tmux.conf";
+
+      l = "ls -lh";
+      la = "ls -lAh";
+      ll = "ls -l";
+      ldot = "ls -ld .*";
+      lS = "ls -1Ssh";
+      lsr = "ls -lARh";
+      lsn = "ls -1";
     };
 
     history = {
@@ -21,7 +32,14 @@
 
     oh-my-zsh = {
       enable = true;
-      plugins = [ "git" "thefuck" ];
+      plugins = [
+        "git"
+        "thefuck"
+        "colored-man-pages"
+        "common-aliases"
+        "lol"
+        "tmux"
+      ];
       theme = "robbyrussell";
     };
 
@@ -31,16 +49,20 @@
 
       # Scripts
       path+=("${opts.dotfiles}/scripts")
-
-      # Download Znap, if it's not there yet.
-      [[ -r "$HOME/develop/other/znap/znap.zsh" ]] ||
-        git clone --depth 1 -- \
-          https://github.com/marlonrichert/zsh-snap.git "$HOME/develop/other/znap"
-
-      source "$HOME/develop/other/znap/znap.zsh"
-
-      znap source marlonrichert/zsh-autocomplete
     '';
+
+    initExtra = ''
+      # Fix plugin aliases
+      unalias tldr
+    '';
+
+    plugins = with pkgs; [
+      {
+        name = "you-should-use";
+        file = "share/zsh/plugins/you-should-use/you-should-use.plugin.zsh";
+        src = pkgs.zsh-you-should-use;
+      }
+    ];
   };
 
   programs.zoxide = {
@@ -51,7 +73,6 @@
   home.packages = with pkgs; [
     zsh
     thefuck
-    nix-zsh-completions
     zoxide
     oh-my-zsh
     bat
@@ -64,5 +85,6 @@
     tldr
     onefetch
     btop
+    zsh-completions
   ];
 }
