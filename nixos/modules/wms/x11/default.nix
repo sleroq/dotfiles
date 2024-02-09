@@ -1,9 +1,23 @@
 { pkgs, ... }: {
-  services.xserver.excludePackages = [ pkgs.xterm ];
 
-  # Configure keymap in X11
   services.xserver = {
+    enable = true;
     layout = "us";
     xkbVariant = "";
+    excludePackages = with pkgs; [ xterm ];
+    displayManager.sddm.enable = true;
+    desktopManager.plasma5.enable = true;
+    # desktopManager.xfce.enable = true;
+
+    libinput = {
+      # Enable touchpad support (enabled default in most desktopManager)
+      enable = true;
+
+      # Disabling mouse acceleration
+      mouse = { accelProfile = "flat"; };
+
+      # Disabling touchpad acceleration
+      touchpad = { accelProfile = "flat"; };
+    };
   };
 }
