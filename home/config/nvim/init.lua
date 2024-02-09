@@ -155,6 +155,15 @@ require('lazy').setup({
     priority = 1000,
     lazy = false,
     config = function()
+      require("catppuccin").setup({
+        integrations = {
+          cmp = true,
+          gitsigns = true,
+          treesitter = true,
+          telescope = true,
+        }
+      })
+
       vim.cmd.colorscheme 'catppuccin-macchiato'
     end,
   },
