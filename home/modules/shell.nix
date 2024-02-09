@@ -13,7 +13,6 @@
       up = "sudo nix-channel --update && sudo nixos-rebuild switch --upgrade";
       hu = "home-manager switch --flake ${opts.realDotfiles}/home#sleroq";
       sudo = "sudo ";
-      tmus = "tmux -f ~/.config/tmux/tmux.conf";
 
       l = "ls -lh";
       la = "ls -lAh";
