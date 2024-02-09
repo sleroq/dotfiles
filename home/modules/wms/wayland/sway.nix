@@ -41,9 +41,9 @@ let
 in
 with lib; {
   imports = [
-    ../../programs/mako.nix
     ../../programs/wofi.nix
     ../../programs/eww.nix
+    ../../programs/swaync.nix
   ];
 
   home.activation.sway = hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -85,6 +85,7 @@ with lib; {
     configure-gtk
     dbus-sway-environment
 
+    stalonetray
     cliphist
     swayfx
     swayidle

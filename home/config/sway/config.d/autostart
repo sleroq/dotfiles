@@ -2,10 +2,18 @@
 exec dbus-sway-environment
 exec configure-gtk
 
-exec aw-server # Activity watch server
+exec swaync --config ~/.config/swaync/config.json # Notification daemon
+exec exec swaykbdd # Per-window keyboard layout
+# exec aw-server # Activity watch server
 exec flameshot
 exec wl-paste --watch cliphist store
 exec nm-applet --indicator
+exec swayrd # Window-switcher server
+
+exec eww -c ~/.config/eww/simple-bar daemon
+exec eww -c ~/.config/eww/simple-bar open bar
+
+exec emacs --daemon
 
 # Tabbed layout for 1 and 2nd workspaces
 exec swaymsg layout tabbed

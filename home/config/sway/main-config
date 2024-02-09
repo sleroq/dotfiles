@@ -21,14 +21,11 @@ gaps inner 6
 corner_radius 4
 titlebar_separator disable
 
-### Idle configuration
-# This will lock your screen after 300 seconds of inactivity, then turn off
-# your displays after another 300 seconds, and turn your screens back on when
-# resumed. It will also lock your screen before your computer goes to sleep.
+# Idle configuration
 exec swayidle -w \
-  timeout 300 'swaylock -f -c 000000' \
-  timeout 600 'swaymsg "output * dpms off"' \
-    resume 'swaymsg "output * dpms on"' \
+  timeout 900 'swaylock -f -c 000000' \
+  timeout 1200 'swaymsg "output * dpms off"' \
+  resume 'swaymsg "output * dpms on"' \
   before-sleep 'swaylock -f -c 000000'
 
 ### Input configuration
@@ -230,29 +227,8 @@ mode 'resize' {
 }
 bindsym --to-code $mod+r mode 'resize'
 
-# Kinda like hiding windows (stash)
-set $hiddenws '99'
-bindsym $mod+Shift+n move container to workspace number $hiddenws
-bindsym $mod+n exec 'swaymsg workspace number 99; swaymsg mode restore'
-mode 'restore' {
-  bindsym --to-code {
-    h focus left
-    j focus down
-    k focus up
-    l focus right
-
-    $mod+Shift+c kill
-
-    Return exec 'swaymsg move container to workspace back_and_forth; swaymsg mode 'default'; swaymsg workspace back_and_forth'
-    Escape exec 'swaymsg mode 'default'; swaymsg workspace back_and_forth'
-
-    $mod+Shift+n exec 'swaymsg move container to workspace back_and_forth; swaymsg mode 'default'; swaymsg workspace back_and_forth'
-    $mod+n exec 'swaymsg mode 'default'; swaymsg workspace back_and_forth'
-  }
-}
-
 # Maximize
-bindsym $mod+Shift+f exec $scripts/maximize.bash
+bindsym --to-code $mod+Shift+f exec $scripts/maximize.bash
 
 mode 'maximize' {
   bindsym --to-code {
@@ -264,11 +240,6 @@ mode 'maximize' {
 bindsym $mod+Tab exec swayr switch-window
 bindsym --to-code $mod+grave exec swayr next-window current-workspace
 bindsym --to-code $mod+Shift+grave exec swayr next-window current-workspace
-
-# Status Bar:
-# bar {
-#     swaybar_command waybar
-# }
 
 # Rules
 include config.d/rules
