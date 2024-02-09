@@ -8,9 +8,8 @@
 
     libsForQt5.polkit-kde-agent
 
-    (steam.override {
-      extraPkgs = pkgs: [ bumblebee glxinfo ];
-    }).run
+    shadowsocks-libev
+    shadowsocks-v2ray-plugin
   ];
 
   # For samba and other stuff
@@ -27,8 +26,9 @@
   programs.java.enable = true;
   programs.steam = {
     enable = true;
-    # remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
     # dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+    gamescopeSession.enable = true;
   };
 
   # programs.adb.enable = true; # Phone stuff
