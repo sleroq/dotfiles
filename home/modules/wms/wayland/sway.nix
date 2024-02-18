@@ -52,6 +52,7 @@ with lib; {
   '';
 
   home.sessionVariables = {
+    # TODO: is this necessary?
     XDG_CURRENT_DESKTOP = "sway";
   };
 
@@ -68,7 +69,7 @@ with lib; {
 
   wayland.windowManager.sway = {
     enable = true;
-    package = null;
+    package = pkgs.swayfx;
 
     # This probably does nothing
     wrapperFeatures.gtk = true;
@@ -79,6 +80,21 @@ with lib; {
     extraConfig = ''
       include main-config
     '';
+
+    extraSessionCommands = ''
+      export _JAVA_AWT_WM_NONREPARENTING=1;
+      export XDG_SESSION_TYPE=wayland;
+      export QT_QPA_PLATFORM=wayland;
+      export QT_QPA_PLATFORMTHEME=qt6ct;
+      export QT_WAYLAND_DISABLE_WINDOWDECORATION=1;
+      export CLUTTER_BACKEND=wayland;
+      export SDL_VIDEODRIVER=wayland;
+      export MOZ_ENABLE_WAYLAND=1;
+      export VDPAU_DRIVER=radeonsi;
+
+      dbus-sway-environment
+      configure-gtk
+    '';
   };
 
   home.packages = with pkgs; [
@@ -87,7 +103,6 @@ with lib; {
 
     stalonetray
     cliphist
-    swayfx
     swayidle
     swaykbdd
     swayr

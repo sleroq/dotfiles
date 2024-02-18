@@ -7,8 +7,11 @@ with lib;
     # ./hyprland.nix
   ];
 
+  services.kanshi.enable = true;
+
   # Packages universal for all window managers
   home.packages = with pkgs; [
+    wl-clipboard
     cava
     grim
     slurp
