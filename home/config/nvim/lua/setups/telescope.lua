@@ -8,10 +8,26 @@ require('telescope').setup {
       },
     },
   },
+  extensions = {
+    file_browser = {
+      -- theme = "ivy",
+      -- disables netrw and use telescope-file-browser in its place
+      hijack_netrw = true,
+      -- mappings = {
+      --   ["i"] = {
+      --     -- your custom insert mode mappings
+      --   },
+      --   ["n"] = {
+      --     -- your custom normal mode mappings
+      --   },
+      -- },
+    },
+  },
 }
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
+pcall(require('telescope').load_extension, 'file_browser')
 
 -- Telescope live_grep in git root
 -- Function to find the git root directory based on the current buffer's path
