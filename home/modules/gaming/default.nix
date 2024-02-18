@@ -1,7 +1,10 @@
 { pkgs, ... }:
 
 {
-  imports = [ ./osu.nix ];
+  imports = [
+    ./osu.nix
+  ];
+
 
   home.packages = with pkgs; [
     # lutris

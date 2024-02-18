@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 
 {
   programs.tmux = {
@@ -7,9 +7,12 @@
     keyMode = "vi";
     newSession = true;
     prefix = "C-a";
-    terminal = "screen-256color";
-    # mouse = true;
+    mouse = true;
     extraConfig = ''
+      # Fix colors
+      set -g default-terminal "tmux-256color"
+      set -ag terminal-overrides ",xterm-256color:RGB"
+
       # Easy config reload
       bind-key R source-file ~/.config/tmux/tmux.conf \; display-message "tmux.conf reloaded."
 
@@ -74,6 +77,11 @@
 
       # Allow the arrow key to be used immediately after changing windows
       set-option -g repeat-time 0
+
+      # Gitmux
+      set -g status-right '#(gitmux "#{pane_current_path}")'
     '';
   };
+
+  home.packages = [ pkgs.gitmux ];
 }

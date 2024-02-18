@@ -48,6 +48,7 @@ in
       html-tidy
       jsbeautifier
       nodePackages_latest.stylelint
+      sass
       # :lang org & export with pandoc
       pandoc
       # :lang go
@@ -63,6 +64,9 @@ in
       # :lang beancount
       beancount
       fava
+
+      # for org-download-clipboard
+      maim
 
       # Fonts
       emacs-all-the-icons-fonts

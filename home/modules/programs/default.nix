@@ -2,12 +2,12 @@
 
 {
   imports = [
-    ./tmux.nix
     ./lf.nix
     ./zathura.nix
     ./foot.nix
     ./neofetch.nix
     ./mpv.nix
+    ./tmux.nix
     ./gitui.nix
   ];
 
@@ -15,22 +15,27 @@
   
   nixpkgs.config.permittedInsecurePackages = [
     "electron-13.6.9" # Required for obinskit
-    "electron-24.8.6" # Required by something else
+    "electron-25.9.0" # Required by obsidian
   ];
 
   home.packages = with pkgs; [
     appimage-run
-    # obinskit # proprietary keyboard software
+    obinskit # proprietary keyboard software
+    xray
+    nheko
 
+    youtube-music
+    sublime-music
     tor-browser-bundle-bin
-    # feishin waiting for merge request to be accepted
     picard # music tagger
-    gtkcord4
-    schildichat-desktop
+    telegram-desktop
+    discord-screenaudio
     chromium
-    brave
-    # exodus
+    thunderbird
+    exodus
     krita
+    logseq
+    obsidian
     libreoffice-fresh
     libsForQt5.kdenlive
     obs-studio
@@ -59,11 +64,12 @@
     # Work
     remmina
     nomachine-client
+    rustdesk
 
     iw
 
-    activitywatch
-    aw-watcher-afk
-    aw-watcher-window
+    # activitywatch
+    # aw-watcher-afk
+    # aw-watcher-window
   ];
 }

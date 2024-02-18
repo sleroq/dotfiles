@@ -1,8 +1,9 @@
 { config, pkgs, ... }:
 
 {
+  # TODO: Update to be actually correct
   xdg.configFile."neofetch/config.conf".text = ''
-    # Source:   https://github.com/Chick2D/neofetch-themes/ 
+    # Source:   https://github.com/Chick2D/neofetch-themes/
     # Made by:  https://github.com/gosxrgxx (simpleFetch)
 
     print_info() {
@@ -399,7 +400,5 @@
     stdout="off"
   '';
 
-  home.packages = with pkgs; [
-    neofetch
-  ];
+  home.packages = with pkgs; [ neofetch ];
 }
