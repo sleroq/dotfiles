@@ -2,8 +2,10 @@
 
   services.xserver = {
     enable = true;
-    layout = "us";
-    xkbVariant = "";
+    xkb = {
+      layout = "us";
+      variant = "";
+    };
     excludePackages = with pkgs; [ xterm ];
     displayManager.sddm.enable = true;
     desktopManager.plasma5.enable = true;
