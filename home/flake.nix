@@ -15,6 +15,10 @@
       url = "github:hyprwm/Hyprland";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    eww = {
+      url = "github:ralismark/eww/tray-3";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -31,6 +35,7 @@
         overlays = [ (import ./overlays.nix self.inputs) ];
       };
       dotfiles = ../.;
+      realDotfiles = "/home/" + user + "/develop/other/dotfiles";
     in
     {
       homeConfigurations."${user}" = home-manager.lib.homeManagerConfiguration {
@@ -53,7 +58,8 @@
             old-configs = dotfiles + /home/.config;
             configs = dotfiles + /home/config;
             dotfiles = dotfiles;
-            realConfigs = "/home/" + user + "/develop/other/dotfiles/home/config";
+            realDotfiles = realDotfiles;
+            realConfigs = realDotfiles + "/home/config";
           };
         };
       };
