@@ -8,6 +8,9 @@ with lib;
       path+=("$HOME/develop/node.js/bin")
       export N_PREFIX="$HOME/develop/node.js"
 
+      # Deno
+      path+=("$HOME/.deno/bin")
+
       # Golang
       path+=("$(go env GOPATH)/bin")
     '';
@@ -31,6 +34,9 @@ with lib;
     rnix-lsp
     cargo
     rustc
+    godot_4
+    marksman
+    nil
 
     mongodb-compass
     # pgadmin4
