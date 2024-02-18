@@ -7,13 +7,16 @@
 {
   imports = [
     ./hardware-configuration.nix # Include the results of the hardware scan.
+    ./modules/battery-life.nix
     ./cachix.nix # Community cache
 
-    # ./modules/virtualisation.nix
+    ./modules/samba.nix
+    ./modules/virtualisation.nix
     ./modules/wms/default.nix
     ./modules/apps.nix
     ./modules/flatpak-workaround.nix
     ./modules/sound/default.nix
+    ./modules/proxy.nix
   ];
 
   # Bootloader.
@@ -84,22 +87,6 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  # Battery life
-  services.power-profiles-daemon.enable = false;
-  services.thermald.enable = true;
-
-  services.tlp = {
-    enable = true;
-    settings = {
-      RUNTIME_PM_ON_AC="auto";
-      RUNTIME_PM_ON_BAT="auto";
-      CPU_ENERGY_PERF_POLICY_ON_AC="balance_power";
-      CPU_ENERGY_PERF_POLICY_ON_BAT="balance_power";
-    };
-  };
-
-  # Enable touchpad support (enabled default in most desktopManager)
-  # services.xserver.libinput.enable = true;
   services.flatpak.enable = true;
 
   # Define a user account
