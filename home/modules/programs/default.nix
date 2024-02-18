@@ -8,6 +8,7 @@
     ./foot.nix
     ./neofetch.nix
     ./mpv.nix
+    ./gitui.nix
   ];
 
   services.flameshot.enable = true;
