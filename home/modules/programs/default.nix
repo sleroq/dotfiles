@@ -8,7 +8,6 @@
     ./neofetch.nix
     ./mpv.nix
     ./tmux.nix
-    ./gitui.nix
   ];
 
   services.flameshot.enable = true;

@@ -2,6 +2,10 @@
 
 with lib;
 {
+  imports = [
+    ./programs/gitui.nix
+  ];
+
   programs.zsh = mkIf opts.zsh-integration {
     envExtra = ''
       # Node.js
@@ -24,6 +28,7 @@ with lib;
 
   home.packages = with pkgs; [
     git-lfs
+    git-fame
     nodejs
     yarn
     deno
@@ -37,6 +42,7 @@ with lib;
     godot_4
     marksman
     nil
+    lua-language-server
 
     mongodb-compass
     # pgadmin4
