@@ -36,11 +36,20 @@ vim.o.completeopt = 'menuone,noselect'
 
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
-vim.o.foldmethod = "indent"
+
+vim.o.foldmethod = 'indent'
+vim.o.foldcolumn = '1'
 vim.o.foldlevel = 999
+vim.o.foldlevelstart = 99
+vim.o.foldenable = true
 
 -- Indent
 vim.o.tabstop = 4
+vim.opt.softtabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.expandtab = true
+
+vim.opt.smartindent = true
 
 -- Disable wrap
 vim.o.wrap = false
@@ -49,10 +58,19 @@ vim.o.wrap = false
 -- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
-  callback = function()
-    vim.highlight.on_yank()
-  end,
-  group = highlight_group,
-  pattern = '*',
+    callback = function()
+        vim.highlight.on_yank()
+    end,
+    group = highlight_group,
+    pattern = '*',
 })
 
+-- Netrw
+--
+vim.g.netrw_winsize = 20
+vim.g.netrw_banner = 0
+
+vim.g.netrw_banner = 0
+
+-- Keep the current directory and the browsing directory synced.
+vim.g.netrw_keepdir = 0

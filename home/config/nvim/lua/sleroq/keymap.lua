@@ -38,8 +38,14 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnos
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
--- Neotree keymaps
-vim.keymap.set('n', '<leader>op', ':Neotree toggle<CR>', { desc = 'Toggle file tree' })
-
 -- Git keymaps
 vim.keymap.set('n', '<leader>gg', ':G<CR><C-w><S-l>', { desc = 'Git status' })
+
+vim.keymap.set('n', '<leader>ff', vim.cmd.Vex, { desc = '[F]ile browser' })
+vim.keymap.set('n', '<leader>op', function()
+    if vim.bo.filetype == 'netrw' then
+        vim.cmd 'bwipeout'
+    else
+        vim.cmd 'Lexplore'
+    end
+end, { silent = true })
