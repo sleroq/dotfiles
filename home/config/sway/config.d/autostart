@@ -13,7 +13,7 @@ exec swayrd # Window-switcher server
 exec eww -c ~/.config/eww/simple-bar daemon
 exec eww -c ~/.config/eww/simple-bar open bar
 
-exec emacs --daemon
+exec swww init
 
 # Tabbed layout for 1 and 2nd workspaces
 exec swaymsg layout tabbed
