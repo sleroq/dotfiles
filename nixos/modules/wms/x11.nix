@@ -1,5 +1,4 @@
 { pkgs, ... }: {
-
   services.xserver = {
     enable = true;
     xkb = {
@@ -8,10 +7,8 @@
       options = "grp:lctrl_lwin_toggle";
     };
     excludePackages = with pkgs; [ xterm ];
-    displayManager.sddm.enable = false;
+    # displayManager.sddm.enable = false;
     # desktopManager.plasma5.enable = true;
-    # desktopManager.xfce.enable = true;
-    # desktopManager.budgie.enable = true;
 
     libinput = {
       # Enable touchpad support (enabled default in most desktopManager)

@@ -14,8 +14,7 @@ let
 
     text = ''
       dbus-update-activation-enviroment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
-      systemctl --user stop pipewire pipewire-media-session xdg-desktop-portal xdg-desktop-portal-wlr
-      systemctl --user start pipewire pipewire-media-session xdg-desktop-portal xdg-desktop-portal-wlr
+      systemctl --user stop pipewire pipewire-media-session xdg-desktop-portal xdg-desktop-portal-wlr systemctl --user start pipewire pipewire-media-session xdg-desktop-portal xdg-desktop-portal-wlr
     '';
   };
 
@@ -40,19 +39,19 @@ let
   };
 
   sway-wrapper = pkgs.writeScriptBin "sway-wrapper" ''
-      #!/bin/sh
-      export _JAVA_AWT_WM_NONREPARENTING=1;
-      export XDG_SESSION_TYPE=wayland;
-      export QT_QPA_PLATFORM=wayland;
-      export QT_QPA_PLATFORMTHEME=qt6ct;
-      export QT_WAYLAND_DISABLE_WINDOWDECORATION=1;
-      export CLUTTER_BACKEND=wayland;
-      export SDL_VIDEODRIVER=wayland;
-      export MOZ_ENABLE_WAYLAND=1;
-      export VDPAU_DRIVER=radeonsi;
+    #!/bin/sh
+    export _JAVA_AWT_WM_NONREPARENTING=1;
+    export XDG_SESSION_TYPE=wayland;
+    export QT_QPA_PLATFORM=wayland;
+    export QT_QPA_PLATFORMTHEME=qt6ct;
+    export QT_WAYLAND_DISABLE_WINDOWDECORATION=1;
+    export CLUTTER_BACKEND=wayland;
+    export SDL_VIDEODRIVER=wayland;
+    export MOZ_ENABLE_WAYLAND=1;
+    export VDPAU_DRIVER=radeonsi;
 
-      exec sway
-    '';
+    exec sway
+  '';
 in
 with lib; {
   imports = [
@@ -89,23 +88,6 @@ with lib; {
     config = null;
     extraConfig = ''
       include main-config
-    '';
-
-    # This does nothing for some reason
-    # So I use sway-wrapper instead
-    extraSessionCommands = ''
-      export _JAVA_AWT_WM_NONREPARENTING=1;
-      export XDG_SESSION_TYPE=wayland;
-      export QT_QPA_PLATFORM=wayland;
-      export QT_QPA_PLATFORMTHEME=qt6ct;
-      export QT_WAYLAND_DISABLE_WINDOWDECORATION=1;
-      export CLUTTER_BACKEND=wayland;
-      export SDL_VIDEODRIVER=wayland;
-      export MOZ_ENABLE_WAYLAND=1;
-      export VDPAU_DRIVER=radeonsi;
-
-      dbus-sway-environment
-      configure-gtk
     '';
   };
 

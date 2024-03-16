@@ -1,8 +1,10 @@
 { pkgs,... }: {
   imports = [
-    # ./lemurs.nix
-    # ./x11/leftwm.nix
-    ./wayland/default.nix
-    ./x11/default.nix
+    ./wayland.nix
+    ./x11.nix
+  ];
+
+  environment.systemPackages = with pkgs; [
+    xdg-utils
   ];
 }
