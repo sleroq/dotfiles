@@ -35,9 +35,24 @@ let
     in ''
       export XDG_DATA_DIRS=${datadir}:$XDG_DATA_DIRS
       gnome_schema=org.gnome.desktop.interface
-      gsettings set $gnome_schema gtk-theme 'Dracula'
+      gsettings set $gnome_schema gtk-theme 'Breeze-Dark'
     '';
   };
+
+  sway-wrapper = pkgs.writeScriptBin "sway-wrapper" ''
+      #!/bin/sh
+      export _JAVA_AWT_WM_NONREPARENTING=1;
+      export XDG_SESSION_TYPE=wayland;
+      export QT_QPA_PLATFORM=wayland;
+      export QT_QPA_PLATFORMTHEME=qt6ct;
+      export QT_WAYLAND_DISABLE_WINDOWDECORATION=1;
+      export CLUTTER_BACKEND=wayland;
+      export SDL_VIDEODRIVER=wayland;
+      export MOZ_ENABLE_WAYLAND=1;
+      export VDPAU_DRIVER=radeonsi;
+
+      exec sway
+    '';
 in
 with lib; {
   imports = [
@@ -51,13 +66,8 @@ with lib; {
         ${opts.realConfigs}/sway/* $HOME/.config/sway/
   '';
 
-  home.sessionVariables = {
-    # TODO: is this necessary?
-    XDG_CURRENT_DESKTOP = "sway";
-  };
-
   programs = {
-    waybar.enable = true;
+    # waybar.enable = true;
     swaylock.enable = true;
   };
 
@@ -81,6 +91,8 @@ with lib; {
       include main-config
     '';
 
+    # This does nothing for some reason
+    # So I use sway-wrapper instead
     extraSessionCommands = ''
       export _JAVA_AWT_WM_NONREPARENTING=1;
       export XDG_SESSION_TYPE=wayland;
@@ -100,6 +112,7 @@ with lib; {
   home.packages = with pkgs; [
     configure-gtk
     dbus-sway-environment
+    sway-wrapper
 
     stalonetray
     cliphist

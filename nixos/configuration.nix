@@ -10,7 +10,9 @@
     ./modules/battery-life.nix
     ./cachix.nix # Community cache
 
-    ./modules/samba.nix
+    # ./modules/samba.nix
+    # ./modules/warp.nix
+    ./modules/kwallet.nix
     ./modules/virtualisation.nix
     ./modules/wms/default.nix
     ./modules/apps.nix
@@ -46,6 +48,10 @@
 
   networking.hostName = "sleroq-international";
   networking.nameservers = [ "1.1.1.1" "1.1.0.1" ];
+
+  services.journald.extraConfig = ''
+      SystemMaxUse=2G
+  '';
 
   networking.wireless.iwd.enable = true;
   # Enable networking
@@ -124,6 +130,9 @@
     ];
   };
 
+  security.pam.loginLimits = [
+    { domain = "@users"; item = "rtprio"; type = "-"; value = 1; }
+  ];
 
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [

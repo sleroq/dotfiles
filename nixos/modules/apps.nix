@@ -7,9 +7,6 @@
     networkmanager-openvpn
 
     libsForQt5.polkit-kde-agent
-
-    shadowsocks-libev
-    shadowsocks-v2ray-plugin
   ];
 
   # For samba and other stuff

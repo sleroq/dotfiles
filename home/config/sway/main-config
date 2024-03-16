@@ -8,7 +8,7 @@ set $right l
 
 set $term foot
 set $filemanager pcmanfm-qt
-set $menu wofi -i | xargs swaymsg exec --
+set $menu wofi -W600 | xargs swaymsg exec --
 set $menu-run wofi -S run
 set $scripts $HOME/.config/sway/scripts
 
@@ -59,7 +59,8 @@ bindsym --to-code {
   $mod+Shift+c kill
   
   # Start your launcher
-  Control+space exec $menu
+  # Control+space exec $menu
+  Tab+space exec $menu
   # Kill focused window
   $mod+p exec $menu-run
   
@@ -67,10 +68,7 @@ bindsym --to-code {
   $mod+e exec $filemanager
   
   # Screenshot
-  Print exec 'flameshot gui --raw | wl-copy'
-  # Fallback:
-  # Print exec 'grim -g "$(slurp)" - | wl-copy'
-  
+  Print exec 'grim -g "$(slurp)" - | wl-copy'
 
   $mod+z exec 'cliphist list | wofi -d | cliphist decode | wl-copy'
 }

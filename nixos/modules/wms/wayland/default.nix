@@ -7,10 +7,21 @@
   # printing and others.
   services.dbus.enable = true;
 
+  services.xserver.displayManager.session = [
+    {
+      manage = "desktop";
+      name = "sway-session";
+      start = ''
+        sway-wrapper &
+        waitPID=$!
+      '';
+    }
+  ];
+
   xdg.portal = {
     enable = true;
     wlr.enable = true;
-    configPackages = [ pkgs.gnome.gnome-session ];
+    configPackages = [ pkgs.xdg-desktop-portal-kde pkgs.xdg-desktop-portal ];
   };
 
   security.pam.services.swaylock = {

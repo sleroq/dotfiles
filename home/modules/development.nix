@@ -36,7 +36,6 @@ with lib;
     nodePackages_latest.typescript-language-server
     gopls
     niv
-    rnix-lsp
     cargo
     rustc
     godot_4
@@ -44,7 +43,7 @@ with lib;
     nil
     lua-language-server
 
-    mongodb-compass
+    # mongodb-compass
     # pgadmin4
     # postgresql_15
     # radicle-cli

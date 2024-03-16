@@ -1,6 +1,7 @@
 { pkgs, ... }:
 
 {
+
   imports = [
     ./wayland/default.nix
     # ./x11/default.nix
@@ -18,9 +19,14 @@
     # Theming
     lxappearance
     qt5ct
-
-    dracula-theme # gtk theme
+    libsForQt5.qtstyleplugin-kvantum
+    catppuccin-kvantum
     kora-icon-theme
+
+    libsForQt5.breeze-gtk
+    lxqt.lxqt-config
+
+    kdePackages.qt6ct
     libsForQt5.breeze-qt5 # qt theme
   ];
 

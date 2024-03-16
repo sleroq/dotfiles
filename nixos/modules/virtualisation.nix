@@ -4,10 +4,16 @@
   environment.systemPackages = with pkgs; [
     virt-manager
     virtiofsd
+    quickemu
+    distrobox
   ];
 
   virtualisation = {
-    docker.enable = true;
+    podman = {
+      enable = true;
+      dockerCompat = true;
+      defaultNetwork.settings.dns_enabled = true;
+    };
     # waydroid.enable = true;
     lxd.enable = true;
     libvirtd.enable = true;

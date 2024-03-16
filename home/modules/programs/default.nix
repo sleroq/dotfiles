@@ -10,8 +10,6 @@
     ./tmux.nix
   ];
 
-  services.flameshot.enable = true;
-  
   nixpkgs.config.permittedInsecurePackages = [
     "electron-13.6.9" # Required for obinskit
     "electron-25.9.0" # Required by obsidian
@@ -20,11 +18,9 @@
   home.packages = with pkgs; [
     appimage-run
     obinskit # proprietary keyboard software
-    xray
     nheko
+    parsec-bin
 
-    youtube-music
-    sublime-music
     tor-browser-bundle-bin
     picard # music tagger
     telegram-desktop
@@ -33,19 +29,14 @@
     thunderbird
     exodus
     krita
-    logseq
     obsidian
+    anytype-beta
     libreoffice-fresh
     libsForQt5.kdenlive
     obs-studio
-    networkmanager-openvpn
     qbittorrent
     keepassxc
     syncplay
-
-    # Android screen mirroring
-    # scrcpy
-    # android-tools
 
     ffmpegthumbnailer
     lxqt.pcmanfm-qt

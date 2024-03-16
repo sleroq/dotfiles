@@ -1,9 +1,5 @@
 { config, pkgs, lib, ... }:
 {
-  imports = [
-    ./pipewire-low-latency.nix
-  ];
-
   # Enable sound with Pipewire.
   security.rtkit.enable = true;
   services.pipewire = {
@@ -11,12 +7,10 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    lowLatency = {
-      enable = true;
-      quantum = 64;
-      rate = 48000;
-    };
+    # If you want to use JACK applications, uncomment this
+    #jack.enable = true;
   };
+  hardware.pulseaudio.enable = false;
 
   environment.systemPackages = with pkgs; [
     # Real-time audio patcher
