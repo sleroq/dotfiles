@@ -40,12 +40,3 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 -- Git keymaps
 vim.keymap.set('n', '<leader>gg', ':G<CR><C-w><S-l>', { desc = 'Git status' })
-
-vim.keymap.set('n', '<leader>ff', vim.cmd.Vex, { desc = '[F]ile browser' })
-vim.keymap.set('n', '<leader>op', function()
-    if vim.bo.filetype == 'netrw' then
-        vim.cmd 'bwipeout'
-    else
-        vim.cmd 'Lexplore'
-    end
-end, { silent = true })
