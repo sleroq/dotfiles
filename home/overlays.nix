@@ -14,4 +14,6 @@ self: super: {
     '';
     mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
   });
+
+  anytype-beta = super.callPackage ./packages/anytype.nix { };
 }
