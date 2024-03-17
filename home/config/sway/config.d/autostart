@@ -1,6 +1,7 @@
 # Autostart
 exec dbus-sway-environment
 exec configure-gtk
+exec swaycons
 
 exec swaync --config ~/.config/swaync/config.json # Notification daemon
 exec exec swaykbdd # Per-window keyboard layout

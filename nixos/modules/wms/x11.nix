@@ -7,8 +7,6 @@
       options = "grp:lctrl_lwin_toggle";
     };
     excludePackages = with pkgs; [ xterm ];
-    displayManager.sddm.enable = true;
-    # desktopManager.plasma5.enable = true;
 
     libinput = {
       # Enable touchpad support (enabled default in most desktopManager)
