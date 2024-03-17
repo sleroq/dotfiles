@@ -29,26 +29,22 @@
   programs.xwayland.enable = true;
 
   environment.systemPackages = with pkgs; [
-    swayfx
+    # This override will be used in sway module
+    (swayfx.override {
+      extraSessionCommands = ''
+        export _JAVA_AWT_WM_NONREPARENTING=1;
+        export XDG_SESSION_TYPE=wayland;
+        export QT_QPA_PLATFORM=wayland;
+        export QT_QPA_PLATFORMTHEME=qt6ct;
+        export QT_WAYLAND_DISABLE_WINDOWDECORATION=1;
+        export CLUTTER_BACKEND=wayland;
+        export SDL_VIDEODRIVER=wayland;
+        export MOZ_ENABLE_WAYLAND=1;
+        export VDPAU_DRIVER=radeonsi;
+      '';
+      withGtkWrapper = true;
+    })
   ];
 
-  programs.sway = {
-    enable = true;
-    wrapperFeatures.gtk = true;
-    extraSessionCommands = ''
-      export _JAVA_AWT_WM_NONREPARENTING=1;
-      export XDG_SESSION_TYPE=wayland;
-      export QT_QPA_PLATFORM=wayland;
-      export QT_QPA_PLATFORMTHEME=qt6ct;
-      export QT_WAYLAND_DISABLE_WINDOWDECORATION=1;
-      export CLUTTER_BACKEND=wayland;
-      export SDL_VIDEODRIVER=wayland;
-      export MOZ_ENABLE_WAYLAND=1;
-      export VDPAU_DRIVER=radeonsi;
-      export TESTVARKEK=1;
-
-      dbus-sway-environment
-      configure-gtk
-    '';
-  };
+  programs.sway.enable = true;
 }

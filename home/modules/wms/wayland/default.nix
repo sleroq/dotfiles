@@ -1,7 +1,6 @@
 { pkgs, opts, lib, ... }:
 
-with lib;
-{
+with lib; {
   imports = [
     ./sway.nix
     # ./hyprland.nix

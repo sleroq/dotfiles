@@ -7,7 +7,7 @@
       options = "grp:lctrl_lwin_toggle";
     };
     excludePackages = with pkgs; [ xterm ];
-    # displayManager.sddm.enable = false;
+    displayManager.sddm.enable = true;
     # desktopManager.plasma5.enable = true;
 
     libinput = {

@@ -1,7 +1,6 @@
 { pkgs, inputs, lib, opts, ... }:
 
-with lib;
-{
+with lib; {
   imports = [
     inputs.hyprland.homeManagerModules.default
     ../../programs/mako.nix
@@ -29,6 +28,6 @@ with lib;
 
   home.activation.hyprland = hm.dag.entryAfter [ "writeBoundary" ] ''
     $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
-        ${opts.realConfigs}/hypr/autostart.bash $HOME/.config/hypr/
+      ${opts.realConfigs}/hypr/autostart.bash $HOME/.config/hypr/
   '';
 }
