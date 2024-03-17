@@ -12,6 +12,7 @@ set $menu wofi -W600 | xargs swaymsg exec --
 set $menu-run wofi -S run
 set $scripts $HOME/.config/sway/scripts
 
+font pango:FuraCode Nerd Font 11
 default_border pixel 3
 default_floating_border pixel 2
 hide_edge_borders smart

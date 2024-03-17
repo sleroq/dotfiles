@@ -1,17 +1,12 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, lib, ... }:
 
 {
   imports = [
-    ./hardware-configuration.nix # Include the results of the hardware scan.
+    ./hardware-configuration.nix
     ./modules/battery-life.nix
-    ./cachix.nix # Community cache
+    ./cachix.nix
 
     # ./modules/samba.nix
-    # ./modules/warp.nix
     ./modules/kwallet.nix
     ./modules/virtualisation.nix
     ./modules/wms/default.nix
@@ -25,6 +20,9 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
+  boot.initrd.systemd.enable = true;
+  boot.plymouth.enable = true;
+  boot.kernelParams = ["quiet"];
 
   # Setup keyfile
   boot.initrd.secrets = {

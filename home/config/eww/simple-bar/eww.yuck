@@ -14,25 +14,28 @@
 (defwidget bar []
   (centerbox :orientation "h"
     (workspaces)
-    (box :class "time" time)
+    (box :class "container" time)
     (sidestuff)))
 
 
 (deflisten SPACES :initial '{"active":0,"workspaces":[]}' "scripts/eww-ws")
 
 (defwidget workspaces []
-  (box :halign "start" :class "workspaces"
+  (box :halign "start" :class "workspaces container"
   (for entry in "${SPACES.workspaces}"
     (button :onclick "sway workspace ${entry.id}"
-      {"${entry.is_active}" ? ">${entry.id}<" : "${entry.id}"}))))
+            :class {"${entry.is_active}" ? "active" : ""}
+      {"${entry.is_active}" ? "" : "${entry.id}"}))))
 
 (defpoll time :interval "10s"
   "date '+%H:%M %b %d, %Y'")
 
 (defwidget sidestuff []
-  (box :class "sidestuff" :orientation "h" :space-evenly false :halign "end"
+  (box :class "container" :orientation "h" :space-evenly false :halign "end"
     (volume)
     (mic)
+    (bat)
+    (mem)
     (systray :class "tray" :icon-size 16 :pack-direction "rtl")))
 
 (defpoll volume_percent :initial 0.0 :interval "1s"
@@ -71,7 +74,7 @@
       (button :onclick "pactl set-source-mute @DEFAULT_SOURCE@ toggle && ${EWW_CMD} update mic_muted=${!mic_muted}" {mic_muted ? "" : ""})
       (revealer :transition "slideleft"
                 :reveal mic_volume_open
-                :duration "350ms"
+                :duration "250ms"
         (scale :class "volbar"
                :value mic_volume_percent
                :orientation "h"
@@ -79,6 +82,36 @@
                :min 0
                :max 151
                :onchange "pactl set-source-volume @DEFAULT_SOURCE@ {}%")))))
+
+(defpoll memory :interval "15s" "scripts/memory")
+
+(defwidget mem []
+		(box :class "mem_module" :vexpand "false" :hexpand "false" 
+            (circular-progress :value memory
+                :class "membar"
+                :thickness 3
+            (button 
+                :class "iconmem"
+                :limit-width 2
+                :tooltip "using ${memory}% ram"
+                :show_truncated false
+                :wrap false
+                ""))))
+
+(defpoll battery :interval "15s" "./scripts/battery --bat")
+
+(defwidget bat []
+		(box :class "bat_module" :vexpand "false" :hexpand "false" 
+            (circular-progress :value battery
+                :class "batbar"
+                :thickness 3
+            (button 
+                :class "iconbat"
+                :limit-width 2
+                :tooltip "battery on ${battery}%"
+                :show_truncated false
+                :wrap false
+                ""))))
 
 (defpoll calendar_day :interval "20h" "date '+%d'")
 (defpoll calendar_year :interval "20h" "date '+%Y'")
