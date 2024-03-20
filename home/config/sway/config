@@ -71,7 +71,8 @@ bindsym --to-code {
   $mod+e exec $filemanager
   
   # Screenshot
-  Print exec 'grim -g "$(slurp)" - | wl-copy'
+  Print exec 'flameshot gui'
+  # Print exec 'grim -g "$(slurp)" - | wl-copy'
 
   $mod+z exec 'cliphist list | wofi -d | cliphist decode | wl-copy'
 }

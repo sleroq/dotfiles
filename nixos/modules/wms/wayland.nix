@@ -29,6 +29,7 @@ in
     configPackages = with pkgs; [
       xdg-desktop-portal-gtk # I don't know what it does but won't hurt
       xdg-desktop-portal-shana # For file picker
+      xdg-desktop-portal-wlr
     ];
   };
 
@@ -54,6 +55,7 @@ in
       extraSessionCommands = waylandBaseSession;
       withGtkWrapper = true;
     })
+    pkgs.vesktop
   ];
 
 

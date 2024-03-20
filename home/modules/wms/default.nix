@@ -15,6 +15,7 @@
     libnotify
     glib # gsettings
     pulseaudioFull
+    flameshot
 
     # Theming
     lxappearance

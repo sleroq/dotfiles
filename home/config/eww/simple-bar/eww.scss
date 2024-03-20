@@ -16,6 +16,10 @@ $inactive-color: #4e4e4e;
   padding-bottom: 4px;
 }
 
+.icon-module {
+  padding-right: 4px;
+}
+
 .bar {
   background-color: rgba($background-color, 0);
   color: #b0b4bc;
@@ -68,12 +72,11 @@ $inactive-color: #4e4e4e;
   font-size: 16px;
 }
 
-.bat_module {
+.bat-module {
   color: #7ad39f;
 }
 
-.mem_module {
-  padding-right: 4px;
+.mem-module {
   color: $active-color;
 }
 

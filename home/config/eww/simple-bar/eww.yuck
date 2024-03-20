@@ -86,7 +86,7 @@
 (defpoll memory :interval "15s" "scripts/memory")
 
 (defwidget mem []
-		(box :class "mem_module" :vexpand "false" :hexpand "false" 
+		(box :class "icon-module mem-module" :vexpand "false" :hexpand "false" 
             (circular-progress :value memory
                 :class "membar"
                 :thickness 3
@@ -101,7 +101,7 @@
 (defpoll battery :interval "15s" "./scripts/battery --bat")
 
 (defwidget bat []
-		(box :class "bat_module" :vexpand "false" :hexpand "false" 
+		(box :class "icon-module bat-module" :vexpand "false" :hexpand "false" 
             (circular-progress :value battery
                 :class "batbar"
                 :thickness 3
