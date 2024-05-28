@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ pkgs, ... }:
 {
   # Enable sound with Pipewire.
   security.rtkit.enable = true;

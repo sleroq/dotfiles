@@ -23,7 +23,6 @@ in
 
   home.sessionVariables = {
     EDITOR = "nvim";
-    BROWSER = "librewolf";
     TERMINAL = "foot";
   };
 
@@ -39,8 +38,8 @@ in
   fonts.fontconfig.enable = true;
 
   home.packages = with pkgs; [
-    libsForQt5.ark
-    libsForQt5.filelight
+    kdePackages.ark # TODO: this is for noobs (or is it)
+    kdePackages.filelight
 
     p7zip
     unzip
@@ -58,6 +57,11 @@ in
     source-han-serif-japanese
     font-awesome
   ];
+
+  qt = {
+    enable = true;
+    platformTheme.name = "qtct";
+  };
 
   services.syncthing.enable = true;
 

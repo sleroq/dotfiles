@@ -1,6 +1,5 @@
-{ config, pkgs, ... }:
+{ ... }:
 
-with config;
 {
   programs.helix = {
     enable = true;

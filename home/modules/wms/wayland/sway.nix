@@ -32,9 +32,7 @@ with lib; {
         ${opts.realConfigs}/sway/* $HOME/.config/sway/
   '';
 
-  programs = {
-    swaylock.enable = true;
-  };
+  programs.swaylock.enable = true;
 
   services = {
     swayidle.enable = true;
