@@ -26,11 +26,11 @@
     telegram-desktop
     discord-screenaudio
     chromium
+    (callPackage ../../packages/anytype.nix {})
     thunderbird
     exodus
     krita
     obsidian
-    anytype-beta
     libreoffice-fresh
     libsForQt5.kdenlive
     obs-studio
