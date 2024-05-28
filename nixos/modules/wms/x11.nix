@@ -4,7 +4,7 @@
     xkb = {
       layout = "us,ru";
       variant = "";
-      options = "grp:lctrl_lwin_toggle";
+      options = "grp:lctrl_lwin_toggle,ctrl:nocaps";
     };
     excludePackages = with pkgs; [ xterm ];
 
