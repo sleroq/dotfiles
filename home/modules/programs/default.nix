@@ -11,7 +11,7 @@
   ];
 
   nixpkgs.config.permittedInsecurePackages = [
-    "electron-13.6.9" # Required for obinskit
+    # "electron-13.6.9" # Required for obinskit
     "electron-25.9.0" # Required by obsidian
   ];
 
