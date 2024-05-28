@@ -1,7 +1,12 @@
-{ config, pkgs, lib, ... }:
+{ pkgs, ... }:
 
 {
   environment.systemPackages = with pkgs; [
+    git
+    neovim
+    helix
+    wget
+    curl
     foot
     librewolf
     networkmanager-openvpn
@@ -28,7 +33,7 @@
     gamescopeSession.enable = true;
   };
 
-  # programs.adb.enable = true; # Phone stuff
+  # programs.adb.enable = true; # Phone debuggin stuff
 
   programs.dconf.enable = true; # Backend for gtk settings or something like that
 }
