@@ -20,15 +20,19 @@
     # Theming
     lxappearance
     qt5ct
-    libsForQt5.qtstyleplugin-kvantum
+    kdePackages.qt6ct
+    kdePackages.qtstyleplugin-kvantum
     catppuccin-kvantum
     kora-icon-theme
 
-    libsForQt5.breeze-gtk
+    kdePackages.breeze-gtk
     lxqt.lxqt-config
+    zuki-themes
 
-    kdePackages.qt6ct
-    libsForQt5.breeze-qt5 # qt theme
+    kdePackages.breeze
+    catppuccin-qt5ct
+    libsForQt5.qtstyleplugins
+    libsForQt5.lightly
   ];
 
   services.gammastep = {

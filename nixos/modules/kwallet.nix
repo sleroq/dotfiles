@@ -1,7 +1,7 @@
 { pkgs, ... }: {
   environment.systemPackages = with pkgs; [
-    libsForQt5.kwallet
-    libsForQt5.kwalletmanager
+    kdePackages.kwalletmanager
+    kdePackages.kwallet
   ];
 
   security.pam.services.login.enableKwallet = true;
