@@ -9,7 +9,7 @@ with lib;
 
   fonts.fontconfig.enable = true;
   home.packages = with pkgs; [
-    inputs.eww.packages.${pkgs.system}.eww-wayland
+    inputs.eww.packages.${pkgs.system}.eww
     gawk
     pamixer
     killall
