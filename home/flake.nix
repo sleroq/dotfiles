@@ -12,7 +12,7 @@
     nix-gaming.url = "github:fufexan/nix-gaming";
     prismlauncher.url = "github:PrismLauncher/PrismLauncher";
     eww = {
-      url = "github:ralismark/eww/tray-3";
+      url = "github:elkowar/eww/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
