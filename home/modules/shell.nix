@@ -1,28 +1,25 @@
-{ config, pkgs, opts, ... }:
+{ pkgs, config, opts, ... }:
 
+let
+  aliases = {
+    cd = "z";
+    up = "sudo nix-channel --update and sudo nixos-rebuild switch --upgrade"; # TODO: Make shell-agnostic
+    hu = "home-manager switch --flake ${opts.realDotfiles}/home#sleroq";
+    sudo = "sudo ";
+  };
+in
 {
+  imports = [
+    ./programs/starship.nix
+  ];
+
   programs.zsh = {
     enable = true;
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
-    shellAliases = {
-      cd = "z";
-      ls = "eza";
-      up = "sudo nix-channel --update && sudo nixos-rebuild switch --upgrade";
-      hu = "home-manager switch --flake ${opts.realDotfiles}/home#sleroq";
-      sudo = "sudo ";
-
-      l = "ls -lh";
-      la = "ls -lAh";
-      ll = "ls -l";
-      ldot = "ls -ld .*";
-      lS = "ls -1Ssh";
-      lsr = "ls -lARh";
-      lsn = "ls -1";
-    };
-
+    shellAliases = aliases;
     history = {
       size = 100000000;
       save = 100000000;
@@ -48,6 +45,8 @@
 
       # Scripts
       path+=("${opts.dotfiles}/scripts")
+
+      export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib";
     '';
 
     initExtra = ''
@@ -55,7 +54,7 @@
       unalias tldr
     '';
 
-    plugins = with pkgs; [
+    plugins = [
       {
         name = "you-should-use";
         file = "share/zsh/plugins/you-should-use/you-should-use.plugin.zsh";
@@ -64,9 +63,31 @@
     ];
   };
 
+  programs.nushell = {
+    enable = true;
+    configFile.source = opts.configs + /nushell/config.nu;
+    envFile.source = opts.configs + /nushell/env.nu;
+    shellAliases = aliases;
+  };
+
   programs.zoxide = {
     enable = true;
-    enableZshIntegration = true;
+    enableNushellIntegration = true;
+  };
+
+  programs.thefuck = {
+    enable = true;
+    enableNushellIntegration = true;
+  };
+
+  programs.carapace = {
+    enable = true;
+    enableNushellIntegration = true;
+  };
+
+  programs.yazi = {
+    enable = true;
+    enableNushellIntegration = true;
   };
 
   home.packages = with pkgs; [
