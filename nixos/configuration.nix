@@ -96,6 +96,7 @@
   # Define a user account
   users.defaultUserShell = pkgs.zsh;
   users.users.sleroq = {
+    shell = pkgs.nushell;
     isNormalUser = true;
     description = "sleroq";
     extraGroups = [ "networkmanager" "input" "wheel" "docker" "video" "libvirtd" "adbusers" ];
