@@ -7,6 +7,7 @@
     ./cachix.nix
 
     # ./modules/samba.nix
+    ./modules/polkit.nix
     ./modules/kwallet.nix
     ./modules/virtualisation.nix
     ./modules/wms/default.nix
