@@ -4,7 +4,7 @@ let
   waylandBaseSession = ''
     export _JAVA_AWT_WM_NONREPARENTING=1;
     export XDG_SESSION_TYPE=wayland;
-    export QT_QPA_PLATFORM=wayland;
+    # export QT_QPA_PLATFORM=wayland;
     export QT_QPA_PLATFORMTHEME=qt6ct;
     export QT_WAYLAND_DISABLE_WINDOWDECORATION=1;
     export CLUTTER_BACKEND=wayland;
@@ -15,6 +15,9 @@ let
   '';
 in 
 {
+  imports = [
+    (import ./dwl)
+  ];
   # xdg-desktop-portal works by exposing a series of D-Bus interfaces
   # known as portals under a well-known name
   # (org.freedesktop.portal.Desktop) and object path
@@ -26,39 +29,38 @@ in
   xdg.portal = {
     enable = true;
     wlr.enable = true;
-    configPackages = with pkgs; [
-      xdg-desktop-portal-gtk # I don't know what it does but won't hurt
-      xdg-desktop-portal-shana # For file picker
-      xdg-desktop-portal-wlr
-    ];
-  };
-
-  security.pam.services.swaylock = {
-    text = ''
-      auth include login
-    '';
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 
   # Brightness cli tool
   programs.light.enable = true;
   programs.xwayland.enable = true;
 
-  # Fixme create wrapper
-  environment.sessionVariables = {
-    NIXOS_OZONE_WL = "1";
-  };
-
   environment.systemPackages = with pkgs; [
     dbus # make dbus-update-activation-environment available in the path
-    # This override will be used in sway module
     (swayfx.override {
+      # TODO: Figure out why can't I pass extraSessionCommands in programs.sway... options
       extraSessionCommands = waylandBaseSession;
-      withGtkWrapper = true;
     })
-    pkgs.vesktop
   ];
 
+  services.desktopManager.plasma6.enable = false;
 
-  programs.sway.enable = true;
-  programs.hyprland.enable = true;
+  programs.sway = {
+    enable = true;
+    wrapperFeatures.gtk = true;
+  };
+
+  programs.dwl = {
+    enable = true;
+    postPatch =
+      let
+        configFile = ./dwl/dwl-config.h; # TODO: move somewhere else
+      in
+      ''
+        cp ${configFile} config.def.h
+      '';
+  };
+
+  # services.displayManager.sessionPackages = [ pkgs.dwl-wrapped ];
 }
