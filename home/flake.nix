@@ -11,6 +11,7 @@
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     nix-gaming.url = "github:fufexan/nix-gaming";
     prismlauncher.url = "github:PrismLauncher/PrismLauncher";
+    paisa.url = "github:ananthakumaran/paisa";
     eww = {
       url = "github:elkowar/eww/master";
       inputs.nixpkgs.follows = "nixpkgs";
