@@ -103,8 +103,6 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.nvidia.acceptLicense = true; # Why do I need this? I don't even have nvidia
-
 
   # About fonts - nixos.wiki/wiki/Fonts
   fonts.fontDir.enable = true;
@@ -136,10 +134,6 @@
   networking.firewall.allowedTCPPorts = [
     25565 # Minecraft
   ];
-
-
-  # About polkit - https://nixos.wiki/wiki/Polkit
-  security.polkit.enable = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
