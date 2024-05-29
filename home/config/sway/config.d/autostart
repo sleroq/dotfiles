@@ -2,7 +2,9 @@
 exec dbus-sway-environment
 exec systemctl --user start nixos-fake-graphical-session.target
 exec configure-gtk
+exec systemctl --user import-environment
 exec swaycons
+exec kwalletd6
 
 exec swaync --config ~/.config/swaync/config.json # Notification daemon
 exec exec swaykbdd # Per-window keyboard layout
@@ -11,7 +13,8 @@ exec flameshot
 exec wl-paste --watch cliphist store
 exec nm-applet --indicator
 exec swayrd # Window-switcher server
-
+exec pcmanfm-qt -d
+ 
 exec eww -c ~/.config/eww/simple-bar daemon
 exec eww -c ~/.config/eww/simple-bar open bar
 
