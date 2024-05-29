@@ -1,5 +1,6 @@
 # Autostart
 exec dbus-sway-environment
+exec systemctl --user start nixos-fake-graphical-session.target
 exec configure-gtk
 exec swaycons
 
