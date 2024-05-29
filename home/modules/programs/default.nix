@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   imports = [
@@ -17,29 +17,47 @@
 
   home.packages = with pkgs; [
     appimage-run
-    obinskit # proprietary keyboard software
-    nheko
-    parsec-bin
+    # obinskit # proprietary keyboard software
 
-    tor-browser-bundle-bin
-    picard # music tagger
+    brave
+
+    # exodus
+    monero-gui
+
     telegram-desktop
+    signal-desktop
+    vesktop
     discord-screenaudio
-    chromium
-    (callPackage ../../packages/anytype.nix {})
-    thunderbird
-    exodus
-    krita
+    nheko
+    iamb
+    
+    inputs.paisa.packages.${pkgs.system}.default
+    ledger
+    beancount
+    beancount-language-server
+    fava
+
+    libsForQt5.kate
     obsidian
+    (callPackage ../../packages/anytype.nix {})
+
+    picard # music tagger
+    nomacs # image viewer
+    thunderbird
+    krita
     libreoffice-fresh
-    libsForQt5.kdenlive
+    kdePackages.kdenlive
     obs-studio
     qbittorrent
     keepassxc
-    syncplay
+    # syncplay
 
+    # File manager
     ffmpegthumbnailer
     lxqt.pcmanfm-qt
+
+    # For "Choose Application" inside pcmanfm-qt to work
+    lxqt.lxqt-menu-data
     lxmenu-data
     shared-mime-info
 
@@ -54,10 +72,10 @@
     # Work
     remmina
     nomachine-client
-    rustdesk
+    zellij
+    # rustdesk
 
-    iw
-
+    # gephi - Visualizing and exploring networks
     # activitywatch
     # aw-watcher-afk
     # aw-watcher-window
