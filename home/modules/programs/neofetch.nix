@@ -7,7 +7,7 @@
     # Made by:  https://github.com/gosxrgxx (simpleFetch)
 
     print_info() {
-        info "$(color 4) " distro
+        info "$(color 4) " distro
         info "$(color 7) " kernel
         info "$(color 2) " packages
         info "$(color 3) " shell
@@ -273,7 +273,7 @@
     # Values:   "ascii", "caca", "chafa", "jp2a", "iterm2", "off",
     #           "termpix", "pixterm", "tycat", "w3m", "kitty", "ueberzug"
     # Flag:     --backend
-    image_backend="kitty"
+    image_backend="ascii"
 
     # Image Source
     #
@@ -306,7 +306,7 @@
     # NOTE: Arch, Crux and Gentoo have a smaller logo variant.
     #       Change this to "arch_small", "crux_small" or "gentoo_small" to use the small logos.
     printf "\n"
-    ascii_distro="arch_small"
+    ascii_distro="nixos_small"
 
     # Ascii Colors
     #
