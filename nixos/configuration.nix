@@ -23,6 +23,10 @@
   boot.initrd.systemd.enable = true;
   boot.plymouth.enable = true;
   boot.kernelParams = ["quiet"];
+  boot.extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
+  boot.kernelModules = [
+    "v4l2loopback" # obs virtual camera
+  ];
 
   # Setup keyfile
   boot.initrd.secrets = {
