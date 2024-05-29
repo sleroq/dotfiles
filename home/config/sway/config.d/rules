@@ -10,7 +10,7 @@ for_window [class="(?i)Lxappearance$"] floating enable
 for_window [app_id="(?i)mpv"] floating enable
 for_window [app_id="pavucontrol"] floating enable
 for_window [app_id="(?i)thunar"] floating enable
-for_window [app_id="(?i)pcmanfm"] floating enable
+for_window [app_id="(?i)pcmanfm(-qt)?"] floating enable
 for_window [app_id="nemo"] floating enable
 for_window [app_id="vlc"] floating enable
 for_window [app_id="tlp-ui"] floating enable
@@ -22,12 +22,14 @@ for_window [app_id="gnome-(calendar|calculator|power-statistics|control-center)"
 for_window [app_id="org.gnome.(Nautilus|Weather)"] floating enable
 for_window [app_id="(pavucontrol|psensor)"] floating enable
 for_window [app_id="soffice"] floating enable
+for_window [app_id="flameshot"] floating enable
 for_window [title="^Open File$"] floating enable
 for_window [title="Weather report: 44240 - qutebrowser"] floating enable
 for_window [title="nmtui - Kitty"] floating enable
 for_window [title="Update Check|Cryptomator"] floating enable, resize set 800 600
 for_window [window_role="GtkFileChooserDialog"] resize set 800 600
 for_window [window_role="GtkFiileChooserDialog"] move position center
+for_window [app_id="brave-.*" title="MetaMask"] floating enable
 
 # default floating
 for_window [window_role="pop-up"] floating enable
