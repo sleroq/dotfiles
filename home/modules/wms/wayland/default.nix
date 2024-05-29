@@ -23,7 +23,7 @@ in
 with lib; {
   imports = [
     ./sway.nix
-    ./hyprland.nix
+    ./dwl/default.nix
   ];
 
   services.kanshi.enable = true;
