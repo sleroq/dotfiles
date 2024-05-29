@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   imports = [
@@ -8,9 +8,7 @@
 
   home.packages = with pkgs; [
     # lutris
-    gamemode
-    wine64Packages.stagingFull
-
-    prismlauncher-qt5
+    # gamemode
+    prismlauncher
   ];
 }

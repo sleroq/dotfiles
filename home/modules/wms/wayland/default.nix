@@ -1,4 +1,4 @@
-{ pkgs, opts, lib, ... }:
+{ pkgs, ... }:
 
 let
   # currently, there is some friction between sway and gtk:
@@ -11,16 +11,19 @@ let
     name = "configure-gtk";
     destination = "/bin/configure-gtk";
     executable = true;
-    text = let
-      schema = pkgs.gsettings-desktop-schemas;
-      datadir = "${schema}/share/gsettings-schemas/${schema.name}";
-    in ''
-      gnome_schema=org.gnome.desktop.interface
-      gsettings set $gnome_schema gtk-theme 'Breeze-Dark'
-    '';
+    text =
+      let
+        schema = pkgs.gsettings-desktop-schemas;
+        datadir = "${schema}/share/gsetting-schemas/${schema.name}";
+      in
+      ''
+        export XDG_DATA_DIRS=${datadir}:$XDG_DATA_DIRS
+        gnome_schema=org.gnome.desktop.interface
+        gsettings set $gnome_schema gtk-theme 'Breeze-Dark'
+      '';
   };
-in 
-with lib; {
+in
+{
   imports = [
     ./sway.nix
     ./dwl/default.nix
@@ -40,7 +43,8 @@ with lib; {
     waypaper
     swww
 
-    nwg-look 
+    nwg-look
+    nwg-panel
   ];
 
 }
