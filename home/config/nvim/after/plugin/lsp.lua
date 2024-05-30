@@ -49,19 +49,20 @@ lsp_zero.set_sign_icons {
 }
 
 require('mason').setup {}
-require 'mason-lspconfig'
+-- require 'mason-lspconfig'
+--
+-- require('mason-lspconfig').setup {
+--   handlers = { lsp_zero.default_setup },
+-- }
 
-require('mason-lspconfig').setup {
-    ensure_installed = { 'tsserver' },
-    handlers = { lsp_zero.default_setup },
-}
+vim.lsp.set_log_level 'debug'
 
-require('lspconfig').lua_ls.setup {}
-require('lspconfig').rnix.setup {}
+local nvim_lsp = require 'lspconfig'
 
-vim.diagnostic.config {
-    float = { source = 'always' },
-}
+nvim_lsp.lua_ls.setup {}
+nvim_lsp.nixd.setup {}
+nvim_lsp.denols.setup {}
+nvim_lsp.gopls.setup {}
 
 local cmp = require 'cmp'
 local cmp_action = lsp_zero.cmp_action()
@@ -120,3 +121,20 @@ lsp_zero.set_server_config {
         },
     },
 }
+
+lsp_zero.preset 'recommended'
+
+lsp_zero.configure('tsserver', {
+    single_file_support = false,
+    autostart = false,
+    root_dir = require('lspconfig.util').root_pattern 'package.json',
+})
+
+lsp_zero.configure('beancount', {
+    init_options = {
+        journal_file = '~/Sync/Shared org/beancount/kek.beancount',
+    },
+    autostart = true
+});
+
+lsp_zero.setup()
