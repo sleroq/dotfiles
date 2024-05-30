@@ -1,11 +1,5 @@
-{ pkgs, opts, lib, ... }:
+{ pkgs, ... }:
 
-let
-  safe-place = ''
-    # Safe place
-    export SAFE_PLACE="/tmp/vault"
-  '';
-in
 {
   home.username = "sleroq";
   home.homeDirectory = "/home/sleroq";
@@ -26,14 +20,7 @@ in
     TERMINAL = "foot";
   };
 
-  xsession = {
-    enable = true;
-    profileExtra = safe-place;
-  };
-
-  programs.zsh = lib.mkIf opts.zsh-integration {
-    envExtra = safe-place;
-  };
+  xsession.enable = true;
 
   fonts.fontconfig.enable = true;
 

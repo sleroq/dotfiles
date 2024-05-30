@@ -51,7 +51,6 @@
         extraSpecialArgs = {
           inputs = self.inputs;
           opts = {
-            zsh-integration = true;
             old-configs = dotfiles + /home/.config;
             configs = dotfiles + /home/config;
             dotfiles = dotfiles;
