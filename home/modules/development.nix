@@ -1,29 +1,32 @@
-{ pkgs, lib, opts, ... }:
+{ pkgs, ... }:
 
-with lib;
 {
   imports = [
     ./programs/gitui.nix
   ];
 
-  programs.zsh = mkIf opts.zsh-integration {
-    envExtra = ''
-      # Node.js
-      path+=("$HOME/develop/node.js/bin")
-      export N_PREFIX="$HOME/develop/node.js"
+  programs.nushell = {
+    extraEnv = ''
+      # Deno
+      $env.Path = ($env.PATH | append ($env.HOME | path join '.deno/bin'))
 
+      # Golang
+      $env.GOPATH = ($env.HOME | path join "develop/go")
+      $env.GOBIN = ($env.HOME | path join "develop/go/bin")
+      $env.Path = ($env.PATH | append $env.GOPATH)
+    '';
+  };
+
+  programs.zsh = {
+    envExtra = ''
       # Deno
       path+=("$HOME/.deno/bin")
 
       # Golang
-      path+=("$(go env GOPATH)/bin")
+      export GOPATH="$HOME/develop/go"
+      export GOBIN="$HOME/develop/go/bin"
+      path+=("$GOPATH")
     '';
-  };
-
-  programs.go = {
-    enable = true;
-    goPath = "develop/go";
-    goBin = "develop/go/bin";
   };
 
   home.packages = with pkgs; [
@@ -32,10 +35,12 @@ with lib;
     nodejs
     yarn
     deno
+    go
     nodePackages_latest.typescript
     nodePackages_latest.typescript-language-server
     gopls
     niv
+    nixd
     cargo
     rustc
     godot_4
@@ -43,12 +48,14 @@ with lib;
     nil
     lua-language-server
 
+    # python39
+    # python39Packages.pip
+
     # mongodb-compass
     # pgadmin4
     # postgresql_15
     # radicle-cli
 
-    # TODO: Remove if nothing breaks
     exiftool
     gcc
     gnumake
