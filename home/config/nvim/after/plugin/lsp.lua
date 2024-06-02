@@ -3,8 +3,15 @@ local lsp_zero = require 'lsp-zero'
 lsp_zero.on_attach(function(client, bufnr)
     -- see :help lsp-zero-keybindings
     -- to learn the available actions
-    lsp_zero.default_keymaps { buffer = bufnr }
+    lsp_zero.default_keymaps { buffer = bufnr, preserve_mappings = false }
 end)
+
+lsp_zero.set_sign_icons {
+    error = '✘',
+    warn = '▲',
+    hint = '⚑',
+    info = '»',
+}
 
 require('mason').setup {}
 require('mason-lspconfig').setup {
@@ -83,16 +90,16 @@ lsp_zero.set_server_config {
 }
 
 lsp_zero.configure('denols', {
-    root_dir = nvim_lsp.util.root_pattern("deno.json"),
+    root_dir = nvim_lsp.util.root_pattern 'deno.json',
     init_options = {
         lint = true,
         unstable = true,
         suggest = {
             imports = {
                 hosts = {
-                    ["https://deno.land"] = true,
-                    ["https://cdn.nest.land"] = true,
-                    ["https://crux.land"] = true,
+                    ['https://deno.land'] = true,
+                    ['https://cdn.nest.land'] = true,
+                    ['https://crux.land'] = true,
                 },
             },
         },
@@ -101,7 +108,7 @@ lsp_zero.configure('denols', {
         local active_clients = vim.lsp.get_clients()
         for _, client in pairs(active_clients) do
             -- stop tsserver if denols is already active
-            if client.name == "tsserver" then
+            if client.name == 'tsserver' then
                 client.stop()
             end
         end
@@ -114,5 +121,3 @@ lsp_zero.configure('beancount', {
     },
     autostart = true,
 })
-
-lsp_zero.setup()
