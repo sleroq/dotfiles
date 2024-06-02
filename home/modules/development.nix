@@ -8,12 +8,11 @@
   programs.nushell = {
     extraEnv = ''
       # Deno
-      $env.Path = ($env.PATH | append ($env.HOME | path join '.deno/bin'))
+      $env.PATH = ($env.PATH | append ($env.HOME | path join '.deno/bin'))
 
       # Golang
-      $env.GOPATH = ($env.HOME | path join "develop/go")
-      $env.GOBIN = ($env.HOME | path join "develop/go/bin")
-      $env.Path = ($env.PATH | append $env.GOPATH)
+      $env.GOPATH = ($env.HOME | path join 'develop/go')
+      $env.PATH = ($env.PATH | append (go env GOBIN))
     '';
   };
 
@@ -24,8 +23,7 @@
 
       # Golang
       export GOPATH="$HOME/develop/go"
-      export GOBIN="$HOME/develop/go/bin"
-      path+=("$GOPATH")
+      path+=(go env GOBIN)
     '';
   };
 
