@@ -1,4 +1,8 @@
-{ ... } : {
+{ pkgs, ... }: {
+  environment.systemPackages = [
+    pkgs.powertop
+  ];
+
   services.power-profiles-daemon.enable = false;
   services.thermald.enable = true;
 
@@ -6,7 +10,9 @@
     enable = true;
     settings = {
       CPU_ENERGY_PERF_POLICY_ON_AC="performance";
+      # CPU_ENERGY_PERF_POLICY_ON_AC="power";
       CPU_ENERGY_PERF_POLICY_ON_BAT="power";
+      # PLATFORM_PROFILE_ON_AC="low-power";
       PLATFORM_PROFILE_ON_AC="performance";
       PLATFORM_PROFILE_ON_BAT="low-power";
       RUNTIME_PM_ON_AC="auto";
