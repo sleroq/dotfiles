@@ -4,7 +4,6 @@ with lib;
 {
   imports = [
     ./leftwm.nix
-    ./macros.nix
   ];
 
   home.activation.picom = hm.dag.entryAfter [ "writeBoundary" ] ''
