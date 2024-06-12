@@ -85,11 +85,6 @@ in
     enableNushellIntegration = true;
   };
 
-  programs.yazi = {
-    enable = true;
-    enableNushellIntegration = true;
-  };
-
   home.packages = with pkgs; [
     zsh
     thefuck
