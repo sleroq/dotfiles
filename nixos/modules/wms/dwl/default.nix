@@ -32,8 +32,8 @@ let
     postPatch = cfg.postPatch;
     patches = [
       (pkgs.fetchpatch {
-        url = "https://codeberg.org/dwl/dwl-patches/raw/branch/main/patches/autostart/autostart.patch";
-        sha256 = "sha256-OGGqnTIpM5bZRUY5j1r8Zy2cDQiLlZKURW5gN56lehY=";
+        url = "https://codeberg.org/dwl/dwl-patches/src/commit/9e98f302ea856177c6ddaef3e6ae5d8611d3d9d8/patches/autostart/autostart.patch";
+        sha256 = "sha256-kJ/yXk/zSpIAyqPztzQZVvpXWf+jrh+K5XjBnvg9kcs=";
       })
       (pkgs.fetchpatch {
         url = "https://codeberg.org/dwl/dwl-patches/raw/commit/3f9a58cde9e3aa02991b3e5a22d371b153cb1459/pertag/pertag.patch";
