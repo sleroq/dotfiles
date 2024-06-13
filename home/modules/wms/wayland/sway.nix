@@ -21,7 +21,6 @@ let
 in
 with lib; {
   imports = [
-    ../../programs/wofi.nix
     ../../programs/eww.nix
     ../../programs/swaync.nix
     ../../programs/swaycons.nix
