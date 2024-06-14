@@ -2,12 +2,12 @@
 
 let
   pname = "anytype";
-  version = "0.41.0";
+  version = "0.41.1";
   name = "Anytype-${version}";
   src = fetchurl {
     url = "https://github.com/anyproto/anytype-ts/releases/download/v${version}/${name}.AppImage";
     name = "Anytype-${version}.AppImage";
-    hash = "sha256-C9TuB+QGifWlv7d4p1aEJLNcdlsN891FXFBYVjiysqM=";
+    hash = "sha256-z/Htqq2HgCKNPzF81/nvLK/32KuMUYdHRTQbM8hZSIw=";
   };
   appimageContents = appimageTools.extractType2 { inherit name src; };
 in appimageTools.wrapType2 {
