@@ -26,6 +26,7 @@ in
 {
   imports = [
     ./sway.nix
+    ./hyprland.nix
     ./dwl/default.nix
   ];
 
@@ -52,6 +53,7 @@ in
     configure-gtk
 
     wl-clipboard
+    cliphist
     cava
     grim
     slurp

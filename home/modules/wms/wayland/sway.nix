@@ -27,6 +27,8 @@ with lib; {
   ];
 
   home.activation.sway = hm.dag.entryAfter [ "writeBoundary" ] ''
+    mkdir -p $HOME/.config/sway
+
     $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
         ${opts.realConfigs}/sway/* $HOME/.config/sway/
   '';
@@ -42,8 +44,6 @@ with lib; {
   home.packages = with pkgs; [
     dbus-sway-environment
 
-    stalonetray
-    cliphist
     swayidle
     swaykbdd
     swayr

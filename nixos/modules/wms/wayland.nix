@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, lib, ... }:
 
 let
   waylandBaseSession = ''
@@ -28,7 +28,7 @@ in
 
   xdg.portal = {
     enable = true;
-    wlr.enable = true;
+    wlr.enable = lib.mkForce false;
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 
@@ -44,11 +44,14 @@ in
     })
   ];
 
-  services.desktopManager.plasma6.enable = false;
-
   programs.sway = {
     enable = true;
     wrapperFeatures.gtk = true;
+  };
+
+  programs.hyprland = {
+    enable = true;
+    package = inputs.hyprland.packages.${pkgs.system}.hyprland;
   };
 
   programs.dwl = {
@@ -61,6 +64,4 @@ in
         cp ${configFile} config.def.h
       '';
   };
-
-  # services.displayManager.sessionPackages = [ pkgs.dwl-wrapped ];
 }
