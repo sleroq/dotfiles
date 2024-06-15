@@ -15,8 +15,8 @@ exec nm-applet --indicator
 exec swayrd # Window-switcher server
 exec pcmanfm-qt -d
  
-exec eww -c ~/.config/eww/simple-bar daemon
-exec eww -c ~/.config/eww/simple-bar open bar
+exec eww -c ~/.config/eww/sway-bar daemon
+exec eww -c ~/.config/eww/sway-bar open bar
 
 exec swww init
 
