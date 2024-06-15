@@ -195,9 +195,14 @@ require('lazy').setup({
         end,
     },
     {
-        "folke/todo-comments.nvim",
-        dependencies = { "nvim-lua/plenary.nvim" },
+        'folke/todo-comments.nvim',
+        dependencies = { 'nvim-lua/plenary.nvim' },
         opts = {},
+    },
+    {
+        'theRealCarneiro/hyprland-vim-syntax',
+        dependencies = { 'nvim-treesitter/nvim-treesitter' },
+        ft = 'hypr'
     },
 }, {})
 
