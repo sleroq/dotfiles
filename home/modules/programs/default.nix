@@ -21,7 +21,6 @@
 
     brave
 
-    # exodus
     monero-gui
 
     telegram-desktop
@@ -55,6 +54,7 @@
     # File manager
     ffmpegthumbnailer
     lxqt.pcmanfm-qt
+    dolphin
 
     # For "Choose Application" inside pcmanfm-qt to work
     lxqt.lxqt-menu-data
