@@ -102,5 +102,8 @@ in
     dbus-hyprland-environment
     hyprland-per-window-layout
     inputs.hy3.packages.x86_64-linux.hy3
+
+    jq
+    socat
   ];
 }
