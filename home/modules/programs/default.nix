@@ -33,7 +33,7 @@
     telegram-desktop
     signal-desktop
     vesktop
-    discord-screenaudio
+    webcord-vencord
     nheko
     iamb
     
