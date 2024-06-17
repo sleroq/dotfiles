@@ -15,6 +15,13 @@
     "electron-25.9.0" # Required by obsidian
   ];
 
+  programs.obs-studio = {
+    enable = true;
+    plugins = with pkgs; [
+      obs-studio-plugins.obs-backgroundremoval
+    ];
+  };
+
   home.packages = with pkgs; [
     appimage-run
     # obinskit # proprietary keyboard software
@@ -46,7 +53,6 @@
     krita
     libreoffice-fresh
     kdePackages.kdenlive
-    obs-studio
     qbittorrent
     keepassxc
     # syncplay
