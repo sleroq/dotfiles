@@ -2,7 +2,12 @@
   description = "Sleroq's NixOS system configuration";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-  inputs.hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
+  inputs.hyprland = {
+    type = "git";
+    url = "https://github.com/hyprwm/Hyprland";
+    submodules = true;
+    ref = "refs/tags/v0.41.0";
+  };
 
   outputs = { self, nixpkgs, ... }@inputs:
   let
