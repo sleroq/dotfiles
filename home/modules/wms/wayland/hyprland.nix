@@ -19,19 +19,18 @@ let
     '';
   };
 in
-with lib; {
+{
   imports = [
     ../../programs/eww.nix
   ];
 
-  home.activation.hyprland = hm.dag.entryAfter [ "writeBoundary" ] ''
+  home.activation.hyprland = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     mkdir -p $HOME/.config/hypr
 
     $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
         ${opts.realConfigs}/hypr/* $HOME/.config/hypr/
   '';
 
-  programs.swaylock.enable = true;
 
   programs.hyprlock = {
     enable = true;
@@ -71,6 +70,29 @@ with lib; {
 
   services = {
     cliphist.enable = true;
+
+    hypridle = {
+      enable = true;
+      settings = {
+        general = {
+          after_sleep_cmd = "hyprctl dispatch dpms on";
+          ignore_dbus_inhibit = false;
+          lock_cmd = "hyprlock";
+        };
+
+        listener = [
+          {
+            timeout = 900;
+            on-timeout = "hyprlock";
+          }
+          {
+            timeout = 1200;
+            on-timeout = "hyprctl dispatch dpms off";
+            on-resume = "hyprctl dispatch dpms on";
+          }
+        ];
+      };
+    };
   };
 
   home.packages = with pkgs; [
