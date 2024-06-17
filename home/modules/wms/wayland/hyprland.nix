@@ -97,5 +97,6 @@ in
 
   home.packages = with pkgs; [
     dbus-hyprland-environment
+    hyprland-per-window-layout
   ];
 }
