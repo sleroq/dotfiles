@@ -6,10 +6,10 @@ handle() {
       # Extract the window ID from the line
       window_id=$(echo ${1#*>>} | cut -d, -f1)
 
+      hyprctl dispatch focuswindow address:0x$window_id &
+
       # Fetch the list of windows and parse it using jq to find the window by its decimal ID
       window_info=$(hyprctl clients -j | jq --arg id "0x$window_id" '.[] | select(.address == ($id))')
-
-      window_title=$(echo "$window_info" | jq '.title')
 
       window_pid=$(echo "$window_info" | jq '.pid')
     
