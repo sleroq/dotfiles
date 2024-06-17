@@ -1,4 +1,4 @@
-{ pkgs, opts, lib, ... }:
+{ pkgs, opts, lib, inputs, config, ... }:
 
 let
   # bash script to let dbus know about important env variables and
@@ -31,6 +31,9 @@ in
         ${opts.realConfigs}/hypr/* $HOME/.config/hypr/
   '';
 
+  home.file."${config.xdg.configHome}/hypr/extra-config.conf" = {
+    text = "plugin = ${inputs.hy3.packages.x86_64-linux.hy3}/lib/libhy3.so";
+  };
 
   programs.hyprlock = {
     enable = true;
@@ -98,5 +101,6 @@ in
   home.packages = with pkgs; [
     dbus-hyprland-environment
     hyprland-per-window-layout
+    inputs.hy3.packages.x86_64-linux.hy3
   ];
 }
