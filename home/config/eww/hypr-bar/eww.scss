@@ -1,0 +1,93 @@
+$background-color: rgb(58, 58, 58);
+$active-color: #8aadf4;
+$inactive-color: #4e4e4e;
+
+* {
+  all: unset;
+	font-family: DaddyTimeMono NF;
+}
+
+.container {
+  background-color: rgba($background-color, 0.6);
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin-top: 4px;
+}
+
+.icon-module {
+  padding-right: 4px;
+}
+
+.bar {
+  background-color: rgba($background-color, 0);
+  color: #b0b4bc;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+.metric scale trough {
+  background-color: $inactive-color;
+  border-radius: 50px;
+  min-height: 3px;
+  min-width: 50px;
+  margin-left: 10px;
+  margin-right: 20px;
+}
+
+.metric scale trough highlight {
+  background-color: $active-color;
+}
+
+.tray > menuitem {
+  margin-right: 4px;
+}
+.tray menu {
+  background-color: $background-color;
+  padding: 4px;
+  border-radius: 4px;
+  
+  menuitem {
+    padding: 4px;
+  }
+
+  menuitem:hover {
+    background-color: $inactive-color;
+  }
+}
+.workspaces {
+  button {
+    padding-right: 4px;
+    padding-left: 4px;
+  }
+
+  button.active {
+    color: $active-color;
+  }
+}
+
+.volume button {
+  padding-right: 8px;
+  font-size: 16px;
+}
+
+.bat-module {
+  color: #7ad39f;
+}
+
+.mem-module {
+  color: $active-color;
+}
+
+.volbar trough {
+  background-color: $inactive-color;
+  min-height: 3px;
+  min-width: 50px;
+  margin-right: 8px;
+}
+
+.volbar trough highlight {
+  background-color: $active-color;
+}
