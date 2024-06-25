@@ -125,7 +125,7 @@ in {
       pam.services.swaylock = {};
     };
 
-    hardware.opengl.enable = mkDefault true;
+    hardware.graphics.enable = mkDefault true;
     fonts.enableDefaultPackages = mkDefault true;
 
     programs = {
