@@ -6,8 +6,6 @@ handle() {
       # Extract the window ID from the line
       window_id=$(echo ${1#*>>} | cut -d, -f1)
 
-      hyprctl dispatch focuswindow address:0x$window_id &
-
       # Fetch the list of windows and parse it using jq to find the window by its decimal ID
       window_info=$(hyprctl clients -j | jq --arg id "0x$window_id" '.[] | select(.address == ($id))')
 
@@ -18,14 +16,6 @@ handle() {
       if [[ "$window_pid" == "$pcmanfm_pid" ]]; then
         hyprctl --batch "dispatch togglefloating address:0x$window_id; dispatch resizewindowpixel exact 60% 60%,address:0x$window_id; dispatch movewindowpixel exact 20% 20%,address:0x$window_id" &
       fi
-      ;;
-
-    movewindowv2*)
-      # Extract the window ID and the new position from the line
-      window_id=$(echo ${1#*>>} | cut -d, -f1)
-
-      # Always focus window when it's being moved to other workspace
-      hyprctl dispatch focuswindow address:0x$window_id &
       ;;
   esac
 }
