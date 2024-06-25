@@ -27,6 +27,7 @@
     # obinskit # proprietary keyboard software
 
     brave
+    chromium
 
     monero-gui
 
@@ -55,7 +56,7 @@
     kdePackages.kdenlive
     qbittorrent
     keepassxc
-    # syncplay
+    syncplay
 
     # File manager
     ffmpegthumbnailer
