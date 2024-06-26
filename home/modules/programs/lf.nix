@@ -29,6 +29,6 @@
     poppler_utils
     imagemagick
     highlight
-    libtransmission
+    libtransmission_4
   ];
 }
