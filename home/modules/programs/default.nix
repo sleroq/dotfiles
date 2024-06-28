@@ -79,7 +79,6 @@
     # Work
     remmina
     nomachine-client
-    zellij
     # rustdesk
 
     # gephi - Visualizing and exploring networks
