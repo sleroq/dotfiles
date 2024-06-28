@@ -23,7 +23,24 @@ nvim_lsp.nixd.setup({})
 nvim_lsp.denols.setup({})
 nvim_lsp.gopls.setup({})
 nvim_lsp.golangci_lint_ls.setup({})
-nvim_lsp.htmx.setup({})
+nvim_lsp.templ.setup({})
+
+nvim_lsp.html.setup({
+    filetypes = { "html", "templ" },
+})
+
+vim.filetype.add({ extension = { templ = "templ" } })
+
+nvim_lsp.htmx.setup({
+    filetypes = { "html", "templ" },
+})
+
+vim.api.nvim_create_autocmd({ "BufWritePre" }, { pattern = { "*.templ" }, callback = vim.lsp.buf.format })
+
+nvim_lsp.tailwindcss.setup({
+    filetypes = { "templ", "astro", "javascript", "typescript", "react" },
+    init_options = { userLanguages = { templ = "html" } },
+})
 
 local cmp = require("cmp")
 local cmp_action = lsp_zero.cmp_action()
