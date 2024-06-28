@@ -3,6 +3,7 @@
 {
   imports = [
     ./programs/gitui.nix
+    ./programs/zellij.nix
   ];
 
   programs.nushell = {
