@@ -27,6 +27,7 @@ with config;
     tree-sitter
     luajitPackages.luarocks
     luajitPackages.jsregexp
+    wakatime
 
     emacs-all-the-icons-fonts
   ];

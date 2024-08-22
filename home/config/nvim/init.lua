@@ -211,6 +211,13 @@ require("lazy").setup({
 			require("guess-indent").setup({})
 		end,
 	}
+  {
+    'wakatime/vim-wakatime',
+    init = function()
+      vim.g.wakatime_CLIPath = '~/.nix-profile/bin/wakatime-cli'
+    end,
+    lazy = false,
+  },
 }, {})
 
 -- [[ Setting options ]]
