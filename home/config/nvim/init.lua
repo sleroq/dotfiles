@@ -2,6 +2,7 @@
 -- Must happen before plugins are required
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+vim.cmd 'set shell=/bin/sh'
 
 -- [[ :help lazy.nvim.txt ]]
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
