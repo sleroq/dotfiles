@@ -13,7 +13,8 @@
 
       # Golang
       $env.GOPATH = ($env.HOME | path join 'develop/go')
-      $env.PATH = ($env.PATH | append (go env GOBIN))
+      $env.GOBIN = ($env.GOPATH | path join 'bin')
+      $env.PATH = ($env.PATH | append $env.GOBIN)
     '';
   };
 
