@@ -33,10 +33,6 @@
 
     telegram-desktop
     signal-desktop
-    vesktop
-    webcord-vencord
-    nheko
-    iamb
     
     inputs.paisa.packages.${pkgs.system}.default
     ledger
@@ -78,7 +74,7 @@
 
     # Work
     remmina
-    nomachine-client
+    # nomachine-client
     # rustdesk
 
     # gephi - Visualizing and exploring networks
