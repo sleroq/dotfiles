@@ -7,6 +7,7 @@
     ./cachix.nix
 
     # ./modules/samba.nix
+    ./modules/flatpak.nix
     ./modules/polkit.nix
     ./modules/kwallet.nix
     ./modules/virtualisation.nix
@@ -112,7 +113,18 @@
   # About fonts - nixos.wiki/wiki/Fonts
   fonts.fontDir.enable = true;
   fonts.packages = with pkgs; [
-    (nerdfonts.override { fonts = [ "JetBrainsMono" "FiraCode" "DroidSansMono" ]; })
+    (nerdfonts.override { fonts = [ "JetBrainsMono" "FiraCode" "DroidSansMono" "Ubuntu" "Agave" ]; })
+    noto-fonts
+    noto-fonts-emoji
+    noto-fonts-cjk
+    noto-fonts-extra
+    helvetica-neue-lt-std
+    arkpandora_ttf
+    powerline-fonts
+    source-han-sans
+    source-han-sans-japanese
+    source-han-serif-japanese
+    font-awesome
   ];
 
   programs.zsh.enable = true;

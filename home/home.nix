@@ -22,27 +22,12 @@
 
   xsession.enable = true;
 
-  fonts.fontconfig.enable = true;
-
   home.packages = with pkgs; [
     kdePackages.ark # TODO: this is for noobs (or is it)
     kdePackages.filelight
 
     p7zip
     unzip
-
-    helvetica-neue-lt-std
-    arkpandora_ttf
-    (nerdfonts.override { fonts = [ "JetBrainsMono" "Ubuntu" "Agave" ]; })
-    powerline-fonts
-    noto-fonts
-    noto-fonts-extra
-    noto-fonts-cjk
-    noto-fonts-emoji
-    source-han-sans
-    source-han-sans-japanese
-    source-han-serif-japanese
-    font-awesome
   ];
 
   qt = {
