@@ -54,6 +54,8 @@
     keepassxc
     syncplay
 
+    xournalpp
+
     # File manager
     ffmpegthumbnailer
     lxqt.pcmanfm-qt
