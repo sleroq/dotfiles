@@ -23,7 +23,7 @@
 (defwidget workspaces []
   (box :halign "start" :class "workspaces container"
   (for entry in "${SPACES.workspaces}"
-    (button :onclick "sway workspace ${entry.id}"
+    (button :onclick "hyprctl dispatch workspace ${entry.id}"
             :class {"${entry.is_active}" ? "active" : ""}
       {"${entry.is_active}" ? "" : "${entry.id}"}))))
 
