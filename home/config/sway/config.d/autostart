@@ -28,4 +28,11 @@ exec swaymsg layout tabbed
 workspace 4
 exec keepassxc
 
+workspace 5
+exec telegram-desktop
+exec signal-desktop
+
+workspace 10
+exec noisetorch
+
 workspace 1
