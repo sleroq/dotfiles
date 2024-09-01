@@ -31,7 +31,7 @@
 
     monero-gui
 
-    telegram-desktop
+    # telegram-desktop
     signal-desktop
     
     inputs.paisa.packages.${pkgs.system}.default
