@@ -62,7 +62,6 @@ in
     swww
 
     nwg-look
-    nwg-panel
   ];
 
 }
