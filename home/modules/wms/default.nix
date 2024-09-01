@@ -20,7 +20,6 @@
     libnotify
     glib # gsettings
     pulseaudioFull
-    flameshot
 
     # Theming
     lxappearance
@@ -36,6 +35,9 @@
 
     kdePackages.breeze
     catppuccin-qt5ct
+    lxqt.lxqt-themes
+    libsForQt5.kiconthemes
+    libsForQt5.grantleetheme
     libsForQt5.qtstyleplugins
     libsForQt5.lightly
   ];
