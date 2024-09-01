@@ -6,6 +6,8 @@ let
     up = "sudo nix-channel --update and sudo nixos-rebuild switch --upgrade"; # TODO: Make shell-agnostic
     hu = "home-manager switch --flake ${opts.realDotfiles}/home#sleroq";
     sudo = "sudo ";
+    # FIXME: Redo as binary or .desktop file
+    discord = "flatpak run dev.vencord.Vesktop --ozone-platform=wayland --disable-features=UseChromeOSDirectVideoDecoder --disable-gpu-memory-buffer-compositor-resources --disable-gpu-memory-buffer-video-frames --enable-hardware-overlays";
   };
 in
 {
