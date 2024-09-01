@@ -16,7 +16,7 @@ let
 in 
 {
   imports = [
-    (import ./dwl)
+    # (import ./dwl)
   ];
   # xdg-desktop-portal works by exposing a series of D-Bus interfaces
   # known as portals under a well-known name
@@ -54,14 +54,16 @@ in
     package = inputs.hyprland.packages.${pkgs.system}.hyprland;
   };
 
-  programs.dwl = {
-    enable = true;
-    postPatch =
-      let
-        configFile = ./dwl/dwl-config.h; # TODO: move somewhere else
-      in
-      ''
-        cp ${configFile} config.def.h
-      '';
   };
+
+  # programs.dwl = {
+  #   enable = true;
+  #   postPatch =
+  #     let
+  #       configFile = ./dwl/dwl-config.h; # TODO: move somewhere else
+  #     in
+  #     ''
+  #       cp ${configFile} config.def.h
+  #     '';
+  # };
 }
