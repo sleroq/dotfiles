@@ -7,6 +7,11 @@
     # ./x11/default.nix
   ];
 
+  services.flameshot = {
+    enable = true;
+    # package = pkgs.flameshot.override { enableWlrSupport = true; };
+  };
+
   # Packages universal for all window managers
   home.packages = with pkgs; [
     networkmanagerapplet # TODO: Find better solution
