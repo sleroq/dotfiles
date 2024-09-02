@@ -1,7 +1,6 @@
 { pkgs, inputs, lib, ... }:
 
 let
-  pkgs-unstable = inputs.hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
   waylandBaseSession = ''
     export _JAVA_AWT_WM_NONREPARENTING=1;
     export XDG_SESSION_TYPE=wayland;
@@ -55,13 +54,8 @@ in
     package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
   };
 
-  hardware.opengl = {
-    package = pkgs-unstable.mesa.drivers;
-
-    # if you also want 32-bit support (e.g for Steam)
-    driSupport32Bit = true;
-    package32 = pkgs-unstable.pkgsi686Linux.mesa.drivers;
-  };
+  # Probably safe to remove but I'm not testing this today
+  hardware.opengl.enable = true;
 
   # programs.dwl = {
   #   enable = true;

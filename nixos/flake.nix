@@ -8,6 +8,7 @@
     url = "https://github.com/hyprwm/Hyprland";
     submodules = true;
     ref = "refs/tags/v0.42.0";
+    inputs.nixpkgs.follows = "nixpkgs"; # MESA/OpenGL HW workaround
   };
 
   outputs = { self, nixpkgs, nixpkgs-unstable, ... }@inputs:
