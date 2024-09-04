@@ -30,11 +30,6 @@
     unzip
   ];
 
-  qt = {
-    enable = true;
-    platformTheme.name = "qtct";
-  };
-
   services.syncthing.enable = true;
 
   # This value determines the Home Manager release that your
