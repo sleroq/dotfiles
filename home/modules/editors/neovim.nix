@@ -1,12 +1,7 @@
-{ config, pkgs, opts, lib, inputs, ... }:
+{ pkgs, opts, lib, ... }:
 
-with config;
 {
-  # nixpkgs.overlays = [ inputs.neovim-nightly-overlay.overlay ];
-  programs.neovim = {
-    enable = true;
-    # package = pkgs.neovim-nightly;
-  };
+  programs.neovim.enable = true;
 
   home.activation.neovim = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
@@ -28,7 +23,5 @@ with config;
     luajitPackages.luarocks
     luajitPackages.jsregexp
     wakatime
-
-    emacs-all-the-icons-fonts
   ];
 }
