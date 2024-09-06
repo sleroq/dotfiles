@@ -33,7 +33,7 @@
 
     # telegram-desktop
     signal-desktop
-    teamspeak-client
+    teamspeak_client
     
     inputs.paisa.packages.${pkgs.system}.default
     ledger
