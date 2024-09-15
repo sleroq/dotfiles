@@ -29,7 +29,7 @@
       inherit system;
       specialArgs = { inherit inputs; inherit (self) outputs; };
       modules = [
-        ({ config, pkgs, ... }: { nixpkgs.overlays = [ overlay-unstable ]; })
+        ({ ... }: { nixpkgs.overlays = [ overlay-unstable ]; })
         ./configuration.nix
       ];
     };
