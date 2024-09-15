@@ -1,16 +1,17 @@
-{ pkgs,... }: {
+{ pkgs, ... }: {
   imports = [
     ./wayland.nix
     ./x11.nix
   ];
 
-  environment.systemPackages = with pkgs; [
-    xdg-utils
-    where-is-my-sddm-theme
+  environment.systemPackages = [
+    pkgs.xdg-utils
+    (pkgs.unstable.where-is-my-sddm-theme.override { variants = [ "qt5" ]; })
   ];
 
   services.displayManager.sddm = {
     enable = true;
-    theme = "where_is_my_sddm_theme";
+    package = pkgs.libsForQt5.sddm;
+    theme = "where_is_my_sddm_theme_qt5";
   };
 }
