@@ -36,12 +36,12 @@ require('lazy').setup({
   'saadparwaiz1/cmp_luasnip',
   'hrsh7th/cmp-nvim-lua',
   'rafamadriz/friendly-snippets',
-  { 'L3MON4D3/LuaSnip', opts = {} },
-  { 'williamboman/mason.nvim', opts = {} },
+  { 'L3MON4D3/LuaSnip',                  opts = {} },
+  { 'williamboman/mason.nvim',           opts = {} },
   { 'williamboman/mason-lspconfig.nvim', opts = {} },
-  { 'hrsh7th/nvim-cmp', opts = {} },
-  { 'hrsh7th/cmp-nvim-lsp', opts = {} },
-  { 'VonHeikemen/lsp-zero.nvim', branch = 'v3.x', lazy = true, config = false },
+  { 'hrsh7th/nvim-cmp',                  opts = {} },
+  { 'hrsh7th/cmp-nvim-lsp',              opts = {} },
+  { 'VonHeikemen/lsp-zero.nvim',         branch = 'v3.x', lazy = true, config = false },
 
   {
     'nvimdev/guard.nvim',
@@ -51,8 +51,8 @@ require('lazy').setup({
     },
   },
 
-  { 'j-hui/fidget.nvim', opts = {} },
-  { 'folke/neodev.nvim', opts = {} },
+  { 'j-hui/fidget.nvim',    opts = {} },
+  { 'folke/neodev.nvim',    opts = {} },
   { 'folke/which-key.nvim', opts = {} },
   'lewis6991/gitsigns.nvim',
 
@@ -98,7 +98,7 @@ require('lazy').setup({
   },
 
   -- 'gc' to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  { 'numToStr/Comment.nvim',  opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
   {
@@ -153,10 +153,10 @@ require('lazy').setup({
 
   {
     'amitds1997/remote-nvim.nvim',
-    version = '*', -- Pin to GitHub releases
+    version = '*',                     -- Pin to GitHub releases
     dependencies = {
-      'nvim-lua/plenary.nvim', -- For standard functions
-      'MunifTanjim/nui.nvim', -- To build the plugin UI
+      'nvim-lua/plenary.nvim',         -- For standard functions
+      'MunifTanjim/nui.nvim',          -- To build the plugin UI
       'nvim-telescope/telescope.nvim', -- For picking b/w different remote methods
     },
     config = true,
