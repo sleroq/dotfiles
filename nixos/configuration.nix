@@ -117,6 +117,7 @@
     noto-fonts
     noto-fonts-emoji
     noto-fonts-cjk
+    roboto
     noto-fonts-extra
     helvetica-neue-lt-std
     arkpandora_ttf
