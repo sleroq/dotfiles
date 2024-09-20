@@ -22,6 +22,7 @@
     tree-sitter
     luajitPackages.luarocks
     luajitPackages.jsregexp
+    tailwindcss-language-server
     wakatime
   ];
 }
