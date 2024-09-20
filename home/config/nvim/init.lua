@@ -219,6 +219,13 @@ require('lazy').setup({
     end,
     lazy = false,
   },
+
+  {
+    "supermaven-inc/supermaven-nvim",
+    config = function()
+      require("supermaven-nvim").setup({})
+    end,
+  },
 }, {})
 
 -- [[ Setting options ]]
