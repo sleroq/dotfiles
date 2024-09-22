@@ -19,6 +19,7 @@
       enable = true;
       dockerCompat = true;
       defaultNetwork.settings.dns_enabled = true;
+      dockerSocket.enable = true;
     };
     # waydroid.enable = true;
     lxd.enable = true;
