@@ -3,13 +3,6 @@
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
   inputs.nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-  inputs.hyprland = {
-    type = "git";
-    url = "https://github.com/hyprwm/Hyprland";
-    submodules = true;
-    ref = "refs/tags/v0.42.0";
-    inputs.nixpkgs.follows = "nixpkgs"; # MESA/OpenGL HW workaround
-  };
 
   outputs = { self, nixpkgs, nixpkgs-unstable, ... }@inputs:
   let

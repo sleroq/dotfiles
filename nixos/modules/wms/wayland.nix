@@ -49,13 +49,10 @@ in
     wrapperFeatures.gtk = true;
   };
 
-  programs.hyprland = {
-    enable = true;
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-  };
-
-  # Probably safe to remove but I'm not testing this today
-  hardware.opengl.enable = true;
+  # programs.hyprland = {
+  #   enable = true;
+  #   package = pkgs.hyprland-patched;
+  # };
 
   # programs.dwl = {
   #   enable = true;

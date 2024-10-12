@@ -26,7 +26,7 @@ in
 {
   imports = [
     ./sway.nix
-    ./hyprland.nix
+    # ./hyprland.nix
     ./dwl/default.nix
   ];
 
