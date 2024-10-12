@@ -34,14 +34,6 @@ require('zen-mode').setup {
     gitsigns = { enabled = false }, -- disables git signs
     tmux = { enabled = true }, -- disables the tmux statusline
   },
-  -- callback where you can add custom code when the Zen window opens
-  on_open = function()
-    require('ibl').update { enabled = false }
-  end,
-  -- callback where you can add custom code when the Zen window closes
-  on_close = function()
-    require('ibl').update { enabled = true }
-  end,
 }
 
 vim.keymap.set('n', '<leader>tz', ':ZenMode<CR>', { desc = 'Zen mode toggle' })
