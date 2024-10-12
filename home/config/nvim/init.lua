@@ -38,8 +38,8 @@ require('lazy').setup({
   'saadparwaiz1/cmp_luasnip',
   'benfowler/telescope-luasnip.nvim',
 
-  { 'j-hui/fidget.nvim',    opts = {} },
-  { 'folke/which-key.nvim', opts = {} },
+  { 'j-hui/fidget.nvim',         opts = {} },
+  { 'folke/which-key.nvim',      opts = {} },
 
   {
     'catppuccin/nvim',
@@ -61,7 +61,7 @@ require('lazy').setup({
   },
 
   -- 'gc' to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  { 'numToStr/Comment.nvim',  opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
   {
