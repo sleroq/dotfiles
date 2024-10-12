@@ -4,7 +4,6 @@
   imports = [
     ./hardware-configuration.nix
     ./modules/battery-life.nix
-    ./cachix.nix
 
     # ./modules/samba.nix
     ./modules/flatpak.nix
