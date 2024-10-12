@@ -164,16 +164,13 @@ bindsym {
 # Layout stuff:
 #
 
-
-# You can 'split' the current object of your focus with
-# $mod+b or $mod+v, for horizontal and vertical splits
-# respectively.
 bindsym --to-code {
-  $mod+b splith
+  $mod+n splith
   $mod+v splitv
   # Switch the current container between different layout styles
   $mod+f1 layout stacking
   $mod+f2 layout tabbed
+  $mod+b layout tabbed
   $mod+f3 layout toggle split
   $mod+f4 floating toggle, floating toggle
 
@@ -190,10 +187,6 @@ bindsym --to-code {
   $mod+a focus parent
 
   $mod+y sticky toggle
-
-  # Scratchpad:
-  $mod+Shift+s move scratchpad
-  $mod+s scratchpad show
 }
 
 # Resizing containers:
