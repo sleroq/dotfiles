@@ -23,6 +23,7 @@
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
   boot.initrd.systemd.enable = true;
   boot.plymouth.enable = true;
+  boot.kernel.sysctl = { "vm.swappiness" = 20; };
   boot.kernelParams = ["quiet"];
   boot.extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
   boot.kernelModules = [
