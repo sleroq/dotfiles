@@ -37,12 +37,6 @@ vim.o.completeopt = 'menuone,noselect'
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
-vim.o.foldmethod = 'indent'
-vim.o.foldcolumn = '1'
-vim.o.foldlevel = 999
-vim.o.foldlevelstart = 99
-vim.o.foldenable = true
-
 -- Indent
 vim.o.tabstop = 4
 vim.opt.softtabstop = 4
