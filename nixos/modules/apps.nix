@@ -4,14 +4,11 @@
   environment.systemPackages = with pkgs; [
     git
     neovim
-    helix
     wget
     curl
     foot
     librewolf
     networkmanager-openvpn
-
-    libsForQt5.polkit-kde-agent
   ];
 
   # For samba and other stuff
@@ -30,6 +27,8 @@
     enable = true;
     gamescopeSession.enable = true;
   };
+
+  programs.partition-manager.enable = true;
 
   # programs.adb.enable = true; # Phone debuggin stuff
 
