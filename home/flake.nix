@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     emacs-overlay.url = "github:nix-community/emacs-overlay";
@@ -19,23 +19,19 @@
 
   outputs =
     { self
-    , nixpkgs
     , home-manager
+    , nixpkgs
     , ...
     }:
     let
       system = "x86_64-linux";
       user = "sleroq";
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = [ (import ./overlays.nix self.inputs) ];
-      };
       dotfiles = ../.;
       realDotfiles = "/home/" + user + "/develop/other/dotfiles";
     in
     {
       homeConfigurations."${user}" = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
+        pkgs = import nixpkgs { inherit system; };
 
         modules = [
           ./home.nix
