@@ -20,60 +20,32 @@ vim.opt.rtp:prepend(lazypath)
 
 -- [[ Configure plugins ]]
 require('lazy').setup({
-  'nvim-tree/nvim-web-devicons',
-
   -- Git related plugins
   'tpope/vim-fugitive',
+  'lewis6991/gitsigns.nvim',
 
-  -- Detect tabstop and shiftwidth automatically
-  -- 'tpope/vim-sleuth',
-
-  -- LSP related plugins
+  { 'VonHeikemen/lsp-zero.nvim', branch = 'v4.x' },
   'neovim/nvim-lspconfig',
-  'hrsh7th/cmp-buffer',
-  opts = {},
-  'hrsh7th/cmp-path',
-  'saadparwaiz1/cmp_luasnip',
-  'hrsh7th/cmp-nvim-lua',
-  'rafamadriz/friendly-snippets',
-  { 'L3MON4D3/LuaSnip',                  opts = {} },
-  { 'williamboman/mason.nvim',           opts = {} },
-  { 'williamboman/mason-lspconfig.nvim', opts = {} },
-  { 'hrsh7th/nvim-cmp',                  opts = {} },
-  { 'hrsh7th/cmp-nvim-lsp',              opts = {} },
-  { 'VonHeikemen/lsp-zero.nvim',         branch = 'v3.x', lazy = true, config = false },
 
-  {
-    'nvimdev/guard.nvim',
-    -- Builtin configuration, optional
-    dependencies = {
-      'nvimdev/guard-collection',
-    },
-  },
+  'hrsh7th/cmp-nvim-lsp',
+  'hrsh7th/nvim-cmp',
+  'hrsh7th/cmp-buffer',
+  'hrsh7th/cmp-path',
+
+  'onsails/lspkind.nvim',
+
+  'L3MON4D3/LuaSnip',
+  'saadparwaiz1/cmp_luasnip',
+  'benfowler/telescope-luasnip.nvim',
 
   { 'j-hui/fidget.nvim',    opts = {} },
-  { 'folke/neodev.nvim',    opts = {} },
   { 'folke/which-key.nvim', opts = {} },
-  'lewis6991/gitsigns.nvim',
 
   {
     'catppuccin/nvim',
     name = 'catppuccin',
     priority = 1000,
     lazy = false,
-    config = function()
-      require('catppuccin').setup {
-        transparent_background = true,
-        integrations = {
-          cmp = true,
-          gitsigns = true,
-          treesitter = true,
-          telescope = true,
-        },
-      }
-
-      vim.cmd.colorscheme 'catppuccin-macchiato'
-    end,
   },
 
   {
@@ -88,17 +60,8 @@ require('lazy').setup({
     },
   },
 
-  {
-    -- Add indentation guides even on blank lines
-    'lukas-reineke/indent-blankline.nvim',
-    -- Enable `lukas-reineke/indent-blankline.nvim`
-    -- See `:help ibl`
-    main = 'ibl',
-    opts = {},
-  },
-
   -- 'gc' to comment visual regions/lines
-  { 'numToStr/Comment.nvim',  opts = {} },
+  { 'numToStr/Comment.nvim', opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
   {
@@ -129,27 +92,6 @@ require('lazy').setup({
     },
     build = ':TSUpdate',
   },
-  -- {
-  -- 	"zbirenbaum/copilot.lua",
-  -- 	config = function()
-  -- 		require("copilot").setup({
-  -- 			suggestion = {
-  -- 				enabled = true,
-  -- 				auto_trigger = true,
-  -- 				debounce = 75,
-  -- 				keymap = {
-  -- 					accept = "<M-l>",
-  -- 					accept_word = false,
-  -- 					accept_line = false,
-  -- 					next = "<M-]>",
-  -- 					prev = "<M-[>",
-  -- 					dismiss = "<C-]>",
-  -- 				},
-  -- 			},
-  -- 		})
-  -- 	end,
-  -- },
-  -- "zbirenbaum/copilot-cmp",
 
   {
     'amitds1997/remote-nvim.nvim',
@@ -167,11 +109,9 @@ require('lazy').setup({
 
   {
     'kevinhwang91/nvim-ufo',
-    setup = function()
-      -- Using ufo provider need remap `zR` and `zM`.
-      vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
-      vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
-    end,
+    dependencies = {
+      'kevinhwang91/promise-async',
+    },
   },
 
   {
@@ -181,20 +121,13 @@ require('lazy').setup({
     dependencies = {
       'nvim-tree/nvim-web-devicons',
     },
-    config = function()
-      require('nvim-tree').setup {}
-    end,
   },
+
   'ledger/vim-ledger',
   'nathangrigg/vim-beancount',
-  'benfowler/telescope-luasnip.nvim',
+
   'nvim-telescope/telescope-frecency.nvim',
-  {
-    'LhKipp/nvim-nu',
-    config = function()
-      require('nvim-tree').setup {}
-    end,
-  },
+  'LhKipp/nvim-nu',
   {
     'folke/todo-comments.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
