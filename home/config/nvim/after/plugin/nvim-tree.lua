@@ -17,3 +17,5 @@ end
 
 vim.keymap.set('n', '<leader>ff', nvimTreeFocusOrToggle, { desc = '[F]ile browser' })
 vim.keymap.set('n', '<leader>op', nvimTreeFocusOrToggle, { desc = '[F]ile browser' })
+
+vim.keymap.set('n', '<leader>bt', ':NvimTreeFindFile<CR>', { desc = 'Current [B]uffer in [T]ree' })
