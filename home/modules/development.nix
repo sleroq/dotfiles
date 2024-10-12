@@ -30,7 +30,7 @@
   };
 
   home.packages = with pkgs; [
-    # git-lfs
+    git-lfs
     # git-fame
     nodejs
     yarn
