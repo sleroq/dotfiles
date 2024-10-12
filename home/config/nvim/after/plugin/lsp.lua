@@ -70,6 +70,7 @@ require('lspconfig').nixd.setup({})
 require('lspconfig').denols.setup({})
 require('lspconfig').gopls.setup({})
 require('lspconfig').golangci_lint_ls.setup({})
+require('lspconfig').marksman.setup({})
 
 -- HTMX stuff
 require('lspconfig').templ.setup({})
