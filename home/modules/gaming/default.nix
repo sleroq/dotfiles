@@ -1,14 +1,9 @@
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
 
 {
-  imports = [
-    ./osu.nix
-  ];
-
-
-  home.packages = with pkgs; [
-    # lutris
-    # gamemode
-    prismlauncher
+  home.packages = with inputs.nix-gaming.packages.${pkgs.system}; [
+    osu-lazer-bin
+    osu-stable
+    pkgs.opentabletdriver
   ];
 }

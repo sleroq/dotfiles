@@ -10,11 +10,6 @@
     ./tmux.nix
   ];
 
-  nixpkgs.config.permittedInsecurePackages = [
-    # "electron-13.6.9" # Required for obinskit
-    "electron-25.9.0" # Required by obsidian
-  ];
-
   programs.obs-studio = {
     enable = true;
     plugins = with pkgs; [
@@ -24,22 +19,20 @@
 
   home.packages = with pkgs; [
     appimage-run
-    # obinskit # proprietary keyboard software
 
     brave
     chromium
 
-    monero-gui
+    # exodus # Does not work
 
-    # telegram-desktop
+    # monero-gui
     signal-desktop
-    teamspeak_client
     
-    inputs.paisa.packages.${pkgs.system}.default
-    ledger
-    beancount
-    beancount-language-server
-    fava
+    # inputs.paisa.packages.${pkgs.system}.default
+    # ledger
+    # beancount
+    # beancount-language-server
+    # fava
 
     libsForQt5.kate
     obsidian
@@ -50,7 +43,6 @@
     thunderbird
     krita
     libreoffice-fresh
-    kdePackages.kdenlive
     qbittorrent
     keepassxc
     syncplay
@@ -74,6 +66,8 @@
     xclip
     bore-cli
     ffmpeg
+
+    timeshift
 
     # Work
     remmina

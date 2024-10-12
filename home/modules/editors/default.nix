@@ -4,13 +4,13 @@
   imports = [
     # ./emacs.nix
     ./neovim.nix
-    ./helix.nix
+    # ./helix.nix
   ];
 
   programs.vscode.enable = true;
 
   home.packages = with pkgs; [
-    zed-editor
+   # zed-editor
    # jetbrains.goland
    # jetbrains.gateway
   ];

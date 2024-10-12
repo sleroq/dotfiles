@@ -30,8 +30,8 @@
   };
 
   home.packages = with pkgs; [
-    git-lfs
-    git-fame
+    # git-lfs
+    # git-fame
     nodejs
     yarn
     deno
@@ -39,13 +39,13 @@
     nodePackages_latest.typescript
     nodePackages_latest.typescript-language-server
     gopls
-    niv
+    # niv
     nixd
     cargo
-    rustc
-    godot_4
+    # rustc
+    # godot_4
     marksman
-    nil
+    # nil
     lua-language-server
 
     # python39
@@ -56,8 +56,8 @@
     # postgresql_15
     # radicle-cli
 
-    exiftool
-    gcc
-    gnumake
+    # exiftool
+    # gcc
+    # gnumake
   ];
 }
