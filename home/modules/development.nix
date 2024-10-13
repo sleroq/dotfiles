@@ -36,6 +36,7 @@
     yarn
     deno
     go
+    golangci-lint
     nodePackages_latest.typescript
     nodePackages_latest.typescript-language-server
     gopls
