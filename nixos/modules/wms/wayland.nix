@@ -51,7 +51,7 @@ in
 
   # programs.hyprland = {
   #   enable = true;
-  #   package = pkgs.hyprland-patched;
+  #   package = inputs.hyprland.packages.${pkgs.system}.hyprland;
   # };
 
   # programs.dwl = {
