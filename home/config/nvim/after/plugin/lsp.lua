@@ -50,6 +50,16 @@ cmp.setup({
 
 local lsp_zero = require('lsp-zero')
 
+lsp_zero.ui({
+  float_border = 'rounded',
+  sign_text = {
+    error = '✘',
+    warn = '▲',
+    hint = '⚑',
+    info = '»',
+  },
+})
+
 local lsp_attach = function(_, bufnr)
     lsp_zero.default_keymaps({
         buffer = bufnr,
