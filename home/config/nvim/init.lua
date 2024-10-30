@@ -159,6 +159,24 @@ require('lazy').setup({
       require("supermaven-nvim").setup({})
     end,
   },
+
+  {
+    "kawre/leetcode.nvim",
+    build = ":TSUpdate html",
+    dependencies = {
+        "nvim-telescope/telescope.nvim",
+        "nvim-lua/plenary.nvim", -- required by telescope
+        "MunifTanjim/nui.nvim",
+
+        -- optional
+        "rcarriga/nvim-notify",
+    },
+    opts = {
+      arg = "leetcode.nvim",
+      lang = "golang",
+      image_support = false,
+    },
+  },
 }, {})
 
 -- [[ Setting options ]]
