@@ -93,3 +93,14 @@ require('lspconfig').tailwindcss.setup({
     filetypes = { "templ", "astro", "javascript", "typescript", "react" },
     init_options = { userLanguages = { templ = "html" } },
 })
+vim.diagnostic.config({
+  virtual_text = false,
+  severity_sort = true,
+  float = {
+    style = 'minimal',
+    border = 'rounded',
+    source = 'always',
+    header = '',
+    prefix = '',
+  },
+})
