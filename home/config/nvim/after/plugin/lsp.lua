@@ -93,6 +93,9 @@ require('lspconfig').tailwindcss.setup({
     filetypes = { "templ", "astro", "javascript", "typescript", "react" },
     init_options = { userLanguages = { templ = "html" } },
 })
+
+vim.keymap.set('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>')
+
 vim.diagnostic.config({
   virtual_text = false,
   severity_sort = true,
