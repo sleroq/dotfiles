@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ pkgs, pkgs-old, inputs, ... }:
 
 {
   imports = [
@@ -18,8 +18,6 @@
   };
 
   home.packages = with pkgs; [
-    appimage-run
-
     brave
     chromium
 
@@ -37,6 +35,7 @@
     libsForQt5.kate
     obsidian
     (callPackage ../../packages/anytype.nix {})
+    pkgs-old.obinskit
 
     picard # music tagger
     nomacs # image viewer
