@@ -15,6 +15,9 @@
     fd
     lazygit
 
+    htmx-lsp
+    nodePackages_latest.vscode-html-languageserver-bin
+
     nodejs
     cargo
     shellcheck
