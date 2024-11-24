@@ -13,7 +13,7 @@
     ./modules/wms/default.nix
     ./modules/apps.nix
     ./modules/sound/default.nix
-    ./modules/proxy.nix
+    # ./modules/proxy.nix
   ];
 
   # Bootloader.
@@ -116,7 +116,7 @@
     (nerdfonts.override { fonts = [ "JetBrainsMono" "FiraCode" "DroidSansMono" "Ubuntu" "Agave" ]; })
     noto-fonts
     noto-fonts-emoji
-    noto-fonts-cjk
+    noto-fonts-cjk-sans
     roboto
     noto-fonts-extra
     helvetica-neue-lt-std

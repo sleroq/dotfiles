@@ -1,8 +1,10 @@
 {
   description = "Sleroq's NixOS system configuration";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
   inputs.nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+  inputs.hyprland.url = "github:hyprwm/Hyprland/12f9a0d0b93f691d4d9923716557154d74777b0a";
 
   outputs = { self, nixpkgs, nixpkgs-unstable, ... }@inputs:
   let

@@ -18,11 +18,12 @@
   };
 
   home.packages = with pkgs; [
-    brave
     chromium
+    # brave
 
     # exodus # Does not work
 
+    feishin
     # monero-gui
     signal-desktop
     
@@ -49,14 +50,14 @@
     xournalpp
 
     # File manager
-    ffmpegthumbnailer
-    lxqt.pcmanfm-qt
-    dolphin
+    # ffmpegthumbnailer
+    # lxqt.pcmanfm-qt
+    # dolphin
 
     # For "Choose Application" inside pcmanfm-qt to work
-    lxqt.lxqt-menu-data
-    lxmenu-data
-    shared-mime-info
+    # lxqt.lxqt-menu-data
+    # lxmenu-data
+    # shared-mime-info
 
     # CLI
     rclone

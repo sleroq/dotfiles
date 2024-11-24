@@ -8,7 +8,7 @@
   home.packages = with pkgs; [
     # Theming
     lxappearance
-    qt5ct
+    libsForQt5.qt5ct
     kdePackages.qt6ct
     libsForQt5.qtstyleplugins
     kdePackages.qtstyleplugin-kvantum

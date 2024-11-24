@@ -9,14 +9,14 @@
   '';
 
   home.packages = with pkgs; [
-    neovide
+    # neovide
 
     ripgrep
     fd
     lazygit
 
     htmx-lsp
-    nodePackages_latest.vscode-html-languageserver-bin
+    vscode-langservers-extracted
 
     nodejs
     cargo

@@ -1,4 +1,4 @@
-{ pkgs, lib, opts, inputs, ... }:
+{ pkgs, lib, opts, ... }:
 
 with lib;
 {
@@ -9,7 +9,7 @@ with lib;
 
   fonts.fontconfig.enable = true;
   home.packages = with pkgs; [
-    inputs.eww.packages.${pkgs.system}.eww
+    eww
     gawk
     pamixer
     killall

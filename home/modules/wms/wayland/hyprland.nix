@@ -13,7 +13,7 @@ let
     executable = true;
 
     text = ''
-      dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+      dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=hyprland
       systemctl --user stop pipewire pipewire-media-session xdg-desktop-portal xdg-desktop-portal-wlr
       systemctl --user start pipewire pipewire-media-session xdg-desktop-portal xdg-desktop-portal-wlr
     '';
@@ -99,7 +99,7 @@ in
   };
 
   home.packages = with pkgs; [
-    dbus-hyprland-environment
+    # dbus-hyprland-environment
     hyprland-per-window-layout
     inputs.hy3.packages.x86_64-linux.hy3
 

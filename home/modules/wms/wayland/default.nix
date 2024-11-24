@@ -26,7 +26,7 @@ in
 {
   imports = [
     ./sway.nix
-    # ./hyprland.nix
+    ./hyprland.nix
     ./dwl/default.nix
   ];
 
@@ -54,7 +54,7 @@ in
 
     wl-clipboard
     cliphist
-    cava
+    # cava
     grim
     slurp
 

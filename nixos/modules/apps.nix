@@ -9,6 +9,7 @@
     foot
     librewolf
     networkmanager-openvpn
+    nekoray
   ];
 
   # For samba and other stuff
@@ -33,4 +34,6 @@
   # programs.adb.enable = true; # Phone debuggin stuff
 
   programs.dconf.enable = true; # Backend for gtk settings or something like that
+
+  programs.fuse.userAllowOther = true;
 }

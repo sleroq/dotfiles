@@ -58,7 +58,7 @@
     # radicle-cli
 
     # exiftool
-    # gcc
+    gcc # For go build
     # gnumake
   ];
 }
