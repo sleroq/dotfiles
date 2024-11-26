@@ -7,7 +7,7 @@ set $up k
 set $right l
 
 set $term foot
-set $filemanager pcmanfm-qt
+set $filemanager nemo
 set $menu tofi-drun | xargs swaymsg exec --
 set $menu-run tofi-run | xargs swaymsg exec --
 set $scripts $HOME/.config/sway/scripts
