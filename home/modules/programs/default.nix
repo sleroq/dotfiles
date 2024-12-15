@@ -21,10 +21,10 @@
     chromium
     # brave
 
-    # exodus # Does not work
+    exodus # Does not work
 
     feishin
-    # monero-gui
+    monero-gui
     signal-desktop
     
     # inputs.paisa.packages.${pkgs.system}.default
@@ -52,6 +52,7 @@
     # File manager
     # ffmpegthumbnailer
     # lxqt.pcmanfm-qt
+    nemo
     # dolphin
 
     # For "Choose Application" inside pcmanfm-qt to work
