@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   imports = [
@@ -36,6 +36,8 @@
     yarn
     deno
     go
+    inputs.zig.packages.${pkgs.system}.master
+    zls
     golangci-lint
     nodePackages_latest.typescript
     nodePackages_latest.typescript-language-server

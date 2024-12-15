@@ -75,10 +75,12 @@ lsp_zero.extend_lspconfig({
 
 require('lspconfig').lua_ls.setup({})
 require('lspconfig').denols.setup({})
+-- require('lspconfig').ts_ls.setup({})
 require('lspconfig').lua_ls.setup({})
 require('lspconfig').nixd.setup({})
 require('lspconfig').denols.setup({})
 require('lspconfig').gopls.setup({})
+require('lspconfig').zls.setup({})
 require('lspconfig').golangci_lint_ls.setup({})
 require('lspconfig').marksman.setup({})
 

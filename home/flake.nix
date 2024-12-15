@@ -11,6 +11,7 @@
     nix-gaming.url = "github:fufexan/nix-gaming";
     prismlauncher.url = "github:PrismLauncher/PrismLauncher";
     paisa.url = "github:ananthakumaran/paisa";
+    zig.url = "github:mitchellh/zig-overlay";
 
     # For old packages, like obinskit
     nixpkgs-old.url = "github:nixos/nixpkgs/1c37a89390481e809b9851781026bc9bb840dd90";
