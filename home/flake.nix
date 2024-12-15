@@ -15,6 +15,7 @@
 
     # For old packages, like obinskit
     nixpkgs-old.url = "github:nixos/nixpkgs/1c37a89390481e809b9851781026bc9bb840dd90";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     hyprland.url = "github:hyprwm/Hyprland/12f9a0d0b93f691d4d9923716557154d74777b0a";
 
@@ -29,6 +30,7 @@
     , home-manager
     , nixpkgs
     , nixpkgs-old
+    , nixpkgs-unstable
     , ...
     }:
     let
@@ -67,6 +69,9 @@
             config.permittedInsecurePackages = [
               "electron-13.6.9"
             ];
+          };
+          pkgs-unstable = import nixpkgs-unstable {
+            inherit system;
           };
         };
       };
