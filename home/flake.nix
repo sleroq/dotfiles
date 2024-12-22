@@ -17,10 +17,10 @@
     nixpkgs-old.url = "github:nixos/nixpkgs/1c37a89390481e809b9851781026bc9bb840dd90";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    hyprland.url = "github:hyprwm/Hyprland/12f9a0d0b93f691d4d9923716557154d74777b0a";
+    hyprland.url = "github:hyprwm/Hyprland/0bd541f2fd902dbfa04c3ea2ccf679395e316887";
 
     hy3 = {
-      url = "github:outfoxxed/hy3?ref=hl0.45.0";
+      url = "github:outfoxxed/hy3?ref=hl0.46.0";
       inputs.hyprland.follows = "hyprland";
     };
   };
