@@ -9,14 +9,11 @@ exec kwalletd6
 exec swaync --config ~/.config/swaync/config.json # Notification daemon
 exec exec swaykbdd # Per-window keyboard layout
 # exec aw-server # Activity watch server
-exec flameshot
 exec wl-paste --watch cliphist store
 exec nm-applet --indicator
 exec swayrd # Window-switcher server
-exec pcmanfm-qt -d
  
-exec eww -c ~/.config/eww/sway-bar daemon
-exec eww -c ~/.config/eww/sway-bar open bar
+exec eww -c ~/.config/eww/sway-bar daemon && exec eww -c ~/.config/eww/sway-bar open bar
 
 exec swww init
 
@@ -30,7 +27,7 @@ exec keepassxc
 
 workspace 5
 exec telegram-desktop
-exec signal-desktop
+# exec signal-desktop
 
 workspace 10
 exec noisetorch
