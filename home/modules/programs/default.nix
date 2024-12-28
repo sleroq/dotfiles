@@ -8,6 +8,7 @@
     ./neofetch.nix
     ./mpv.nix
     ./tmux.nix
+    ./ghostty.nix
   ];
 
   programs.obs-studio = {
@@ -21,7 +22,7 @@
     chromium
     # brave
 
-    exodus # Does not work
+    exodus
 
     feishin
     monero-gui
