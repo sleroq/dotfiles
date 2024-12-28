@@ -7,7 +7,7 @@
     ./foot.nix
     ./neofetch.nix
     ./mpv.nix
-    ./tmux.nix
+    # ./tmux.nix
     ./ghostty.nix
   ];
 
