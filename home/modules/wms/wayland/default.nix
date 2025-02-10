@@ -25,9 +25,8 @@ let
 in
 {
   imports = [
-    ./sway.nix
+    # ./sway.nix
     ./hyprland.nix
-    ./dwl/default.nix
   ];
 
   services.kanshi.enable = true;

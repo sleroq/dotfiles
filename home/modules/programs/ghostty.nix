@@ -1,20 +1,22 @@
-{ pkgs, inputs, ... }: {
+{ pkgs, ... }: {
   home.packages = [
-    inputs.ghostty.packages.${pkgs.system}.default
+    pkgs.ghostty
   ];
 
   xdg.configFile."ghostty/config".text = ''
     theme = catppuccin-mocha
     cursor-style = block
     window-decoration = false
+    background-opacity = 0.9
+    gtk-tabs-location = hidden
 
     keybind = alt+w=toggle_window_decorations
 
     keybind = ctrl+s>c=new_tab
     keybind = ctrl+s>x=close_surface
 
-    keybind = ctrl+s>shift+h=move_tab:-1
-    keybind = ctrl+s>shift+l=move_tab:1
+    keybind = ctrl+s>h=move_tab:-1
+    keybind = ctrl+s>l=move_tab:1
 
     keybind = ctrl+s>1=goto_tab:1
     keybind = ctrl+s>2=goto_tab:2

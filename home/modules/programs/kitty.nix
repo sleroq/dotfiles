@@ -1,4 +1,4 @@
-{ pkgs, lib, opts, ... }:
+{ pkgs, lib, opts, pkgs-unstable, ... }:
 
 with lib;
 {
@@ -8,8 +8,8 @@ with lib;
   '';
 
   fonts.fontconfig.enable = true;
-  home.packages = with pkgs; [
-    kitty
-    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+  home.packages = [
+    pkgs.kitty
+    pkgs-unstable.nerd-fonts.jetbrains-mono
   ];
 }

@@ -1,11 +1,11 @@
-{ pkgs, pkgs-old, inputs, ... }:
+{ pkgs, pkgs-old, ... }:
 
 {
   imports = [
     ./lf.nix
     ./zathura.nix
     ./foot.nix
-    ./neofetch.nix
+    # ./neofetch.nix
     ./mpv.nix
     # ./tmux.nix
     ./ghostty.nix
@@ -20,13 +20,12 @@
 
   home.packages = with pkgs; [
     chromium
-    # brave
 
     exodus
-
-    feishin
     monero-gui
-    signal-desktop
+
+    # feishin
+    # signal-desktop
     
     # inputs.paisa.packages.${pkgs.system}.default
     # ledger
@@ -34,42 +33,35 @@
     # beancount-language-server
     # fava
 
-    libsForQt5.kate
-    obsidian
-    (callPackage ../../packages/anytype.nix {})
-    pkgs-old.obinskit
-
-    picard # music tagger
-    nomacs # image viewer
-    thunderbird
-    krita
-    libreoffice-fresh
-    qbittorrent
-    keepassxc
+    teamspeak5_client
     syncplay
 
+    pkgs-old.obinskit
+
+    keepassxc
+    krita
+    libreoffice-fresh
     xournalpp
+    # obsidian
+    (callPackage ../../packages/anytype.nix {})
+    picard # music tagger
+    qbittorrent
+    # thunderbird
 
-    # File manager
-    # ffmpegthumbnailer
-    # lxqt.pcmanfm-qt
     nemo
-    # dolphin
-
-    # For "Choose Application" inside pcmanfm-qt to work
-    # lxqt.lxqt-menu-data
-    # lxmenu-data
-    # shared-mime-info
+    kdePackages.ark # TODO: this is for noobs (or is it)
+    kdePackages.filelight
+    p7zip
+    unzip
+    nomacs # Image viewer
 
     # CLI
     rclone
     gdb
-    gocryptfs
-    xclip
-    bore-cli
+    # gocryptfs
+    # xclip
+    # bore-cli
     ffmpeg
-
-    timeshift
 
     # Work
     remmina

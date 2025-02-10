@@ -177,6 +177,12 @@ require('lazy').setup({
       image_support = false,
     },
   },
+
+  "tpope/vim-dadbod",
+  "kristijanhusak/vim-dadbod-completion",
+  "kristijanhusak/vim-dadbod-ui",
+
+  -- {'akinsho/toggleterm.nvim', version = "*", config = true},-- TODO: Figure out how to use
 }, {})
 
 -- [[ Setting options ]]

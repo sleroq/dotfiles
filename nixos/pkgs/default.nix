@@ -1,3 +1,3 @@
 { pkgs , lib }: {
-  dwl-wrapped = pkgs.callPackage ./dwl-wrapped.nix { inherit lib; };
+  matebook-charge-limit = pkgs.callPackage ./matebook-charge-limit.nix { inherit lib; };
 }

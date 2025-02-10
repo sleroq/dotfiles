@@ -13,7 +13,7 @@
     libsForQt5.qtstyleplugins
     kdePackages.qtstyleplugin-kvantum
     catppuccin-kvantum
-    kora-icon-theme
+    # kora-icon-theme
 
     kdePackages.breeze-gtk
     lxqt.lxqt-config

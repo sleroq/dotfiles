@@ -22,14 +22,6 @@
 
   xsession.enable = true;
 
-  home.packages = with pkgs; [
-    kdePackages.ark # TODO: this is for noobs (or is it)
-    kdePackages.filelight
-
-    p7zip
-    unzip
-  ];
-
   services.syncthing.enable = true;
 
   # This value determines the Home Manager release that your
@@ -50,5 +42,6 @@
     "dotnet-runtime-6.0.36"
     "dotnet-sdk-6.0.428"
     "dotnet-sdk-wrapped-6.0.428"
+    "electron-31.7.7"
   ];
 }

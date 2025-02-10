@@ -99,7 +99,7 @@
   services.flatpak.enable = true;
 
   # Define a user account
-  users.defaultUserShell = pkgs.zsh;
+  users.defaultUserShell = pkgs.bash;
   users.users.sleroq = {
     shell = pkgs.nushell;
     isNormalUser = true;
@@ -113,7 +113,12 @@
   # About fonts - nixos.wiki/wiki/Fonts
   fonts.fontDir.enable = true;
   fonts.packages = with pkgs; [
-    (nerdfonts.override { fonts = [ "JetBrainsMono" "FiraCode" "DroidSansMono" "Ubuntu" "Agave" ]; })
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.fira-code
+    nerd-fonts.droid-sans-mono
+    nerd-fonts.ubuntu
+    nerd-fonts.agave
+    # (nerdfonts.override { fonts = [ "JetBrainsMono" "FiraCode" "DroidSansMono" "Ubuntu" "Agave" ]; })
     noto-fonts
     noto-fonts-emoji
     noto-fonts-cjk-sans
@@ -139,9 +144,8 @@
     MODE="0666", GROUP="plugdev"
   '';
 
-  programs.zsh.enable = true;
-  environment.shells = with pkgs; [ zsh ];
-  environment.pathsToLink = [ "/share/zsh" ];
+  environment.shells = with pkgs; [ bash nushell ];
+  environment.pathsToLink = [ "/share/bash" "/share/nushell" ];
 
   nix.settings = {
     substituters = [

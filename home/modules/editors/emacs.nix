@@ -1,4 +1,4 @@
-{ config, pkgs, opts, lib, inputs, ... }:
+{ pkgs, pkgs-unstable, opts, lib, inputs, ... }:
 
 with lib;
 let repoUrl = "https://github.com/doomemacs/doomemacs";
@@ -70,7 +70,8 @@ in
 
       # Fonts
       emacs-all-the-icons-fonts
-      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+      pkgs-unstable.nerd-fonts.jetbrains-mone
+      # (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
     ];
 
     home.activation.emacs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -81,12 +82,6 @@ in
               "${opts.realConfigs}/doom" "$HOME/.config/doom"
       fi
     '';
-
-    programs.zsh = {
-      envExtra = ''
-        path+=("$HOME/.config/emacs/bin/")
-      '';
-    };
   };
 }
 

@@ -9,7 +9,7 @@
   '';
 
   home.packages = with pkgs; [
-    # neovide
+    neovide
 
     ripgrep
     fd
@@ -27,5 +27,6 @@
     luajitPackages.jsregexp
     tailwindcss-language-server
     wakatime
+    sqlite
   ];
 }

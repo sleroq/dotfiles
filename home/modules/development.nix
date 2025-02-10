@@ -18,17 +18,6 @@
     '';
   };
 
-  programs.zsh = {
-    envExtra = ''
-      # Deno
-      path+=("$HOME/.deno/bin")
-
-      # Golang
-      export GOPATH="$HOME/develop/go"
-      path+=(go env GOBIN)
-    '';
-  };
-
   home.packages = with pkgs; [
     git-lfs
     # git-fame

@@ -1,4 +1,4 @@
-{ pkgs, lib, opts, ... }:
+{ pkgs, pkgs-unstable, lib, opts, ... }:
 
 with lib;
 {
@@ -14,6 +14,7 @@ with lib;
     pamixer
     killall
 
-    (nerdfonts.override { fonts = [ "Noto" "DaddyTimeMono" ]; })
+    pkgs-unstable.nerd-fonts.noto
+    pkgs-unstable.nerd-fonts.daddy-time-mono
   ];
 }
