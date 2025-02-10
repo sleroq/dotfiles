@@ -3,29 +3,26 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
-    home-manager = {
-      url = "github:nix-community/home-manager/release-24.11";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    emacs-overlay.url = "github:nix-community/emacs-overlay";
-    nix-gaming.url = "github:fufexan/nix-gaming";
-    prismlauncher.url = "github:PrismLauncher/PrismLauncher";
-    paisa.url = "github:ananthakumaran/paisa";
-    zig.url = "github:mitchellh/zig-overlay";
-
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     # For old packages, like obinskit
     nixpkgs-old.url = "github:nixos/nixpkgs/1c37a89390481e809b9851781026bc9bb840dd90";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    hyprland.url = "github:hyprwm/Hyprland/0bd541f2fd902dbfa04c3ea2ccf679395e316887";
+    home-manager.url = "github:nix-community/home-manager/release-24.11";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    nix-gaming.url = "github:fufexan/nix-gaming";
+    # emacs-overlay.url = "github:nix-community/emacs-overlay";
+    # prismlauncher.url = "github:PrismLauncher/PrismLauncher";
+    # paisa.url = "github:ananthakumaran/paisa";
+    zig.url = "github:mitchellh/zig-overlay";
+
+
+    # hyprland.url = "github:hyprwm/Hyprland";
+    hyprland.url = "github:hyprwm/Hyprland/882f7ad";
 
     hy3 = {
-      url = "github:outfoxxed/hy3?ref=hl0.46.0";
+      url = "github:outfoxxed/hy3?ref=hl0.47.0-1";
       inputs.hyprland.follows = "hyprland";
-    };
-
-    ghostty = {
-      url = "github:ghostty-org/ghostty";
     };
   };
 
@@ -45,7 +42,9 @@
     in
     {
       homeConfigurations."${user}" = home-manager.lib.homeManagerConfiguration {
-        pkgs = import nixpkgs { inherit system; };
+        pkgs = import nixpkgs {
+          inherit system;
+        };
 
         modules = [
           ./home.nix
