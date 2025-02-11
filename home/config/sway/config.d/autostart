@@ -1,7 +1,7 @@
 # Autostart
+# TODO: Move to uwsm, hopefully getting rid of following workarounds
 exec dbus-sway-environment
 exec systemctl --user start nixos-fake-graphical-session.target
-exec configure-gtk
 exec systemctl --user import-environment
 exec swaycons
 exec kwalletd6

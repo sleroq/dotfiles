@@ -2,7 +2,7 @@
 
 let
   aliases = {
-    # cd = "z";
+    cd = "z";
     up = "sudo nix-channel --update and sudo nixos-rebuild switch --upgrade"; # TODO: Make shell-agnostic
     hu = "nix run home-manager/release-24.11 -- switch --flake ${opts.realDotfiles}/home#sleroq";
     sudo = "sudo ";
@@ -20,11 +20,10 @@ in
     shellAliases = aliases;
   };
 
-  # FIXME: Waiting for fix
-  # programs.zoxide = {
-  #   enable = true;
-  #   enableNushellIntegration = true;
-  # };
+  programs.zoxide = {
+    enable = true;
+    enableNushellIntegration = true;
+  };
 
   programs.thefuck = {
     enable = true;
