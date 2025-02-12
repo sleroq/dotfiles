@@ -8,7 +8,7 @@
   xdg.portal = {
     enable = true;
     wlr.enable = lib.mkForce false;
-    # extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 
   # Brightness cli tool
