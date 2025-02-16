@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, pkgs-unstable, ... }:
 
 {
   imports = [
@@ -9,9 +9,9 @@
 
   programs.vscode.enable = true;
 
-  # home.packages = with pkgs; [
-   # zed-editor
+  home.packages = [
+   pkgs-unstable.zed-editor
    # jetbrains.goland
    # jetbrains.gateway
-  # ];
+  ];
 }
