@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, pkgs-unstable, ... }:
 {
   imports = [
     # ./sway.nix
@@ -35,5 +35,6 @@
     swww
 
     nwg-look
+    # pkgs-unstable.nwg-displays # TODO: Make stable after major update
   ];
 }

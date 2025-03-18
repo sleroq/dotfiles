@@ -83,6 +83,8 @@
     hyprland-per-window-layout
     inputs.hy3.packages.x86_64-linux.hy3
     hyprpolkitagent
+    hyprpicker
+    flameshot
 
     jq
     socat

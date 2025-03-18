@@ -9,6 +9,8 @@
 
   programs.vscode.enable = true;
 
+  # TODO: Add zed configuration
+
   home.packages = [
    pkgs-unstable.zed-editor
    # jetbrains.goland
