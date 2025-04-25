@@ -34,14 +34,11 @@
   # changes in each release.
   home.stateVersion = "22.11";
 
+  # TODO: Remove after homemanager update
+  systemd.user.startServices = true;
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
   nixpkgs.config.allowUnfreePredicate = (_: true);
-  nixpkgs.config.permittedInsecurePackages = [
-    "dotnet-runtime-6.0.36"
-    "dotnet-sdk-6.0.428"
-    "dotnet-sdk-wrapped-6.0.428"
-    "electron-31.7.7"
-  ];
 }

@@ -1,4 +1,4 @@
-{ pkgs, pkgs-old, ... }:
+{ pkgs, pkgs-unstable, pkgs-old, ... }:
 
 {
   imports = [
@@ -13,14 +13,27 @@
 
   programs.obs-studio = {
     enable = true;
-    plugins = with pkgs; [
-      obs-studio-plugins.obs-backgroundremoval
+    plugins = with pkgs.obs-studio-plugins; [
+      wlrobs
+      obs-backgroundremoval
+      obs-pipewire-audio-capture
+      input-overlay
+    ];
+  };
+
+  # services.easyeffects.enable = true;
+
+  programs.chromium = {
+    enable = true;
+    commandLineArgs = [
+      "--enable-features=VaapiVideoDecoder"
+      "--use-angle=vulkan"
+      "--ozone-platform=wayland"
+      "--enable-unsafe-webgpu"
     ];
   };
 
   home.packages = with pkgs; [
-    chromium
-
     exodus
     monero-gui
 
@@ -33,7 +46,7 @@
     # beancount-language-server
     # fava
 
-    teamspeak5_client
+    pkgs-unstable.teamspeak6-client
     syncplay
 
     pkgs-old.obinskit
@@ -46,9 +59,10 @@
     (callPackage ../../packages/anytype.nix {})
     picard # music tagger
     qbittorrent
-    # thunderbird
+    thunderbird
 
     nemo
+    kdePackages.dolphin
     kdePackages.ark # TODO: this is for noobs (or is it)
     kdePackages.filelight
     p7zip

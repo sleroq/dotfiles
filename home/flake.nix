@@ -10,6 +10,9 @@
     home-manager.url = "github:nix-community/home-manager/release-24.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
+    # zed.url = "github:zed-industries/zed";
+    # zed.url = "github:AidanV/zed";
+
     nix-gaming.url = "github:fufexan/nix-gaming";
     # emacs-overlay.url = "github:nix-community/emacs-overlay";
     # prismlauncher.url = "github:PrismLauncher/PrismLauncher";
@@ -17,12 +20,16 @@
     zig.url = "github:mitchellh/zig-overlay";
 
 
-    # hyprland.url = "github:hyprwm/Hyprland";
-    hyprland.url = "github:hyprwm/Hyprland/882f7ad";
+    hyprland.url = "github:hyprwm/Hyprland/29e2e59";
 
     hy3 = {
-      url = "github:outfoxxed/hy3?ref=hl0.47.0-1";
+      url = "github:outfoxxed/hy3";
       inputs.hyprland.follows = "hyprland";
+    };
+
+    ironbar = {
+      url = "github:JakeStanger/ironbar";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -39,6 +46,21 @@
       user = "sleroq";
       dotfiles = ../.;
       realDotfiles = "/home/" + user + "/develop/other/dotfiles";
+      myOverlay = final: prev: {
+        zed-editor = prev.zed-editor.overrideAttrs (old: rec {
+          version = "0.184.1-pre";
+          src = prev.fetchFromGitHub {
+            owner = "zed-industries";
+            repo = "zed";
+            tag = "v${version}";
+            hash = "sha256-WqvjENci7JZ7jz3Lpz998X1XOTqdBrLcEMA5ExzjDWc=";
+          };
+          cargoDeps = final.rustPlatform.fetchCargoVendor {
+            inherit src;
+            hash = "sha256-egF9M9HJ9bqyNwMC0733CPr3Q149u1bsWp8ASW7TmLc=";
+          };
+        });
+      };
     in
     {
       homeConfigurations."${user}" = home-manager.lib.homeManagerConfiguration {
@@ -47,6 +69,7 @@
         };
 
         modules = [
+          self.inputs.ironbar.homeManagerModules.default
           ./home.nix
           ./modules/editors/default.nix
           ./modules/gaming/default.nix
@@ -75,6 +98,8 @@
           };
           pkgs-unstable = import nixpkgs-unstable {
             inherit system;
+            config.allowUnfree = true;
+            overlays = [ myOverlay ];
           };
         };
       };

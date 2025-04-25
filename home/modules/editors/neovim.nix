@@ -8,9 +8,13 @@
         ${opts.realConfigs}/nvim $HOME/.config
   '';
 
-  home.packages = with pkgs; [
-    neovide
+  programs.neovide = {
+    enable = true;
+    settings = {
+    };
+  };
 
+  home.packages = with pkgs; [
     ripgrep
     fd
     lazygit

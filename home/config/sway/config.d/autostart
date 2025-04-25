@@ -6,10 +6,8 @@ exec systemctl --user import-environment
 exec swaycons
 exec kwalletd6
 
-exec swaync --config ~/.config/swaync/config.json # Notification daemon
 exec exec swaykbdd # Per-window keyboard layout
 # exec aw-server # Activity watch server
-exec wl-paste --watch cliphist store
 exec nm-applet --indicator
 exec swayrd # Window-switcher server
  
@@ -30,6 +28,6 @@ exec telegram-desktop
 # exec signal-desktop
 
 workspace 10
-exec noisetorch
+# exec noisetorch
 
 workspace 1

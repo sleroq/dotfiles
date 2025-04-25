@@ -10,30 +10,48 @@
     librewolf
     networkmanager-openvpn
     nekoray
+    nvtopPackages.full
   ];
 
   # For samba and other stuff
   services.gvfs.enable = true;
 
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
+  # Steam remote play
+  hardware.uinput.enable = true;
+
+  programs = {
+    neovim = {
+      enable = true;
+      defaultEditor = true;
+      viAlias = true;
+      vimAlias = true;
+    };
+
+    java.enable = true;
+
+    steam = {
+      enable = true;
+      extest.enable = true;
+      remotePlay.openFirewall = true;
+      dedicatedServer.openFirewall = true;
+      localNetworkGameTransfers.openFirewall = true;
+    };
+
+    gamescope = {
+      enable = true;
+      capSysNice = true;
+    };
+
+    gamemode.enable = true;
+
+    partition-manager.enable = true;
+
+    dconf.enable = true;
+
+    fuse.userAllowOther = true;
+
+    noisetorch.enable = true;
+
+    # adb.enable = true; # Phone debuggin stuff
   };
-
-  programs.noisetorch.enable = true;
-  programs.java.enable = true;
-  programs.steam = {
-    enable = true;
-    gamescopeSession.enable = true;
-  };
-
-  programs.partition-manager.enable = true;
-
-  # programs.adb.enable = true; # Phone debuggin stuff
-
-  programs.dconf.enable = true; # Backend for gtk settings or something like that
-
-  programs.fuse.userAllowOther = true;
 }

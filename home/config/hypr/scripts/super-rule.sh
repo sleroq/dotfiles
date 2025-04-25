@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Script is not relevant anymore, but useful for reference
+
 handle() {
   case $1 in
     openwindow*)

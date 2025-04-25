@@ -2,14 +2,9 @@
 
 set -e
 
-# I am using this script to sync
-# configuration from this repo with my system
-
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 
-sudo rm -rf /etc/nixos.backup/
-sudo mv /etc/nixos /etc/nixos.backup
-sudo cp -r "$(dirname "$SCRIPTPATH")"/nixos /etc/nixos
+HOSTNAME=$(hostname)
 
-sudo nixos-rebuild switch
+sudo nixos-rebuild switch --flake "$(dirname "$SCRIPTPATH")"/nixos/hosts/"$HOSTNAME"#sleroq-"$HOSTNAME"

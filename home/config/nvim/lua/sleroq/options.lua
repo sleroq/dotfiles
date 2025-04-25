@@ -50,7 +50,7 @@ vim.o.wrap = false
 
 vim.o.guifont = 'JetBrainsMono Nerd Font:h14'
 vim.opt.linespace = 4
-vim.g.neovide_transparency = 0.8
+vim.g.neovide_transparency = 0.4
 vim.g.neovide_cursor_vfx_mode = 'pixiedust'
 vim.g.neovide_cursor_vfx_particle_density = 14.0
 

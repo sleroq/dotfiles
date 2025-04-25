@@ -11,6 +11,13 @@ if [ "$HYPRGAMEMODE" = 1 ] ; then
         keyword general:border_size 1;\
         keyword decoration:rounding 0"
     exit
+else
+    hyprctl --batch "\
+        keyword animations:enabled 1;\
+        keyword decoration:shadow:enabled 1;\
+        keyword decoration:blur:enabled 1;\
+        keyword misc:vfr 1;\
+        keyword general:border_size 2;\
+        keyword decoration:rounding 1"
+    exit
 fi
-
-hyprctl reload

@@ -1,17 +1,27 @@
-{ pkgs, ... }: {
+{ pkgs, ... }: 
+let
+  sddm-astronaut = pkgs.sddm-astronaut.override { 
+    embeddedTheme = "hyprland_kath";
+  };
+in
+{
   imports = [
     ./wayland.nix
     ./x11.nix
   ];
 
-  environment.systemPackages = [
-    pkgs.xdg-utils
-    pkgs.where-is-my-sddm-theme
+  environment.systemPackages = with pkgs; [
+    xdg-utils
+    sddm-astronaut
   ];
 
-  services.displayManager.sddm = {
-    enable = true;
-    package = pkgs.kdePackages.sddm;
-    theme = "where_is_my_sddm_theme";
+  services = {
+    displayManager.sddm = {
+      enable = true;
+      wayland.enable = true;
+      package = pkgs.kdePackages.sddm;
+      theme = "sddm-astronaut-theme";
+      extraPackages = [ sddm-astronaut ];
+    };
   };
 }

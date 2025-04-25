@@ -25,7 +25,7 @@
     yarn
     deno
     go
-    inputs.zig.packages.${pkgs.system}.master
+    # inputs.zig.packages.${pkgs.system}.master
     zls
     golangci-lint
     nodePackages_latest.typescript

@@ -3,67 +3,100 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./modules/battery-life.nix
 
-    # ./modules/samba.nix
-    ./modules/flatpak.nix
-    ./modules/kwallet.nix
-    ./modules/virtualisation.nix
-    ./modules/wms/default.nix
-    ./modules/apps.nix
-    ./modules/sound/default.nix
-    # ./modules/proxy.nix
+    ../../modules/flatpak.nix
+    ../../modules/kwallet.nix
+    ../../modules/virtualisation.nix
+    ../../modules/wms/default.nix
+    ../../modules/apps.nix
+    ../../modules/sound/default.nix
+    # ../../modules/proxy.nix
   ];
+
+  hardware.amdgpu.initrd.enable = true;
 
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.efi.efiSysMountPoint = "/boot/efi";
-  boot.initrd.systemd.enable = true;
-  boot.plymouth.enable = true;
-  boot.kernel.sysctl = { "vm.swappiness" = 20; };
-  boot.kernelParams = ["quiet"];
-  boot.extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
-  boot.kernelModules = [
-    "v4l2loopback" # obs virtual camera
-  ];
+  boot = {
+    kernelPackages = pkgs.linuxKernel.packages.linux_zen;
+    tmp.cleanOnBoot = true;
 
-  # Setup keyfile
-  boot.initrd.secrets = {
-    "/crypto_keyfile.bin" = null;
+    plymouth = {
+      enable = true;
+      theme = "rings";
+      themePackages = with pkgs; [
+        # By default we would install all themes
+        (adi1090x-plymouth-themes.override {
+          selected_themes = [ "rings" ];
+        })
+      ];
+    };
+
+    # Enable "Silent Boot"
+    consoleLogLevel = 0;
+    initrd = {
+      systemd.enable = true;
+      verbose = false;
+      luks.devices."luks-16e9a143-3440-4844-9742-9fb6f3a2f679" = {
+        device = "/dev/disk/by-uuid/16e9a143-3440-4844-9742-9fb6f3a2f679";
+        allowDiscards = true;
+      };
+    };
+    kernelParams = [
+      "quiet"
+      "splash"
+      "boot.shell_on_fail"
+      "loglevel=3"
+      "rd.systemd.show_status=false"
+      "rd.udev.log_level=3"
+      "udev.log_priority=3"
+    ];
+
+    kernel.sysctl = { "vm.swappiness" = 10; };
+    extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
+    kernelModules = [
+      "v4l2loopback" # obs virtual camera
+    ];
+
+    # Hide the OS choice for bootloaders.
+    # It's still possible to open the bootloader list by pressing any key
+    # It will just not appear on screen unless a key is pressed
+    loader.timeout = 0;
+    loader.systemd-boot.enable = true;
+    loader.efi.canTouchEfiVariables = true;
+  };
+
+  services.logind.extraConfig = ''
+    # don’t shutdown when power button is short-pressed
+    HandlePowerKey=ignore
+  '';
+
+  systemd = {
+    extraConfig = ''
+      DefaultTimeoutStopSec=10s
+      DefaultTimeoutStartSec=10s
+    '';
+
+    coredump = {
+      enable = true;
+      extraConfig = "ExternalSizeMax=${toString (8 * 1024 * 1024 * 1024)}";
+    };
+  };
+
+  environment.variables = {
+    # https://wiki.archlinux.org/title/Hardware_video_acceleration#Configuring_Vulkan_Video
+    RADV_PERFTEST = "video_decode,video_encode";
   };
 
   services.fstrim.enable = true;
 
-  boot.initrd.luks.devices."luks-47f43abe-5bff-40e7-9484-5766d62e9b77" = {
-    # Enable swap on luks
-    device = "/dev/disk/by-uuid/47f43abe-5bff-40e7-9484-5766d62e9b77";
-    keyFile = "/crypto_keyfile.bin";
-    # Enable trimming
-    allowDiscards = true;
-  };
-
-  boot.initrd.luks.devices."luks-d8faed41-c117-470b-aa32-b7dd33331e62" = {
-    # Enable trimming
-    allowDiscards = true;
-  };
-
-  networking.hostName = "sleroq-international";
+  networking.hostName = "sleroq-interplanetary";
   networking.nameservers = [ "1.1.1.1" "1.1.0.1" ];
+
+  networking.networkmanager.enable = true;
 
   services.journald.extraConfig = ''
       SystemMaxUse=2G
   '';
-
-  networking.wireless.iwd.enable = true;
-  # Enable networking
-  networking.networkmanager = {
-    enable = true;
-    wifi.backend = "iwd";
-  };
-
-  hardware.bluetooth.enable = true;
-  services.blueman.enable = true;
 
   hardware.opentabletdriver.enable = true;
   hardware.opentabletdriver.daemon.enable = true;
@@ -103,7 +136,7 @@
     shell = pkgs.nushell;
     isNormalUser = true;
     description = "sleroq";
-    extraGroups = [ "networkmanager" "input" "wheel" "docker" "video" "libvirtd" "adbusers" ];
+    extraGroups = [ "networkmanager" "input" "wheel" "video" "libvirtd" "adbusers" "uinput" ];
   };
 
   # Allow unfree packages
@@ -170,16 +203,10 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "22.11"; # Did you read the comment?
+  system.stateVersion = "24.11"; # Did you read the comment?
 
   security.polkit.enable = true;
 
   # Enable flakes:
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-  nixpkgs.config.permittedInsecurePackages = [
-    "dotnet-runtime-6.0.36"
-    "dotnet-sdk-wrapped-6.0.428"
-    "dotnet-sdk-6.0.428"
-  ];
 }

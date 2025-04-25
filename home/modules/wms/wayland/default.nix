@@ -3,6 +3,7 @@
   imports = [
     # ./sway.nix
     ./hyprland.nix
+    ../../programs/swaync.nix
   ];
 
   services.kanshi.enable = true;
