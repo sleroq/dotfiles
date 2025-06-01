@@ -10,13 +10,12 @@
   };
 
   outputs =
-    {
-      nixpkgs,
-      disko,
-      agenix,
-      secrets,
-      nixos-facter-modules,
-      ...
+    { nixpkgs
+    , disko
+    , agenix
+    , secrets
+    , nixos-facter-modules
+    , ...
     }:
     {
       nixosConfigurations.cumserver = nixpkgs.lib.nixosSystem {

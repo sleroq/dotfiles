@@ -643,6 +643,7 @@
         "nix-gaming": "nix-gaming",
         "nixpkgs": "nixpkgs_4",
         "nixpkgs-old": "nixpkgs-old",
+        "secrets": "secrets",
         "zed": "zed",
         "zig": "zig"
       }
@@ -667,6 +668,18 @@
         "repo": "rust-overlay",
         "type": "github"
       }
+    },
+    "secrets": {
+      "flake": false,
+      "locked": {
+        "path": "../../secrets",
+        "type": "path"
+      },
+      "original": {
+        "path": "../../secrets",
+        "type": "path"
+      },
+      "parent": []
     },
     "systems": {
       "locked": {

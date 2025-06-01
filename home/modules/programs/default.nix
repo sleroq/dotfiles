@@ -1,4 +1,4 @@
-{ pkgs, pkgs-old, lib, config, ... }:
+{ pkgs, pkgs-old, lib, config, secrets, ... }:
 
 let
   cfg = config.myHome.programs;
@@ -59,7 +59,9 @@ in
     })
     (lib.mkIf cfg.ghostty.enable (import ./ghostty.nix { }))
     (lib.mkIf cfg.mpv.enable (import ./mpv.nix { inherit pkgs; }))
-    (lib.mkIf cfg.wezterm.enable (import ./wezterm.nix { }))
+    (lib.mkIf cfg.wezterm.enable (
+        import ./wezterm.nix { extraConfig = secrets.wezterm-ssh-domains; }
+    ))
     (lib.mkIf cfg.teams.enable (import ./teams.nix { inherit pkgs; }))
     (lib.mkIf cfg.obs.enable {
       programs.obs-studio = {

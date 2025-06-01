@@ -23,6 +23,7 @@
       modules = [
         ({ ... }: { nixpkgs.overlays = [ overlay-unstable ]; })
         ./configuration.nix
+        ../shared
       ];
     };
   };

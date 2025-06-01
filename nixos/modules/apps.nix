@@ -11,6 +11,7 @@
     networkmanager-openvpn
     nekoray
     nvtopPackages.full
+    powertop
   ];
 
   # For samba and other stuff
