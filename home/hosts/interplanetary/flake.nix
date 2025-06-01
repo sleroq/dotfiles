@@ -4,6 +4,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-old.url = "github:nixos/nixpkgs/1c37a89390481e809b9851781026bc9bb840dd90";
+    secrets = {
+      flake = false;
+      url = "path:../../secrets";
+    };
 
     home-manager.url = "github:nix-community/home-manager/master";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -22,6 +26,7 @@
     , home-manager
     , nixpkgs
     , nixpkgs-old
+    , secrets
     , ...
     }:
     let
@@ -50,6 +55,7 @@
 
         extraSpecialArgs = {
           inputs = self.inputs;
+          secrets = import "${secrets}/default.nix";
           opts = {
             inherit host repoPath repoPathString;
             old-configs = repoPath + /home/.config;
