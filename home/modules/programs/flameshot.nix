@@ -1,4 +1,5 @@
 { pkgs, ... }:
+
 {
   # Flameshot is a great screenshot + annotation tool, unfortunately it doens't run
   # natively under Wayland yet, but it does seem to play nicely with xwayland + hyprland :pray:

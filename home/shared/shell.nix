@@ -1,19 +1,21 @@
 { pkgs, opts, ... }:
 
 let
+  runHM = command : "nix run home-manager/master -- ${command} --flake ${opts.repoPathString}/home/hosts/${opts.host}#sleroq";
+
   aliases = {
     cd = "z";
-    hu = "nix run home-manager/release-24.11 -- switch --flake ${opts.realDotfiles}/home#sleroq";
+    hu = runHM "switch";
+    hn = runHM "news";
     sudo = "sudo ";
+    neofetch = "fastfetch";
   };
 in
 {
   imports = [
-    ./programs/starship.nix
-    ./programs/btop.nix
+    ../modules/programs/starship.nix
+    ../modules/programs/btop.nix
   ];
-
-  programs.btop.catppuccin.enable = true;
 
   programs.zsh = {
     enable = true;

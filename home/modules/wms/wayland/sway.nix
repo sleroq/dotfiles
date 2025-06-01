@@ -19,34 +19,33 @@ let
     '';
   };
 in
-with lib; {
-  imports = [
-    ../../programs/eww.nix
-    ../../programs/swaync.nix
-    ../../programs/swaycons.nix
-  ];
+lib.mkMerge [
+  (import ../../programs/eww.nix { inherit pkgs lib opts; })
+  (import ../../programs/swaync.nix { })
+  (import ../../programs/swaycons.nix { inherit pkgs opts lib; })
+  (with lib; {
+    home.activation.sway = hm.dag.entryAfter [ "writeBoundary" ] ''
+      mkdir -p $HOME/.config/sway
 
-  home.activation.sway = hm.dag.entryAfter [ "writeBoundary" ] ''
-    mkdir -p $HOME/.config/sway
+      $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+          ${opts.realConfigs}/sway/* $HOME/.config/sway/
+    '';
 
-    $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
-        ${opts.realConfigs}/sway/* $HOME/.config/sway/
-  '';
+    programs.swaylock.enable = true;
 
-  programs.swaylock.enable = true;
+    services = {
+      swayidle.enable = true;
+      swayosd.enable = true;
+      cliphist.enable = true;
+    };
 
-  services = {
-    swayidle.enable = true;
-    swayosd.enable = true;
-    cliphist.enable = true;
-  };
+    home.packages = with pkgs; [
+      dbus-sway-environment
 
-  home.packages = with pkgs; [
-    dbus-sway-environment
-
-    swayidle
-    swaykbdd
-    swayr
-    pango
-  ];
-}
+      swayidle
+      swaykbdd
+      swayr
+      pango
+    ];
+  })
+]

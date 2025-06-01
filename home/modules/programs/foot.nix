@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable, ... }:
+{ pkgs, ... }:
 
 {
   programs.foot = {
@@ -21,9 +21,9 @@
 
       # Catpussy machiatto
       colors = {
-        alpha = "0.5";
+        alpha = "0.7";
         foreground = "cad3f5"; # Text
-        background = "282c34"; # Base
+        background = "000000"; # Base
         regular0 = "494d64";   # Surface 1
         regular1 = "ed8796";   # red
         regular2 = "a6da95";   # green
@@ -46,7 +46,6 @@
 
   fonts.fontconfig.enable = true;
   home.packages = [
-    # TODO: remove unstable once new font naming is merged into stable
-    pkgs-unstable.nerd-fonts.jetbrains-mono
+    pkgs.nerd-fonts.jetbrains-mono
   ];
 }

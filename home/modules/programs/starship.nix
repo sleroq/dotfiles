@@ -9,17 +9,17 @@
       add_newline = false;
 
       format = lib.concatStrings [
-        "$line_break"
-        "$all"
+        "$directory"
+        "$git"
+        # "$all" # Too much stuff
 
         "$fill"
 
         "$time"
         "$line_break"
         "$jobs"
-        "$battery"
+        # "$battery" # TODO: only on laptop
         "$status"
-        "$os"
         "$container"
         "$shell"
         "$character"
@@ -30,6 +30,7 @@
         use_12hr = true;
         time_format = "%T %p";
       };
+
       fill = {
         symbol = " ";
       };

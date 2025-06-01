@@ -15,9 +15,6 @@ hyprland.stdenv.mkDerivation {
     repo = "hyprscroller";
     rev = "5b62ca58790f8c2961da79af95efa458f6a814fe";
     hash = "sha256-monOoefLpK2cUAPBlJlVt9BkoSELQmYVysj81zJ74i0=";
-
-    # rev = "de8e4bf8c419d849b053299d67bd554ac3f5c231";
-    # hash = "sha256-NZPCWWJuBF8xhg27puq9sHmEs1cxyPkiNpNCoHwqGcc=";
   };
 
   nativeBuildInputs = [ pkg-config cmake hyprland ];

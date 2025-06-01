@@ -1,0 +1,53 @@
+{ inputs, pkgs, lib, config, ... }:
+
+let
+  cfg = config.myHome.gaming;
+in
+{
+  options.myHome.gaming = {
+    osu = {
+      enable = lib.mkEnableOption "osu! lazer";
+    };
+
+    etterna = {
+      enable = lib.mkEnableOption "etterna";
+    };
+
+    osu-stable = {
+      enable = lib.mkEnableOption "osu! lazer";
+    };
+
+    minecraft = {
+      enable = lib.mkEnableOption "osu! lazer";
+      osuStable = lib.mkEnableOption "osu! stable";
+    };
+  };
+
+  config = lib.mkMerge [
+    {
+      home.packages = [ pkgs.protonup-qt ];
+    }
+
+    (lib.mkIf cfg.osu.enable {
+      home.packages = with inputs.nix-gaming.packages.${pkgs.system}; [
+        osu-lazer-bin
+        pkgs.opentabletdriver
+      ];
+    })
+    
+    (lib.mkIf cfg.etterna.enable { home.packages = [ pkgs.etterna ]; })
+
+    (lib.mkIf cfg.osu-stable.enable {
+      home.packages = with inputs.nix-gaming.package.${pkgs.system}; [
+        osu-stable
+        pkgs.opentabletdriver
+      ];
+    })
+
+    (lib.mkIf cfg.minecraft.enable {
+      home.packages = [
+        pkgs.prismlauncher
+      ];
+    })
+  ];
+}

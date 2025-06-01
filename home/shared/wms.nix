@@ -1,16 +1,9 @@
 { pkgs, ... }:
 
 {
-
-  imports = [
-    ./wayland/default.nix
-    # ./x11/default.nix
-    ./theming.nix
-  ];
-
   # Packages universal for all window managers
   home.packages = with pkgs; [
-    networkmanagerapplet # TODO: Find better solution
+    networkmanagerapplet # TODO: Find better gui
     pavucontrol # TODO: Find better volume control
     gammastep # screen temperature
     libnotify

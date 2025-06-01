@@ -1,9 +1,9 @@
 { pkgs, inputs, ... }:
-
 {
   imports = [
-    ./programs/gitui.nix
-    ./programs/zellij.nix
+    ../modules/programs/gitui.nix
+    ../modules/programs/zellij.nix
+    # ../modules/programs/tmux.nix # TODO: option
   ];
 
   programs.nushell = {
@@ -25,7 +25,7 @@
     yarn
     deno
     go
-    # inputs.zig.packages.${pkgs.system}.master
+    inputs.zig.packages.${pkgs.system}.master
     zls
     golangci-lint
     nodePackages_latest.typescript

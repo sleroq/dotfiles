@@ -2,6 +2,41 @@
 
 Using [[https://nixos.org/][nix]] for +reproducible packages+ everything I can
 
+** Docs
+
+├── home
+│   ├── config
+│   │   └── [some configs are linked from here,
+│   │        because it's easier to edit the without rebuilding]
+│   ├── home.nix
+│   ├── hosts
+│   │   ├── international
+│   │   │   ├── ...
+│   │   │   └── flake.lock - separate lock files for different hosts and from system 
+│   │   └── interplanetary
+│   │   │   ├── ...
+│   │   │   └── flake.lock
+│   ├── modules
+│   │   └── [home manager modules and configurations]
+│   └── shared
+│       └── [everything that's shared between all hosts]
+├── nixos
+│   ├── hosts
+│   │   ├── international
+│   │   │   ├── ...
+│   │   │   └── flake.lock - separate lock files for different hosts
+│   │   ├── interplanetary
+│   │   │   ├── ...
+│   │   │   └── flake.nix
+│   │   └── shared
+│   │       └── everything that's shared between all hosts
+│   └── modules
+│       └── [system modules and configurations]
+├── packages
+│   └── [packages, can be used both by system config and home manager]
+└── scripts
+    └── [some helper scripts here]
+
 ** Install
 
 1. Enable flakes

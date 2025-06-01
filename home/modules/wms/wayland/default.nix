@@ -1,41 +1,49 @@
-{ pkgs, pkgs-unstable, ... }:
+{ inputs, pkgs, lib, config, opts, ... }:
+
+let
+  cfg = config.myHome.wms.wayland;
+in
 {
-  imports = [
-    # ./sway.nix
-    ./hyprland.nix
-    ../../programs/swaync.nix
-  ];
-
-  services.kanshi.enable = true;
-
-  programs.tofi = {
-    enable = true;
-    settings = {
-      background-color = "#000A";
-      border-width = 0;
-      font = "monospace";
-      height = "100%";
-      num-results = 5;
-      outline-width = 0;
-      padding-left = "35%";
-      padding-top = "35%";
-      result-spacing = 25;
-      width = "100%";
-    };
+  options.myHome.wms.wayland = {
+    enable = lib.mkEnableOption "Default wayland stuff";
+    hyprland.enable = lib.mkEnableOption "Hyprland";
+    sway.enable = lib.mkEnableOption "Sway";
   };
 
-  # Packages universal for all window managers
-  home.packages = with pkgs; [
-    wl-clipboard
-    cliphist
-    # cava
-    grim
-    slurp
+  config = lib.mkMerge [
+    (lib.mkIf cfg.enable {
+      services.kanshi.enable = true;
 
-    waypaper
-    swww
+      programs.tofi = {
+        enable = true;
+        settings = {
+          background-color = "#000A";
+          border-width = 0;
+          font = "monospace";
+          height = "100%";
+          num-results = 5;
+          outline-width = 0;
+          padding-left = "35%";
+          padding-top = "35%";
+          result-spacing = 25;
+          width = "100%";
+        };
+      };
 
-    nwg-look
-    # pkgs-unstable.nwg-displays # TODO: Make stable after major update
+      # Packages universal for all window managers
+      home.packages = with pkgs; [
+        wl-clipboard
+        cliphist
+        # cava
+        grim
+        slurp
+
+        waypaper
+        swww
+      ];
+    })
+
+    (lib.mkIf (cfg.hyprland.enable) (import ./hyprland.nix { inherit pkgs opts lib inputs config; }))
+    (lib.mkIf (cfg.sway.enable) (import ./sway.nix { inherit pkgs opts lib; }))
   ];
 }

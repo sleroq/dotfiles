@@ -1,22 +1,49 @@
-{ inputs, pkgs, pkgs-unstable, ... }:
+{ inputs, pkgs, lib, config, opts, ... }:
 
+let
+  cfg = config.myHome.editors;
+in
 {
-  imports = [
-    # ./emacs.nix
-    ./neovim.nix
-    ./helix.nix
-  ];
+  options.myHome.editors = {
+    vscode.enable = lib.mkEnableOption "Visual Studio Code";
+    cursor.enable = lib.mkEnableOption "Cursor";
+    neovim = {
+      enable = lib.mkEnableOption "Neovim (imports ./neovim.nix)";
+      enableNeovide = lib.mkEnableOption "Neovide";
+      default = lib.mkEnableOption "default env";
+    };
+    helix.enable = lib.mkEnableOption "Helix (imports ./helix.nix)";
+    zed.enable = lib.mkEnableOption "Zed Editor";
+    emacs.enable = lib.mkEnableOption "Emacs (imports ./emacs.nix)";
+  };
 
-  programs.vscode.enable = true;
+  config = lib.mkMerge [
+    (lib.mkIf cfg.vscode.enable {
+      programs.vscode.enable = true;
+    })
 
-  # TODO: Add zed configuration
-  # https://nix-community.github.io/home-manager/options.xhtml#opt-programs.zed-editor.enable
+    (lib.mkIf (cfg.cursor.enable) {
+      home.packages = [ pkgs.code-cursor ];
+    })
 
-  home.packages = [
-    pkgs-unstable.code-cursor
-    pkgs-unstable.zed-editor
-    # inputs.zed.packages.${pkgs.system}.default
-   # pkgs.jetbrains.goland
-   # pkgs.jetbrains.gateway
+    (lib.mkIf cfg.neovim.enable (import ./neovim.nix { inherit pkgs lib opts; }))
+    (lib.mkIf (cfg.neovim.enable && cfg.neovim.default) {
+      home.sessionVariables.EDITOR = "nvim";
+    })
+
+    (lib.mkIf (cfg.neovim.enable && cfg.neovim.enableNeovide) {
+      programs.neovide = {
+        enable = true;
+        settings = {};
+      };
+    })
+
+    (lib.mkIf cfg.helix.enable (import ./helix.nix { inherit pkgs; }))
+
+    (lib.mkIf cfg.emacs.enable (import ./emacs.nix { inherit pkgs inputs lib opts; }))
+
+    (lib.mkIf cfg.zed.enable {
+      home.packages = [ inputs.zed.packages.${pkgs.stdenv.hostPlatform.system}.default ];
+    })
   ];
 }

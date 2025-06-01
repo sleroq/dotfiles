@@ -10,26 +10,16 @@
     home-manager.url = "github:nix-community/home-manager/release-24.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-    # zed.url = "github:zed-industries/zed";
-    # zed.url = "github:AidanV/zed";
-
     nix-gaming.url = "github:fufexan/nix-gaming";
-    # emacs-overlay.url = "github:nix-community/emacs-overlay";
-    # prismlauncher.url = "github:PrismLauncher/PrismLauncher";
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
     # paisa.url = "github:ananthakumaran/paisa";
     zig.url = "github:mitchellh/zig-overlay";
-
 
     hyprland.url = "github:hyprwm/Hyprland/29e2e59";
 
     hy3 = {
       url = "github:outfoxxed/hy3";
       inputs.hyprland.follows = "hyprland";
-    };
-
-    ironbar = {
-      url = "github:JakeStanger/ironbar";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -44,20 +34,21 @@
     let
       system = "x86_64-linux";
       user = "sleroq";
-      dotfiles = ../.;
-      realDotfiles = "/home/" + user + "/develop/other/dotfiles";
+      host = "interplanetary";
+      repoPath = ../../..;
+      repoPathString = "/home/${user}/develop/other/dotfiles";
       myOverlay = final: prev: {
         zed-editor = prev.zed-editor.overrideAttrs (old: rec {
-          version = "0.184.1-pre";
+          version = "0.184.4-pre";
           src = prev.fetchFromGitHub {
             owner = "zed-industries";
             repo = "zed";
             tag = "v${version}";
-            hash = "sha256-WqvjENci7JZ7jz3Lpz998X1XOTqdBrLcEMA5ExzjDWc=";
+            hash = "sha256-8YEuR8CfZsMq2pBBWVPEmZgIyO2724THP4yQhf7TkPA=";
           };
           cargoDeps = final.rustPlatform.fetchCargoVendor {
             inherit src;
-            hash = "sha256-egF9M9HJ9bqyNwMC0733CPr3Q149u1bsWp8ASW7TmLc=";
+            hash = "sha256-KU/pmdQm9OUPod7oWwtUlutk5V+odzg/ojJ/feL6icE=";
           };
         });
       };
@@ -69,24 +60,21 @@
         };
 
         modules = [
-          self.inputs.ironbar.homeManagerModules.default
           ./home.nix
-          ./modules/editors/default.nix
-          ./modules/gaming/default.nix
-          ./modules/programs/default.nix
-          ./modules/wms/default.nix
-          ./modules/development.nix
-          ./modules/shell.nix
+          ../../modules/wms/wayland
+          ../../modules/programs
+          ../../modules/editors
+          ../../modules/gaming.nix
+          ../../shared
         ];
 
         extraSpecialArgs = {
           inputs = self.inputs;
           opts = {
-            old-configs = dotfiles + /home/.config;
-            configs = dotfiles + /home/config;
-            dotfiles = dotfiles;
-            realDotfiles = realDotfiles;
-            realConfigs = realDotfiles + "/home/config";
+            inherit host repoPath repoPathString;
+            old-configs = repoPath + /home/.config;
+            configs = repoPath + /home/config;
+            realConfigs = repoPathString + "/home/config";
           };
           pkgs-old = import nixpkgs-old {
             inherit system;
