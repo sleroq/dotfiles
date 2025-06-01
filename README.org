@@ -30,7 +30,7 @@ Using [[https://nixos.org/][nix]] for +reproducible packages+ everything I can
 │   │   │   ├── ...
 │   │   │   └── flake.nix
 │   │   └── shared
-│   │       └── everything that's shared between all hosts
+│   │       └── everything that's shared between all desktop hosts
 │   └── modules
 │       └── [system modules and configurations]
 ├── packages
