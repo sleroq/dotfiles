@@ -4,6 +4,7 @@ Using [[https://nixos.org/][nix]] for +reproducible packages+ everything I can
 
 ** Docs
 
+#+BEGIN_SRC
 ├── home
 │   ├── config
 │   │   └── [some configs are linked from here,
@@ -36,6 +37,7 @@ Using [[https://nixos.org/][nix]] for +reproducible packages+ everything I can
 │   └── [packages, can be used both by system config and home manager]
 └── scripts
     └── [some helper scripts here]
+#+END_SRC
 
 ** Install
 
