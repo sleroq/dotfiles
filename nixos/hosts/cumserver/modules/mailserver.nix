@@ -3,7 +3,6 @@
 let
   cfg = config.cumserver.mailserver;
   fqdn = "mail.cum.army";
-  numberOfPasswords = 4;
 
   primaryDomain = lib.elemAt config.mailserver.domains 0;
 
@@ -42,16 +41,14 @@ in {
       }
     ];
 
-    age.secrets = let
-      secretNames = lib.map
-        (n: "password${toString n}")
-        (lib.range 1 numberOfPasswords);
-    in
-      lib.genAttrs secretNames (name: {
+    age.secrets = lib.listToAttrs (lib.map (userConf: {
+      name = userConf.passwordSecretName;
+      value = {
         owner = "virtualMail";
         group = "virtualMail";
-        file = ../secrets/mail/${name};
-      });
+        file = ../secrets/mail/${userConf.passwordSecretName};
+      };
+    }) secrets.mailUsers);
 
     mailserver = {
       inherit fqdn;
