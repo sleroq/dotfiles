@@ -3,7 +3,6 @@
   lib,
   pkgs,
   secrets,
-  config,
   ...
 }:
 {
@@ -11,9 +10,15 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
+    ./modules/caddy.nix
+    ./modules/matterbridge.nix
+    ./modules/mailserver.nix
   ];
   boot.loader.grub.enable = true;
+  boot.tmp.cleanOnBoot = true;
 
+  services.logrotate.enable = true;
+  services.fail2ban.enable = true;
   services.openssh = {
     enable = true;
     settings = {
@@ -21,33 +26,18 @@
     };
   };
 
+  services.qemuGuest.enable = true;
+
+  cumserver.caddy.enable = true;
+  cumserver.matterbridge.enable = true;
+  cumserver.mailserver.enable = true;
+
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl
     pkgs.gitMinimal
     pkgs.fastfetch
     pkgs.btop
   ];
-
-  age.secrets.matterbridge = {
-    owner = "matterbridge";
-    group = "matterbridge";
-    file = ./secrets/matterbridge.toml;
-  };
-
-  services.matterbridge = {
-    package = pkgs.matterbridge.overrideAttrs (oldAttrs: rec {
-      version = "1.26.0-fork-${builtins.substring 0 7 src.rev}";
-
-      src = pkgs.fetchFromGitHub {
-        owner = "bibanon";
-        repo = "matterbridge";
-        rev = "f32058598335f28b2187706cfa902f624f4d193c";
-        hash = "sha256-7F0cAdnxUt2to+zhf/gtobbvPX1NnSpsLKbxy059CB0=";
-      };
-    });
-    enable = true;
-    configPath = config.age.secrets.matterbridge.path;
-  };
 
   networking = {
     hostName = "cumserver";
@@ -99,7 +89,6 @@
   services.resolved.enable = true;
 
   users.users.root.openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK72BBTnP5Os5ZQfS1BuigNzWMqNFl7lgUH4CJq1bl9P cantundo@pm.me"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK72BBTnP5Os5ZQfS1BuigNzWMqNFl7lgUH4CJq1bl9P cantundo@pm.me"
   ];
 
