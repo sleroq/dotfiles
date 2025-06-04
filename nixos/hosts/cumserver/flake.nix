@@ -4,9 +4,13 @@
   inputs.disko.inputs.nixpkgs.follows = "nixpkgs";
   inputs.nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
   inputs.agenix.url = "github:ryantm/agenix";
+  inputs.mailserver.url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver";
   inputs.secrets = {
     flake = false;
     url = "path:./secrets";
+  };
+  inputs.sleroq-link = {
+    url = "git+file:///home/sleroq/develop/other/sleroq.link";
   };
 
   outputs =
@@ -15,17 +19,21 @@
     , agenix
     , secrets
     , nixos-facter-modules
+    , mailserver
     , ...
-    }:
+    }@inputs:
     {
       nixosConfigurations.cumserver = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {
+          inherit inputs;
+
           secrets = import "${secrets}/default.nix";
         };
         modules = [
           disko.nixosModules.disko
           agenix.nixosModules.default
+          mailserver.nixosModules.default
           ./configuration.nix
           nixos-facter-modules.nixosModules.facter
           {
