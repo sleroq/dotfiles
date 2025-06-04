@@ -10,7 +10,8 @@
     url = "path:./secrets";
   };
   inputs.sleroq-link = {
-    url = "git+file:///home/sleroq/develop/other/sleroq.link";
+    url = "github:sleroq/sleroq.link";
+    inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
