@@ -1,0 +1,78 @@
+{ config, lib, inputs, pkgs, secrets, ... }:
+
+let
+  cfg = config.cumserver.matterbridge;
+  fqdn = "mail.cum.army";
+
+  primaryDomain = lib.elemAt config.mailserver.domains 0;
+
+  generateLoginAccountEntry = userConf:
+    let
+      emailAddress = "${userConf.name}@${primaryDomain}";
+
+      accountBaseConfig = {
+        hashedPasswordFile = config.age.secrets."${userConf.passwordSecretName}".path;
+      };
+
+      catchAllConfig = lib.optionalAttrs (userConf.isCatchAll or false) {
+        catchAll = [ primaryDomain ];
+      };
+
+      userProvidedAliases = userConf.additionalDeliveryAliases or [];
+
+      aliasesConfig = lib.optionalAttrs (userProvidedAliases != []) {
+        aliases = map (aliasLocalPart: "${aliasLocalPart}@${primaryDomain}") userProvidedAliases;
+      };
+    in
+    {
+      name = emailAddress;
+      value = accountBaseConfig // catchAllConfig // aliasesConfig;
+    };
+
+  generatedLoginAccounts = lib.listToAttrs (map generateLoginAccountEntry secrets.mailUsers);
+in {
+  options.cumserver.mailserver.enable = lib.mkEnableOption "mailserver";
+
+  config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = config.services.caddy.enable;
+        message = "Caddy has to be enabled for mailserver to work";
+      }
+    ];
+
+    age.secrets = let
+      numberOfPasswords = 4;
+      secretNames = lib.map
+        (n: "password${toString n}")
+        (lib.range 1 numberOfPasswords);
+    in
+      lib.genAttrs secretNames (name: {
+        owner = "virtualMail";
+        group = "virtualMail";
+        file = ../secrets/mail/${name};
+      });
+
+    mailserver = {
+      inherit fqdn;
+      enable = true;
+      stateVersion = 1;
+      domains = [ "cum.army" ];
+
+      # nix-shell -p mkpasswd --run 'mkpasswd -sm bcrypt'
+      loginAccounts = generatedLoginAccounts;
+
+      certificateFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.crt";
+      keyFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.key";
+      certificateScheme = "manual";
+    };
+
+    services.caddy.virtualHosts."mail.cum.army" = {
+      extraConfig = ''
+        root * ${inputs.sleroq-link.packages."${pkgs.system}".default}
+        file_server
+        encode zstd gzip
+      '';
+    };
+  };
+}
