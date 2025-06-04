@@ -3,7 +3,7 @@ let
   cfg = config.cumserver.caddy;
 in
 {
-  options.cumserver.caddy.enable = lib.mkEnableOption "caddy";
+  options.cumserver.caddy.enable = lib.mkEnableOption "Caddy";
 
   config = lib.mkIf cfg.enable {
     age.secrets.cf-fullchain = {

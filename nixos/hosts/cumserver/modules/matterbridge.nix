@@ -3,7 +3,7 @@ let
   cfg = config.cumserver.matterbridge;
 in
 {
-  options.cumserver.matterbridge.enable = lib.mkEnableOption "matterbridge";
+  options.cumserver.matterbridge.enable = lib.mkEnableOption "Matterbridge";
 
   config = lib.mkIf cfg.enable {
     age.secrets.matterbridge = {
