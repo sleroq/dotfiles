@@ -11,24 +11,27 @@ Using [[https://nixos.org/][nix]] for +reproducible packages+ everything I can
 │   │        because it's easier to edit the without rebuilding]
 │   ├── home.nix
 │   ├── hosts
-│   │   ├── international
+│   │   ├── international - laptop
 │   │   │   ├── ...
 │   │   │   └── flake.lock - separate lock files for different hosts and from system 
-│   │   └── interplanetary
-│   │   │   ├── ...
-│   │   │   └── flake.lock
+│   │   └── interplanetary - PC
+│   │       ├── ...
+│   │       └── flake.lock
 │   ├── modules
 │   │   └── [home manager modules and configurations]
 │   └── shared
 │       └── [everything that's shared between all hosts]
 ├── nixos
 │   ├── hosts
-│   │   ├── international
+│   │   ├── international - laptop
 │   │   │   ├── ...
 │   │   │   └── flake.lock - separate lock files for different hosts
-│   │   ├── interplanetary
+│   │   ├── interplanetary - PC
 │   │   │   ├── ...
 │   │   │   └── flake.nix
+│   │   ├── cumserver - server with lots of stuff
+│   │   │   ├── ...
+│   │   │   └── flake.lock
 │   │   └── shared
 │   │       └── everything that's shared between all desktop hosts
 │   └── modules
