@@ -37,6 +37,27 @@
         "type": "gitlab"
       }
     },
+    "cum-army": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1749071462,
+        "narHash": "sha256-DBGzsG7D0WeWDXaRNwuSFtHVUEyi59/Gq0d50h/7XQ4=",
+        "owner": "sleroq",
+        "repo": "cum.army",
+        "rev": "83e1359019fd57472886b842ac43e1c70995cf1c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sleroq",
+        "repo": "cum.army",
+        "type": "github"
+      }
+    },
     "darwin": {
       "inputs": {
         "nixpkgs": [
@@ -98,6 +119,24 @@
     "flake-utils": {
       "inputs": {
         "systems": "systems_2"
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "flake-utils_2": {
+      "inputs": {
+        "systems": "systems_3"
       },
       "locked": {
         "lastModified": 1731533236,
@@ -197,11 +236,11 @@
         "rev": "d6d6308ba28df3e9f7ce7bd45aa2e1f8a0999c72",
         "revCount": 711,
         "type": "git",
-        "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver"
+        "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/"
       },
       "original": {
         "type": "git",
-        "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver"
+        "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/"
       }
     },
     "nixos-facter-modules": {
@@ -286,6 +325,7 @@
     "root": {
       "inputs": {
         "agenix": "agenix",
+        "cum-army": "cum-army",
         "disko": "disko",
         "mailserver": "mailserver",
         "nixos-facter-modules": "nixos-facter-modules",
@@ -308,7 +348,7 @@
     },
     "sleroq-link": {
       "inputs": {
-        "flake-utils": "flake-utils",
+        "flake-utils": "flake-utils_2",
         "nixpkgs": [
           "nixpkgs"
         ]
@@ -343,6 +383,21 @@
       }
     },
     "systems_2": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_3": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",

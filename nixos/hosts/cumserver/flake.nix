@@ -4,13 +4,17 @@
   inputs.disko.inputs.nixpkgs.follows = "nixpkgs";
   inputs.nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
   inputs.agenix.url = "github:ryantm/agenix";
-  inputs.mailserver.url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver";
+  inputs.mailserver.url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/";
   inputs.secrets = {
     flake = false;
     url = "path:./secrets";
   };
   inputs.sleroq-link = {
     url = "github:sleroq/sleroq.link";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+  inputs.cum-army = {
+    url = "github:sleroq/cum.army";
     inputs.nixpkgs.follows = "nixpkgs";
   };
 

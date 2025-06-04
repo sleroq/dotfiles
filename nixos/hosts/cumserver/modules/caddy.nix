@@ -46,7 +46,7 @@ in
         "cum.army" = {
           serverAliases = [ "www.cum.army" ];
           extraConfig = ''
-            root * ${inputs.sleroq-link.packages."${pkgs.system}".default}
+            root * ${inputs.cum-army.packages."${pkgs.system}".default}
             file_server
             encode zstd gzip
           '';
