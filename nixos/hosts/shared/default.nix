@@ -13,7 +13,8 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  networking.nameservers = [ "1.1.1.1" "1.1.0.1" ];
+  # networking.nameservers = [ "1.1.1.1" "1.1.0.1" "8.8.8.8" ];
+  networking.networkmanager.insertNameservers = [ "1.1.1.1" "1.1.0.1" "8.8.8.8" ];
   services.nixops-dns.domain = "1.1.1.1";
 
   services.fstrim.enable = true;
