@@ -1,8 +1,9 @@
 { config, lib, inputs, pkgs, secrets, ... }:
 
 let
-  cfg = config.cumserver.matterbridge;
+  cfg = config.cumserver.mailserver;
   fqdn = "mail.cum.army";
+  numberOfPasswords = 4;
 
   primaryDomain = lib.elemAt config.mailserver.domains 0;
 
@@ -42,7 +43,6 @@ in {
     ];
 
     age.secrets = let
-      numberOfPasswords = 4;
       secretNames = lib.map
         (n: "password${toString n}")
         (lib.range 1 numberOfPasswords);
