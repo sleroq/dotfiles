@@ -5,7 +5,7 @@
   # inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
   inputs.nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
-  inputs.hyprland.url = "github:hyprwm/Hyprland/29e2e59";
+  inputs.hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/tags/v0.49.0";
 
   outputs = { self, nixpkgs, nixpkgs-unstable, ... }@inputs:
   let
