@@ -33,6 +33,7 @@ let
     "secrets/kopokaEnv" = { publicKeys = commonPublicKeys; };
     "secrets/reactorEnv" = { publicKeys = commonPublicKeys; };
     "secrets/sieveEnv" = { publicKeys = commonPublicKeys; };
+    "secrets/spoilerImagesEnv" = { publicKeys = commonPublicKeys; };
   };
 
 in

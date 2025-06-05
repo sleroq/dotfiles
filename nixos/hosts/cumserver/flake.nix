@@ -25,6 +25,10 @@
     url = "git+ssh://git@github.com/sleroq/kopoka";
     inputs.nixpkgs.follows = "nixpkgs";
   };
+  inputs.spoiler-images = {
+    url = "github:sleroq/spoiler-images";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
   inputs.reactor = {
     url = "github:sleroq/reactor";
     inputs.nixpkgs.follows = "nixpkgs";
@@ -43,6 +47,7 @@
     , mailserver
     , reactor
     , sieve
+    , spoiler-images
     , ...
     }@inputs:
     {

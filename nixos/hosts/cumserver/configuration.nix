@@ -22,6 +22,12 @@ let
     package = inputs.kopoka.packages.${pkgs.system}.default;
     secretFile = ./secrets/kopokaEnv;
   };
+  
+  spoiler-images = serviceWrapper.mkTelegramBot {
+    name = "spoiler-images";
+    package = inputs.spoiler-images.packages.${pkgs.system}.default;
+    secretFile = ./secrets/spoilerImagesEnv;
+  };
 in
 {
   imports = [
@@ -35,6 +41,7 @@ in
     ./modules/grafana.nix
     bayan
     kopoka
+    spoiler-images
   ];
   boot.loader.grub.enable = true;
   boot.tmp.cleanOnBoot = true;
@@ -58,6 +65,7 @@ in
 
   services.bayan.enable = true;
   services.kopoka.enable = true;
+  services.spoiler-images.enable = true;
 
   age.secrets.reactorEnv = {
     owner = "reactor";
