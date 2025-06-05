@@ -6,7 +6,19 @@ in
 {
   options.myHome.wms.wayland = {
     enable = lib.mkEnableOption "Default wayland stuff";
-    hyprland.enable = lib.mkEnableOption "Hyprland";
+    hyprland = {
+      enable = lib.mkEnableOption "Hyprland";
+      extraConfig = lib.mkOption {
+        type = lib.types.lines;
+        default = "";
+        description = "Extra configuration to append to Hyprland config";
+      };
+      gamemode = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Whether to enable gamemode (disable animations) by default";
+      };
+    };
     sway.enable = lib.mkEnableOption "Sway";
   };
 

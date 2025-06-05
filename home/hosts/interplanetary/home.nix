@@ -2,6 +2,16 @@
 
 {
   myHome = {
+    wms = {
+      wayland = {
+        hyprland = {
+          extraConfig = ''
+            # See https://wiki.hyprland.org/Configuring/Monitors/
+            monitor = DP-2, 2560x1440@180.00, auto, 1
+          '';
+        };
+      };
+    };
     editors = {
       zed.enable = true;
       cursor.enable = true;

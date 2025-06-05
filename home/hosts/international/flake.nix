@@ -15,10 +15,10 @@
     # paisa.url = "github:ananthakumaran/paisa";
     zig.url = "github:mitchellh/zig-overlay";
 
-    hyprland.url = "github:hyprwm/Hyprland/29e2e59";
+    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/tags/v0.49.0";
 
     hy3 = {
-      url = "github:outfoxxed/hy3";
+      url = "github:outfoxxed/hy3?ref=hl0.49.0";
       inputs.hyprland.follows = "hyprland";
     };
   };

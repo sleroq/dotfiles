@@ -1,14 +1,4 @@
 { pkgs, opts, lib, inputs, config, ... }:
-
-let
-  hyprscroller = pkgs.callPackage ../../../../packages/hyprscroller.nix {
-    lib = lib;
-    pkg-config = pkgs.pkg-config;
-    hyprland = inputs.hyprland.packages.x86_64-linux.hyprland;
-    cmake = pkgs.cmake;
-    fetchFromGitHub = pkgs.fetchFromGitHub;
-  };
-in
 lib.mkMerge [
   (import ../../programs/eww.nix { inherit pkgs lib opts; })
   (import ../../programs/flameshot.nix { inherit pkgs lib opts; })
@@ -20,12 +10,17 @@ lib.mkMerge [
           ${opts.realConfigs}/hypr/* $HOME/.config/hypr/
     '';
 
-    # home.file."${config.xdg.configHome}/hypr/extra-config.conf" = {
-    #   text = "plugin = ${inputs.hy3.packages.x86_64-linux.hy3}/lib/libhy3.so";
-    # };
-
     home.file."${config.xdg.configHome}/hypr/extra-config.conf" = {
-      text = "plugin = ${hyprscroller}/lib/hyprscroller.so";
+      text = lib.mkMerge [
+        "plugin = ${inputs.hy3.packages.x86_64-linux.hy3}/lib/libhy3.so"
+        (lib.mkIf config.myHome.wms.wayland.hyprland.gamemode ''
+          exec = ~/.config/hypr/scripts/gamemode.sh
+        '')
+        (lib.mkIf (config.myHome.gaming.osu.enable && config.myHome.gaming.osu.enableTearing) ''
+          windowrulev2 = immediate, class:^(osu!)$
+        '')
+        config.myHome.wms.wayland.hyprland.extraConfig
+      ];
     };
 
     programs.swaylock = {
@@ -62,7 +57,6 @@ lib.mkMerge [
       hypridle = {
         enable = true;
 
-
         settings = {
           general = {
             after_sleep_cmd = "hyprctl dispatch dpms on";
@@ -87,7 +81,7 @@ lib.mkMerge [
 
     home.packages = with pkgs; [
       hyprland-per-window-layout
-      # inputs.hy3.packages.x86_64-linux.hy3
+      inputs.hy3.packages.x86_64-linux.hy3
       hyprpolkitagent
       hyprpicker
 
