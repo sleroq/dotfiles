@@ -36,12 +36,6 @@ in
     enableZshIntegration = true;
   };
 
-  programs.thefuck = {
-    enable = true;
-    enableNushellIntegration = true;
-    enableZshIntegration = true;
-  };
-
   programs.carapace = {
     enable = true;
     enableNushellIntegration = true;
