@@ -69,6 +69,19 @@ in
     environmentFile = config.age.secrets.reactorEnv.path;
   };
 
+  age.secrets.sieveEnv = {
+    owner = "sieve";
+    group = "sieve";
+    file = ./secrets/sieveEnv;
+  };
+  services.sieve = {
+    enable = true;
+    environmentFile = config.age.secrets.sieveEnv.path;
+  };
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+    "sieve"
+  ];
+
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl
     pkgs.gitMinimal

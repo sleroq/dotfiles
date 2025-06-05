@@ -29,6 +29,10 @@
     url = "github:sleroq/reactor";
     inputs.nixpkgs.follows = "nixpkgs";
   };
+  inputs.sieve = {
+    url = "git+ssh://git@github.com/sleroq/sieve";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   outputs =
     { nixpkgs
@@ -38,6 +42,7 @@
     , nixos-facter-modules
     , mailserver
     , reactor
+    , sieve
     , ...
     }@inputs:
     {
@@ -53,6 +58,7 @@
           agenix.nixosModules.default
           mailserver.nixosModules.default
           reactor.nixosModules.reactor
+          sieve.nixosModules.sieve
           ./configuration.nix
           nixos-facter-modules.nixosModules.facter
           {
