@@ -37,7 +37,7 @@ in
 
     services.caddy = {
       virtualHosts = {
-        "cal.cum.army" = {
+        "cum.army" = {
           extraConfig = ''
             handle_path /radicale/* {
                 uri strip_prefix /radicale
