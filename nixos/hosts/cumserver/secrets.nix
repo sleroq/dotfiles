@@ -30,6 +30,7 @@ let
     "secrets/cf-privkey.pem" = { publicKeys = commonPublicKeys; };
     "secrets/grafanaPassword" = { publicKeys = commonPublicKeys; };
     "secrets/bayanEnv" = { publicKeys = commonPublicKeys; };
+    "secrets/kopokaEnv" = { publicKeys = commonPublicKeys; };
   };
 
 in

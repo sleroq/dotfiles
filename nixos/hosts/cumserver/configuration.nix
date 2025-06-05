@@ -16,6 +16,7 @@
     ./modules/radicale.nix
     ./modules/grafana.nix
     ./modules/bayan.nix
+    ./modules/kopoka.nix
   ];
   boot.loader.grub.enable = true;
   boot.tmp.cleanOnBoot = true;
@@ -38,6 +39,7 @@
   cumserver.grafana.enable = true;
 
   services.bayan.enable = true;
+  services.kopoka.enable = true;
 
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl

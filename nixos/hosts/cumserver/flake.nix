@@ -21,6 +21,10 @@
     url = "github:sleroq/bayan";
     inputs.nixpkgs.follows = "nixpkgs";
   };
+  inputs.kopoka = {
+    url = "git+ssh://git@github.com/sleroq/kopoka";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   outputs =
     { nixpkgs
