@@ -14,6 +14,7 @@
     ./modules/matterbridge.nix
     ./modules/mailserver.nix
     ./modules/radicale.nix
+    ./modules/grafana.nix
   ];
   boot.loader.grub.enable = true;
   boot.tmp.cleanOnBoot = true;
@@ -33,6 +34,7 @@
   cumserver.matterbridge.enable = true;
   cumserver.mailserver.enable = true;
   cumserver.radicale.enable = true;
+  cumserver.grafana.enable = true;
 
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl

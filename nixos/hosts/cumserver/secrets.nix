@@ -28,6 +28,7 @@ let
     "secrets/matterbridge.toml" = { publicKeys = commonPublicKeys; };
     "secrets/cf-fullchain.pem" = { publicKeys = commonPublicKeys; };
     "secrets/cf-privkey.pem" = { publicKeys = commonPublicKeys; };
+    "secrets/grafanaPassword" = { publicKeys = commonPublicKeys; };
   };
 
 in
