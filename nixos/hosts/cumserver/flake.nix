@@ -25,6 +25,10 @@
     url = "git+ssh://git@github.com/sleroq/kopoka";
     inputs.nixpkgs.follows = "nixpkgs";
   };
+  inputs.reactor = {
+    url = "github:sleroq/reactor";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   outputs =
     { nixpkgs
@@ -33,6 +37,7 @@
     , secrets
     , nixos-facter-modules
     , mailserver
+    , reactor
     , ...
     }@inputs:
     {
@@ -47,6 +52,7 @@
           disko.nixosModules.disko
           agenix.nixosModules.default
           mailserver.nixosModules.default
+          reactor.nixosModules.reactor
           ./configuration.nix
           nixos-facter-modules.nixosModules.facter
           {

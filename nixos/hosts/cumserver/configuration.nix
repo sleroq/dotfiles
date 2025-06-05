@@ -3,6 +3,7 @@
   lib,
   pkgs,
   secrets,
+  config,
   ...
 }:
 {
@@ -40,6 +41,16 @@
 
   services.bayan.enable = true;
   services.kopoka.enable = true;
+
+  age.secrets.reactorEnv = {
+    owner = "reactor";
+    group = "reactor";
+    file = ./secrets/reactorEnv;
+  };
+  services.reactor = {
+    enable = true;
+    environmentFile = config.age.secrets.reactorEnv.path;
+  };
 
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl
