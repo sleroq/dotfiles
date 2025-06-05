@@ -15,6 +15,7 @@
     ./modules/mailserver.nix
     ./modules/radicale.nix
     ./modules/grafana.nix
+    ./modules/bayan.nix
   ];
   boot.loader.grub.enable = true;
   boot.tmp.cleanOnBoot = true;
@@ -35,6 +36,8 @@
   cumserver.mailserver.enable = true;
   cumserver.radicale.enable = true;
   cumserver.grafana.enable = true;
+
+  services.bayan.enable = true;
 
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl

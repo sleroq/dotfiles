@@ -29,6 +29,7 @@ let
     "secrets/cf-fullchain.pem" = { publicKeys = commonPublicKeys; };
     "secrets/cf-privkey.pem" = { publicKeys = commonPublicKeys; };
     "secrets/grafanaPassword" = { publicKeys = commonPublicKeys; };
+    "secrets/bayanEnv" = { publicKeys = commonPublicKeys; };
   };
 
 in

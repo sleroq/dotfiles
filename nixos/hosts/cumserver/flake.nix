@@ -17,6 +17,10 @@
     url = "github:sleroq/cum.army";
     inputs.nixpkgs.follows = "nixpkgs";
   };
+  inputs.bayan = {
+    url = "github:sleroq/bayan";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   outputs =
     { nixpkgs
