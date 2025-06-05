@@ -3,7 +3,6 @@
   imports = [
     ../modules/programs/gitui.nix
     ../modules/programs/zellij.nix
-    # ../modules/programs/tmux.nix # TODO: option
   ];
 
   programs.nushell = {
