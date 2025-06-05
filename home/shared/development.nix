@@ -17,6 +17,30 @@
     '';
   };
 
+  programs.zsh = {
+    initContent = ''
+      # Deno
+      export PATH="$PATH:$HOME/.deno/bin"
+
+      # Golang
+      export GOPATH="$HOME/develop/go"
+      export GOBIN="$GOPATH/bin"
+      export PATH="$PATH:$GOBIN"
+    '';
+  };
+
+  programs.bash = {
+    initExtra = ''
+      # Deno
+      export PATH="$PATH:$HOME/.deno/bin"
+
+      # Golang
+      export GOPATH="$HOME/develop/go"
+      export GOBIN="$GOPATH/bin"
+      export PATH="$PATH:$GOBIN"
+    '';
+  };
+
   home.packages = with pkgs; [
     git-lfs
     # git-fame
