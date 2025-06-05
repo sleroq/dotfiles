@@ -4,8 +4,25 @@
   pkgs,
   secrets,
   config,
+  inputs,
   ...
 }:
+let
+  serviceWrapper = import ./modules/telegram-bot.nix { inherit config lib pkgs; };
+  
+  bayan = serviceWrapper.mkTelegramBot {
+    name = "bayan";
+    package = inputs.bayan.packages.${pkgs.system}.default;
+    secretFile = ./secrets/bayanEnv;
+    dataDir = "/var/lib/bayan";
+  };
+  
+  kopoka = serviceWrapper.mkTelegramBot {
+    name = "kopoka";
+    package = inputs.kopoka.packages.${pkgs.system}.default;
+    secretFile = ./secrets/kopokaEnv;
+  };
+in
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -16,8 +33,8 @@
     ./modules/mailserver.nix
     ./modules/radicale.nix
     ./modules/grafana.nix
-    ./modules/bayan.nix
-    ./modules/kopoka.nix
+    bayan
+    kopoka
   ];
   boot.loader.grub.enable = true;
   boot.tmp.cleanOnBoot = true;
