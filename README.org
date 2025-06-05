@@ -1,6 +1,6 @@
 * Dotfiles
 
-Using [[https://nixos.org/][nix]] for +reproducible packages+ everything I can
+Overcomplicated nix configs for my laptop, PC and server.
 
 ** Docs
 
@@ -42,15 +42,14 @@ Using [[https://nixos.org/][nix]] for +reproducible packages+ everything I can
     └── [some helper scripts here]
 #+END_SRC
 
+Note: Some configs in the home manager are linked with activation scripts, so you can edit them without rebuilding the whole system. This means that home configurations are not really pure and you won't be able to apply them to remote hosts.
+
 ** Install
 
 1. Enable flakes
 2. =git clone https://github.com/nix-community/home-manager.git ~/somewhere=
-3. [[https://nix-community.github.io/home-manager/index.html#sec-flakes-standalone][Install home manager]] (with flakes)
-4. Configure in [[./nixpkgs/flake.nix][flake.nix]]
-5. Remove =.git= and make it your own
-
-Some configurations are not in nix yet (=.config/=), you can sync it using [[https://www.gnu.org/software/stow/][Stow]].
+3. =scripts/u= to build current system based on hostname. or =sudo nixos-rebuild switch --flake ./nixos/hosts/whateverhost/#whateverhostname=
+4. =hu= to build home manager configs. or =nix run home-manager/master -- switch --flake ./home/hosts/whateverhost/#sleroq= for the first time time.
 
 ** How to understand Nix?
 
