@@ -9,7 +9,6 @@
     foot
     librewolf
     networkmanager-openvpn
-    nekoray
     nvtopPackages.full
     powertop
   ];

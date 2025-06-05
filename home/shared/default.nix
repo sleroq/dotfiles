@@ -74,6 +74,8 @@
         remmina
         # nomachine-client
         # rustdesk
+
+        hiddify-app
       ];
     };
   };
