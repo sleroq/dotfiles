@@ -7,6 +7,11 @@ in
   options.myHome.gaming = {
     osu = {
       enable = lib.mkEnableOption "osu! lazer";
+      enableTearing = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable tearing for osu!";
+      };
     };
 
     etterna = {
