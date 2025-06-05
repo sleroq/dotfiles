@@ -19,6 +19,6 @@
       options = "grp:lctrl_lwin_toggle,ctrl:nocaps";
     };
 
-    excludePackages = with pkgs; [ xterm ];
+    excludePackages = [ pkgs.xterm ];
   };
 }
