@@ -86,6 +86,23 @@ in
     enable = true;
     environmentFile = config.age.secrets.sieveEnv.path;
   };
+
+  age.secrets.slushaEnv = {
+    owner = "slusha";
+    group = "slusha";
+    file = ./secrets/slushaEnv;
+  };
+  age.secrets.slushaConfig = {
+    owner = "slusha";
+    group = "slusha";
+    file = ./secrets/slushaConfig.js;
+  };
+  services.slusha = {
+    enable = false;
+    environmentFile = config.age.secrets.slushaEnv.path;
+    configFile = config.age.secrets.slushaConfig.path;
+  };
+
   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
     "sieve"
   ];

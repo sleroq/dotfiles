@@ -37,6 +37,10 @@
     url = "git+ssh://git@github.com/sleroq/sieve";
     inputs.nixpkgs.follows = "nixpkgs";
   };
+  inputs.slusha = {
+    url = "github:sleroq/slusha";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   outputs =
     { nixpkgs
@@ -47,6 +51,7 @@
     , mailserver
     , reactor
     , sieve
+    , slusha
     , spoiler-images
     , ...
     }@inputs:
@@ -64,6 +69,7 @@
           mailserver.nixosModules.default
           reactor.nixosModules.reactor
           sieve.nixosModules.sieve
+          slusha.nixosModules.slusha
           ./configuration.nix
           nixos-facter-modules.nixosModules.facter
           {
