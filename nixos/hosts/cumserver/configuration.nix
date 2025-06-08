@@ -39,7 +39,6 @@ in
     ./modules/mailserver.nix
     ./modules/radicale.nix
     ./modules/grafana.nix
-    ./modules/bore.nix
     bayan
     kopoka
     spoiler-images
