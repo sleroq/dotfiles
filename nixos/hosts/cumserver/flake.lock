@@ -810,11 +810,11 @@
         "zig2nix": "zig2nix"
       },
       "locked": {
-        "lastModified": 1749408838,
-        "narHash": "sha256-ve22EKciHIKLMzmWKI64w4eiQNmP5I2KDWAm4qQewPY=",
+        "lastModified": 1749410672,
+        "narHash": "sha256-zCgXBGIBR7BXOw+R8ZFVZ+pLQIpLeocIJ/O6IwaMJt4=",
         "owner": "sleroq",
         "repo": "zefxi",
-        "rev": "a6029560639e444cddac98bd6bd165b72f7593bd",
+        "rev": "7e795476b9556c1183ec9d9cbdf0ad0bf377ad92",
         "type": "github"
       },
       "original": {

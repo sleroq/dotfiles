@@ -68,6 +68,7 @@ in
     # Example tunnel configurations
     # Uncomment and modify as needed
     
+    # Example: Expose a local web application
     # webapp = {
     #   enable = true;
     #   localPort = 3000;
@@ -75,23 +76,46 @@ in
     #   caddy.domain = "webapp.bore.cum.army";
     # };
     
+    # Test tunnel (disabled by default)
+    test = {
+      enable = false;  # Set to true to enable
+      localPort = 8000;
+      caddy.enable = true;
+      caddy.domain = "test.bore.cum.army";
+      caddy.extraConfig = ''
+        encode zstd gzip
+        header X-Test-Header "Bore Tunnel Active"
+      '';
+    };
+    
+    # Example: API server with custom configuration
     # api = {
     #   enable = true;
     #   localPort = 8080;
     #   caddy.enable = true;
     #   caddy.domain = "api.bore.cum.army";
+    #   caddy.extraConfig = ''
+    #     encode zstd gzip
+    #     header X-Frame-Options DENY
+    #   '';
     # };
     
+    # Example: Development server using public bore.pub
     # dev-server = {
     #   enable = true;
     #   localPort = 4000;
     #   server = "bore.pub";  # Use public bore server
     #   caddy.enable = true;
     #   caddy.domain = "dev.bore.cum.army";
-    #   caddy.extraConfig = ''
-    #     encode zstd gzip
-    #     header X-Frame-Options DENY
-    #   '';
+    # };
+    
+    # Example: Raw TCP tunnel without Caddy (for databases, etc.)
+    # postgres = {
+    #   enable = true;
+    #   localPort = 5432;
+    #   server = "bore.pub";
+    #   secret = "my-secret";  # Optional authentication
+    #   # No Caddy integration for raw TCP
     # };
   };
 

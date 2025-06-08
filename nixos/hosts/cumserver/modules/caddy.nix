@@ -52,12 +52,7 @@ in
           '';
         };
 
-        "*.bore.cum.army" = {
-          extraConfig = ''
-            # Wildcard subdomain for bore tunnels
-            # Individual tunnel configurations will be merged here
-          '';
-        };
+        # Bore tunnel subdomains will be added dynamically by the bore module
 
         # "m.sleroq.link" = {
         #   extraConfig = ''
