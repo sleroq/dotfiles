@@ -52,6 +52,13 @@ in
           '';
         };
 
+        "*.bore.cum.army" = {
+          extraConfig = ''
+            # Wildcard subdomain for bore tunnels
+            # Individual tunnel configurations will be merged here
+          '';
+        };
+
         # "m.sleroq.link" = {
         #   extraConfig = ''
         #     reverse_proxy localhost:8008

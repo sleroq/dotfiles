@@ -39,6 +39,7 @@ in
     ./modules/mailserver.nix
     ./modules/radicale.nix
     ./modules/grafana.nix
+    ./modules/bore.nix
     bayan
     kopoka
     spoiler-images
@@ -62,6 +63,37 @@ in
   cumserver.mailserver.enable = true;
   cumserver.radicale.enable = true;
   cumserver.grafana.enable = true;
+  cumserver.bore.enable = true;
+  cumserver.bore.tunnels = {
+    # Example tunnel configurations
+    # Uncomment and modify as needed
+    
+    # webapp = {
+    #   enable = true;
+    #   localPort = 3000;
+    #   caddy.enable = true;
+    #   caddy.domain = "webapp.bore.cum.army";
+    # };
+    
+    # api = {
+    #   enable = true;
+    #   localPort = 8080;
+    #   caddy.enable = true;
+    #   caddy.domain = "api.bore.cum.army";
+    # };
+    
+    # dev-server = {
+    #   enable = true;
+    #   localPort = 4000;
+    #   server = "bore.pub";  # Use public bore server
+    #   caddy.enable = true;
+    #   caddy.domain = "dev.bore.cum.army";
+    #   caddy.extraConfig = ''
+    #     encode zstd gzip
+    #     header X-Frame-Options DENY
+    #   '';
+    # };
+  };
 
   services.bayan.enable = true;
   services.kopoka.enable = true;
