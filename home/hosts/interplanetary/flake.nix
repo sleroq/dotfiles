@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-old.url = "github:nixos/nixpkgs/1c37a89390481e809b9851781026bc9bb840dd90";
+    nixpkgs-master.url = "github:nixos/nixpkgs/master";
     secrets = {
       flake = false;
       url = "path:../../secrets";
@@ -31,6 +32,7 @@
     , home-manager
     , nixpkgs
     , nixpkgs-old
+    , nixpkgs-master
     , secrets
     , ...
     }:
@@ -74,6 +76,10 @@
             config.permittedInsecurePackages = [
               "electron-13.6.9"
             ];
+          };
+          pkgs-master = import nixpkgs-master {
+            inherit system;
+            config.allowUnfree = true;
           };
         };
       };
