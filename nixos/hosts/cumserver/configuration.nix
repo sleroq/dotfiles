@@ -39,6 +39,7 @@ in
     ./modules/mailserver.nix
     ./modules/radicale.nix
     ./modules/grafana.nix
+    ./modules/bore.nix
     bayan
     kopoka
     spoiler-images
@@ -62,7 +63,10 @@ in
   cumserver.mailserver.enable = true;
   cumserver.radicale.enable = true;
   cumserver.grafana.enable = true;
-  cumserver.bore.enable = true;
+  cumserver.bore = {
+    enable = true;
+    domain = "bore.cum.army";
+  };
 
   services.bayan.enable = true;
   services.kopoka.enable = true;
