@@ -33,14 +33,15 @@
     url = "github:sleroq/reactor";
     inputs.nixpkgs.follows = "nixpkgs";
   };
+  inputs.zefxi = {
+    url = "github:sleroq/zefxi";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
   inputs.sieve = {
     url = "git+ssh://git@github.com/sleroq/sieve";
     inputs.nixpkgs.follows = "nixpkgs";
   };
-  inputs.slusha = {
-    url = "github:sleroq/slusha";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
+  inputs.slusha.url = "github:sleroq/slusha";
 
   outputs =
     { nixpkgs
@@ -53,6 +54,7 @@
     , sieve
     , slusha
     , spoiler-images
+    , zefxi
     , ...
     }@inputs:
     {
@@ -70,6 +72,7 @@
           reactor.nixosModules.reactor
           sieve.nixosModules.sieve
           slusha.nixosModules.slusha
+          zefxi.nixosModules.zefxi
           ./configuration.nix
           nixos-facter-modules.nixosModules.facter
           {

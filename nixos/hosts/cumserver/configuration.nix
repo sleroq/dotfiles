@@ -77,6 +77,17 @@ in
     environmentFile = config.age.secrets.reactorEnv.path;
   };
 
+  age.secrets.zefxiEnv = {
+    owner = "zefxi";
+    group = "zefxi";
+    file = ./secrets/zefxiEnv;
+  };
+  services.zefxi = {
+    enable = true;
+    caddy.enable = true;
+    environmentFile = config.age.secrets.zefxiEnv.path;
+  };
+
   age.secrets.sieveEnv = {
     owner = "sieve";
     group = "sieve";

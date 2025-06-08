@@ -36,6 +36,7 @@ let
     "secrets/slushaEnv" = { publicKeys = commonPublicKeys; };
     "secrets/slushaConfig.js" = { publicKeys = commonPublicKeys; };
     "secrets/spoilerImagesEnv" = { publicKeys = commonPublicKeys; };
+    "secrets/zefxiEnv" = { publicKeys = commonPublicKeys; };
   };
 
 in
