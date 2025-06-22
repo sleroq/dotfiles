@@ -32,7 +32,11 @@
     };
 
     programs = {
-      anytype.enable = true;
+      anytype = {
+        enable = true;
+        version = "0.47.3";
+        hash = "sha256-19VHCezNqWAgkw+5RlvZ31gSiHKPVhHvpRVlifJ9K88=";
+      };
       mpv.enable = true;
       foot = {
         enable = true;

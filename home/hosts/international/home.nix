@@ -18,16 +18,16 @@
         };
       };
     };
+    editors = {
+      zed.enable = false;
+      cursor.enable = false;
+      helix.enable = true;
+    };
     programs = {
       obs.enable = true;
       chromium = {
         enable = true;
         unsafeWebGPU = true;
-      };
-      anytype = {
-        enable = true;
-        version = "0.46.8";
-        hash = "sha256-lmMmGNXybJ33ODcSfguSPM05gun5CbKUcW3ZFo6jdVE=";
       };
     };
   };
