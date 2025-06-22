@@ -41,6 +41,7 @@ in
       description = "A list of extra packages to install.";
     };
     activity-watch.enable = lib.mkEnableOption "Activity Watch";
+    wireplumberHacks.enable = lib.mkEnableOption "WirePlumber autolink";
   };
 
   config = lib.mkMerge [
@@ -64,15 +65,17 @@ in
     ))
     (lib.mkIf cfg.teams.enable (import ./teams.nix { inherit pkgs; }))
     (lib.mkIf cfg.obs.enable {
-      programs.obs-studio = {
-        enable = true;
-        plugins = with pkgs.obs-studio-plugins; [
-          wlrobs
-          obs-backgroundremoval
-          obs-pipewire-audio-capture
-          input-overlay
-        ];
-      };
+      home.packages = [
+        (pkgs.wrapOBS {
+          plugins = with pkgs.obs-studio-plugins; [
+            wlrobs
+            obs-backgroundremoval
+            obs-pipewire-audio-capture
+            input-overlay
+            obs-multi-rtmp
+          ];
+        })
+      ];
     })
     (lib.mkIf cfg.chromium.enable {
       programs.chromium = {
@@ -103,5 +106,6 @@ in
       ];
     })
     (lib.mkIf (cfg.extraPackages != []) { home.packages = cfg.extraPackages; })
+    (lib.mkIf cfg.wireplumberHacks.enable (import ./wireplumber.nix { inherit lib config pkgs; }))
   ];
 }
