@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 {
   imports = [
     ../modules/programs/gitui.nix
@@ -50,8 +50,6 @@
     yarn
     deno
     go
-    inputs.zig.packages.${pkgs.system}.master
-    inputs.zls.packages.${pkgs.system}.default
     golangci-lint
     nodePackages_latest.typescript
     nodePackages_latest.typescript-language-server

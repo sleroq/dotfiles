@@ -1,4 +1,4 @@
-{ pkgs, scrcpyPkgs, pkgs-master, ... }:
+{ pkgs, scrcpyPkgs, pkgs-master, inputs, ... }:
 
 {
   myHome = {
@@ -36,6 +36,8 @@
         pkgs.chatbox
         scrcpyPkgs.scrcpy
         pkgs-master.broadcast-box
+        inputs.zig.packages.${pkgs.system}.master
+        inputs.zls.packages.${pkgs.system}.default
       ];
     };
   };
