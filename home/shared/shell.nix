@@ -17,6 +17,11 @@ in
     ../modules/programs/btop.nix
   ];
 
+  programs.bash = {
+    enable = true;
+    shellAliases = aliases;
+  };
+
   programs.zsh = {
     enable = true;
     autosuggestion.enable = true;
