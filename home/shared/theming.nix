@@ -36,8 +36,8 @@ in {
     theme.package = pkgs.orchis-theme;
     iconTheme.name = "Tela";
     iconTheme.package = pkgs.tela-icon-theme;
-    cursorTheme.name = "Vimix-cursors";
-    cursorTheme.package = pkgs.vimix-cursors;
+    # cursorTheme.name = "Vimix-cursors";
+    # cursorTheme.package = pkgs.vimix-cursors;
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = true;
     };
@@ -47,9 +47,31 @@ in {
   };
 
   home.file = {
-    ".icons/vimix-cursors".source = "${pkgs.vimix-cursors}/share/icons/Vimix-cursors";
     ".icons/Tela".source = "${pkgs.tela-icon-theme}/share/icons/Tela";
   };
+
+  home.pointerCursor = 
+    let 
+      getFrom = url: hash: name: {
+          gtk.enable = true;
+          x11.enable = true;
+          hyprcursor.enable = true;
+          name = name;
+          size = 24;
+          package = 
+            pkgs.runCommand "moveUp" {} ''
+              mkdir -p $out/share/icons
+              ln -s ${pkgs.fetchzip {
+                url = url;
+                hash = hash;
+              }} $out/share/icons/${name}
+          '';
+        };
+    in
+      getFrom 
+        "https://github.com/ful1e5/fuchsia-cursor/releases/download/v2.0.0/Fuchsia-Pop.tar.gz"
+        "sha256-BvVE9qupMjw7JRqFUj1J0a4ys6kc9fOLBPx2bGaapTk="
+        "Fuchsia-Pop";
 
   home.packages = [ pkgs.libsForQt5.qt5ct pkgs.qt6ct ];
 }
