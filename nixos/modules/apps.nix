@@ -52,6 +52,6 @@
 
     noisetorch.enable = true;
 
-    # adb.enable = true; # Phone debuggin stuff
+    adb.enable = true; # Phone debuggin stuff
   };
 }

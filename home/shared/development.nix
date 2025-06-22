@@ -41,6 +41,8 @@
     '';
   };
 
+  # TODO: Seems bloated, too much dev tools?
+  # Do I really need nix/lua lsp
   home.packages = with pkgs; [
     git-lfs
     # git-fame
@@ -49,18 +51,19 @@
     deno
     go
     inputs.zig.packages.${pkgs.system}.master
-    zls
+    inputs.zls.packages.${pkgs.system}.default
     golangci-lint
     nodePackages_latest.typescript
     nodePackages_latest.typescript-language-server
     gopls
-    # niv
-    nixd
     cargo
     # rustc
     # godot_4
     marksman
-    # nil
+
+    nixd # Nix language server
+    nil # Another nix language server? (zed needs it)
+    package-version-server # JSON language server
     lua-language-server
 
     # python39
@@ -73,6 +76,6 @@
 
     # exiftool
     gcc # For go build
-    # gnumake
+    gnumake # Generally usefull sometimes
   ];
 }

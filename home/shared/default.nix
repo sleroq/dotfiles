@@ -1,6 +1,6 @@
 # This direcotry is meant for configurations relevant on every host
 
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   imports = [
@@ -76,6 +76,7 @@
         # rustdesk
 
         hiddify-app
+        inputs.agenix.packages.${pkgs.system}.default
       ];
     };
   };

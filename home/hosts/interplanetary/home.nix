@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, scrcpyPkgs, pkgs-master, ... }:
 
 {
   myHome = {
@@ -15,6 +15,7 @@
     editors = {
       zed.enable = true;
       cursor.enable = true;
+      helix.enable = true;
     };
     gaming = {
       etterna.enable = true;
@@ -23,10 +24,11 @@
     };
 
     programs = {
+      wireplumberHacks.enable = true;
       anytype = {
         enable = true;
-        version = "0.46.8";
-        hash = "sha256-lmMmGNXybJ33ODcSfguSPM05gun5CbKUcW3ZFo6jdVE=";
+        version = "0.47.3";
+        hash = "sha256-19VHCezNqWAgkw+5RlvZ31gSiHKPVhHvpRVlifJ9K88=";
       };
       obs.enable = true;
       chromium = {
@@ -34,6 +36,12 @@
         unsafeWebGPU = true;
       };
       teams.enable = true;
+      extraPackages = [
+        pkgs.ollama-rocm
+        pkgs.chatbox
+        scrcpyPkgs.scrcpy
+        pkgs-master.broadcast-box
+      ];
     };
   };
 }
