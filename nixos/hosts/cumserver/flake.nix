@@ -33,10 +33,7 @@
     url = "github:sleroq/reactor";
     inputs.nixpkgs.follows = "nixpkgs";
   };
-  inputs.zefxi = {
-    url = "github:sleroq/zefxi";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
+  inputs.zefxi.url = "github:sleroq/zefxi";
   inputs.sieve = {
     url = "git+ssh://git@github.com/sleroq/sieve";
     inputs.nixpkgs.follows = "nixpkgs";
