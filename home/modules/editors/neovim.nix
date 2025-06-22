@@ -26,5 +26,6 @@
     tailwindcss-language-server
     wakatime
     sqlite
+    lua
   ];
 }
