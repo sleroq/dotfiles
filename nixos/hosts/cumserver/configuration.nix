@@ -40,6 +40,8 @@ in
     ./modules/radicale.nix
     ./modules/grafana.nix
     ./modules/bore.nix
+    ./modules/podman.nix
+    ./modules/broadcast-box.nix
     bayan
     kopoka
     spoiler-images
@@ -63,9 +65,17 @@ in
   cumserver.mailserver.enable = true;
   cumserver.radicale.enable = true;
   cumserver.grafana.enable = true;
-  cumserver.bore = {
+  cumserver.bore.enable = true;
+  cumserver.podman.enable = true;
+  
+  cumserver.broadcast-box = {
     enable = true;
-    domain = "bore.cum.army";
+    domain = "web.cum.army";
+    port = 8080;
+    udpPort = 8080;
+    extraEnvironment = {
+      DISABLE_STATUS = "false";
+    };
   };
 
   services.bayan.enable = true;
@@ -82,13 +92,13 @@ in
     environmentFile = config.age.secrets.reactorEnv.path;
   };
 
-  age.secrets.zefxiEnv = {
-    owner = "zefxi";
-    group = "zefxi";
-    file = ./secrets/zefxiEnv;
-  };
+  # age.secrets.zefxiEnv = {
+  #   owner = "zefxi";
+  #   group = "zefxi";
+  #   file = ./secrets/zefxiEnv;
+  # };
   services.zefxi = {
-    enable = true;
+    enable = false;
     caddy.enable = true;
     environmentFile = config.age.secrets.zefxiEnv.path;
   };
@@ -103,16 +113,16 @@ in
     environmentFile = config.age.secrets.sieveEnv.path;
   };
 
-  age.secrets.slushaEnv = {
-    owner = "slusha";
-    group = "slusha";
-    file = ./secrets/slushaEnv;
-  };
-  age.secrets.slushaConfig = {
-    owner = "slusha";
-    group = "slusha";
-    file = ./secrets/slushaConfig.js;
-  };
+  # age.secrets.slushaEnv = {
+  #   owner = "slusha";
+  #   group = "slusha";
+  #   file = ./secrets/slushaEnv;
+  # };
+  # age.secrets.slushaConfig = {
+  #   owner = "slusha";
+  #   group = "slusha";
+  #   file = ./secrets/slushaConfig.js;
+  # };
   services.slusha = {
     enable = false;
     environmentFile = config.age.secrets.slushaEnv.path;
