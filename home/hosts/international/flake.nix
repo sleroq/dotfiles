@@ -35,30 +35,18 @@
     , home-manager
     , nixpkgs
     , nixpkgs-old
-    , nixpkgs-unstable
+    , nixpkgs-master
+    , secrets
+    , scrcpyPkgs
     , ...
     }:
     let
       system = "x86_64-linux";
       user = "sleroq";
-      host = "interplanetary";
+      host = "international";
       repoPath = ../../..;
       repoPathString = "/home/${user}/develop/other/dotfiles";
-      myOverlay = final: prev: {
-        zed-editor = prev.zed-editor.overrideAttrs (old: rec {
-          version = "0.184.4-pre";
-          src = prev.fetchFromGitHub {
-            owner = "zed-industries";
-            repo = "zed";
-            tag = "v${version}";
-            hash = "sha256-8YEuR8CfZsMq2pBBWVPEmZgIyO2724THP4yQhf7TkPA=";
-          };
-          cargoDeps = final.rustPlatform.fetchCargoVendor {
-            inherit src;
-            hash = "sha256-KU/pmdQm9OUPod7oWwtUlutk5V+odzg/ojJ/feL6icE=";
-          };
-        });
-      };
+      myOverlay = final: prev: {};
     in
     {
       homeConfigurations."${user}" = home-manager.lib.homeManagerConfiguration {
@@ -77,6 +65,7 @@
 
         extraSpecialArgs = {
           inputs = self.inputs;
+          secrets = import "${secrets}/default.nix";
           opts = {
             inherit host repoPath repoPathString;
             old-configs = repoPath + /home/.config;
@@ -86,15 +75,17 @@
           pkgs-old = import nixpkgs-old {
             inherit system;
             config.allowUnfree = true;
-            # For obinskit
+            # For ObinsKit
             config.permittedInsecurePackages = [
               "electron-13.6.9"
             ];
           };
-          pkgs-unstable = import nixpkgs-unstable {
+          pkgs-master = import nixpkgs-master {
             inherit system;
             config.allowUnfree = true;
-            overlays = [ myOverlay ];
+          };
+          scrcpyPkgs = import scrcpyPkgs {
+            inherit system;
           };
         };
       };
