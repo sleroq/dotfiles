@@ -78,6 +78,7 @@
         remmina
         # nomachine-client
         # rustdesk
+        vial
 
         hiddify-app
         inputs.agenix.packages.${pkgs.system}.default
