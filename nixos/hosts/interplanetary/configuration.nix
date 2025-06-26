@@ -79,18 +79,18 @@
     isNormalUser = true;
     description = "sleroq";
     extraGroups = [ "networkmanager" "input" "wheel" "video" "libvirtd" "adbusers" "uinput" ];
+
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSh54pu9bAH8DFBKPtswFJzevCft+gHZStJQ0trYGoj sleroq@cum.army"
+    ];
   };
 
-  # Allow plugdev access to ANNE PRO 2
-  # https://github.com/sizezero/dev-notes/blob/master/anne-pro-2.org
-  # services.udev.extraRules = ''
-  #   SUBSYSTEM=="input", GROUP="input", MODE="0666"
-  #   # For ANNE PRO 2
-  #   SUBSYSTEM=="usb", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8008",
-  #   MODE="0666", GROUP="plugdev"
-  #   KERNEL=="hidraw*", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8008",
-  #   MODE="0666", GROUP="plugdev"
-  # '';
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+    };
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

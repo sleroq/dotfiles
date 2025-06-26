@@ -100,6 +100,17 @@
     KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{serial}=="*vial:f64c2b3c*", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
   '';
 
+  # Allow plugdev access to ANNE PRO 2
+  # https://github.com/sizezero/dev-notes/blob/master/anne-pro-2.org
+  # services.udev.extraRules = ''
+  #   SUBSYSTEM=="input", GROUP="input", MODE="0666"
+  #   # For ANNE PRO 2
+  #   SUBSYSTEM=="usb", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8008",
+  #   MODE="0666", GROUP="plugdev"
+  #   KERNEL=="hidraw*", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8008",
+  #   MODE="0666", GROUP="plugdev"
+  # '';
+
   nix.settings = {
     substituters = [
       "https://nix-gaming.cachix.org"
