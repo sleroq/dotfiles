@@ -65,14 +65,12 @@ in
   cumserver.mailserver.enable = true;
   cumserver.radicale.enable = true;
   cumserver.grafana.enable = true;
-  cumserver.bore.enable = true;
+  cumserver.bore.enable = false;
   cumserver.podman.enable = true;
   
   cumserver.broadcast-box = {
     enable = true;
     domain = "web.cum.army";
-    port = 8080;
-    udpPort = 8080;
     extraEnvironment = {
       DISABLE_STATUS = "false";
     };

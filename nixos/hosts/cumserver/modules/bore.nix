@@ -3,6 +3,7 @@ let
   cfg = config.cumserver.bore;
 in
 {
+  # TODO: Add some sort of auth
   options.cumserver.bore = {
     enable = lib.mkEnableOption "Bore server";
     
@@ -82,8 +83,7 @@ in
       description = "Bore server user";
     };
 
-    users.groups.bore = {};
-
+    # Expose one of the bore ports through Caddy reverse proxy
     services.caddy = {
       virtualHosts = {
         "${cfg.domain}" = {
