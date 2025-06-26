@@ -93,6 +93,13 @@
     { domain = "@users"; item = "rtprio"; type = "-"; value = 1; }
   ];
 
+  # Udev rules for Vial keyboard configuration
+  # https://get.vial.today/manual/linux-udev.html
+  services.udev.extraRules = ''
+    # Universal Vial udev rule
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{serial}=="*vial:f64c2b3c*", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+  '';
+
   nix.settings = {
     substituters = [
       "https://nix-gaming.cachix.org"
