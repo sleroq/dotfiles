@@ -6,22 +6,49 @@ in
   options.cumserver.podman.enable = lib.mkEnableOption "Podman container runtime";
 
   config = lib.mkIf cfg.enable {
-    # Enable Podman with proper rootless configuration
     virtualisation.podman = {
       enable = true;
       dockerCompat = true;
       defaultNetwork.settings.dns_enabled = true;
       
-      # Enable auto-pruning to keep storage clean
       autoPrune = {
         enable = true;
         dates = "weekly";
       };
     };
 
-    # Add podman-compose to system packages
     environment.systemPackages = with pkgs; [
       podman-compose
+    ];
+
+    virtualisation.oci-containers.backend = "podman";
+
+    virtualisation.oci-containers.containers = {
+      prometheus-podman-exporter = lib.mkIf config.cumserver.grafana.enable {
+        image = "quay.io/navidys/prometheus-podman-exporter:latest";
+        autoStart = true;
+        ports = [ "127.0.0.1:9882:9882" ];
+        volumes = [
+          "/run/podman/podman.sock:/run/podman/podman.sock:ro"
+        ];
+        environment = {
+          CONTAINER_HOST = "unix:///run/podman/podman.sock";
+        };
+        extraOptions = [
+          "--security-opt=label=disable"
+          "--user=root"
+        ];
+        cmd = [
+          "--collector.enable-all"
+        ];
+      };
+    };
+
+    services.prometheus.scrapeConfigs = lib.mkIf config.cumserver.grafana.enable [
+      {
+        job_name = "podman";
+        static_configs = [{ targets = [ "127.0.0.1:9882" ]; }];
+       }
     ];
   };
 } 
