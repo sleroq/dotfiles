@@ -46,6 +46,7 @@
       extraPackages = with pkgs; [
         exodus
         monero-gui
+        signal-desktop
 
         teamspeak6-client
         syncplay
@@ -79,8 +80,6 @@
         # nomachine-client
         # rustdesk
         vial
-
-        hiddify-app
         inputs.agenix.packages.${pkgs.system}.default
       ];
     };
