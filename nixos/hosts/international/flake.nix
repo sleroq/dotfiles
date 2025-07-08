@@ -6,8 +6,9 @@
   inputs.nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
   inputs.hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/tags/v0.49.0";
+  inputs.agenix.url = "github:ryantm/agenix";
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, ... }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, agenix, ... }@inputs:
   let
     system = "x86_64-linux";
     overlay-unstable = final: prev: {
@@ -24,6 +25,7 @@
         ({ ... }: { nixpkgs.overlays = [ overlay-unstable ]; })
         ./configuration.nix
         ../shared
+        agenix.nixosModules.default
       ];
     };
   };
