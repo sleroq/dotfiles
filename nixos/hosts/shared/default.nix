@@ -1,6 +1,6 @@
 # This direcotry is meant for configurations relevant on every desktop host
 
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
   imports = [
     ../../modules/flatpak.nix
@@ -9,6 +9,7 @@
     ../../modules/wms/default.nix
     ../../modules/apps.nix
     ../../modules/sound/default.nix
+    ../../modules/sing-box.nix
   ];
 
   nixpkgs.config.allowUnfree = true;
@@ -135,4 +136,21 @@
 
   # Enable flakes:
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  age.secrets.sing-box-outbounds = {
+    file = ./secrets/sing-box-outbounds.jsonc;
+    mode = "0644";
+  };
+
+  sleroq.sing-box = {
+    enable = true;
+    useTunMode = false;
+    settings = {
+      # log.level = "warn";
+      outbounds = {
+        _secret = config.age.secrets.sing-box-outbounds.path;
+        quote = false;
+      };
+    };
+  };
 }
