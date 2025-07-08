@@ -3,6 +3,8 @@
 -- Set highlight on search
 vim.o.hlsearch = false
 
+vim.o.shell = '/usr/bin/env bash'
+
 -- Make line numbers default
 vim.wo.number = true
 
@@ -50,7 +52,7 @@ vim.o.wrap = false
 
 vim.o.guifont = 'JetBrainsMono Nerd Font:h14'
 vim.opt.linespace = 4
-vim.g.neovide_transparency = 0.4
+vim.g.neovide_opacity = 0.5
 vim.g.neovide_cursor_vfx_mode = 'pixiedust'
 vim.g.neovide_cursor_vfx_particle_density = 14.0
 
