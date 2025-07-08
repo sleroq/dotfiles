@@ -37,6 +37,7 @@ in
     ./modules/caddy.nix
     ./modules/matterbridge.nix
     ./modules/mailserver.nix
+    ./modules/navidrome.nix
     ./modules/radicale.nix
     ./modules/grafana.nix
     ./modules/bore.nix
@@ -67,6 +68,12 @@ in
   cumserver.grafana.enable = true;
   cumserver.bore.enable = false;
   cumserver.podman.enable = true;
+
+  cumserver.navidrome = {
+    enable = true;
+    filebrowser.enable = true;
+    feishin.enable = true;
+  };
   
   cumserver.broadcast-box = {
     enable = true;

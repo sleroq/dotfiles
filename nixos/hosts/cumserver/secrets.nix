@@ -31,6 +31,7 @@ let
     "secrets/grafanaPassword" = { publicKeys = commonPublicKeys; };
     "secrets/bayanEnv" = { publicKeys = commonPublicKeys; };
     "secrets/kopokaEnv" = { publicKeys = commonPublicKeys; };
+    "secrets/navidromeEnv" = { publicKeys = commonPublicKeys; };
     "secrets/reactorEnv" = { publicKeys = commonPublicKeys; };
     "secrets/sieveEnv" = { publicKeys = commonPublicKeys; };
     "secrets/slushaEnv" = { publicKeys = commonPublicKeys; };
