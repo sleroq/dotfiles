@@ -117,10 +117,7 @@ in
         LogLevel = "info";
         SessionTimeout = "24h";
         BaseURL = "https://${cfg.domain}";
-        
-        Scanner.Extractor = "ffmpeg";
         EnableSharing = true;
-        EnableInsightsCollector = false;
       };
     };
 
