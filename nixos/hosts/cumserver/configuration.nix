@@ -45,6 +45,7 @@ in
     ./modules/broadcast-box.nix
     ./modules/tuwunel.nix
     ./modules/marzban.nix
+    ./modules/traggo.nix
     bayan
     kopoka
     spoiler-images
@@ -71,7 +72,17 @@ in
   cumserver.podman.enable = true;
   cumserver.tuwunel.enable = true;
 
-  cumserver.marzban.enable = true;
+  age.secrets.marzbanMetricsEnv = {
+    owner = "root";
+    group = "root";
+    file = ./secrets/marzbanMetricsEnv;
+  };
+  cumserver.marzban = {
+    enable = true;
+    metricsEnvironmentFile = config.age.secrets.marzbanMetricsEnv.path;
+  };
+
+  cumserver.traggo.enable = true;
 
   age.secrets.grafanaPassword = { owner = "grafana";
       group = "grafana";

@@ -38,6 +38,7 @@ let
     "secrets/slushaConfig.js" = { publicKeys = commonPublicKeys; };
     "secrets/spoilerImagesEnv" = { publicKeys = commonPublicKeys; };
     "secrets/zefxiEnv" = { publicKeys = commonPublicKeys; };
+    "secrets/marzbanMetricsEnv" = { publicKeys = commonPublicKeys; };
   };
 
 in
