@@ -191,6 +191,12 @@ in
                 job_name = "node";
                 static_configs = [{ targets = [ "127.0.0.1:9100" ]; }];
             }
+        ] ++ lib.optionals (config.cumserver.marzban.enable && config.cumserver.marzban.metricsEnvironmentFile != null) [
+            {
+                job_name = "marzban";
+                static_configs = [{ targets = [ "127.0.0.1:9091" ]; }];
+                scrape_interval = "30s";
+            }
         ];
         exporters = {
             node = {

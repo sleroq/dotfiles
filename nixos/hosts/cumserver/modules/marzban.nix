@@ -41,6 +41,12 @@ in
       default = [ "--network=host" ];
       description = "Additional options to pass to the container";
     };
+
+    metricsEnvironmentFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = "Environment file containing Marzban metrics exporter configuration";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -55,20 +61,30 @@ in
       }
     ];
 
-    virtualisation.oci-containers.containers.marzban = {
-      autoStart = true;
-      image = cfg.image;
-      environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
-      environment = {
-        UVICORN_HOST = "127.0.0.1";
-        UVICORN_PORT = toString cfg.port;
-        XRAY_JSON = "/var/lib/marzban/xray_config.json";
-        SQLALCHEMY_DATABASE_URL = "sqlite:////var/lib/marzban/db.sqlite3";
+    virtualisation.oci-containers.containers = {
+      marzban = {
+        autoStart = true;
+        image = cfg.image;
+        environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
+        environment = {
+          UVICORN_HOST = "127.0.0.1";
+          UVICORN_PORT = toString cfg.port;
+          XRAY_JSON = "/var/lib/marzban/xray_config.json";
+          SQLALCHEMY_DATABASE_URL = "sqlite:////var/lib/marzban/db.sqlite3";
+        };
+        extraOptions = cfg.extraOptions;
+        volumes = [
+          "${cfg.dataDir}:/var/lib/marzban"
+        ];
       };
-      extraOptions = cfg.extraOptions;
-      volumes = [
-        "${cfg.dataDir}:/var/lib/marzban"
-      ];
+    } // lib.optionalAttrs (config.cumserver.monitoring.enable && cfg.metricsEnvironmentFile != null) {
+      marzban-exporter = {
+        autoStart = true;
+        image = "kutovoys/marzban-exporter:latest";
+        environmentFiles = [ cfg.metricsEnvironmentFile ];
+        ports = [ "127.0.0.1:9091:9090" ];
+        dependsOn = [ "marzban" ];
+      };
     };
 
     services.caddy.virtualHosts.${cfg.domain} = {
