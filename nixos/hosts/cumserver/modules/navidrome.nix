@@ -84,8 +84,8 @@ in
       }
     ] ++ lib.optionals cfg.feishin.enable [
       {
-        assertion = config.cumserver.podman.enable or config.virtualisation.podman.enable;
-        message = "Feishin requires Podman to be enabled. Set cumserver.podman.enable = true or virtualisation.podman.enable = true";
+        assertion = config.virtualisation.oci-containers.backend != null;
+        message = "OCI containers backend must be configured for Feishin to work";
       }
     ];
 

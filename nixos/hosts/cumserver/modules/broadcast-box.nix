@@ -50,8 +50,8 @@ in
   config = lib.mkIf cfg.enable {
     assertions = [
       {
-        assertion = config.cumserver.podman.enable or config.virtualisation.podman.enable;
-        message = "broadcast-box requires Podman to be enabled. Set cumserver.podman.enable = true or virtualisation.podman.enable = true";
+        assertion = config.virtualisation.oci-containers.backend != null;
+        message = "OCI containers backend must be configured for Marzban to work";
       }
       {
         assertion = config.services.caddy.enable;
