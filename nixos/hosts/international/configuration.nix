@@ -6,7 +6,7 @@
     ../../modules/battery-life.nix
   ];
 
-  sleroq.batteryLife.profile = "balanced";
+  sleroq.batteryLife.profile = "power-save";
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
