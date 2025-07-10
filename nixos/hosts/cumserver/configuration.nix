@@ -39,7 +39,7 @@ in
     ./modules/mailserver.nix
     ./modules/navidrome.nix
     ./modules/radicale.nix
-    ./modules/grafana.nix
+    ./modules/monitoring
     ./modules/bore.nix
     ./modules/podman.nix
     ./modules/broadcast-box.nix
@@ -68,6 +68,14 @@ in
   cumserver.grafana.enable = true;
   cumserver.bore.enable = false;
   cumserver.podman.enable = true;
+  age.secrets.grafanaPassword = { owner = "grafana";
+      group = "grafana";
+      file = ./secrets/grafanaPassword;
+  };
+  cumserver.monitoring = {
+    enable = true;
+    grafanaPasswordPath = config.age.secrets.grafanaPassword.path;
+  };
 
   cumserver.navidrome = {
     enable = true;

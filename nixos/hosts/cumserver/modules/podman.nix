@@ -24,7 +24,7 @@ in
     virtualisation.oci-containers.backend = "podman";
 
     virtualisation.oci-containers.containers = {
-      prometheus-podman-exporter = lib.mkIf config.cumserver.grafana.enable {
+      prometheus-podman-exporter = lib.mkIf config.cumserver.monitoring.enable {
         image = "quay.io/navidys/prometheus-podman-exporter:latest";
         autoStart = true;
         ports = [ "127.0.0.1:9882:9882" ];
@@ -44,7 +44,7 @@ in
       };
     };
 
-    services.prometheus.scrapeConfigs = lib.mkIf config.cumserver.grafana.enable [
+    services.prometheus.scrapeConfigs = lib.mkIf config.cumserver.monitoring.enable [
       {
         job_name = "podman";
         static_configs = [{ targets = [ "127.0.0.1:9882" ]; }];
