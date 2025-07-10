@@ -5,6 +5,10 @@
   inputs.nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
   inputs.agenix.url = "github:ryantm/agenix";
   inputs.mailserver.url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/";
+  inputs.tuwunel = {
+    url = "github:matrix-construct/tuwunel/v1.2.0";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
   inputs.secrets = {
     flake = false;
     url = "path:./secrets";

@@ -43,6 +43,7 @@ in
     ./modules/bore.nix
     ./modules/podman.nix
     ./modules/broadcast-box.nix
+    ./modules/tuwunel.nix
     bayan
     kopoka
     spoiler-images
@@ -68,6 +69,8 @@ in
   cumserver.grafana.enable = true;
   cumserver.bore.enable = false;
   cumserver.podman.enable = true;
+  cumserver.tuwunel.enable = true;
+
   age.secrets.grafanaPassword = { owner = "grafana";
       group = "grafana";
       file = ./secrets/grafanaPassword;
