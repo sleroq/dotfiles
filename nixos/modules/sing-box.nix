@@ -53,10 +53,6 @@ let
           protocol = "dns";
           action = "hijack-dns";
         }
-        {
-          domain = [ "ifconfig.io" ];
-          outbound = "direct";
-        }
       ];
       auto_detect_interface = true;
     };
