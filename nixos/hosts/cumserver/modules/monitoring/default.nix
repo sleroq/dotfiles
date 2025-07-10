@@ -1,0 +1,325 @@
+{ config, pkgs, lib, ... }:
+let
+  cfg = config.cumserver.monitoring;
+in
+{
+  options.cumserver.monitoring = {
+    enable = lib.mkEnableOption "Monitoring";
+    grafanaPasswordPath = lib.mkOption {
+      type = lib.types.path;
+      description = "Path to the Grafana password file";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = config.services.caddy.enable;
+        message = "Caddy has to be enabled for Grafana to work";
+      }
+    ];
+
+    services.alloy = {
+      enable = true;
+      extraFlags = [
+        "--server.http.listen-addr=127.0.0.1:12345"
+        "--disable-reporting"
+      ];
+    };
+
+    environment.etc."alloy/config.alloy".text = ''
+      logging {
+        level = "info"
+        format = "logfmt"
+      }
+
+      livedebugging {
+        enabled = true
+      }
+
+      // Get hostname for labeling
+      local.file "hostname" {
+        filename = "/proc/sys/kernel/hostname"
+      }
+
+      // Discover node_exporter target
+      discovery.relabel "integrations_node_exporter" {
+        targets = [{
+          __address__ = "localhost:9100",
+        }]
+
+        rule {
+          source_labels = ["__address__"]
+          target_label = "instance"
+          replacement = local.file.hostname.content
+        }
+
+        rule {
+          target_label = "job"
+          replacement = "integrations/node_exporter"
+        }
+      }
+
+      // Scrape node_exporter metrics
+      prometheus.scrape "integrations_node_exporter" {
+        targets = discovery.relabel.integrations_node_exporter.output
+        forward_to = [prometheus.remote_write.prometheus.receiver]
+        scrape_interval = "15s"
+      }
+
+      // Send metrics to Prometheus
+      prometheus.remote_write "prometheus" {
+        endpoint {
+          url = "http://localhost:${toString config.services.prometheus.port}/api/v1/write"
+        }
+      }
+
+      // Relabeling rules for systemd journal logs
+      discovery.relabel "logs_integrations_node_exporter_journal_scrape" {
+        targets = []
+
+        rule {
+          source_labels = ["__journal__systemd_unit"]
+          target_label  = "unit"
+        }
+
+        rule {
+          source_labels = ["__journal__boot_id"]
+          target_label  = "boot_id"
+        }
+
+        rule {
+          source_labels = ["__journal__transport"]
+          target_label  = "transport"
+        }
+
+        rule {
+          source_labels = ["__journal_priority_keyword"]
+          target_label  = "level"
+        }
+      }
+
+      // Collect systemd journal logs
+      loki.source.journal "logs_integrations_node_exporter_journal_scrape" {
+        max_age = "24h"
+        relabel_rules = discovery.relabel.logs_integrations_node_exporter_journal_scrape.rules
+        forward_to = [loki.write.loki.receiver]
+      }
+
+      // Discover log files
+      local.file_match "logs_integrations_node_exporter_direct_scrape" {
+        path_targets = [{
+          __address__ = "localhost",
+          __path__    = "/var/log/{syslog,messages,*.log}",
+          instance    = local.file.hostname.content,
+          job         = "integrations/node_exporter",
+        }]
+      }
+
+      // Collect log files
+      loki.source.file "logs_integrations_node_exporter_direct_scrape" {
+        targets = local.file_match.logs_integrations_node_exporter_direct_scrape.targets
+        forward_to = [loki.write.loki.receiver]
+      }
+
+      // Send logs to Loki
+      loki.write "loki" {
+        endpoint {
+          url = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}/loki/api/v1/push"
+        }
+      }
+    '';
+
+    services.grafana = {
+        enable = true;
+        settings = {
+            server = {
+                http_addr = "127.0.0.1";
+                http_port = 3200;
+                root_url = "https://cum.army/grafana/";
+            };
+            security = {
+                admin_user = "sleroq";
+                admin_password = "$__file{${cfg.grafanaPasswordPath}}";
+            };
+        };
+        provision = {
+            enable = true;
+            datasources.settings = {
+                apiVersion = 1;
+                datasources = [
+                    {
+                        name = "Loki";
+                        type = "loki";
+                        uid = "Loki1";
+                        url = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}";
+                    }
+                    {
+                        name = "Prometheus";
+                        type = "prometheus";
+                        uid = "Prometheus1";
+                        url = "http://localhost:${toString config.services.prometheus.port}";
+                    }
+                ];
+            };
+            dashboards.settings = {
+                apiVersion = 1;
+                providers = [
+                    {
+                        name = "dashboards";
+                        options.path = ./dashboards;
+                        options.foldersFromFilesStructure = true;
+                    }
+                ];
+            };
+        };
+    };
+
+    services.prometheus = {
+        enable = true;
+        # keep data for 90 days
+        extraFlags = [ 
+          "--storage.tsdb.retention.time=90d"
+          "--web.enable-remote-write-receiver"
+        ];
+        scrapeConfigs = [
+            {
+                job_name = "prometheus";
+                static_configs = [{ targets = [ "127.0.0.1:9090" ]; }];
+            }
+            {
+                job_name = "node";
+                static_configs = [{ targets = [ "127.0.0.1:9100" ]; }];
+            }
+        ];
+        exporters = {
+            node = {
+                enable = true;
+                enabledCollectors = [ "systemd" "processes" ];
+            };
+        };
+    };
+
+    # This is extracted from various sources, including:
+    # https://github.com/britter/nix-configuration/blob/680036688d23e6e1e520522847b1cd0f7e284192/modules/grafana/loki.nix
+    # https://github.com/mrVanDalo/nix-nomad-cluster/blob/6a605c89dc25cada4c59beea864e9bae150b8eea/nixos/roles/monitor/loki.nix
+    # https://grafana.com/blog/2019/08/22/homelab-security-with-ossec-loki-prometheus-and-grafana-on-a-raspberry-pi/
+    # https://xeiaso.net/blog/prometheus-grafana-loki-nixos-2020-11-20/
+    # https://grafana.com/docs/loki/latest/configure
+    services.loki = {
+      enable = true;
+      configuration = {
+        server = {
+          http_listen_port = 3100;
+        };
+        auth_enabled = false;
+
+        analytics = {
+          reporting_enabled = false;
+        };
+
+        ingester = {
+          lifecycler = {
+            address = "127.0.0.1";
+            ring = {
+              kvstore = {
+                store = "inmemory";
+              };
+              replication_factor = 1;
+            };
+          };
+        };
+
+        pattern_ingester = {
+          enabled = true;
+          lifecycler = {
+            ring = {
+              kvstore = {
+                store = "inmemory";
+              };
+              replication_factor = 1;
+            };
+            num_tokens = 128;
+            heartbeat_period = "5s";
+            heartbeat_timeout = "1m";
+            address = "127.0.0.1";
+            unregister_on_shutdown = true;
+          };
+          client_config = {
+            pool_config = {
+              client_cleanup_period = "15s";
+              health_check_ingesters = true;
+              remote_timeout = "1s";
+            };
+            remote_timeout = "5s";
+          };
+          concurrent_flushes = 32;
+          flush_check_period = "1m";
+          max_clusters = 300;
+          max_eviction_ratio = 0.25;
+          connection_timeout = "2s";
+          max_allowed_line_length = 3000;
+        };
+
+        schema_config = {
+          configs = [
+            {
+              from = "2024-01-01";
+              store = "boltdb";
+              object_store = "filesystem";
+              schema = "v13";
+              index = {
+                prefix = "index_";
+                period = "168h"; # seven days
+              };
+            }
+          ];
+        };
+
+        storage_config = {
+          boltdb = {
+            directory = "/var/lib/loki/index";
+          };
+          filesystem = {
+            directory = "/var/lib/loki/chunks";
+          };
+        };
+
+        limits_config = {
+          allow_structured_metadata = false;
+          reject_old_samples = true;
+          reject_old_samples_max_age = "168h";
+        };
+
+        table_manager = {
+          chunk_tables_provisioning = {
+            inactive_read_throughput = 0;
+            inactive_write_throughput = 0;
+            provisioned_read_throughput = 0;
+            provisioned_write_throughput = 0;
+          };
+          index_tables_provisioning = {
+            inactive_read_throughput = 0;
+            inactive_write_throughput = 0;
+            provisioned_read_throughput = 0;
+            provisioned_write_throughput = 0;
+          };
+          retention_deletes_enabled = true;
+          retention_period = "720h"; # 30 days
+        };
+      };
+    };
+
+    services.caddy = {
+      virtualHosts = {
+        "cum.army" = {
+          extraConfig = ''
+            handle_path /grafana/* {
+                reverse_proxy 127.0.0.1:3200
+            }
+          '';
+        };
+      };
+    };
+  };
+}
