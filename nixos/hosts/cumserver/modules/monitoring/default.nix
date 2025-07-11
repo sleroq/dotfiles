@@ -9,6 +9,46 @@ in
       type = lib.types.path;
       description = "Path to the Grafana password file";
     };
+    localNodeName = lib.mkOption {
+      type = lib.types.str;
+      default = config.networking.hostName;
+      description = "Display name for the local monitoring node";
+    };
+    remoteNodes = lib.mkOption {
+      type = lib.types.listOf (lib.types.submodule {
+        options = {
+          name = lib.mkOption {
+            type = lib.types.str;
+            description = "Name of the remote node";
+          };
+          address = lib.mkOption {
+            type = lib.types.str;
+            description = "Address of the remote node (IP:PORT)";
+          };
+          username = lib.mkOption {
+            type = lib.types.str;
+            default = "prometheus";
+            description = "Username for basic auth";
+          };
+          passwordPath = lib.mkOption {
+            type = lib.types.path;
+            description = "Path to the password file for basic auth";
+          };
+          enableTLS = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = "Enable TLS encryption";
+          };
+          tlsInsecure = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = "Skip TLS certificate verification";
+          };
+        };
+      });
+      default = [];
+      description = "List of remote nodes to monitor";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -42,7 +82,7 @@ in
         filename = "/proc/sys/kernel/hostname"
       }
 
-      // Discover node_exporter target
+      // Discover local node_exporter target
       discovery.relabel "integrations_node_exporter" {
         targets = [{
           __address__ = "localhost:9100",
@@ -51,21 +91,57 @@ in
         rule {
           source_labels = ["__address__"]
           target_label = "instance"
-          replacement = local.file.hostname.content
+          replacement = "${cfg.localNodeName}"
         }
 
         rule {
           target_label = "job"
-          replacement = "integrations/node_exporter"
+          replacement = "node"
         }
       }
 
-      // Scrape node_exporter metrics
+      // Scrape local node_exporter metrics
       prometheus.scrape "integrations_node_exporter" {
         targets = discovery.relabel.integrations_node_exporter.output
         forward_to = [prometheus.remote_write.prometheus.receiver]
         scrape_interval = "15s"
       }
+
+      ${lib.concatMapStringsSep "\n" (node: ''
+      // Discover remote node_exporter target: ${node.name}
+      discovery.relabel "integrations_node_exporter_${node.name}" {
+        targets = [{
+          __address__ = "${node.address}",
+        }]
+
+        rule {
+          source_labels = ["__address__"]
+          target_label = "instance"
+          replacement = "${node.name}"
+        }
+
+        rule {
+          target_label = "job"
+          replacement = "node"
+        }
+      }
+
+      // Scrape remote node_exporter metrics: ${node.name}
+      prometheus.scrape "integrations_node_exporter_${node.name}" {
+        targets = discovery.relabel.integrations_node_exporter_${node.name}.output
+        forward_to = [prometheus.remote_write.prometheus.receiver]
+        scrape_interval = "30s"
+        basic_auth {
+          username = "${node.username}"
+          password_file = "${node.passwordPath}"
+        }
+        ${lib.optionalString node.enableTLS ''
+        tls_config {
+          insecure_skip_verify = ${if node.tlsInsecure then "true" else "false"}
+        }
+        ''}
+      }
+      '') cfg.remoteNodes}
 
       // Send metrics to Prometheus
       prometheus.remote_write "prometheus" {
@@ -159,6 +235,9 @@ in
                         type = "prometheus";
                         uid = "Prometheus1";
                         url = "http://localhost:${toString config.services.prometheus.port}";
+                        jsonData = {
+                            timeInterval = "1m";
+                        };
                     }
                 ];
             };
@@ -188,8 +267,18 @@ in
                 static_configs = [{ targets = [ "127.0.0.1:9090" ]; }];
             }
             {
-                job_name = "node";
+                job_name = "node-local";
                 static_configs = [{ targets = [ "127.0.0.1:9100" ]; }];
+                relabel_configs = [
+                    {
+                        target_label = "job";
+                        replacement = "node";
+                    }
+                    {
+                        target_label = "instance";
+                        replacement = cfg.localNodeName;
+                    }
+                ];
             }
         ] ++ lib.optionals (config.cumserver.marzban.enable && config.cumserver.marzban.metricsEnvironmentFile != null) [
             {
@@ -197,7 +286,35 @@ in
                 static_configs = [{ targets = [ "127.0.0.1:9091" ]; }];
                 scrape_interval = "30s";
             }
-        ];
+        ] ++ (lib.imap0 (i: node: {
+            job_name = "node-remote-${node.name}";
+            static_configs = [{ 
+                targets = [ node.address ];
+                labels = {
+                    node_name = node.name;
+                    node_type = "remote";
+                };
+            }];
+            basic_auth = {
+                username = node.username;
+                password_file = toString node.passwordPath;
+            };
+            scheme = if node.enableTLS then "https" else "http";
+            tls_config = lib.mkIf node.enableTLS {
+                insecure_skip_verify = node.tlsInsecure;
+            };
+            relabel_configs = [
+                {
+                    target_label = "job";
+                    replacement = "node";
+                }
+                {
+                    source_labels = [ "node_name" ];
+                    target_label = "instance";
+                    replacement = "\${1}";
+                }
+            ];
+        }) cfg.remoteNodes);
         exporters = {
             node = {
                 enable = true;

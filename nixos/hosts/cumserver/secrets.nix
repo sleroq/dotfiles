@@ -39,6 +39,8 @@ let
     "secrets/spoilerImagesEnv" = { publicKeys = commonPublicKeys; };
     "secrets/zefxiEnv" = { publicKeys = commonPublicKeys; };
     "secrets/marzbanMetricsEnv" = { publicKeys = commonPublicKeys; };
+    "secrets/nodeExporter1Password" = { publicKeys = commonPublicKeys; };
+    "secrets/nodeExporter2Password" = { publicKeys = commonPublicKeys; };
   };
 
 in
