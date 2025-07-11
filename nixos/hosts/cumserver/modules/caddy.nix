@@ -13,7 +13,7 @@ in
         "cum.army" = {
           serverAliases = [ "www.cum.army" ];
           extraConfig = ''
-            root * ${inputs.cum-army.packages."${pkgs.system}".default}/public
+            root * ${inputs.cum-army.packages."${pkgs.system}".default}
             file_server
             encode zstd gzip
           '';
