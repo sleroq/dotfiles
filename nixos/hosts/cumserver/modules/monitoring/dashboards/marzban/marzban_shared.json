@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 18,
+  "id": 24,
   "links": [],
   "panels": [
     {
@@ -74,10 +74,10 @@
           "expr": "bottomk(1, avg by(instance) (rate(node_network_receive_bytes_total{instance!~\"Moscow|127.0.0.1:9100|mskp|cumserver\\n|swarsaw\"}[1h]))) * 8",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
-          "instant": false,
+          "instant": true,
           "interval": "",
           "legendFormat": "Best server by load - {{instance}}",
-          "range": true,
+          "range": false,
           "refId": "A",
           "useBackend": false
         }
@@ -1555,5 +1555,5 @@
   "timezone": "browser",
   "title": "Marzban Shared",
   "uid": "4417d4a1-5fe3-4809-9833-4fea4053704b",
-  "version": 15
+  "version": 1
 }
