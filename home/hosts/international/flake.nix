@@ -61,6 +61,7 @@
           ../../modules/editors
           ../../modules/gaming.nix
           ../../shared
+          self.inputs.agenix.homeManagerModules.default
         ];
 
         extraSpecialArgs = {
