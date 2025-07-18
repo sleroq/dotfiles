@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-pactl list sources | grep -c 'State: RUNNING'
-exit 0

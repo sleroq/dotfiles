@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-pamixer --default-source --get-mute
-exit 0

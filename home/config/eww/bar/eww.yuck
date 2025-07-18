@@ -46,7 +46,7 @@
              :pack-direction "rtl")))
 
 (defpoll volume_percent :initial 0.0 :interval "1s"
-  "scripts/get-volume")
+  "eww-get-volume")
 
 (defwidget volume []
   (eventbox :onhover "${EWW_CMD} update volume_open=true"
@@ -65,20 +65,20 @@
                :onchange "pactl set-sink-volume @DEFAULT_SINK@ {}%")))))
 
 (defpoll mic_volume_percent :initial 0.0 :interval "1s"
-  "scripts/get-mic-volume")
+  "eww-get-mic-volume")
 
 (defpoll mic_in_use :initial 0 :interval "1s"
-  "scripts/mic-use-status")
+  "eww-mic-use-status")
 
 (defpoll mic_muted :initial false :interval "1s"
-  "scripts/mic-mute-status")
+  "eww-mic-mute-status")
 
 (defwidget mic []
   (eventbox :visible {mic_in_use > 0}
             :onhover "${EWW_CMD} update mic_volume_open=true"
             :onhoverlost "${EWW_CMD} update mic_volume_open=false"
     (box :class "volume" :space-evenly false
-      (button :onclick "pactl set-source-mute @DEFAULT_SOURCE@ toggle && ${EWW_CMD} update mic_muted=${!mic_muted}"
+      (button :onclick "mic-mute-toggle"
               {mic_muted ? "" : ""})
       (revealer :transition "slideleft"
                 :reveal mic_volume_open
@@ -92,7 +92,7 @@
                :onchange "pactl set-source-volume @DEFAULT_SOURCE@ {}%")))))
 
 (defpoll memory :interval "15s"
-  "scripts/memory")
+  "eww-memory")
 
 (defwidget mem []
   (box :class "icon-module mem-module"
@@ -109,7 +109,7 @@
           ""))))
 
 (defpoll battery :interval "15s"
-  "./scripts/battery --bat")
+  "eww-battery --bat")
 
 (defwidget bat []
   (box :class "icon-module bat-module"
