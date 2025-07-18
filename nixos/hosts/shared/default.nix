@@ -112,6 +112,11 @@
   #   MODE="0666", GROUP="plugdev"
   # '';
 
+  networking.networkmanager = {
+    enable = true;
+    plugins = [ pkgs.networkmanager-openvpn ];
+  };
+
   nix.settings = {
     substituters = [
       "https://nix-gaming.cachix.org"
