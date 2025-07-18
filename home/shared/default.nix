@@ -34,8 +34,8 @@
     programs = {
       anytype = {
         enable = true;
-        version = "0.47.5";
-        hash = "sha256-2NIBt1UCuhydnI4+oikS5fTbz6O2UauZ0Ce5R6D61I0=";
+        version = "0.47.6-hotfix1";
+        hash = "sha256-voMz1W7m/Q3L2yfhqwm0+rtefSGCxvAp6H4IQBnqeuE=";
       };
       mpv.enable = true;
       foot = {
