@@ -22,10 +22,10 @@
     zed.url = "github:zed-industries/zed?submodules=1&ref=refs/tags/v0.193.1-pre";
     agenix.url = "github:ryantm/agenix";
 
-    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/tags/v0.49.0";
+    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/tags/v0.50.0";
 
     hy3 = {
-      url = "github:outfoxxed/hy3?ref=hl0.49.0";
+      url = "github:outfoxxed/hy3?ref=hl0.50.0";
       inputs.hyprland.follows = "hyprland";
     };
 
