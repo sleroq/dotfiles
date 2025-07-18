@@ -38,6 +38,7 @@ in
     ./modules/matterbridge.nix
     ./modules/mailserver.nix
     ./modules/navidrome.nix
+    ./modules/zipline.nix
     ./modules/radicale.nix
     ./modules/monitoring
     ./modules/bore.nix
@@ -124,6 +125,17 @@ in
     enable = true;
     filebrowser.enable = true;
     feishin.enable = true;
+  };
+
+  age.secrets.ziplineEnv = {
+    owner = "zipline";
+    group = "zipline";
+    file = ./secrets/ziplineEnv;
+  };
+
+  cumserver.zipline = {
+    enable = true;
+    environmentFile = config.age.secrets.ziplineEnv.path;
   };
   
   cumserver.broadcast-box = {
