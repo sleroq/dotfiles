@@ -45,7 +45,6 @@ in
       # Packages universal for all window managers
       home.packages = with pkgs; [
         wl-clipboard
-        cliphist
         # cava
         grim
         slurp
@@ -53,8 +52,11 @@ in
         waypaper
         swww
       ];
+
+      services.cliphist.enable = true;
     })
 
+    (import ../../programs/swaync.nix { })
     (lib.mkIf (cfg.hyprland.enable) (import ./hyprland.nix { inherit pkgs opts lib inputs config; }))
     (lib.mkIf (cfg.sway.enable) (import ./sway.nix { inherit pkgs opts lib; }))
   ];

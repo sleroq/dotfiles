@@ -21,8 +21,8 @@ let
 in
 lib.mkMerge [
   (import ../../programs/eww.nix { inherit pkgs lib opts; })
-  (import ../../programs/swaync.nix { })
   (import ../../programs/swaycons.nix { inherit pkgs opts lib; })
+  (import ../../programs/mic-mute.nix { inherit pkgs; })
   (with lib; {
     home.activation.sway = hm.dag.entryAfter [ "writeBoundary" ] ''
       mkdir -p $HOME/.config/sway
@@ -36,7 +36,6 @@ lib.mkMerge [
     services = {
       swayidle.enable = true;
       swayosd.enable = true;
-      cliphist.enable = true;
     };
 
     home.packages = with pkgs; [
