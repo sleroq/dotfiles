@@ -32,6 +32,7 @@
     };
 
     programs = {
+      ghostty.enable = true;
       anytype = {
         enable = true;
         version = "0.47.6-hotfix1";

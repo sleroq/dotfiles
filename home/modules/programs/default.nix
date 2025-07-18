@@ -25,10 +25,22 @@ in
       default = lib.mkEnableOption "default env";
     };
     mpv.enable = lib.mkEnableOption "MPV";
-    ghostty.enable = lib.mkEnableOption "Ghostty";
+    ghostty = {
+      enable = lib.mkEnableOption "Ghostty";
+      package = lib.mkOption {
+        type = lib.types.package;
+        default = pkgs.ghostty;
+      };
+    };
     wezterm.enable = lib.mkEnableOption "Wezterm"; 
     teams.enable = lib.mkEnableOption "Teams"; 
-    obs.enable = lib.mkEnableOption "obs-studio"; 
+    obs = {
+      enable = lib.mkEnableOption "Ghostty";
+      package = lib.mkOption {
+        type = lib.types.package;
+        default = pkgs.obs-studio;
+      };
+    };
     chromium = {
       enable = lib.mkEnableOption "chromium";
       unsafeWebGPU = lib.mkEnableOption "unsafe webgpu"; 
@@ -58,24 +70,26 @@ in
     (lib.mkIf (cfg.foot.enable && cfg.foot.default) {
       home.sessionVariables.TERMINAL = "foot";
     })
-    (lib.mkIf cfg.ghostty.enable (import ./ghostty.nix { }))
+    (lib.mkIf cfg.ghostty.enable (import ./ghostty.nix { package = cfg.ghostty.package; }))
     (lib.mkIf cfg.mpv.enable (import ./mpv.nix { inherit pkgs; }))
     (lib.mkIf cfg.wezterm.enable (
         import ./wezterm.nix { extraConfig = secrets.wezterm-ssh-domains; }
     ))
     (lib.mkIf cfg.teams.enable (import ./teams.nix { inherit pkgs; }))
     (lib.mkIf cfg.obs.enable {
-      home.packages = [
-        (pkgs.wrapOBS {
-          plugins = with pkgs.obs-studio-plugins; [
-            wlrobs
-            obs-backgroundremoval
-            obs-pipewire-audio-capture
-            input-overlay
-            obs-multi-rtmp
-          ];
-        })
-      ];
+      programs.obs-studio = {
+        enable = true;
+        package = cfg.obs.package;
+        plugins = with pkgs.obs-studio-plugins; [
+          wlrobs
+          obs-gstreamer
+          obs-backgroundremoval
+          obs-pipewire-audio-capture
+          input-overlay
+          obs-vaapi
+          # obs-multi-rtmp
+        ];
+      };
     })
     (lib.mkIf cfg.chromium.enable {
       programs.chromium = {

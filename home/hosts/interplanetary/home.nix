@@ -28,6 +28,10 @@
     };
 
     programs = {
+      ghostty = {
+        enable = true;
+        package = inputs.ghostty.packages.${pkgs.system}.default;
+      };
       wireplumberHacks.enable = true;
       obs.enable = true;
       chromium = {
@@ -39,10 +43,8 @@
         pkgs.ollama-rocm
         pkgs.chatbox
         scrcpyPkgs.scrcpy
-        pkgs-master.broadcast-box
         inputs.zig.packages.${pkgs.system}.master
         inputs.zls.packages.${pkgs.system}.default
-        pkgs.brave
         pkgs.bottles
       ];
     };

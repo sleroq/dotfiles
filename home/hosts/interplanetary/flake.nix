@@ -28,6 +28,8 @@
       url = "github:outfoxxed/hy3?ref=hl0.49.0";
       inputs.hyprland.follows = "hyprland";
     };
+
+    ghostty.url = "github:ghostty-org/ghostty";
   };
 
   outputs =

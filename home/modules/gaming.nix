@@ -14,18 +14,9 @@ in
       };
     };
 
-    etterna = {
-      enable = lib.mkEnableOption "etterna";
-    };
+    etterna.enable = lib.mkEnableOption "etterna";
 
-    osu-stable = {
-      enable = lib.mkEnableOption "osu! lazer";
-    };
-
-    minecraft = {
-      enable = lib.mkEnableOption "osu! lazer";
-      osuStable = lib.mkEnableOption "osu! stable";
-    };
+    minecraft.enable = lib.mkEnableOption "osu! lazer";
   };
 
   config = lib.mkMerge [
@@ -41,13 +32,6 @@ in
     })
     
     (lib.mkIf cfg.etterna.enable { home.packages = [ pkgs.etterna ]; })
-
-    (lib.mkIf cfg.osu-stable.enable {
-      home.packages = with inputs.nix-gaming.package.${pkgs.system}; [
-        osu-stable
-        pkgs.opentabletdriver
-      ];
-    })
 
     (lib.mkIf cfg.minecraft.enable {
       home.packages = [

@@ -1,7 +1,8 @@
 { pkgs, opts, lib, inputs, config, ... }:
 lib.mkMerge [
   (import ../../programs/eww.nix { inherit pkgs lib opts; })
-  (import ../../programs/flameshot.nix { inherit pkgs lib opts; })
+  (import ../../programs/flameshot.nix { inherit pkgs config; })
+  (import ../../programs/mic-mute.nix { inherit pkgs; })
   {
     home.activation.hyprland = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       mkdir -p $HOME/.config/hypr
@@ -52,8 +53,6 @@ lib.mkMerge [
     };
 
     services = {
-      cliphist.enable = true;
-
       hypridle = {
         enable = true;
 

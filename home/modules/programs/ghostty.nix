@@ -1,14 +1,16 @@
-{ ... }:
+{ package, ... }:
 
 {
   programs.ghostty = {
     enable = true;
+    package = package;
     settings = {
       theme = "catppuccin-mocha";
-      background = "#282c34";
+      confirm-close-surface = false;
+      background = "#000000";
       font-size = 14;
       cursor-style = "block";
-      # window-decoration = false;
+      window-decoration = false;
       background-opacity = 0.5;
       background-blur = true;
       gtk-tabs-location = "hidden";
