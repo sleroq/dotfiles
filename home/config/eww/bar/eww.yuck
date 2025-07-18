@@ -1,6 +1,10 @@
 (defvar volume_open false)
 (defvar mic_volume_open false)
 
+; Check if system has a battery (for laptops vs desktops)
+(defpoll has_battery :interval "10m" :initial false
+  "bash -c '[ -n \"$(ls /sys/class/power_supply/BAT* 2>/dev/null)\" ] && echo true || echo false'")
+
 (defwindow bar
   :monitor 0
   :exclusive true
@@ -32,6 +36,22 @@
 (defpoll time :interval "10s"
   "date '+%H:%M %b %d, %Y'")
 
+(defwidget bat []
+  (box :class "icon-module bat-module"
+       :vexpand "false"
+       :hexpand "false"
+    (circular-progress :value {EWW_BATTERY["BAT0"]?.capacity ?: 0}
+       :class "batbar"
+       :thickness 3
+      (button :class "iconbat"
+              :limit-width 2
+              :tooltip "battery on ${EWW_BATTERY["BAT0"]?.capacity ?: 0}%"
+              :show_truncated false
+              :wrap false
+              ; Only show battery widget if system has a battery
+              {has_battery ? "" : ""}
+          ))))
+
 (defwidget sidestuff []
   (box :class "container"
        :orientation "h"
@@ -45,7 +65,7 @@
              :icon-size 16
              :pack-direction "rtl")))
 
-(defpoll volume_percent :initial 0.0 :interval "1s"
+(defpoll volume_percent :initial 0.0 :interval "500ms"
   "eww-get-volume")
 
 (defwidget volume []
@@ -64,13 +84,13 @@
                :max 101
                :onchange "pactl set-sink-volume @DEFAULT_SINK@ {}%")))))
 
-(defpoll mic_volume_percent :initial 0.0 :interval "1s"
+(defpoll mic_volume_percent :initial 0.0 :interval "500ms"
   "eww-get-mic-volume")
 
-(defpoll mic_in_use :initial 0 :interval "1s"
+(defpoll mic_in_use :initial 0 :interval "500ms"
   "eww-mic-use-status")
 
-(defpoll mic_muted :initial false :interval "1s"
+(defpoll mic_muted :initial false :interval "500ms"
   "eww-mic-mute-status")
 
 (defwidget mic []
@@ -91,41 +111,21 @@
                :max 151
                :onchange "pactl set-source-volume @DEFAULT_SOURCE@ {}%")))))
 
-(defpoll memory :interval "15s"
-  "eww-memory")
-
 (defwidget mem []
   (box :class "icon-module mem-module"
        :vexpand "false"
        :hexpand "false"
-    (circular-progress :value memory
+    (circular-progress :value {round((EWW_RAM.used_mem / EWW_RAM.total_mem) * 100, 0)}
        :class "membar"
        :thickness 3
       (button :class "iconmem"
               :limit-width 2
-              :tooltip "using ${memory}% ram"
+              :tooltip "using ${round((EWW_RAM.used_mem / EWW_RAM.total_mem) * 100, 0)}% ram"
               :show_truncated false
               :wrap false
           ""))))
 
-(defpoll battery :interval "15s"
-  "eww-battery --bat")
-
-(defwidget bat []
-  (box :class "icon-module bat-module"
-       :vexpand "false"
-       :hexpand "false"
-    (circular-progress :value battery
-       :class "batbar"
-       :thickness 3
-      (button :class "iconbat"
-              :limit-width 2
-              :tooltip "battery on ${battery}%"
-              :show_truncated false
-              :wrap false
-          ""))))
-
-(defpoll calendar_day :interval "20h"
+(defpoll calendar_day :interval "1h"
   "date '+%d'")
 (defpoll calendar_year :interval "20h"
   "date '+%Y'")

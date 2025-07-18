@@ -2,7 +2,6 @@
 
 with lib;
 let
-  # eww scripts extracted from config directories
   ewwScripts = {
     getMicVolume = pkgs.writeShellScriptBin "eww-get-mic-volume" ''
       #!/usr/bin/env bash
@@ -24,11 +23,6 @@ let
       fi
     '';
 
-    memory = pkgs.writeShellScriptBin "eww-memory" ''
-      #!/usr/bin/env sh
-      printf "%.0f\n" $(free -m | grep Mem | awk '{print ($3/$2)*100}')
-    '';
-
     micMuteStatus = pkgs.writeShellScriptBin "eww-mic-mute-status" ''
       #!/usr/bin/env bash
       pamixer --default-source --get-mute
@@ -40,51 +34,26 @@ let
       pactl list sources | grep -c 'State: RUNNING'
       exit 0
     '';
-
-    battery = pkgs.writeShellScriptBin "eww-battery" ''
-      #!/usr/bin/env bash
-      battery() {
-      	BAT=$(ls /sys/class/power_supply | grep BAT | head -n 1)
-      	cat /sys/class/power_supply/''${BAT}/capacity
-      }
-      battery_stat() {
-      	BAT=$(ls /sys/class/power_supply | grep BAT | head -n 1)
-      	cat /sys/class/power_supply/''${BAT}/status
-      }
-
-      if [[ "$1" == "--bat" ]]; then
-      	battery
-      elif [[ "$1" == "--bat-st" ]]; then
-      	battery_stat
-      fi
-    '';
   };
 in
 {
-  home.activation.eww = hm.dag.entryAfter [ "writeBoundary" ] ''
-    $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
-        ${opts.realConfigs}/eww $HOME/.config
-    
-    # Create scripts directory with just eww-ws binary (other scripts are in PATH)
-    mkdir -p $HOME/.config/eww/bar/scripts
-    $DRY_RUN_CMD cp $VERBOSE_ARG \
-        ${opts.realConfigs}/eww/bar/scripts/eww-ws $HOME/.config/eww/bar/scripts/ || true
-  '';
+  # Use programs.eww.configDir instead of manual activation
+  programs.eww = {
+    enable = true;
+    configDir = opts.configs + /eww/bar;
+  };
 
   fonts.fontconfig.enable = true;
   home.packages = with pkgs; [
-    eww
     gawk
     pamixer
     killall
 
-    # eww scripts
+    # eww scripts (removed battery and memory since using built-in variables)
     ewwScripts.getMicVolume
     ewwScripts.getVolume
-    ewwScripts.memory
     ewwScripts.micMuteStatus
     ewwScripts.micUseStatus
-    ewwScripts.battery
 
     pkgs.nerd-fonts.noto
     pkgs.nerd-fonts.daddy-time-mono
