@@ -9,7 +9,7 @@
 
   # Bootloader.
   boot = {
-    kernelPackages = pkgs.linuxKernel.packages.linux_zen;
+    kernelPackages = pkgs.linuxKernel.packages.linux_lqx;
     tmp.cleanOnBoot = true;
 
     plymouth = {
@@ -55,6 +55,8 @@
     loader.efi.canTouchEfiVariables = true;
   };
 
+  powerManagement.cpuFreqGovernor = "performance";
+
   services.logind.extraConfig = ''
     # don’t shutdown when power button is short-pressed
     HandlePowerKey=ignore
@@ -66,8 +68,6 @@
   };
 
   networking.hostName = "sleroq-interplanetary";
-
-  networking.networkmanager.enable = true;
 
   hardware.opentabletdriver.enable = true;
   hardware.opentabletdriver.daemon.enable = true;
