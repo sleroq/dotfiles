@@ -8,7 +8,6 @@
     curl
     foot
     librewolf
-    networkmanager-openvpn
     nvtopPackages.full
     powertop
   ];
@@ -26,8 +25,6 @@
       viAlias = true;
       vimAlias = true;
     };
-
-    java.enable = true;
 
     steam = {
       enable = true;

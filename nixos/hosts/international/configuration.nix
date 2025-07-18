@@ -40,8 +40,8 @@
   };
 
   networking.hostName = "sleroq-international";
-
   networking.wireless.iwd.enable = true;
+
   # Enable networking
   networking.networkmanager = {
     enable = true;

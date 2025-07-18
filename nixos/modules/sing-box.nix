@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  utils,
   ...
 }:
 let
@@ -80,10 +79,6 @@ let
 
 in
 {
-  meta = {
-    maintainers = with lib.maintainers; [ ];
-  };
-
   options.sleroq.sing-box = {
     enable = lib.mkEnableOption "sing-box universal proxy platform";
 
@@ -160,6 +155,10 @@ in
         })
       ];
     };
+
+    environment.systemPackages = [
+      cfg.package
+    ];
 
     systemd.services.sing-box.serviceConfig = lib.mkMerge [
       (lib.mkIf (!cfg.useTunMode) {
