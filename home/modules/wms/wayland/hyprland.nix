@@ -1,23 +1,71 @@
 { pkgs, opts, lib, inputs, config, ... }:
-lib.mkMerge [
+
+with lib;
+let
+  hyprlandScripts = {
+    followMouseToggle = pkgs.writeShellScriptBin "hypr-follow-mouse-toggle" ''
+      #!/usr/bin/env sh
+      
+      FOLLOWMOUSE=$(hyprctl getoption input:follow_mouse | awk 'NR==1{print $2}')
+      
+      if [ "$FOLLOWMOUSE" = 1 ] ; then
+          hyprctl --batch "\
+              keyword input:follow_mouse 0;\
+              keyword input:float_switch_override_focus 0"
+          exit
+      fi
+      
+      hyprctl reload
+    '';
+
+    gamemode = pkgs.writeShellScriptBin "hypr-gamemode" ''
+      #!/usr/bin/env sh
+      
+      HYPRGAMEMODE=$(hyprctl getoption animations:enabled | awk 'NR==1{print $2}')
+      
+      if [ "$HYPRGAMEMODE" = 1 ] ; then
+          hyprctl --batch "\
+              keyword animations:enabled 0;\
+              keyword decoration:shadow:enabled 0;\
+              keyword decoration:blur:enabled 0;\
+              keyword misc:vfr 0;\
+              keyword general:border_size 1;\
+              keyword decoration:rounding 0"
+          exit
+      else
+          hyprctl --batch "\
+              keyword animations:enabled 1;\
+              keyword decoration:shadow:enabled 1;\
+              keyword decoration:blur:enabled 1;\
+              keyword misc:vfr 1;\
+              keyword general:border_size 2;\
+              keyword decoration:rounding 1"
+          exit
+      fi
+    '';
+  };
+in
+mkMerge [
   (import ../../programs/eww.nix { inherit pkgs lib opts; })
   (import ../../programs/flameshot.nix { inherit pkgs config; })
   (import ../../programs/mic-mute.nix { inherit pkgs; })
   {
-    home.activation.hyprland = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    home.activation.hyprland = hm.dag.entryAfter [ "writeBoundary" ] ''
       mkdir -p $HOME/.config/hypr
 
       $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
           ${opts.realConfigs}/hypr/* $HOME/.config/hypr/
     '';
 
+
+
     home.file."${config.xdg.configHome}/hypr/extra-config.conf" = {
-      text = lib.mkMerge [
+      text = mkMerge [
         "plugin = ${inputs.hy3.packages.x86_64-linux.hy3}/lib/libhy3.so"
-        (lib.mkIf config.myHome.wms.wayland.hyprland.gamemode ''
-          exec = ~/.config/hypr/scripts/gamemode.sh
+        (mkIf config.myHome.wms.wayland.hyprland.gamemode ''
+          exec = hypr-gamemode
         '')
-        (lib.mkIf (config.myHome.gaming.osu.enable && config.myHome.gaming.osu.enableTearing) ''
+        (mkIf (config.myHome.gaming.osu.enable && config.myHome.gaming.osu.enableTearing) ''
           windowrulev2 = immediate, class:^(osu!)$
         '')
         config.myHome.wms.wayland.hyprland.extraConfig
@@ -86,6 +134,10 @@ lib.mkMerge [
 
       jq
       socat
+
+      # hyprland scripts
+      hyprlandScripts.followMouseToggle
+      hyprlandScripts.gamemode
     ];
   }
 ]

@@ -9,6 +9,7 @@
     ./wms.nix
     ./shell.nix
     ./development.nix
+    ./scripts.nix
   ];
 
   home.username = "sleroq";
