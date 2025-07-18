@@ -99,6 +99,14 @@
   services.udev.extraRules = ''
     # Universal Vial udev rule
     KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{serial}=="*vial:f64c2b3c*", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+    
+    # SayoDevice O3C v1 keyboard (specific device by serial number)
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="8089", ATTRS{idProduct}=="0009", ATTRS{serial}=="03CDAB10239BBC788B39E339E300", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+    KERNEL=="hidraw*", ATTRS{idVendor}=="8089", ATTRS{idProduct}=="0009", ATTRS{serial}=="03CDAB10239BBC788B39E339E300", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+    
+    # SayoDevice O3C v1 keyboard bootloader mode (for firmware updates)
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="8089", ATTRS{idProduct}=="0005", ATTRS{serial}=="00CDAB10239BBC788B39E339E300", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+    KERNEL=="hidraw*", ATTRS{idVendor}=="8089", ATTRS{idProduct}=="0005", ATTRS{serial}=="00CDAB10239BBC788B39E339E300", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
   '';
 
   # Allow plugdev access to ANNE PRO 2
