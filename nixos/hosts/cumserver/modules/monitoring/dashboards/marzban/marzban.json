@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 17,
+  "id": 33,
   "links": [],
   "panels": [
     {
@@ -1526,7 +1526,28 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsZero",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 12,
@@ -1535,7 +1556,8 @@
         "y": 19
       },
       "id": 3,
-      "interval": "10m",
+      "interval": "1m",
+      "maxDataPoints": 100,
       "options": {
         "colWidth": 1,
         "legend": {
@@ -1543,7 +1565,7 @@
           "placement": "bottom",
           "showLegend": false
         },
-        "rowHeight": 0.71,
+        "rowHeight": 0.7,
         "showValue": "never",
         "tooltip": {
           "hideZeros": false,
@@ -1555,7 +1577,7 @@
       "targets": [
         {
           "disableTextWrap": false,
-          "editorMode": "builder",
+          "editorMode": "code",
           "expr": "marzban_user_online",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -1846,5 +1868,5 @@
   "timezone": "browser",
   "title": "Marzban",
   "uid": "d608b4b0-19d3-4d32-9cd8-2b871042f201",
-  "version": 57
+  "version": 1
 }

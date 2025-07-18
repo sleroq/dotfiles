@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 16,
+  "id": 39,
   "links": [],
   "panels": [
     {
@@ -70,10 +70,6 @@
             "steps": [
               {
                 "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           }
@@ -88,7 +84,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "green",
+                  "fixedColor": "semi-dark-blue",
                   "mode": "fixed"
                 }
               }
@@ -103,8 +99,24 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "#9f9d86",
+                  "fixedColor": "semi-dark-yellow",
                   "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Errors"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed",
+                  "seriesBy": "last"
                 }
               }
             ]
@@ -159,6 +171,20 @@
           "legendFormat": "Warnings",
           "queryType": "range",
           "refId": "B",
+          "step": "30m"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "Loki1"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({unit=\"navidrome.service\"} |= `error` [$__auto]))",
+          "hide": false,
+          "legendFormat": "Errors",
+          "queryType": "range",
+          "refId": "C",
           "step": "30m"
         }
       ],
@@ -381,5 +407,5 @@
   "timezone": "browser",
   "title": "Random stuff",
   "uid": "2de70f2f-0b39-4d9f-9f2d-7fff97342a2e",
-  "version": 9
+  "version": 1
 }
