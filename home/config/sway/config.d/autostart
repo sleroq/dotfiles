@@ -4,7 +4,6 @@ exec dbus-sway-environment
 exec systemctl --user start nixos-fake-graphical-session.target
 exec systemctl --user import-environment
 exec swaycons
-exec kwalletd6
 
 exec exec swaykbdd # Per-window keyboard layout
 # exec aw-server # Activity watch server
