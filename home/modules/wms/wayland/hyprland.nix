@@ -72,6 +72,14 @@ mkMerge [
       ];
     };
 
+    home.file."${config.xdg.configHome}/hypr/xdph.conf" = {
+      text = ''
+        screencopy {
+          max_fps = 60
+        }
+      '';
+    };
+
     programs.swaylock = {
       enable = true;
       settings = {
@@ -125,6 +133,13 @@ mkMerge [
         };
       };
     };
+
+    # TODO: move to quickshell when hyprperks config drops if it's any good
+    # otherwise try to simplify https://github.com/Rexcrazy804/Zaphkiel
+    # programs.quickshell = {
+    #   enable = true;
+    #   package = inputs.quickshell.packages.${pkgs.system}.default;
+    # };
 
     home.packages = with pkgs; [
       hyprland-per-window-layout

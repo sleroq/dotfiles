@@ -1,4 +1,4 @@
-{ ... }:
+_:
 
 {
   age.secrets.flameshot-auth-token = {

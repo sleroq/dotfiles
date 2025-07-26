@@ -19,15 +19,21 @@
     # paisa.url = "github:ananthakumaran/paisa";
     zig.url = "github:mitchellh/zig-overlay";
     zls.url = "github:zigtools/zls";
-    zed.url = "github:zed-industries/zed?submodules=1&ref=refs/tags/v0.193.1-pre";
+    zed.url = "github:zed-industries/zed?submodules=1&ref=refs/tags/v0.196.4-pre";
     agenix.url = "github:ryantm/agenix";
 
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/tags/v0.50.1";
 
     hy3 = {
-      url = "github:outfoxxed/hy3?ref=hl0.50.0";
+      # url = "github:outfoxxed/hy3?ref=hl0.50.0";
+      url = "github:outfoxxed/hy3";
       inputs.hyprland.follows = "hyprland";
     };
+
+    # quickshell = {
+    #   url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     ghostty.url = "github:ghostty-org/ghostty";
   };
@@ -68,7 +74,7 @@
         ];
 
         extraSpecialArgs = {
-          inputs = self.inputs;
+          inherit (self) inputs;
           secrets = import "${secrets}/default.nix";
           opts = {
             inherit host repoPath repoPathString;

@@ -65,7 +65,7 @@
         ];
 
         extraSpecialArgs = {
-          inputs = self.inputs;
+          inherit (self) inputs;
           secrets = import "${secrets}/default.nix";
           opts = {
             inherit host repoPath repoPathString;
