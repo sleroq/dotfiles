@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 with lib;
 
@@ -31,13 +31,13 @@ with lib;
     in mkIf cfg.enable {
       age.secrets."${name}Env" = {
         owner = cfg.user;
-        group = cfg.group;
+        inherit (cfg) group;
         file = secretFile;
       };
 
       users.users.${cfg.user} = {
         isSystemUser = true;
-        group = cfg.group;
+        inherit (cfg) group;
       } // (optionalAttrs (dataDir != null) {
         home = cfg.dataDir;
         createHome = true;

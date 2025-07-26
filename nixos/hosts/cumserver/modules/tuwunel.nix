@@ -26,7 +26,7 @@ in
     
     package = lib.mkOption {
       type = lib.types.package;
-      default = inputs.tuwunel.packages."${config.nixpkgs.system}".default;
+      inherit (inputs.tuwunel.packages."${config.nixpkgs.system}") default;
       description = "The tuwunel package to use";
     };
     
@@ -47,7 +47,7 @@ in
 
     services.matrix-conduit = {
       enable = true;
-      package = cfg.package;
+      inherit (cfg) package;
       
       settings = {
         global = lib.mkMerge [

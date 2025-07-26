@@ -22,7 +22,7 @@
       inherit system;
       specialArgs = { inherit inputs; inherit (self) outputs; };
       modules = [
-        ({ ... }: { nixpkgs.overlays = [ overlay-unstable ]; })
+        (_: { nixpkgs.overlays = [ overlay-unstable ]; })
         ./configuration.nix
         ../shared
         agenix.nixosModules.default

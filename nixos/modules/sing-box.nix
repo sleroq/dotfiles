@@ -127,7 +127,7 @@ in
   config = lib.mkIf cfg.enable {
     services.sing-box = {
       enable = true;
-      package = cfg.package;
+      inherit (cfg) package;
       settings = lib.mkMerge [
         defaultSettings
         

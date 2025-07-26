@@ -9,7 +9,7 @@
 
   # Bootloader.
   boot = {
-    kernelPackages = pkgs.linuxKernel.packages.linux_lqx;
+    kernelPackages = pkgs.linuxKernel.packages.linux_xanmod;
     tmp.cleanOnBoot = true;
 
     plymouth = {
@@ -43,7 +43,7 @@
       "udev.log_priority=3"
     ];
 
-    kernel.sysctl = { "vm.swappiness" = 10; };
+    # kernel.sysctl = { "vm.swappiness" = 10; };
     extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
     kernelModules = [ "v4l2loopback" ]; # obs virtual camera
 

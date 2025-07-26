@@ -4,7 +4,6 @@
 {
   imports = [
     ../../modules/flatpak.nix
-    ../../modules/kwallet.nix
     ../../modules/virtualisation.nix
     ../../modules/wms/default.nix
     ../../modules/apps.nix
@@ -15,15 +14,44 @@
   nixpkgs.config.allowUnfree = true;
 
   networking.nameservers = [ "1.1.1.1" "1.1.0.1" "8.8.8.8" ];
-  services.nixops-dns.domain = "1.1.1.1";
+  
+  services = {
+    nixops-dns.domain = "1.1.1.1";
+    fstrim.enable = true;
+    journald.extraConfig = ''
+        SystemMaxUse=2G
+    '';
+  };
 
-  services.fstrim.enable = true;
+  nix = {
+    settings = {
+      auto-optimise-store = true;
+      substituters = [
+        "https://nix-gaming.cachix.org"
+        "https://nix-community.cachix.org"
+        "https://cache.nixos.org/"
+        "https://hyprland.cachix.org"
 
-  nix.settings.auto-optimise-store = true;
-  nix.gc = {
-    automatic = true;
-    dates = "monthly";
-    options = "--delete-older-than 30d";
+        # From zed flake
+        "https://cache.garnix.io"
+        "https://zed.cachix.org"
+      ];
+      trusted-public-keys = [
+        "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+
+        # From zed flake
+        "zed.cachix.org-1:/pHQ6dpMsAZk2DiP4WCL0p9YDNKWj2Q5FL20bNmw1cU="
+        "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+      ];
+      experimental-features = [ "nix-command" "flakes" ];
+    };
+    gc = {
+      automatic = true;
+      dates = "monthly";
+      options = "--delete-older-than 30d";
+    };
   };
 
   systemd = {
@@ -37,10 +65,6 @@
       extraConfig = "ExternalSizeMax=${toString (8 * 1024 * 1024 * 1024)}";
     };
   };
-
-  services.journald.extraConfig = ''
-      SystemMaxUse=2G
-  '';
 
   # Set your time zone.
   time.timeZone = "Europe/Moscow";
@@ -107,7 +131,7 @@
     # SayoDevice O3C v1 keyboard bootloader mode (for firmware updates)
     SUBSYSTEM=="usb", ATTRS{idVendor}=="8089", ATTRS{idProduct}=="0005", ATTRS{serial}=="00CDAB10239BBC788B39E339E300", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
     KERNEL=="hidraw*", ATTRS{idVendor}=="8089", ATTRS{idProduct}=="0005", ATTRS{serial}=="00CDAB10239BBC788B39E339E300", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
-  '';
+ '';
 
   # Allow plugdev access to ANNE PRO 2
   # https://github.com/sizezero/dev-notes/blob/master/anne-pro-2.org
@@ -117,38 +141,13 @@
   #   SUBSYSTEM=="usb", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8008",
   #   MODE="0666", GROUP="plugdev"
   #   KERNEL=="hidraw*", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8008",
-  #   MODE="0666", GROUP="plugdev"
+  #   MODE="0660", GROUP="plugdev"
   # '';
 
   networking.networkmanager = {
     enable = true;
     plugins = [ pkgs.networkmanager-openvpn ];
   };
-
-  nix.settings = {
-    substituters = [
-      "https://nix-gaming.cachix.org"
-      "https://nix-community.cachix.org"
-      "https://cache.nixos.org/"
-      "https://hyprland.cachix.org"
-
-      # From zed flake
-      "https://cache.garnix.io"
-      "https://zed.cachix.org"
-    ];
-    trusted-public-keys = [
-      "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
-
-      # From zed flake
-      "zed.cachix.org-1:/pHQ6dpMsAZk2DiP4WCL0p9YDNKWj2Q5FL20bNmw1cU="
-      "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
-    ];
-  };
-
-  # Enable flakes:
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   age.secrets.sing-box-outbounds = {
     file = ./secrets/sing-box-outbounds.jsonc;

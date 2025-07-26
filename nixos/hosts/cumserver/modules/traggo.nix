@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 let
   cfg = config.cumserver.traggo;
 in
@@ -51,8 +51,7 @@ in
 
     virtualisation.oci-containers.containers.traggo = {
       autoStart = true;
-      image = cfg.image;
-      environment = cfg.environment;
+      inherit (cfg) image environment;
       ports = [ "127.0.0.1:${toString cfg.port}:3030" ];
       volumes = [
         "${cfg.dataDir}:/opt/traggo/data"

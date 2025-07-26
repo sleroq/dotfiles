@@ -1,4 +1,4 @@
-{ ... }:
+_:
 
 {
   # Config from https://github.com/mylinuxforwork/dotfiles

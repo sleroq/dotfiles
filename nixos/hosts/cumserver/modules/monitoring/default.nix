@@ -59,12 +59,245 @@ in
       }
     ];
 
-    services.alloy = {
-      enable = true;
-      extraFlags = [
-        "--server.http.listen-addr=127.0.0.1:12345"
-        "--disable-reporting"
-      ];
+    services = {
+      alloy = {
+        enable = true;
+        extraFlags = [
+          "--server.http.listen-addr=127.0.0.1:12345"
+          "--disable-reporting"
+        ];
+      };
+      grafana = {
+        enable = true;
+        settings = {
+          server = {
+            http_addr = "127.0.0.1";
+            http_port = 3200;
+            root_url = "https://cum.army/grafana/";
+          };
+          security = {
+            admin_user = "sleroq";
+            admin_password = "$__file{${cfg.grafanaPasswordPath}}";
+          };
+        };
+        provision = {
+          enable = true;
+          datasources.settings = {
+            apiVersion = 1;
+            datasources = [
+              {
+                name = "Loki";
+                type = "loki";
+                uid = "Loki1";
+                url = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}";
+              }
+              {
+                name = "Prometheus";
+                type = "prometheus";
+                uid = "Prometheus1";
+                url = "http://localhost:${toString config.services.prometheus.port}";
+                jsonData = {
+                  timeInterval = "1m";
+                };
+              }
+            ];
+          };
+          dashboards.settings = {
+            apiVersion = 1;
+            providers = [
+              {
+                name = "dashboards";
+                options.path = ./dashboards;
+                options.foldersFromFilesStructure = true;
+              }
+            ];
+          };
+        };
+      };
+      prometheus = {
+        enable = true;
+        # keep data for 90 days
+        extraFlags = [ 
+          "--storage.tsdb.retention.time=90d"
+          "--web.enable-remote-write-receiver"
+        ];
+        scrapeConfigs = [
+            {
+                job_name = "prometheus";
+                static_configs = [{ targets = [ "127.0.0.1:9090" ]; }];
+            }
+            {
+                job_name = "node-local";
+                static_configs = [{ targets = [ "127.0.0.1:9100" ]; }];
+                relabel_configs = [
+                    {
+                        target_label = "job";
+                        replacement = "node";
+                    }
+                    {
+                        target_label = "instance";
+                        replacement = cfg.localNodeName;
+                    }
+                    {
+                        target_label = "node_name";
+                        replacement = cfg.localNodeName;
+                    }
+                    {
+                        target_label = "node_type";
+                        replacement = "local";
+                    }
+                ];
+            }
+        ] ++ (map (node: {
+            job_name = "node-${lib.strings.toLower node.name}";
+            static_configs = [{
+                targets = [ node.address ];
+                labels = {
+                    node_name = node.name;
+                    node_type = "remote";
+                };
+            }];
+            basic_auth = {
+                inherit (node) username;
+                password_file = toString node.passwordPath;
+            };
+            scheme = if node.enableTLS then "https" else "http";
+            tls_config = lib.mkIf node.enableTLS {
+                insecure_skip_verify = node.tlsInsecure;
+            };
+            relabel_configs = [
+                {
+                    target_label = "job";
+                    replacement = "node";
+                }
+                {
+                    source_labels = [ "node_name" ];
+                    target_label = "instance";
+                    replacement = "\${1}";
+                }
+            ];
+        }) cfg.remoteNodes);
+        exporters = {
+            node = {
+                enable = true;
+                enabledCollectors = [ "systemd" "processes" ];
+            };
+        };
+      };
+      loki = {
+        enable = true;
+        configuration = {
+          server = {
+            http_listen_port = 3100;
+          };
+          auth_enabled = false;
+
+          analytics = {
+            reporting_enabled = false;
+          };
+
+          ingester = {
+            lifecycler = {
+              address = "127.0.0.1";
+              ring = {
+                kvstore = {
+                  store = "inmemory";
+                };
+                replication_factor = 1;
+              };
+            };
+          };
+
+          pattern_ingester = {
+            enabled = true;
+            lifecycler = {
+              ring = {
+                kvstore = {
+                  store = "inmemory";
+                };
+                replication_factor = 1;
+              };
+              num_tokens = 128;
+              heartbeat_period = "5s";
+              heartbeat_timeout = "1m";
+              address = "127.0.0.1";
+              unregister_on_shutdown = true;
+            };
+            client_config = {
+              pool_config = {
+                client_cleanup_period = "15s";
+                health_check_ingesters = true;
+                remote_timeout = "1s";
+              };
+              remote_timeout = "5s";
+            };
+            concurrent_flushes = 32;
+            flush_check_period = "1m";
+            max_clusters = 300;
+            max_eviction_ratio = 0.25;
+            connection_timeout = "2s";
+            max_allowed_line_length = 3000;
+          };
+
+          schema_config = {
+            configs = [
+              {
+                from = "2024-01-01";
+                store = "boltdb";
+                object_store = "filesystem";
+                schema = "v13";
+                index = {
+                  prefix = "index_";
+                  period = "168h"; # seven days
+                };
+              }
+            ];
+          };
+
+          storage_config = {
+            boltdb = {
+              directory = "/var/lib/loki/index";
+            };
+            filesystem = {
+              directory = "/var/lib/loki/chunks";
+            };
+          };
+
+          limits_config = {
+            allow_structured_metadata = false;
+            reject_old_samples = true;
+            reject_old_samples_max_age = "168h";
+          };
+
+          table_manager = {
+            chunk_tables_provisioning = {
+              inactive_read_throughput = 0;
+              inactive_write_throughput = 0;
+              provisioned_read_throughput = 0;
+              provisioned_write_throughput = 0;
+            };
+            index_tables_provisioning = {
+              inactive_read_throughput = 0;
+              inactive_write_throughput = 0;
+              provisioned_read_throughput = 0;
+              provisioned_write_throughput = 0;
+            };
+            retention_deletes_enabled = true;
+            retention_period = "720h"; # 30 days
+          };
+        };
+      };
+      caddy = {
+        virtualHosts = {
+          "cum.army" = {
+            extraConfig = ''
+              handle_path /grafana/* {
+                  reverse_proxy 127.0.0.1:3200
+              }
+            '';
+          };
+        };
+      };
     };
 
     environment.etc."alloy/config.alloy".text = ''
@@ -205,244 +438,5 @@ in
         }
       }
     '';
-
-    services.grafana = {
-        enable = true;
-        settings = {
-            server = {
-                http_addr = "127.0.0.1";
-                http_port = 3200;
-                root_url = "https://cum.army/grafana/";
-            };
-            security = {
-                admin_user = "sleroq";
-                admin_password = "$__file{${cfg.grafanaPasswordPath}}";
-            };
-        };
-        provision = {
-            enable = true;
-            datasources.settings = {
-                apiVersion = 1;
-                datasources = [
-                    {
-                        name = "Loki";
-                        type = "loki";
-                        uid = "Loki1";
-                        url = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}";
-                    }
-                    {
-                        name = "Prometheus";
-                        type = "prometheus";
-                        uid = "Prometheus1";
-                        url = "http://localhost:${toString config.services.prometheus.port}";
-                        jsonData = {
-                            timeInterval = "1m";
-                        };
-                    }
-                ];
-            };
-            dashboards.settings = {
-                apiVersion = 1;
-                providers = [
-                    {
-                        name = "dashboards";
-                        options.path = ./dashboards;
-                        options.foldersFromFilesStructure = true;
-                    }
-                ];
-            };
-        };
-    };
-
-    services.prometheus = {
-        enable = true;
-        # keep data for 90 days
-        extraFlags = [ 
-          "--storage.tsdb.retention.time=90d"
-          "--web.enable-remote-write-receiver"
-        ];
-        scrapeConfigs = [
-            {
-                job_name = "prometheus";
-                static_configs = [{ targets = [ "127.0.0.1:9090" ]; }];
-            }
-            {
-                job_name = "node-local";
-                static_configs = [{ targets = [ "127.0.0.1:9100" ]; }];
-                relabel_configs = [
-                    {
-                        target_label = "job";
-                        replacement = "node";
-                    }
-                    {
-                        target_label = "instance";
-                        replacement = cfg.localNodeName;
-                    }
-                ];
-            }
-        ] ++ lib.optionals (config.cumserver.marzban.enable && config.cumserver.marzban.metricsEnvironmentFile != null) [
-            {
-                job_name = "marzban";
-                static_configs = [{ targets = [ "127.0.0.1:9091" ]; }];
-                scrape_interval = "30s";
-            }
-        ] ++ (lib.imap0 (i: node: {
-            job_name = "node-remote-${node.name}";
-            static_configs = [{ 
-                targets = [ node.address ];
-                labels = {
-                    node_name = node.name;
-                    node_type = "remote";
-                };
-            }];
-            basic_auth = {
-                username = node.username;
-                password_file = toString node.passwordPath;
-            };
-            scheme = if node.enableTLS then "https" else "http";
-            tls_config = lib.mkIf node.enableTLS {
-                insecure_skip_verify = node.tlsInsecure;
-            };
-            relabel_configs = [
-                {
-                    target_label = "job";
-                    replacement = "node";
-                }
-                {
-                    source_labels = [ "node_name" ];
-                    target_label = "instance";
-                    replacement = "\${1}";
-                }
-            ];
-        }) cfg.remoteNodes);
-        exporters = {
-            node = {
-                enable = true;
-                enabledCollectors = [ "systemd" "processes" ];
-            };
-        };
-    };
-
-    # This is extracted from various sources, including:
-    # https://github.com/britter/nix-configuration/blob/680036688d23e6e1e520522847b1cd0f7e284192/modules/grafana/loki.nix
-    # https://github.com/mrVanDalo/nix-nomad-cluster/blob/6a605c89dc25cada4c59beea864e9bae150b8eea/nixos/roles/monitor/loki.nix
-    # https://grafana.com/blog/2019/08/22/homelab-security-with-ossec-loki-prometheus-and-grafana-on-a-raspberry-pi/
-    # https://xeiaso.net/blog/prometheus-grafana-loki-nixos-2020-11-20/
-    # https://grafana.com/docs/loki/latest/configure
-    services.loki = {
-      enable = true;
-      configuration = {
-        server = {
-          http_listen_port = 3100;
-        };
-        auth_enabled = false;
-
-        analytics = {
-          reporting_enabled = false;
-        };
-
-        ingester = {
-          lifecycler = {
-            address = "127.0.0.1";
-            ring = {
-              kvstore = {
-                store = "inmemory";
-              };
-              replication_factor = 1;
-            };
-          };
-        };
-
-        pattern_ingester = {
-          enabled = true;
-          lifecycler = {
-            ring = {
-              kvstore = {
-                store = "inmemory";
-              };
-              replication_factor = 1;
-            };
-            num_tokens = 128;
-            heartbeat_period = "5s";
-            heartbeat_timeout = "1m";
-            address = "127.0.0.1";
-            unregister_on_shutdown = true;
-          };
-          client_config = {
-            pool_config = {
-              client_cleanup_period = "15s";
-              health_check_ingesters = true;
-              remote_timeout = "1s";
-            };
-            remote_timeout = "5s";
-          };
-          concurrent_flushes = 32;
-          flush_check_period = "1m";
-          max_clusters = 300;
-          max_eviction_ratio = 0.25;
-          connection_timeout = "2s";
-          max_allowed_line_length = 3000;
-        };
-
-        schema_config = {
-          configs = [
-            {
-              from = "2024-01-01";
-              store = "boltdb";
-              object_store = "filesystem";
-              schema = "v13";
-              index = {
-                prefix = "index_";
-                period = "168h"; # seven days
-              };
-            }
-          ];
-        };
-
-        storage_config = {
-          boltdb = {
-            directory = "/var/lib/loki/index";
-          };
-          filesystem = {
-            directory = "/var/lib/loki/chunks";
-          };
-        };
-
-        limits_config = {
-          allow_structured_metadata = false;
-          reject_old_samples = true;
-          reject_old_samples_max_age = "168h";
-        };
-
-        table_manager = {
-          chunk_tables_provisioning = {
-            inactive_read_throughput = 0;
-            inactive_write_throughput = 0;
-            provisioned_read_throughput = 0;
-            provisioned_write_throughput = 0;
-          };
-          index_tables_provisioning = {
-            inactive_read_throughput = 0;
-            inactive_write_throughput = 0;
-            provisioned_read_throughput = 0;
-            provisioned_write_throughput = 0;
-          };
-          retention_deletes_enabled = true;
-          retention_period = "720h"; # 30 days
-        };
-      };
-    };
-
-    services.caddy = {
-      virtualHosts = {
-        "cum.army" = {
-          extraConfig = ''
-            handle_path /grafana/* {
-                reverse_proxy 127.0.0.1:3200
-            }
-          '';
-        };
-      };
-    };
   };
 }

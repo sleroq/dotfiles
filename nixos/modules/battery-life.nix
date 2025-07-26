@@ -37,22 +37,24 @@ in {
       pkgs.powertop
     ];
 
-    services.power-profiles-daemon.enable = false;
-    services.thermald.enable = true;
+    services = {
+      power-profiles-daemon.enable = false;
+      thermald.enable = true;
 
-    services.tlp = {
-      enable = true;
-      settings = {
-        CPU_ENERGY_PERF_POLICY_ON_AC = selectedProfile.cpuEnergyPerfPolicy;
-        CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-        PLATFORM_PROFILE_ON_AC = selectedProfile.platformProfile;
-        PLATFORM_PROFILE_ON_BAT = "low-power";
-        RUNTIME_PM_ON_AC = "auto";
-        RUNTIME_PM_ON_BAT = "auto";
-        CPU_BOOST_ON_AC = if selectedProfile.cpuBoost then "1" else "0";
-        CPU_BOOST_ON_BAT = "0";
-        CPU_HWP_DYN_BOOST_ON_AC = if selectedProfile.cpuHwpDynBoost then "1" else "0";
-        CPU_HWP_DYN_BOOST_ON_BAT = "0";
+      tlp = {
+        enable = true;
+        settings = {
+          CPU_ENERGY_PERF_POLICY_ON_AC = selectedProfile.cpuEnergyPerfPolicy;
+          CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
+          PLATFORM_PROFILE_ON_AC = selectedProfile.platformProfile;
+          PLATFORM_PROFILE_ON_BAT = "low-power";
+          RUNTIME_PM_ON_AC = "auto";
+          RUNTIME_PM_ON_BAT = "auto";
+          CPU_BOOST_ON_AC = if selectedProfile.cpuBoost then "1" else "0";
+          CPU_BOOST_ON_BAT = "0";
+          CPU_HWP_DYN_BOOST_ON_AC = if selectedProfile.cpuHwpDynBoost then "1" else "0";
+          CPU_HWP_DYN_BOOST_ON_BAT = "0";
+        };
       };
     };
   };

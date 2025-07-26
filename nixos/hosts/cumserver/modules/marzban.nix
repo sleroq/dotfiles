@@ -64,7 +64,7 @@ in
     virtualisation.oci-containers.containers = {
       marzban = {
         autoStart = true;
-        image = cfg.image;
+        inherit (cfg) image;
         environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
         environment = {
           UVICORN_HOST = "127.0.0.1";
@@ -72,7 +72,7 @@ in
           XRAY_JSON = "/var/lib/marzban/xray_config.json";
           SQLALCHEMY_DATABASE_URL = "sqlite:////var/lib/marzban/db.sqlite3";
         };
-        extraOptions = cfg.extraOptions;
+        inherit (cfg) extraOptions;
         volumes = [
           "${cfg.dataDir}:/var/lib/marzban"
         ];

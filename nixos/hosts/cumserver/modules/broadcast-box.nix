@@ -65,7 +65,7 @@ in
     };
 
     virtualisation.oci-containers.containers.broadcast-box = {
-      image = cfg.image;
+      inherit (cfg) image;
       autoStart = true;
       
       ports = [

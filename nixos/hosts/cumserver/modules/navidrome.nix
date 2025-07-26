@@ -99,44 +99,105 @@ in
       "d /var/lib/navidrome/music 0755 navidrome navidrome -"
     ];
 
-    services.navidrome = {
-      enable = true;
-      openFirewall = false; # We'll use Caddy reverse proxy
-      
-      environmentFile = config.age.secrets.navidromeEnv.path;
-      
-      settings = {
-        Address = "127.0.0.1";
-        Port = 4533;
+    services = {
+      navidrome = {
+        enable = true;
+        openFirewall = false; # We'll use Caddy reverse proxy
         
-        MusicFolder = cfg.musicFolder;
-        DataFolder = "/var/lib/navidrome/data";
-        CacheFolder = "/var/lib/navidrome/cache";
+        environmentFile = config.age.secrets.navidromeEnv.path;
         
-        ScanSchedule = "1h";
-        LogLevel = "info";
-        SessionTimeout = "24h";
-        BaseURL = "https://${cfg.domain}";
-        EnableSharing = true;
+        settings = {
+          Address = "127.0.0.1";
+          Port = 4533;
+          
+          MusicFolder = cfg.musicFolder;
+          DataFolder = "/var/lib/navidrome/data";
+          CacheFolder = "/var/lib/navidrome/cache";
+          
+          ScanSchedule = "1h";
+          LogLevel = "info";
+          SessionTimeout = "24h";
+          BaseURL = "https://${cfg.domain}";
+          EnableSharing = true;
+        };
       };
-    };
 
-    services.filebrowser = lib.mkIf cfg.filebrowser.enable {
-      enable = true;
-      openFirewall = false; # We'll use Caddy reverse proxy
-      user = "navidrome";
-      group = "navidrome";
-      
-      settings = {
-        address = "127.0.0.1";
-        port = cfg.filebrowser.port;
-        root = cfg.musicFolder;
-        baseURL = cfg.filebrowser.baseUrl;
+      filebrowser = lib.mkIf cfg.filebrowser.enable {
+        enable = true;
+        openFirewall = false; # We'll use Caddy reverse proxy
+        user = "navidrome";
+        group = "navidrome";
+        
+        settings = {
+          address = "127.0.0.1";
+          inherit (cfg.filebrowser) port;
+          root = cfg.musicFolder;
+          baseURL = cfg.filebrowser.baseUrl;
+        };
+      };
+
+      caddy.virtualHosts = {
+        ${cfg.domain} = {
+          extraConfig = ''
+            # FileBrowser on /filebrowser path
+            ${lib.optionalString cfg.filebrowser.enable ''
+            handle_path /filebrowser* {
+              reverse_proxy localhost:${toString cfg.filebrowser.port}
+              header {
+                X-Content-Type-Options nosniff
+                X-Frame-Options DENY
+                X-XSS-Protection "1; mode=block"
+                -Server
+              }
+            }
+            ''}
+
+            # Feishin on /feishin path
+            ${lib.optionalString cfg.feishin.enable ''
+            handle_path /feishin* {
+              reverse_proxy localhost:${toString cfg.feishin.port}
+              header {
+                X-Content-Type-Options nosniff
+                X-Frame-Options DENY
+                X-XSS-Protection "1; mode=block"
+                -Server
+              }
+            }
+            ''}
+
+            # Navidrome as the root path
+            reverse_proxy localhost:4533 {
+              header_up X-Forwarded-Proto {scheme}
+              header_up X-Forwarded-For {remote}
+            }
+            
+            # Security headers
+            header {
+              X-Content-Type-Options nosniff
+              X-Frame-Options DENY
+              X-XSS-Protection "1; mode=block"
+              -Server
+            }
+          '';
+        };
+      } // lib.optionalAttrs cfg.feishin.enable {
+        ${cfg.feishin.domain} = {
+          extraConfig = ''
+            reverse_proxy localhost:${toString cfg.feishin.port}
+            encode zstd gzip
+            
+            header {
+              X-Content-Type-Options nosniff
+              X-Frame-Options SAMEORIGIN
+              X-XSS-Protection "1; mode=block"
+            }
+          '';
+        };
       };
     };
 
     virtualisation.oci-containers.containers.feishin = lib.mkIf cfg.feishin.enable {
-      image = cfg.feishin.image;
+      inherit (cfg.feishin) image;
       autoStart = true;
       
       ports = [
@@ -157,44 +218,6 @@ in
       extraOptions = [
         "--hostname=feishin"
       ];
-    };
-
-    services.caddy.virtualHosts = {
-      ${cfg.domain} = {
-        extraConfig = ''
-          # FileBrowser on /filebrowser path
-          ${lib.optionalString cfg.filebrowser.enable ''
-          handle_path /filebrowser* {
-            reverse_proxy localhost:${toString cfg.filebrowser.port}
-            header {
-              X-Content-Type-Options nosniff
-              X-Frame-Options SAMEORIGIN
-              X-XSS-Protection "1; mode=block"
-            }
-          }
-          ''}
-          
-          # Navidrome for all other paths
-          handle {
-            reverse_proxy localhost:4533
-          }
-          
-          encode zstd gzip
-        '';
-      };
-    } // lib.optionalAttrs cfg.feishin.enable {
-      ${cfg.feishin.domain} = {
-        extraConfig = ''
-          reverse_proxy localhost:${toString cfg.feishin.port}
-          encode zstd gzip
-          
-          header {
-            X-Content-Type-Options nosniff
-            X-Frame-Options SAMEORIGIN
-            X-XSS-Protection "1; mode=block"
-          }
-        '';
-      };
     };
   };
 }

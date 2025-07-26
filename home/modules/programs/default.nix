@@ -70,7 +70,7 @@ in
     (lib.mkIf (cfg.foot.enable && cfg.foot.default) {
       home.sessionVariables.TERMINAL = "foot";
     })
-    (lib.mkIf cfg.ghostty.enable (import ./ghostty.nix { package = cfg.ghostty.package; }))
+    (lib.mkIf cfg.ghostty.enable (import ./ghostty.nix { inherit (cfg.ghostty) package; }))
     (lib.mkIf cfg.mpv.enable (import ./mpv.nix { inherit pkgs; }))
     (lib.mkIf cfg.wezterm.enable (
         import ./wezterm.nix { extraConfig = secrets.wezterm-ssh-domains; }
@@ -79,7 +79,7 @@ in
     (lib.mkIf cfg.obs.enable {
       programs.obs-studio = {
         enable = true;
-        package = cfg.obs.package;
+        inherit (cfg.obs) package;
         plugins = with pkgs.obs-studio-plugins; [
           wlrobs
           obs-gstreamer

@@ -37,7 +37,6 @@ let
   };
 in
 {
-  # Use programs.eww.configDir instead of manual activation
   programs.eww = {
     enable = true;
     configDir = opts.configs + /eww/bar;
@@ -49,7 +48,6 @@ in
     pamixer
     killall
 
-    # eww scripts (removed battery and memory since using built-in variables)
     ewwScripts.getMicVolume
     ewwScripts.getVolume
     ewwScripts.micMuteStatus

@@ -3,7 +3,7 @@
 {
   programs.ghostty = {
     enable = true;
-    package = package;
+    inherit package;
     settings = {
       theme = "catppuccin-mocha";
       confirm-close-surface = false;

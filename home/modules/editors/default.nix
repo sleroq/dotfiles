@@ -22,7 +22,7 @@ in
       programs.vscode.enable = true;
     })
 
-    (lib.mkIf (cfg.cursor.enable) {
+    (lib.mkIf cfg.cursor.enable {
       home.packages = [ pkgs-master.code-cursor ];
     })
 

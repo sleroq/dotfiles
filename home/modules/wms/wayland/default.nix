@@ -57,7 +57,7 @@ in
     })
 
     (import ../../programs/swaync.nix { })
-    (lib.mkIf (cfg.hyprland.enable) (import ./hyprland.nix { inherit pkgs opts lib inputs config; }))
-    (lib.mkIf (cfg.sway.enable) (import ./sway.nix { inherit pkgs opts lib; }))
+    (lib.mkIf cfg.hyprland.enable (import ./hyprland.nix { inherit pkgs opts lib inputs config; }))
+    (lib.mkIf cfg.sway.enable (import ./sway.nix { inherit pkgs opts lib; }))
   ];
 }
