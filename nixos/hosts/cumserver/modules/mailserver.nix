@@ -98,6 +98,7 @@ in {
       stateVersion = 1;
       domains = [ "cum.army" ];
       messageSizeLimit = 52428800; # 50MB
+      enableManageSieve = true;
 
       # nix-shell -p mkpasswd --run 'mkpasswd -sm bcrypt'
       loginAccounts = generatedLoginAccounts;
