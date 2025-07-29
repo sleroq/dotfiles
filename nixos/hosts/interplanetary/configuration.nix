@@ -3,7 +3,23 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ../../modules/webdav.nix
   ];
+
+  age.secrets = {
+    webdav-cert = {
+      file = ../shared/secrets/webdav-cert.pem;
+      mode = "0644";
+      owner = "webdav";
+      group = "webdav";
+    };
+    webdav-key = {
+      file = ../shared/secrets/webdav-key.pem;
+      mode = "0600";
+      owner = "webdav";
+      group = "webdav";
+    };
+  };
 
   hardware.amdgpu.initrd.enable = true;
 
@@ -89,6 +105,21 @@
     enable = true;
     settings = {
       PasswordAuthentication = false;
+    };
+  };
+
+  # WebDAV server configuration
+  services.webdav-server = {
+    enable = true;
+    port = 8092;
+    directory = "/srv/webdav";
+    permissions = "CRUD";
+    debug = false;
+    openFirewall = true;
+    tls = {
+      enable = true;
+      certFile = config.age.secrets.webdav-cert.path;
+      keyFile = config.age.secrets.webdav-key.path;
     };
   };
 

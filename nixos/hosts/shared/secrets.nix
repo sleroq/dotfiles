@@ -7,4 +7,6 @@ let
 in
 {
   "secrets/sing-box-outbounds.jsonc" = { publicKeys = commonPublicKeys; };
+  "secrets/webdav-cert.pem" = { publicKeys = commonPublicKeys; };
+  "secrets/webdav-key.pem" = { publicKeys = commonPublicKeys; };
 }
