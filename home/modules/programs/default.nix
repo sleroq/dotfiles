@@ -81,12 +81,12 @@ in
         enable = true;
         inherit (cfg.obs) package;
         plugins = with pkgs.obs-studio-plugins; [
-          wlrobs
+          # wlrobs
           obs-gstreamer
-          obs-backgroundremoval
-          obs-pipewire-audio-capture
-          input-overlay
-          obs-vaapi
+          # obs-backgroundremoval
+          # obs-pipewire-audio-capture
+          # input-overlay
+          # obs-vaapi
           # obs-multi-rtmp
         ];
       };
