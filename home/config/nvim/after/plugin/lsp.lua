@@ -83,6 +83,9 @@ require('lspconfig').gopls.setup({})
 require('lspconfig').zls.setup({})
 require('lspconfig').golangci_lint_ls.setup({})
 require('lspconfig').marksman.setup({})
+require("lspconfig").qmlls.setup {
+  cmd = {"qmlls", "-E"}
+}
 
 -- HTMX stuff
 require('lspconfig').templ.setup({})
