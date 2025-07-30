@@ -80,7 +80,7 @@ in
         NETWORK_TYPES = "udp4";
         NAT_1_TO_1_IP = (builtins.head config.networking.interfaces.ens3.ipv4.addresses).address;
         NETWORK_TEST_ON_START = "false";
-        DISABLE_STATUS = "false";
+        DISABLE_STATUS = "true";
       } // cfg.extraEnvironment;
 
       environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
