@@ -5,6 +5,7 @@
   inputs.nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
   inputs.agenix.url = "github:ryantm/agenix";
   inputs.mailserver.url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/";
+  # inputs.mailserver.url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/?ref=master&rev=ed6d699eb4adcddce75418515ef2f99ed4c60032";
   inputs.tuwunel = {
     url = "github:matrix-construct/tuwunel/v1.2.0";
     inputs.nixpkgs.follows = "nixpkgs";
@@ -19,6 +20,11 @@
   };
   inputs.cum-army = {
     url = "github:sleroq/cum.army";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+  inputs.web-cum-army = {
+    # url = "github:sleroq/web.cum.army";
+    url = "path:/home/sleroq/develop/other/web.cum.army";
     inputs.nixpkgs.follows = "nixpkgs";
   };
   inputs.bayan = {

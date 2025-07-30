@@ -336,13 +336,17 @@ in
     services.caddy.virtualHosts = {
       ${cfg.domain} = {
         extraConfig = ''
-          # Streaming endpoints go to OvenMediaEngine
-          reverse_proxy /app/* 127.0.0.1:${toString cfg.port}
+          # All streaming endpoints go to OvenMediaEngine
+          handle /app/* {
+            reverse_proxy 127.0.0.1:${toString cfg.port}
+          }
           
           # Everything else serves the static website
-          root * ${inputs.web-cum-army.packages."${pkgs.system}".default}
-          file_server
-          encode zstd gzip
+          handle {
+            root * ${inputs.web-cum-army.packages."${pkgs.system}".default}
+            file_server
+            encode zstd gzip
+          }
           
           header {
             X-Content-Type-Options nosniff

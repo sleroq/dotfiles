@@ -128,16 +128,16 @@ in
     feishin.enable = true;
   };
 
-  age.secrets.ziplineEnv = {
-    owner = "zipline";
-    group = "zipline";
-    file = ./secrets/ziplineEnv;
-  };
+  # age.secrets.ziplineEnv = {
+  #   owner = "zipline";
+  #   group = "zipline";
+  #   file = ./secrets/ziplineEnv;
+  # };
 
-  cumserver.zipline = {
-    enable = true;
-    environmentFile = config.age.secrets.ziplineEnv.path;
-  };
+  # cumserver.zipline = {
+  #   enable = false;
+  #   environmentFile = config.age.secrets.ziplineEnv.path;
+  # };
   
   cumserver.broadcast-box = {
     enable = true;
@@ -284,6 +284,8 @@ in
     dates = "daily";
     options = "--delete-older-than 7d";
   };
+
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   system.stateVersion = "24.05";
 }
