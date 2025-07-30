@@ -44,6 +44,7 @@ in
     ./modules/bore.nix
     ./modules/podman.nix
     ./modules/broadcast-box.nix
+    ./modules/oven-media-engine.nix
     ./modules/tuwunel.nix
     ./modules/marzban.nix
     ./modules/traggo.nix
@@ -141,10 +142,26 @@ in
   cumserver.broadcast-box = {
     enable = true;
     domain = "web.cum.army";
-    extraEnvironment = {
-      DISABLE_STATUS = "false";
-    };
   };
+
+  # cumserver.oven-media-engine = {
+  #   enable = true;
+  #   domain = "web.cum.army";
+  # };
+
+  # Advanced tuning for ultra-low latency
+  # cumserver.oven-media-engine = {
+  #   enable = true;
+  #   domain = "web.cum.army";
+    
+  #   # Ultra-low latency LLHLS
+  #   llhlsChunkDuration = 0.1;
+  #   llhlsSegmentDuration = 3;
+    
+  #   # WebRTC optimizations  
+  #   webrtcRtx = true;
+  #   webrtcJitterBuffer = true;
+  # };
 
   services.bayan.enable = true;
   services.kopoka.enable = true;
