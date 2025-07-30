@@ -6,21 +6,6 @@
     ../../modules/webdav.nix
   ];
 
-  age.secrets = {
-    webdav-cert = {
-      file = ../shared/secrets/webdav-cert.pem;
-      mode = "0644";
-      owner = "webdav";
-      group = "webdav";
-    };
-    webdav-key = {
-      file = ../shared/secrets/webdav-key.pem;
-      mode = "0600";
-      owner = "webdav";
-      group = "webdav";
-    };
-  };
-
   hardware.amdgpu.initrd.enable = true;
 
   # Bootloader.
@@ -108,7 +93,20 @@
     };
   };
 
-  # WebDAV server configuration
+  age.secrets = {
+    webdav-cert = {
+      file = ../shared/secrets/webdav-cert.pem;
+      mode = "0644";
+      owner = "webdav";
+      group = "webdav";
+    };
+    webdav-key = {
+      file = ../shared/secrets/webdav-key.pem;
+      mode = "0600";
+      owner = "webdav";
+      group = "webdav";
+    };
+  };
   services.webdav-server = {
     enable = true;
     port = 8092;
