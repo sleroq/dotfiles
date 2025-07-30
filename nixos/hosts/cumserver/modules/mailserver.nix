@@ -95,7 +95,7 @@ in {
     mailserver = {
       inherit fqdn;
       enable = true;
-      stateVersion = 1;
+      stateVersion = 3;
       domains = [ "cum.army" ];
       messageSizeLimit = 52428800; # 50MB
       enableManageSieve = true;
@@ -109,7 +109,7 @@ in {
     };
 
     # Wait for caddy, so certs are ready on first ever boot
-    systemd.services.dovecot2.after = [ "caddy.service" ];
+    systemd.services.dovecot.after = [ "caddy.service" ];
 
     services.caddy.virtualHosts."mail.cum.army" = {
       extraConfig = ''
