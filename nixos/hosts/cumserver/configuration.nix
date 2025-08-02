@@ -128,20 +128,15 @@ in
     feishin.enable = true;
   };
 
-  # age.secrets.ziplineEnv = {
-  #   owner = "zipline";
-  #   group = "zipline";
-  #   file = ./secrets/ziplineEnv;
-  # };
+  age.secrets.ziplineEnv = {
+    owner = "zipline";
+    group = "zipline";
+    file = ./secrets/ziplineEnv;
+  };
 
-  # cumserver.zipline = {
-  #   enable = false;
-  #   environmentFile = config.age.secrets.ziplineEnv.path;
-  # };
-  
-  cumserver.broadcast-box = {
+  cumserver.zipline = {
     enable = true;
-    domain = "web.cum.army";
+    environmentFile = config.age.secrets.ziplineEnv.path;
   };
   
   # cumserver.broadcast-box = {
