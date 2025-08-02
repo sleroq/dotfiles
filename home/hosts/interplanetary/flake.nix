@@ -19,7 +19,7 @@
     # paisa.url = "github:ananthakumaran/paisa";
     zig.url = "github:mitchellh/zig-overlay";
     zls.url = "github:zigtools/zls";
-    zed.url = "github:zed-industries/zed?submodules=1&ref=refs/tags/v0.197.2-pre";
+    zed.url = "github:zed-industries/zed?submodules=1&ref=refs/tags/v0.198.0-pre";
     agenix.url = "github:ryantm/agenix";
 
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/tags/v0.50.1";
