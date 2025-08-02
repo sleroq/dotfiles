@@ -199,6 +199,7 @@ in
     virtualisation.oci-containers.containers.feishin = lib.mkIf cfg.feishin.enable {
       inherit (cfg.feishin) image;
       autoStart = true;
+      pull = "newer";
       
       ports = [
         "127.0.0.1:${toString cfg.feishin.port}:9180"

@@ -50,8 +50,9 @@ in
     ];
 
     virtualisation.oci-containers.containers.traggo = {
-      autoStart = true;
       inherit (cfg) image environment;
+      autoStart = true;
+      pull = "newer";
       ports = [ "127.0.0.1:${toString cfg.port}:3030" ];
       volumes = [
         "${cfg.dataDir}:/opt/traggo/data"

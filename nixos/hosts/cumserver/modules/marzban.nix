@@ -8,7 +8,7 @@ in
 
     image = lib.mkOption {
       type = lib.types.str;
-      default = "ghcr.io/gozargah/marzban:latest";
+      default = "ghcr.io/gozargah/marzban:v0.8.4";
       description = "Docker image to use for Marzban";
     };
 
@@ -80,7 +80,7 @@ in
     } // lib.optionalAttrs (config.cumserver.monitoring.enable && cfg.metricsEnvironmentFile != null) {
       marzban-exporter = {
         autoStart = true;
-        image = "kutovoys/marzban-exporter:latest";
+        image = "kutovoys/marzban-exporter:v0.2.3";
         environmentFiles = [ cfg.metricsEnvironmentFile ];
         ports = [ "127.0.0.1:9091:9090" ];
         dependsOn = [ "marzban" ];
