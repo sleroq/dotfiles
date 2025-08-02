@@ -15,9 +15,6 @@ let
             <HTTP2>
                 <Enable>true</Enable>
             </HTTP2>
-            <LLHLS>
-                <Enable>true</Enable>
-            </LLHLS>
         </Modules>
 
         <Bind>
@@ -60,10 +57,6 @@ let
                         <TcpRelayWorkerCount>1</TcpRelayWorkerCount>
                     </IceCandidates>
                 </WebRTC>
-                <LLHLS>
-                    <Port>${toString cfg.port}</Port>
-                    <WorkerCount>1</WorkerCount>
-                </LLHLS>
             </Publishers>
         </Bind>
 
@@ -86,18 +79,37 @@ let
                                 <Name>bypass_stream</Name>
                                 <OutputStreamName>''${OriginStreamName}</OutputStreamName>
                                 <Encodes>
-                                    <Audio>
-                                        <Bypass>true</Bypass>
-                                    </Audio>
+                                    ${lib.optionalString cfg.videoBypass ''
                                     <Video>
                                         <Bypass>true</Bypass>
                                     </Video>
+                                    ''}
+                                    ${lib.optionalString (!cfg.videoBypass) ''
+                                    <Video>
+                                        <Name>video_transcode</Name>
+                                        <Codec>${cfg.videoCodec}</Codec>
+                                        <Bitrate>${toString cfg.videoBitrate}</Bitrate>
+                                        ${lib.optionalString (cfg.videoWidth != null) "<Width>${toString cfg.videoWidth}</Width>"}
+                                        ${lib.optionalString (cfg.videoHeight != null) "<Height>${toString cfg.videoHeight}</Height>"}
+                                        ${lib.optionalString (cfg.videoFramerate != null) "<Framerate>${toString cfg.videoFramerate}</Framerate>"}
+                                        <Preset>${cfg.videoPreset}</Preset>
+                                        ${lib.optionalString (cfg.videoKeyFrameInterval != null) "<KeyFrameInterval>${toString cfg.videoKeyFrameInterval}</KeyFrameInterval>"}
+                                    </Video>
+                                    ''}
+                                    ${lib.optionalString cfg.audioBypass ''
                                     <Audio>
-                                        <Codec>opus</Codec>
+                                        <Bypass>true</Bypass>
+                                    </Audio>
+                                    ''}
+                                    ${lib.optionalString (!cfg.audioBypass) ''
+                                    <Audio>
+                                        <Name>audio_transcode</Name>
+                                        <Codec>${cfg.audioCodec}</Codec>
                                         <Bitrate>${toString cfg.audioBitrate}</Bitrate>
                                         <Samplerate>48000</Samplerate>
                                         <Channel>2</Channel>
                                     </Audio>
+                                    ''}
                                 </Encodes>
                             </OutputProfile>
                         </OutputProfiles>
@@ -118,14 +130,6 @@ let
                                 <Ulpfec>${lib.boolToString cfg.webrtcUlpfec}</Ulpfec>
                                 <JitterBuffer>${lib.boolToString cfg.webrtcJitterBuffer}</JitterBuffer>
                             </WebRTC>
-                            <LLHLS>
-                                <ChunkDuration>${toString cfg.llhlsChunkDuration}</ChunkDuration>
-                                <SegmentDuration>${toString cfg.llhlsSegmentDuration}</SegmentDuration>
-                                <SegmentCount>${toString cfg.llhlsSegmentCount}</SegmentCount>
-                                <CrossDomains>
-                                    <Url>*</Url>
-                                </CrossDomains>
-                            </LLHLS>
                         </Publishers>
                     </Application>
                 </Applications>
@@ -227,23 +231,67 @@ in
       default = false;
       description = "Enable WebRTC jitter buffer";
     };
-    
-    llhlsChunkDuration = lib.mkOption {
-      type = lib.types.float;
-      default = 0.2;
-      description = "LLHLS chunk duration in seconds";
+
+    # Video transcoding options
+    videoBypass = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Bypass video encoding (passthrough). When true, video is not re-encoded.";
     };
-    
-    llhlsSegmentDuration = lib.mkOption {
-      type = lib.types.int;
-      default = 6;
-      description = "LLHLS segment duration in seconds";
+
+    videoCodec = lib.mkOption {
+      type = lib.types.enum [ "h264" "h265" "vp8" ];
+      default = "h264";
+      description = "Video codec for transcoding";
     };
-    
-    llhlsSegmentCount = lib.mkOption {
+
+    videoBitrate = lib.mkOption {
       type = lib.types.int;
-      default = 10;
-      description = "LLHLS segment count";
+      default = 2000000;
+      description = "Video bitrate in bps for transcoding";
+    };
+
+    videoWidth = lib.mkOption {
+      type = lib.types.nullOr lib.types.int;
+      default = null;
+      description = "Video width for transcoding. If null, keeps original width.";
+    };
+
+    videoHeight = lib.mkOption {
+      type = lib.types.nullOr lib.types.int;
+      default = null;
+      description = "Video height for transcoding. If null, keeps original height.";
+    };
+
+    videoFramerate = lib.mkOption {
+      type = lib.types.nullOr lib.types.float;
+      default = null;
+      description = "Video framerate for transcoding. If null, keeps original framerate.";
+    };
+
+    videoPreset = lib.mkOption {
+      type = lib.types.enum [ "slower" "slow" "medium" "fast" "faster" ];
+      default = "medium";
+      description = "Video encoding preset. Slower = better quality, more CPU. Faster = lower quality, less CPU.";
+    };
+
+    videoKeyFrameInterval = lib.mkOption {
+      type = lib.types.nullOr lib.types.int;
+      default = 30;
+      description = "Video keyframe interval in frames. If null, uses codec default.";
+    };
+
+    # Audio transcoding options
+    audioBypass = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Bypass audio encoding (passthrough). When false, audio is re-encoded to ensure WebRTC compatibility.";
+    };
+
+    audioCodec = lib.mkOption {
+      type = lib.types.enum [ "aac" "opus" ];
+      default = "opus";
+      description = "Audio codec for transcoding. Opus is required for WebRTC compatibility.";
     };
     
     audioBitrate = lib.mkOption {
@@ -281,6 +329,10 @@ in
         assertion = config.services.caddy.enable;
         message = "oven-media-engine requires Caddy to be enabled for reverse proxy. Set services.caddy.enable = true";
       }
+      {
+        assertion = cfg.audioBypass || cfg.audioCodec == "opus";
+        message = "When audio bypass is disabled, codec should be 'opus' for WebRTC compatibility";
+      }
     ];
 
     networking.firewall = {
@@ -310,8 +362,9 @@ in
 
     virtualisation.oci-containers.containers = {
       ovenmediaengine = {
-        autoStart = true;
         inherit (cfg) image;
+        autoStart = true;
+        pull = "newer";
         
         ports = [
           "127.0.0.1:${toString cfg.port}:3333"
