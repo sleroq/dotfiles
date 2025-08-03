@@ -14,6 +14,7 @@
             monitor = DP-2, 2560x1440@180.00, auto, 1
           '';
         };
+        gamemode = true;
       };
     };
     editors = {
