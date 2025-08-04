@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 24,
+  "id": 43,
   "links": [],
   "panels": [
     {
@@ -65,7 +65,7 @@
         "textMode": "name",
         "wideLayout": false
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.0.2+security-01",
       "targets": [
         {
           "disableTextWrap": false,
@@ -76,13 +76,13 @@
           "includeNullMetadata": true,
           "instant": true,
           "interval": "",
-          "legendFormat": "Best server by load - {{instance}}",
+          "legendFormat": "Самый свободный сервер за последний час: {{instance}}",
           "range": false,
           "refId": "A",
           "useBackend": false
         }
       ],
-      "title": "The best node",
+      "title": "Лучший сервер сейчас",
       "transparent": true,
       "type": "stat"
     },
@@ -539,7 +539,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.0.2+security-01",
       "targets": [
         {
           "datasource": {
@@ -1019,7 +1019,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.0.2+security-01",
       "targets": [
         {
           "datasource": {
@@ -1499,7 +1499,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.0.2+security-01",
       "targets": [
         {
           "datasource": {
