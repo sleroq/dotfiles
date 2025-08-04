@@ -112,5 +112,13 @@ in
       2080 # vless
       8081 # vmess
     ];
+
+    services.prometheus.scrapeConfigs = lib.mkIf (config.cumserver.monitoring.enable && cfg.metricsEnvironmentFile != null) [
+      {
+        job_name = "marzban";
+        static_configs = [{ targets = [ "127.0.0.1:9091" ]; }];
+        scrape_interval = "30s";
+      }
+    ];
   };
 } 
