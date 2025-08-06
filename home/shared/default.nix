@@ -1,6 +1,6 @@
 # This direcotry is meant for configurations relevant on every host
 
-{ pkgs, inputs, ... }:
+{ pkgs, inputs, config, ... }:
 
 {
   imports = [
@@ -16,6 +16,11 @@
     username = "sleroq";
     homeDirectory = "/home/sleroq";
     stateVersion = "22.11";
+  };
+
+  age.secrets.ssh-config = {
+    file = ../secrets/ssh-config;
+    path = ".ssh/config";
   };
 
   myHome = {

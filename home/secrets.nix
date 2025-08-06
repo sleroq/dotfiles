@@ -6,4 +6,5 @@ let
 in
 {
   "secrets/flameshot-auth-token" = { publicKeys = commonPublicKeys; };
+  "secrets/ssh-config" = { publicKeys = commonPublicKeys; };
 } 
