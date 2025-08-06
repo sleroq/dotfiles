@@ -88,23 +88,11 @@
   fonts.fontDir.enable = true;
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
-    nerd-fonts.fira-code
-    nerd-fonts.droid-sans-mono
-    nerd-fonts.ubuntu
-    nerd-fonts.agave
-    # (nerdfonts.override { fonts = [ "JetBrainsMono" "FiraCode" "DroidSansMono" "Ubuntu" "Agave" ]; })
     noto-fonts
     noto-fonts-emoji
     noto-fonts-cjk-sans
-    roboto
     noto-fonts-extra
-    helvetica-neue-lt-std
-    arkpandora_ttf
-    powerline-fonts
-    source-han-sans
-    source-han-sans-japanese
-    source-han-serif-japanese
-    font-awesome
+    roboto
   ];
 
   environment.shells = with pkgs; [ bash nushell ];
