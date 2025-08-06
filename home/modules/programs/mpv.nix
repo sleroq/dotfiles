@@ -9,6 +9,8 @@
       osd-font-size = 24;
       sub-font-size = 24;
       screenshot-directory = "~/Pictures/Screenshots/mpv";
+      alang = "eng";
+      slang = "eng";
     };
   };
 }
