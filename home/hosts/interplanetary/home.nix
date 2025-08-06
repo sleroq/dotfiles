@@ -1,10 +1,6 @@
 { pkgs, scrcpyPkgs, pkgs-master, inputs, ... }:
 
 {
-  age.secrets.flameshot-auth-token = {
-    file = ../../secrets/flameshot-auth-token;
-  };
-
   myHome = {
     wms = {
       wayland = {
