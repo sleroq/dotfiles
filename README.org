@@ -8,7 +8,7 @@ Overcomplicated nix configs for my laptop, PC and server.
 ├── home
 │   ├── config
 │   │   └── [some configs are linked from here,
-│   │        because it's easier to edit the without rebuilding]
+│   │        because it's easier to edit the without rebuilding]
 │   ├── home.nix
 │   ├── hosts
 │   │   ├── international - laptop
@@ -20,7 +20,7 @@ Overcomplicated nix configs for my laptop, PC and server.
 │   ├── modules
 │   │   └── [home manager modules and configurations]
 │   └── shared
-│       └── [everything that's shared between all hosts]
+│       └── [everything that's shared between all hosts]
 ├── nixos
 │   ├── hosts
 │   │   ├── international - laptop
@@ -33,7 +33,7 @@ Overcomplicated nix configs for my laptop, PC and server.
 │   │   │   ├── ...
 │   │   │   └── flake.lock
 │   │   └── shared
-│   │       └── everything that's shared between all desktop hosts
+│   │       └── everything that's shared between all desktop hosts
 │   └── modules
 │       └── [system modules and configurations]
 ├── packages
@@ -48,6 +48,7 @@ Note: Some configs in the home manager are linked with activation scripts, so yo
 
 1. Enable flakes
 2. =git clone https://github.com/nix-community/home-manager.git ~/somewhere=
+3. Setup secrets mentioned in =home/secrets.nix= and in =nixos/hosts/shared/secrets.nix=
 3. =scripts/u= to build current system based on hostname. or =sudo nixos-rebuild switch --flake ./nixos/hosts/whateverhost/#whateverhostname=
 4. =hu= to build home manager configs. or =nix run home-manager/master -- switch --flake ./home/hosts/whateverhost/#sleroq= for the first time time.
 
