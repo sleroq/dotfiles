@@ -1,4 +1,4 @@
-{ pkgs, scrcpyPkgs, pkgs-master, inputs, ... }:
+{ pkgs, scrcpyPkgs, inputs, ... }:
 
 {
   myHome = {

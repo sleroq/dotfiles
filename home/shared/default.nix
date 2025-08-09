@@ -1,6 +1,6 @@
 # This direcotry is meant for configurations relevant on every host
 
-{ pkgs, inputs, config, ... }:
+{ pkgs, inputs, ... }:
 
 {
   imports = [
@@ -52,6 +52,7 @@
         enable = true;
         default = true;
       };
+      lf.enable = true;
 
       extraPackages = with pkgs; [
         exodus
