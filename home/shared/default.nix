@@ -1,6 +1,6 @@
 # This direcotry is meant for configurations relevant on every host
 
-{ pkgs, inputs, ... }:
+{ pkgs, inputs, lib, config, ... }:
 
 {
   imports = [
@@ -54,45 +54,46 @@
       };
       lf.enable = true;
 
-      extraPackages = with pkgs; [
-        exodus
-        monero-gui
-        signal-desktop
+      extraPackages =
+        let base = with pkgs; [
+          monero-gui
+          signal-desktop
 
-        teamspeak6-client
-        syncplay
+          teamspeak6-client
+          syncplay
 
-        krita
-        libreoffice-fresh
-        xournalpp
-        picard # music tagger
+          krita
+          libreoffice-fresh
+          xournalpp
+          picard # music tagger
 
-        # obsidian
-        qbittorrent
-        thunderbird
+          # obsidian
+          qbittorrent
+          thunderbird
 
-        keepassxc
+          keepassxc
 
-        nemo
+          nemo
 
-        kdePackages.filelight
-        p7zip
-        unzip
-        nomacs # Image viewer
+          kdePackages.filelight
+          p7zip
+          unzip
+          nomacs # Image viewer
 
-        # CLI
-        rclone
-        gdb
-        ffmpeg
+          # CLI
+          rclone
+          gdb
+          ffmpeg
 
-        # Remote stuff
-        # bore-cli
-        remmina
-        # nomachine-client
-        # rustdesk
-        vial
-        inputs.agenix.packages.${pkgs.system}.default
-      ];
+          # Remote stuff
+          # bore-cli
+          remmina
+          # nomachine-client
+          # rustdesk
+          vial
+          inputs.agenix.packages.${pkgs.system}.default
+        ];
+        in base ++ lib.optionals (lib.attrByPath [ "myHome" "programs" "exodus" "enable" ] false config) [ pkgs.exodus ];
     };
   };
 

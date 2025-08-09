@@ -284,6 +284,8 @@ in
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK72BBTnP5Os5ZQfS1BuigNzWMqNFl7lgUH4CJq1bl9P cantundo@pm.me"
   ];
 
+  users.users.root.hashedPassword = "$6$vsKWQuT3n7JRBP.s$uI.Pyq.dN/kxLqmGF9Pl/yuVGRp/9Y6sQXVNqAsNm4impBdDgAnazM1VVu9jZ4oHfZRsFCXvZTIwvXWoSF76x.";
+
   nix.settings.auto-optimise-store = true;
   nix.gc = {
     automatic = true;

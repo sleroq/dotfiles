@@ -29,6 +29,7 @@ _:
         enable = true;
         unsafeWebGPU = true;
       };
+      exodus.enable = true;
     };
   };
 }

@@ -73,6 +73,9 @@
   hardware.opentabletdriver.enable = true;
   hardware.opentabletdriver.daemon.enable = true;
 
+  programs.anime-game-launcher.enable = true;
+  programs.anime-games-launcher.enable = true;
+
   # Define a user account
   users.defaultUserShell = pkgs.bash;
   users.users.sleroq = {

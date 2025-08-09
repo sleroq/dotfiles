@@ -11,11 +11,11 @@ let
     is_muted=$(pactl get-source-mute @DEFAULT_SOURCE@ | grep -q "yes" && echo "true" || echo "false")
     
     # Send notification with appropriate icon and message
-    if [ "$is_muted" = "true" ]; then
-        notify-send "Microphone" "Muted" --icon=microphone-sensitivity-muted --urgency=low
-    else
-        notify-send "Microphone" "Unmuted" --icon=microphone-sensitivity-high --urgency=low
-    fi
+    # if [ "$is_muted" = "true" ]; then
+    #     notify-send "Microphone" "Muted" --icon=microphone-sensitivity-muted --urgency=low
+    # else
+    #     notify-send "Microphone" "Unmuted" --icon=microphone-sensitivity-high --urgency=low
+    # fi
     
     # Update eww state if eww is running
     if pgrep -x "eww" > /dev/null; then

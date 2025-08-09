@@ -7,7 +7,7 @@ let
 
     HOSTNAME=$(${pkgs.nettools}/bin/hostname)
 
-    sudo nixos-rebuild switch --flake "${opts.repoPathString}/nixos/hosts/${opts.host}#$HOSTNAME"
+    sudo nixos-rebuild switch --flake "${opts.repoPathString}/nixos#${HOSTNAME}"
   '';
 
   # Disable KDE global shortcuts

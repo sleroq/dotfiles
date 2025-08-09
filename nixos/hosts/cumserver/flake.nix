@@ -5,15 +5,21 @@
   inputs.nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
   inputs.agenix.url = "github:ryantm/agenix";
   inputs.mailserver.url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/";
-  # inputs.mailserver.url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/?ref=master&rev=ed6d699eb4adcddce75418515ef2f99ed4c60032";
-  inputs.tuwunel = {
-    url = "github:matrix-construct/tuwunel/v1.2.0";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
   inputs.secrets = {
     flake = false;
     url = "path:./secrets";
   };
+
+
+  inputs.kopoka = {
+    url = "git+ssh://git@github.com/sleroq/kopoka";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+  inputs.sieve = {
+    url = "git+ssh://git@github.com/sleroq/sieve";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+
   inputs.sleroq-link = {
     url = "github:sleroq/sleroq.link";
     inputs.nixpkgs.follows = "nixpkgs";
@@ -31,10 +37,6 @@
     url = "github:sleroq/bayan";
     inputs.nixpkgs.follows = "nixpkgs";
   };
-  inputs.kopoka = {
-    url = "git+ssh://git@github.com/sleroq/kopoka";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
   inputs.spoiler-images = {
     url = "github:sleroq/spoiler-images";
     inputs.nixpkgs.follows = "nixpkgs";
@@ -44,10 +46,6 @@
     inputs.nixpkgs.follows = "nixpkgs";
   };
   inputs.zefxi.url = "github:sleroq/zefxi";
-  inputs.sieve = {
-    url = "git+ssh://git@github.com/sleroq/sieve";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
   inputs.slusha.url = "github:sleroq/slusha";
 
   outputs =
@@ -60,7 +58,6 @@
     , reactor
     , sieve
     , slusha
-    , spoiler-images
     , zefxi
     , ...
     }@inputs:

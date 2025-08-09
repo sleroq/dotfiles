@@ -1245,11 +1245,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1749161630,
-        "narHash": "sha256-x2tv/WlRCZrbgKjy/7skjH8KpXCwZM1e287ZfqH5UCY=",
+        "lastModified": 1754595615,
+        "narHash": "sha256-eLbRaaaVjuGXbbJI/NLPXgodyS1ay/UDq9kujR/TxCo=",
         "owner": "sleroq",
         "repo": "spoiler-images",
-        "rev": "b16bcef71dfcac34e3652afdaac52b0f0558cd4b",
+        "rev": "d378da9dccaf4882a7189e1f7d50a0e942356edf",
         "type": "github"
       },
       "original": {

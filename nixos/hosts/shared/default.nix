@@ -55,10 +55,12 @@
   };
 
   systemd = {
-    extraConfig = ''
-      DefaultTimeoutStopSec=10s
-      DefaultTimeoutStartSec=10s
-    '';
+    settings = {
+      Manager = {
+        DefaultTimeoutStopSec = "10s";
+        DefaultTimeoutStartSec = "10s";
+      };
+    };
 
     coredump = {
       enable = true;

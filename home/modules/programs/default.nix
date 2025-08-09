@@ -54,6 +54,7 @@ in
     };
     activity-watch.enable = lib.mkEnableOption "Activity Watch";
     wireplumberHacks.enable = lib.mkEnableOption "WirePlumber autolink";
+    exodus.enable = lib.mkEnableOption "Exodus wallet";
   };
 
   config = lib.mkMerge [
