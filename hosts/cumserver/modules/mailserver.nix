@@ -1,4 +1,4 @@
-{ config, lib, inputs, pkgs, secrets, ... }:
+{ config, lib, inputs', secrets, ... }:
 
 let
   cfg = config.cumserver.mailserver;
@@ -113,7 +113,7 @@ in {
 
     services.caddy.virtualHosts."mail.cum.army" = {
       extraConfig = ''
-        root * ${inputs.sleroq-link.packages."${pkgs.system}".default}
+        root * ${inputs'.sleroq-link.packages.default}
         file_server
         encode zstd gzip
       '';

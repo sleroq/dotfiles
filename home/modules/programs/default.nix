@@ -1,4 +1,4 @@
-{ pkgs, pkgs-old, lib, config, secrets, ... }:
+{ pkgs, pkgs-old, lib, config, secrets, inputs', ... }:
 
 let
   cfg = config.myHome.programs;
@@ -25,13 +25,7 @@ in
       default = lib.mkEnableOption "default env";
     };
     mpv.enable = lib.mkEnableOption "MPV";
-    ghostty = {
-      enable = lib.mkEnableOption "Ghostty";
-      package = lib.mkOption {
-        type = lib.types.package;
-        default = pkgs.ghostty;
-      };
-    };
+    ghostty.enable = lib.mkEnableOption "Ghostty";
     wezterm.enable = lib.mkEnableOption "Wezterm"; 
     teams.enable = lib.mkEnableOption "Teams"; 
     obs = {
@@ -71,7 +65,7 @@ in
     (lib.mkIf (cfg.foot.enable && cfg.foot.default) {
       home.sessionVariables.TERMINAL = "foot";
     })
-    (lib.mkIf cfg.ghostty.enable (import ./ghostty.nix { inherit (cfg.ghostty) package; }))
+    (lib.mkIf cfg.ghostty.enable (import ./ghostty.nix { }))
     (lib.mkIf cfg.mpv.enable (import ./mpv.nix { inherit pkgs; }))
     (lib.mkIf cfg.wezterm.enable (
         import ./wezterm.nix { extraConfig = secrets.wezterm-ssh-domains; }
@@ -104,7 +98,7 @@ in
     })
     (lib.mkIf cfg.accounting.enable {
       home.packages = with pkgs; [
-        inputs.paisa.packages.${pkgs.system}.default
+        inputs'.paisa.packages.default
         ledger
         beancount
         beancount-language-server

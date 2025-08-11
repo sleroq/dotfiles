@@ -1,4 +1,4 @@
-{ inputs, pkgs, lib, config, opts, ... }:
+{ inputs', pkgs, lib, config, opts, ... }:
 
 let
   cfg = config.myHome.wms.wayland;
@@ -57,7 +57,7 @@ in
     })
 
     (import ../../programs/swaync.nix { })
-    (lib.mkIf cfg.hyprland.enable (import ./hyprland.nix { inherit pkgs opts lib inputs config; }))
+    (lib.mkIf cfg.hyprland.enable (import ./hyprland.nix { inherit pkgs opts lib inputs' config; }))
     (lib.mkIf cfg.sway.enable (import ./sway.nix { inherit pkgs opts lib; }))
   ];
 }

@@ -1,6 +1,6 @@
 # This direcotry is meant for configurations relevant on every host
 
-{ pkgs, inputs, lib, config, ... }:
+{ pkgs, inputs', lib, config, ... }:
 
 {
   imports = [
@@ -91,7 +91,7 @@
           # nomachine-client
           # rustdesk
           vial
-          inputs.agenix.packages.${pkgs.system}.default
+          inputs'.agenix.packages.default
         ];
         in base ++ lib.optionals (lib.attrByPath [ "myHome" "programs" "exodus" "enable" ] false config) [ pkgs.exodus ];
     };
@@ -102,6 +102,4 @@
   services.syncthing.enable = true;
 
   programs.home-manager.enable = true;
-
-  nixpkgs.config.allowUnfreePredicate = _: true;
 }

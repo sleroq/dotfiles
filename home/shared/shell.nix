@@ -1,12 +1,8 @@
 { pkgs, opts, ... }:
 
 let
-  runHM = command : "nix run home-manager/master -- ${command} --flake ${opts.repoPathString}/home/hosts/${opts.host}#sleroq";
-
   aliases = {
     cd = "z";
-    hu = runHM "switch";
-    hn = runHM "news";
     sudo = "sudo ";
     neofetch = "fastfetch";
   };

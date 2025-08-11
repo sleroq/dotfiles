@@ -15,12 +15,9 @@
         hide-when-typing = "yes";
       };
 
-      cursor = {
-        color = "1c1c1c eeeeee";
-      };
-
       # Catpussy machiatto
       colors = {
+        cursor = "1c1c1c eeeeee";
         alpha = "0.7";
         foreground = "cad3f5"; # Text
         background = "000000"; # Base

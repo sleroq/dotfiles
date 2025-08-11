@@ -4,7 +4,7 @@
   pkgs,
   secrets,
   config,
-  inputs,
+  inputs',
   ...
 }:
 let
@@ -12,20 +12,20 @@ let
   
   bayan = serviceWrapper.mkTelegramBot {
     name = "bayan";
-    package = inputs.bayan.packages.${pkgs.system}.default;
+    package = inputs'.bayan.packages.default;
     secretFile = ./secrets/bayanEnv;
     dataDir = "/var/lib/bayan";
   };
   
   kopoka = serviceWrapper.mkTelegramBot {
     name = "kopoka";
-    package = inputs.kopoka.packages.${pkgs.system}.default;
+    package = inputs'.kopoka.packages.default;
     secretFile = ./secrets/kopokaEnv;
   };
   
   spoiler-images = serviceWrapper.mkTelegramBot {
     name = "spoiler-images";
-    package = inputs.spoiler-images.packages.${pkgs.system}.default;
+    package = inputs'.spoiler-images.packages.default;
     secretFile = ./secrets/spoilerImagesEnv;
   };
 in
@@ -52,6 +52,8 @@ in
     kopoka
     spoiler-images
   ];
+  facter.reportPath = ./facter.json;
+
   boot.loader.grub.enable = true;
   boot.tmp.cleanOnBoot = true;
 
@@ -188,11 +190,11 @@ in
   #   group = "zefxi";
   #   file = ./secrets/zefxiEnv;
   # };
-  services.zefxi = {
-    enable = false;
-    caddy.enable = true;
-    environmentFile = config.age.secrets.zefxiEnv.path;
-  };
+  # services.zefxi = {
+  #   enable = false;
+  #   caddy.enable = true;
+  #   environmentFile = config.age.secrets.zefxiEnv.path;
+  # };
 
   age.secrets.sieveEnv = {
     owner = "sieve";

@@ -1,4 +1,4 @@
-{ pkgs, scrcpyPkgs, inputs, ... }:
+{ pkgs, scrcpyPkgs, inputs', ... }:
 
 {
   myHome = {
@@ -25,10 +25,7 @@
     };
 
     programs = {
-      ghostty = {
-        enable = true;
-        package = inputs.ghostty.packages.${pkgs.system}.default;
-      };
+      ghostty.enable = true;
       wireplumberHacks.enable = true;
       obs.enable = true;
       chromium = {
@@ -41,7 +38,7 @@
         pkgs.ollama-rocm
         pkgs.chatbox
         scrcpyPkgs.scrcpy
-        inputs.zig.packages.${pkgs.system}.master
+        inputs'.zig.packages.master
         # Temporarily disabled due to upstream test failures; re-enable after picking a working rev
         # inputs.zls.packages.${pkgs.system}.default
         pkgs.bottles
@@ -49,3 +46,5 @@
     };
   };
 }
+
+

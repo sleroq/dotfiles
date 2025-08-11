@@ -1,4 +1,4 @@
-{ inputs, pkgs, lib, config, ... }:
+{ inputs', pkgs, lib, config, ... }:
 
 let
   cfg = config.myHome.gaming;
@@ -25,7 +25,7 @@ in
     }
 
     (lib.mkIf cfg.osu.enable {
-      home.packages = with inputs.nix-gaming.packages.${pkgs.system}; [
+      home.packages = with inputs'.nix-gaming.packages; [
         osu-lazer-bin
         pkgs.opentabletdriver
       ];

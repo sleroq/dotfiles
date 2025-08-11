@@ -1,9 +1,9 @@
-{ config, pkgs, ... }:
+{ config, pkgs, self, ... }:
 
 {
   imports = [
     ./hardware-configuration.nix
-    ../../modules/webdav.nix
+    "${self}/nixos/modules/webdav.nix"
   ];
 
   hardware.amdgpu.initrd.enable = true;
@@ -98,13 +98,13 @@
 
   age.secrets = {
     webdav-cert = {
-      file = ../shared/secrets/webdav-cert.pem;
+      file = "${self}/nixos/hosts/shared/secrets/webdav-cert.pem";
       mode = "0644";
       owner = "webdav";
       group = "webdav";
     };
     webdav-key = {
-      file = ../shared/secrets/webdav-key.pem;
+      file = "${self}/nixos/hosts/shared/secrets/webdav-key.pem";
       mode = "0600";
       owner = "webdav";
       group = "webdav";

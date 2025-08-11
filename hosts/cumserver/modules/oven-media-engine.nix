@@ -1,4 +1,4 @@
-{ inputs, config, lib, pkgs, ... }:
+{ inputs', config, lib, pkgs, ... }:
 let
   cfg = config.cumserver.oven-media-engine;
   
@@ -396,7 +396,7 @@ in
           
           # Everything else serves the static website
           handle {
-            root * ${inputs.web-cum-army.packages."${pkgs.system}".default}
+            root * ${inputs'.web-cum-army.packages.default}
             file_server
             encode zstd gzip
           }

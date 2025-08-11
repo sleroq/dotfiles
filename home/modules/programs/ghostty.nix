@@ -1,9 +1,8 @@
-{ package, ... }:
+{ ... }:
 
 {
   programs.ghostty = {
     enable = true;
-    inherit package;
     settings = {
       theme = "catppuccin-mocha";
       confirm-close-surface = false;

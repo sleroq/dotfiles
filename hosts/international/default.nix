@@ -1,9 +1,9 @@
-{ config, pkgs, ... }:
+{ config, pkgs, self, ... }:
 
 {
   imports = [
     ./hardware-configuration.nix
-    ../../modules/battery-life.nix
+    "${self}/nixos/modules/battery-life.nix"
   ];
 
   sleroq.batteryLife.profile = "power-save";

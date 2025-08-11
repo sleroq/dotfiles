@@ -1,4 +1,4 @@
-{ inputs, pkgs, pkgs-master, lib, config, opts, ... }:
+{ inputs', pkgs, pkgs-master, lib, config, opts, ... }:
 
 let
   cfg = config.myHome.editors;
@@ -40,10 +40,10 @@ in
 
     (lib.mkIf cfg.helix.enable (import ./helix.nix { inherit pkgs; }))
 
-    (lib.mkIf cfg.emacs.enable (import ./emacs.nix { inherit pkgs inputs lib opts; }))
+    (lib.mkIf cfg.emacs.enable (import ./emacs.nix { inherit pkgs lib opts; }))
 
     (lib.mkIf cfg.zed.enable {
-      home.packages = [ inputs.zed.packages.${pkgs.stdenv.hostPlatform.system}.default ];
+      home.packages = [ inputs'.zed.packages.default ];
     })
   ];
 }

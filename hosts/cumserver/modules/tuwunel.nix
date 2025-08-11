@@ -1,4 +1,4 @@
-{ config, inputs, lib, secrets, pkgs, ... }:
+{ config, inputs', lib, secrets, pkgs, ... }:
 let
   cfg = config.cumserver.tuwunel;
 in
@@ -145,7 +145,7 @@ in
           extraConfig = ''
             tls ${config.age.secrets.cf-fullchain.path} ${config.age.secrets.cf-privkey.path}
 
-            root * ${inputs.sleroq-link.packages."${config.nixpkgs.system}".default}
+            root * ${inputs'.sleroq-link.packages.default}
             file_server
             encode zstd gzip
 

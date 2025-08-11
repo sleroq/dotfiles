@@ -1,4 +1,4 @@
-{ inputs, pkgs, config, lib, ... }:
+{ inputs', config, lib, ... }:
 let
   cfg = config.cumserver.caddy;
 in
@@ -13,7 +13,7 @@ in
         "cum.army" = {
           serverAliases = [ "www.cum.army" ];
           extraConfig = ''
-            root * ${inputs.cum-army.packages."${pkgs.system}".default}
+            root * ${inputs'.cum-army.packages.default}
             file_server
             encode zstd gzip
           '';

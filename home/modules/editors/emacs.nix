@@ -1,11 +1,9 @@
-{ pkgs, opts, lib, inputs, ... }:
+{ pkgs, opts, lib, ... }:
 
 with lib;
 let repoUrl = "https://github.com/doomemacs/doomemacs";
 in
 {
-    nixpkgs.overlays = [ inputs.emacs-overlay.overlay ];
-
     fonts.fontconfig.enable = true;
     home.packages = with pkgs; [
       ## Emacs itself
