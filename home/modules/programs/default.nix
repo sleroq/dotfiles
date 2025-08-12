@@ -1,4 +1,4 @@
-{ pkgs, pkgs-old, lib, config, secrets, inputs', ... }:
+{ pkgs, lib, config, secrets, inputs', ... }:
 
 let
   cfg = config.myHome.programs;
@@ -40,7 +40,6 @@ in
       unsafeWebGPU = lib.mkEnableOption "unsafe webgpu"; 
     };
     accounting.enable = lib.mkEnableOption "accounting software";
-    obinskit.enable = lib.mkEnableOption "ObinsKit";
     extraPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [];
@@ -105,7 +104,6 @@ in
         fava
       ];
     })
-    (lib.mkIf cfg.obinskit.enable { home.packages = [ pkgs-old.obinskit ]; })
     (lib.mkIf cfg.activity-watch.enable {
       home.packages = with pkgs; [
         activitywatch

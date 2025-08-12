@@ -1826,14 +1826,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1754666751,
-        "narHash": "sha256-DL4KIdB3mtt/BDzYgoC4OwLMpGQrS9VE9GDdam9KwJ4=",
-        "path": "/home/sleroq/develop/other/web.cum.army",
-        "type": "path"
+        "lastModified": 1755020484,
+        "narHash": "sha256-sK19Zm9WSW2VkMD4dbc778Um/FqrIg4WZFIHq8V+T+g=",
+        "owner": "sleroq",
+        "repo": "web.cum.army",
+        "rev": "4cfc554d35e7857737100355c76df9b9c06914c8",
+        "type": "github"
       },
       "original": {
-        "path": "/home/sleroq/develop/other/web.cum.army",
-        "type": "path"
+        "owner": "sleroq",
+        "repo": "web.cum.army",
+        "type": "github"
       }
     },
     "xdph": {

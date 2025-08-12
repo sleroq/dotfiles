@@ -1,10 +1,10 @@
 { config, lib, pkgs, ... }:
 
 let
-  cfg = config.services.webdav-server;
+  cfg = config.sleroq.webdav;
 in
 {
-  options.services.webdav-server = {
+  options.sleroq.webdav = {
     enable = lib.mkEnableOption "WebDAV server with custom configuration";
 
     port = lib.mkOption {

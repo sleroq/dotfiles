@@ -1,4 +1,4 @@
-{ pkgs, opts, lib, inputs', config, ... }:
+{ pkgs, opts, lib, inputs', config, self, ... }:
 
 with lib;
 let
@@ -46,7 +46,7 @@ let
   };
 in
 mkMerge [
-  (import ../../programs/eww.nix { inherit pkgs lib opts; })
+  (import ../../programs/eww.nix { inherit pkgs lib self; })
   (import ../../programs/flameshot.nix { inherit pkgs config; })
   (import ../../programs/mic-mute.nix { inherit pkgs; })
   {

@@ -1,4 +1,4 @@
-{ pkgs, opts, ... }:
+{ pkgs, opts, self, ... }:
 
 let
   aliases = {
@@ -29,8 +29,8 @@ in
 
     nushell = {
       enable = true;
-      configFile.source = opts.configs + /nushell/config.nu;
-      envFile.source = opts.configs + /nushell/env.nu;
+      configFile.source = self + /home/config/nushell/config.nu;
+      envFile.source = self + /home/config/nushell/env.nu;
       shellAliases = aliases;
     };
 

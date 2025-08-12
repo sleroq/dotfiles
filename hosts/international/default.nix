@@ -3,7 +3,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-    "${self}/nixos/modules/battery-life.nix"
+    "${self}/modules/battery-life.nix"
   ];
 
   sleroq.batteryLife.profile = "power-save";

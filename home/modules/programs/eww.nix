@@ -1,4 +1,4 @@
-{ pkgs, lib, opts, ... }:
+{ pkgs, lib, self, ... }:
 
 with lib;
 let
@@ -39,7 +39,7 @@ in
 {
   programs.eww = {
     enable = true;
-    configDir = opts.configs + /eww/bar;
+    configDir = self + /home/config/eww/bar;
   };
 
   fonts.fontconfig.enable = true;

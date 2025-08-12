@@ -1,4 +1,4 @@
-{ pkgs, opts, lib, ... }:
+{ pkgs, opts, lib, self, ... }:
 
 let
   # bash script to let dbus know about important env variables and
@@ -20,7 +20,7 @@ let
   };
 in
 lib.mkMerge [
-  (import ../../programs/eww.nix { inherit pkgs lib opts; })
+  (import ../../programs/eww.nix { inherit pkgs lib self; })
   (import ../../programs/swaycons.nix { inherit pkgs opts lib; })
   (import ../../programs/mic-mute.nix { inherit pkgs; })
   (with lib; {

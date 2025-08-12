@@ -3,7 +3,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-    "${self}/nixos/modules/webdav.nix"
+    "${self}/modules/webdav.nix"
   ];
 
   hardware.amdgpu.initrd.enable = true;
@@ -98,19 +98,19 @@
 
   age.secrets = {
     webdav-cert = {
-      file = "${self}/nixos/hosts/shared/secrets/webdav-cert.pem";
+      file = "${self}/shared/secrets/webdav-cert.pem";
       mode = "0644";
       owner = "webdav";
       group = "webdav";
     };
     webdav-key = {
-      file = "${self}/nixos/hosts/shared/secrets/webdav-key.pem";
+      file = "${self}/shared/secrets/webdav-key.pem";
       mode = "0600";
       owner = "webdav";
       group = "webdav";
     };
   };
-  services.webdav-server = {
+  sleroq.webdav = {
     enable = true;
     port = 8092;
     directory = "/srv/webdav";

@@ -1,6 +1,7 @@
-{ config, pkgs, ... }:
-
+{ lib, config, pkgs, ... }:
+with lib;
 let
+  cfg = config.sleroq.batteryLife;
   profiles = {
     performance = {
       cpuEnergyPerfPolicy = "performance";
@@ -22,17 +23,19 @@ let
     };
   };
 
-  selectedProfile = profiles.${config.sleroq.batteryLife.profile};
+  selectedProfile = profiles.${cfg.profile};
 in {
   options.sleroq.batteryLife = {
-    profile = pkgs.lib.mkOption {
-      type = pkgs.lib.types.enum [ "performance" "balanced" "power-save" ];
+    enable = mkEnableOption "battery life tuning via TLP and thermald";
+
+    profile = mkOption {
+      type = types.enum [ "performance" "balanced" "power-save" ];
       default = "balanced";
       description = "Performance profile for battery management";
     };
   };
 
-  config = {
+  config = mkIf cfg.enable {
     environment.systemPackages = [
       pkgs.powertop
     ];

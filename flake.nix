@@ -59,8 +59,7 @@
       inputs.nixpkgs.follows = "nixpkgs-cumserver";
     };
     web-cum-army = {
-      # url = "github:sleroq/web.cum.army";
-      url = "path:/home/sleroq/develop/other/web.cum.army";
+      url = "github:sleroq/web.cum.army";
       inputs.nixpkgs.follows = "nixpkgs-cumserver";
     };
     reactor = {
@@ -89,14 +88,21 @@
     };
   };
 
-  outputs = { nixpkgs, ... }@inputs:
+  outputs = { self, nixpkgs, ... }@inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [ inputs.easy-hosts.flakeModule ];
 
       systems = [ "x86_64-nixos" ];
 
+      flake.overlays = import ./overlays/default.nix {
+        inherit self nixpkgs;
+        inherit (inputs) scrcpyPkgs nixpkgs-master;
+      };
+
       easy-hosts =
         let
+          configs = ./home/config;
+          realConfigs = "/home/sleroq/develop/other/dotfiles/home/config";
           withNixpkgsFor = name: extra:
             let key = "nixpkgs-" + name; in
             extra // {
@@ -125,91 +131,33 @@
           };
 
         shared.modules = [
-          # Resolver that computes inputsResolved' and inputFor.
-          # Convention: an input named "foo-bar" is a host-specific override for base "foo" on host "bar".
-          # If there is no "foo-${host}", we fall back to shared base "foo".
-          ({ lib, inputs', easyHostsHost, ... }:
-            let
-              host = easyHostsHost;
-              names = builtins.attrNames inputs';
-              dashed = builtins.filter (n: builtins.match ".*-.*" n != null) names;
-              baseOf = n: builtins.head (builtins.split "-" n);
-              bases = lib.unique (builtins.map baseOf dashed);
-              resolveFor = base:
-                let hostKey = base + "-" + host; in
-                if builtins.hasAttr hostKey inputs' then builtins.getAttr hostKey inputs'
-                else if builtins.hasAttr base inputs' then builtins.getAttr base inputs'
-                else null;
-              aliasList = builtins.filter (a: a.value != null)
-                (builtins.map (b: { name = b; value = resolveFor b; }) bases);
-              aliasSet = lib.listToAttrs aliasList;
-              resolved = inputs' // aliasSet;
-              inputFor = name:
-                let hostKey = name + "-" + host; in
-                if builtins.hasAttr hostKey resolved then builtins.getAttr hostKey resolved
-                else builtins.getAttr name resolved;
-            in {
-              _module.args."inputsResolved'" = resolved;
-              _module.args.inputFor = inputFor;
-            }
-          )
+          (import ./lib/inputs-resolver.nix)
 
           inputs.agenix.nixosModules.default
+
+          ({ inputs, ... }: { nixpkgs.overlays = [ inputs.self.overlays.default ]; })
         ];
 
         perTag = tag:
-          let
-            system = "x86_64-linux"; # FIXME
-            user = "sleroq"; # FIXME
-            repoPath = ./.; # FIXME
-            repoPathString = "/home/${user}/develop/other/dotfiles";
-          in
           {
             modules = builtins.concatLists [
               (nixpkgs.lib.optionals (tag == "non-server") [
-                ({ inputs, inputsResolved', inputFor, ... }:
-                  {
-                    home-manager =
-                      {
-                        useGlobalPkgs = true;
-                        useUserPackages = true;
-                        sharedModules = [
-                          ./home/modules/wms/wayland
-                          ./home/modules/programs
-                          ./home/modules/editors
-                          ./home/modules/gaming.nix
-                          ./home/shared
-                          inputs.agenix.homeManagerModules.default
-                        ];
-
-                        extraSpecialArgs = {
-                          inherit inputs inputFor;
-                          # pass host-resolved inputs' into Home Manager
-                          "inputs'" = inputsResolved'; # TODO: not sure this is a best way
-
-                          secrets = import ./home/secrets/default.nix;
-                          opts = {
-                            configs = repoPath + /home/config;
-                            realConfigs = repoPathString + "/home/config";
-                          };
-                          pkgs-old = import inputs.nixpkgs-old {
-                            inherit system;
-                            config.allowUnfree = true;
-                            config.permittedInsecurePackages = [ "electron-13.6.9" ];
-                          };
-                          pkgs-master = import inputs.nixpkgs-master { inherit system; config.allowUnfree = true; };
-                          scrcpyPkgs = import inputs.scrcpyPkgs { inherit system; };
-                        };
-                      };
-                  })
+                ({ inputs, inputsResolved', ... } @ args:
+                  (import ./home/default.nix)
+                    (args // {
+                      agenixModule = inputs.agenix.homeManagerModules.default;
+                      inputs' = inputsResolved';
+                      self = inputs.self;
+                      inherit realConfigs;
+                    }))
               ])
 
-              (nixpkgs.lib.optionals (tag == "non-server") [ ./nixos/hosts/shared ])
+              (nixpkgs.lib.optionals (tag == "non-server") [ ./shared ])
 
               (nixpkgs.lib.optionals (tag == "laptop") [
                 inputs.home-manager-international.nixosModules.home-manager
                 {
-                  home-manager.users.sleroq.imports = [ ./home/hosts/international.nix ]; # FIXME
+                  home-manager.users.sleroq.imports = [ ./home/hosts/international.nix ];
                 }
               ])
 
@@ -217,7 +165,7 @@
                 inputs.home-manager-interplanetary.nixosModules.home-manager
                 inputs.aagl.nixosModules.default
                 { 
-                  home-manager.users.sleroq.imports = [ ./home/hosts/interplanetary.nix ]; # FIXME
+                  home-manager.users.sleroq.imports = [ ./home/hosts/interplanetary.nix ];
                 }
               ])
 
@@ -230,6 +178,11 @@
                 inputs.nixos-facter-modules.nixosModules.facter
               ])
             ];
+
+            specialArgs =
+              nixpkgs.lib.optionalAttrs (tag == "non-server") {
+                secrets = import ./shared/secrets/default.nix;
+              };
           };
       };
     };

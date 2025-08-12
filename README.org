@@ -1,33 +1,71 @@
 * Dotfiles
 
-Single unified flake for NixOS + Home Manager across laptop, PC, and server.
+Single unified flake for NixOS + Home Manager across laptop, desktop, and server.
 
-** Docs
+** Layout
 
 #+BEGIN_SRC
-├── flake.nix                     # top-level flake for NixOS + HM (per-host nixpkgs)
-├── home/
+├── flake.nix                     # top-level flake for NixOS + HM
+├── home/                         # Home Manager
 │   ├── config/                   # configs linked into $XDG_CONFIG_HOME
-│   ├── hosts/
-│   │   ├── international.nix     # HM per-host settings (laptop)
-│   │   └── interplanetary.nix    # HM per-host settings (PC)
-│   ├── modules/                  # HM modules: programs, editors, wms, etc
-│   └── shared/                   # shared HM settings
-├── nixos/
-│   ├── hosts/
-│   │   ├── international/        # NixOS host (laptop)
-│   │   ├── interplanetary/       # NixOS host (PC)
-│   │   └── cumserver/            # NixOS server (has extra modules)
-│   └── modules/                  # reusable NixOS modules
+│   ├── hosts/                    # per-host settings
+│   │   ├── international.nix     # laptop
+│   │   └── interplanetary.nix    # desktop
+│   ├── modules/                  # modules: programs, editors, wms, etc
+│   ├── secrets/                  # secrets
+│   └── shared/                   # shared settings
+├── hosts/                        # NixOS hosts
+│   ├── international/            # laptop
+│   ├── interplanetary/           # desktop
+│   └── cumserver/                # server (NixOS + services)
+├── modules/                      # reusable NixOS modules (shared across non-server hosts)
+├── shared/                       # shared NixOS config + secrets for non-servers
+│   ├── default.nix
+│   ├── secrets.nix
+│   └── secrets/                  # secrets for non-servers
 └── packages/                     # custom derivations
 #+END_SRC
 
 Note: Some HM configs are linked via activation scripts for local editing without rebuilds. This makes HM not strictly pure and not intended for remote application.
 
+** Notable features
+
+I use =easy-hosts= and special input resolver to make it easier to manage per-host inputs:
+
+- Convenience attrs: =self'= and =inputs'= to avoid repeating =${pkgs.system}=.
+  - Instead of: =inputs.input-name.packages.${pkgs.system}.package-name=
+    use: =inputs'.input-name.packages.package-name=
+  - Instead of: =self.packages.${pkgs.system}.package-name=
+    use: =self'.packages.package-name=
+
+- Per-host inputs resolver that exposes two helpers to modules: =inputsResolved'= and =inputFor=.
+  - Naming convention: define host-specific inputs as =baseName-hostName= (e.g. =zed-interplanetary=).
+  - For a host =HOST=, =inputsResolved'.baseName= becomes:
+    - the host-specific input if `baseName-HOST` exists, otherwise
+    - the shared `baseName` input if it exists, otherwise `null`.
+  - =inputFor "baseName"= returns the resolved input for the current host.
+
+Example usage in modules:
+
+#+BEGIN_SRC nix
+{ lib, pkgs, inputs', ... }:
+{
+  # Host-aware: picks inputs.zed-interplanetary on "interplanetary" host, inputs.zed-international on "international" host
+  environment.systemPackages = [
+    # shorter access thanks to inputs'
+    inputs'.zed.packages.default
+    inputs'.zig.packages.master
+    inputs'.zls.packages.default
+  ];
+}
+#+END_SRC
+
+These helpers are also passed into Home Manager via =extraSpecialArgs=, so HM modules can use the same API.
+
 ** Install / Rebuild
 
 1. Enable flakes
-2. Setup secrets mentioned in =home/secrets.nix= and =nixos/hosts/shared/secrets.nix=
+2. Setup secrets mentioned in =home/secrets.nix=, =shared/secrets.nix=, and host-specific =hosts/*/secrets.nix=
 3. Switch NixOS (from repo root):
    - =sudo nixos-rebuild switch --flake .#interplanetary=
    - =sudo nixos-rebuild switch --flake .#international=
@@ -40,5 +78,5 @@ Note: Some HM configs are linked via activation scripts for local editing withou
 
 ** How to understand Nix?
 
-- [[https://github.com/hlissner/dotfiles#frequently-asked-questions][Read links at the buttom]]
+ - [[https://github.com/hlissner/dotfiles#frequently-asked-questions][Read links at the bottom]]
 - [[https://www.youtube.com/watch?v=Eni9PPPPBpg][Listen to this]]

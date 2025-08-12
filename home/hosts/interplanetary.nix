@@ -1,4 +1,4 @@
-{ pkgs, scrcpyPkgs, inputs', ... }:
+{ pkgs, inputs', ... }:
 
 {
   myHome = {
@@ -34,14 +34,13 @@
       };
       teams.enable = true;
       exodus.enable = true;
-      extraPackages = [
-        pkgs.ollama-rocm
-        pkgs.chatbox
-        scrcpyPkgs.scrcpy
+      extraPackages = with pkgs; [
+        ollama-rocm
+        chatbox
+        scrcpy
         inputs'.zig.packages.master
-        # Temporarily disabled due to upstream test failures; re-enable after picking a working rev
-        # inputs.zls.packages.${pkgs.system}.default
-        pkgs.bottles
+        inputs'.zls.packages.default
+        bottles
       ];
     };
   };

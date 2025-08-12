@@ -9,4 +9,8 @@ in
   "secrets/sing-box-outbounds.jsonc" = { publicKeys = commonPublicKeys; };
   "secrets/webdav-cert.pem" = { publicKeys = commonPublicKeys; };
   "secrets/webdav-key.pem" = { publicKeys = commonPublicKeys; };
+  "secrets/work-vpn/ca.crt" = { publicKeys = commonPublicKeys; };
+  "secrets/work-vpn/cert.crt" = { publicKeys = commonPublicKeys; };
+  "secrets/work-vpn/private.key" = { publicKeys = commonPublicKeys; };
+  "secrets/work-vpn/tls_auth.key" = { publicKeys = commonPublicKeys; };
 }

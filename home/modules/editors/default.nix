@@ -1,4 +1,4 @@
-{ inputs', pkgs, pkgs-master, lib, config, opts, ... }:
+{ inputs', pkgs, lib, config, opts, ... }:
 
 let
   cfg = config.myHome.editors;
@@ -23,7 +23,7 @@ in
     })
 
     (lib.mkIf cfg.cursor.enable {
-      home.packages = [ pkgs-master.code-cursor ];
+      home.packages = [ pkgs.code-cursor ];
     })
 
     (lib.mkIf cfg.neovim.enable (import ./neovim.nix { inherit pkgs lib opts; }))

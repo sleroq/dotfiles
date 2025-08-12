@@ -1,14 +1,17 @@
 # This direcotry is meant for configurations relevant on every desktop host
 
-{ pkgs, config, ... }:
+{ pkgs, config, secrets, ... }:
 {
   imports = [
-    ../../modules/flatpak.nix
-    ../../modules/virtualisation.nix
-    ../../modules/wms/default.nix
-    ../../modules/apps.nix
-    ../../modules/sound/default.nix
-    ../../modules/sing-box.nix
+    ../modules/flatpak.nix
+    ../modules/virtualisation.nix
+    ../modules/wms/default.nix
+    ../modules/apps.nix
+    ../modules/sound/default.nix
+    ../modules/sing-box.nix
+    ../modules/openvpn-work-vpn.nix
+    ../modules/kwallet.nix
+    ../modules/webdav.nix
   ];
 
   nixpkgs.config.allowUnfree = true;
@@ -134,9 +137,22 @@
   #   MODE="0660", GROUP="plugdev"
   # '';
 
-  networking.networkmanager = {
-    enable = true;
-    plugins = [ pkgs.networkmanager-openvpn ];
+  networking.networkmanager.enable = true;
+
+  sleroq = {
+    apps.enable = true;
+    flatpakIntegration.enable = true;
+    kwallet.enable = true;
+    virtualisation.enable = true;
+    sound.enable = true;
+    wms.enable = true;
+    workVpn = {
+      enable = true;
+      secretsPath = ./secrets/work-vpn;
+      username = secrets.work-vpn.username;
+      port = secrets.work-vpn.port;
+      remotes = secrets.work-vpn.remotes;
+    };
   };
 
   age.secrets.sing-box-outbounds = {
