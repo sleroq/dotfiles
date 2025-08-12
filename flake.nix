@@ -3,19 +3,15 @@
 
   inputs = {
     nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
-    flake-parts = {
-      url = "github:hercules-ci/flake-parts";
-      inputs.nixpkgs-lib.follows = "nixpkgs";
-    };
+    flake-utils.url = "github:numtide/flake-utils";
+    flake-utils.inputs.nixpkgs.follows = "nixpkgs";
     easy-hosts.url = "github:tgirlcloud/easy-hosts";
 
     # Common NixOS flakes
     agenix.url = "github:ryantm/agenix";
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/heads/main";
-    hy3 = {
-      url = "github:outfoxxed/hy3";
-      inputs.hyprland.follows = "hyprland";
-    };
+    hy3.url = "github:outfoxxed/hy3";
+    hy3.inputs.hyprland.follows = "hyprland";
 
     # Per-host nixpkgs pins
     nixpkgs-interplanetary.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
@@ -50,43 +46,34 @@
     disko.inputs.nixpkgs.follows = "nixpkgs-cumserver";
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
     mailserver.url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/";
+
     # FIXME: Maybe use overlays to avoid following everything?
-    sleroq-link = {
-      url = "github:sleroq/sleroq.link";
-      inputs.nixpkgs.follows = "nixpkgs-cumserver";
-    };
-    cum-army = {
-      url = "github:sleroq/cum.army";
-      inputs.nixpkgs.follows = "nixpkgs-cumserver";
-    };
-    web-cum-army = {
-      url = "github:sleroq/web.cum.army";
-      inputs.nixpkgs.follows = "nixpkgs-cumserver";
-    };
-    reactor = {
-      url = "github:sleroq/reactor";
-      inputs.nixpkgs.follows = "nixpkgs-cumserver";
-    };
-    sieve = {
-      url = "git+ssh://git@github.com/sleroq/sieve";
-      inputs.nixpkgs.follows = "nixpkgs-cumserver";
-    };
-    slusha = {
-      url = "github:sleroq/slusha";
-      inputs.nixpkgs.follows = "nixpkgs-cumserver";
-    };
-    bayan = {
-      url = "github:sleroq/bayan";
-      inputs.nixpkgs.follows = "nixpkgs-cumserver";
-    };
-    kopoka = {
-      url = "git+ssh://git@github.com/sleroq/kopoka";
-      inputs.nixpkgs.follows = "nixpkgs-cumserver";
-    };
-    spoiler-images = {
-      url = "github:sleroq/spoiler-images";
-      inputs.nixpkgs.follows = "nixpkgs-cumserver";
-    };
+    sleroq-link.url = "github:sleroq/sleroq.link";
+    sleroq-link.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+
+    cum-army.url = "github:sleroq/cum.army";
+    cum-army.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+
+    web-cum-army.url = "github:sleroq/web.cum.army";
+    web-cum-army.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+
+    reactor.url = "github:sleroq/reactor";
+    reactor.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+
+    sieve.url = "git+ssh://git@github.com/sleroq/sieve";
+    sieve.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+
+    slusha.url = "github:sleroq/slusha";
+    slusha.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+
+    bayan.url = "github:sleroq/bayan";
+    bayan.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+
+    kopoka.url = "git+ssh://git@github.com/sleroq/kopoka";
+    kopoka.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+
+    spoiler-images.url = "github:sleroq/spoiler-images";
+    spoiler-images.inputs.nixpkgs.follows = "nixpkgs-cumserver";
   };
 
   outputs = { self, nixpkgs, ... }@inputs:
