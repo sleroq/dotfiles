@@ -35,7 +35,7 @@
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     zig.url = "github:mitchellh/zig-overlay";
     zls.url = "github:zigtools/zls?rev=45b855f7ec3dccea3c9a95df0b68e27dab842ae4";
-    zed-interplanetary.url = "github:zed-industries/zed?submodules=1&ref=refs/tags/v0.199.3-pre";
+    zed-interplanetary.url = "github:zed-industries/zed?submodules=1&ref=refs/tags/v0.200.0-pre";
     zed-international.url = "github:zed-industries/zed?submodules=1&ref=refs/tags/v0.199.3-pre";
 
     scrcpyPkgs.url = "github:nixos/nixpkgs/77a0bdd";
