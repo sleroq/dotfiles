@@ -39,7 +39,6 @@
     zed-international.url = "github:zed-industries/zed?submodules=1&ref=refs/tags/v0.199.3-pre";
 
     scrcpyPkgs.url = "github:nixos/nixpkgs/77a0bdd";
-    nixpkgs-old.url = "github:nixos/nixpkgs/1c37a89390481e809b9851781026bc9bb840dd90";
     nixpkgs-master.url = "github:nixos/nixpkgs/master";
 
     # Cumserver flakes

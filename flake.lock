@@ -1199,22 +1199,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-old": {
-      "locked": {
-        "lastModified": 1697146913,
-        "narHash": "sha256-BXT1VhfQmyIwKD99bzNPDAL9a9XVxQWG/RyAcfY8wCs=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "1c37a89390481e809b9851781026bc9bb840dd90",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "1c37a89390481e809b9851781026bc9bb840dd90",
-        "type": "github"
-      }
-    },
     "nixpkgs-stable": {
       "locked": {
         "lastModified": 1751274312,
@@ -1449,7 +1433,6 @@
         "nixpkgs-international": "nixpkgs-international",
         "nixpkgs-interplanetary": "nixpkgs-interplanetary",
         "nixpkgs-master": "nixpkgs-master",
-        "nixpkgs-old": "nixpkgs-old",
         "reactor": "reactor",
         "scrcpyPkgs": "scrcpyPkgs",
         "sieve": "sieve",
