@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Setup TLS for remote node_exporter
-# This script should be run on the remote server (45.144.51.68)
 
 set -e
 
