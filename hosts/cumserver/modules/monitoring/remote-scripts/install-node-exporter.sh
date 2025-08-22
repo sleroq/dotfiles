@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Setup script for remote node_exporter with basic authentication
-# This script should be run on the remote server (45.144.51.68)
 
 set -e
 

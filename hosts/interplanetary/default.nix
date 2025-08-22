@@ -1,4 +1,4 @@
-{ config, pkgs, self, ... }:
+{ config, pkgs, self, inputs', ... }:
 
 {
   imports = [
@@ -75,6 +75,11 @@
 
   programs.anime-game-launcher.enable = true;
   programs.anime-games-launcher.enable = true;
+
+  environment.systemPackages = [
+    inputs'.winapps.packages.winapps
+    inputs'.winapps.packages.winapps-launcher # optional
+  ];
 
   # Define a user account
   users.defaultUserShell = pkgs.bash;

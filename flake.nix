@@ -22,6 +22,11 @@
     # Interplanetary flakes
     aagl.url = "github:ezKEa/aagl-gtk-on-nix";
     aagl.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
+    winapps.url = "github:winapps-org/winapps";
+    winapps.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
+
+    zenbrowser-interplanetary.url = "github:youwen5/zen-browser-flake";
+    zenbrowser-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
 
     home-manager-interplanetary.url = "github:nix-community/home-manager";
     home-manager-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
@@ -89,7 +94,6 @@
 
       easy-hosts =
         let
-          configs = ./home/config;
           realConfigs = "/home/sleroq/develop/other/dotfiles/home/config";
           withNixpkgsFor = name: extra:
             let key = "nixpkgs-" + name; in

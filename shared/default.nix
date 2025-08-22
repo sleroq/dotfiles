@@ -16,6 +16,7 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  # FIXME: There is probably some conflicts in this confiuation
   networking.nameservers = [ "1.1.1.1" "1.1.0.1" "8.8.8.8" ];
   
   services = {
