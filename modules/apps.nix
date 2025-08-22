@@ -1,4 +1,4 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, inputsResolved', ... }:
 with lib;
 let
   cfg = config.sleroq.apps;
@@ -13,9 +13,9 @@ in
       wget
       curl
       foot
-      librewolf
       nvtopPackages.full
       powertop
+      inputsResolved'.zenbrowser.packages.default
     ];
 
     # For samba and other stuff
