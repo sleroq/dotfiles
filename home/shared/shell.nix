@@ -1,12 +1,8 @@
-{ pkgs, opts, ... }:
+{ pkgs, opts, self, ... }:
 
 let
-  runHM = command : "nix run home-manager/master -- ${command} --flake ${opts.repoPathString}/home/hosts/${opts.host}#sleroq";
-
   aliases = {
     cd = "z";
-    hu = runHM "switch";
-    hn = runHM "news";
     sudo = "sudo ";
     neofetch = "fastfetch";
   };
@@ -33,8 +29,8 @@ in
 
     nushell = {
       enable = true;
-      configFile.source = opts.configs + /nushell/config.nu;
-      envFile.source = opts.configs + /nushell/env.nu;
+      configFile.source = self + /home/config/nushell/config.nu;
+      envFile.source = self + /home/config/nushell/env.nu;
       shellAliases = aliases;
     };
 

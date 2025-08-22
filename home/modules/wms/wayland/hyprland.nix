@@ -1,4 +1,4 @@
-{ pkgs, opts, lib, inputs, config, ... }:
+{ pkgs, opts, lib, inputs', config, self, ... }:
 
 with lib;
 let
@@ -46,7 +46,7 @@ let
   };
 in
 mkMerge [
-  (import ../../programs/eww.nix { inherit pkgs lib opts; })
+  (import ../../programs/eww.nix { inherit pkgs lib self; })
   (import ../../programs/flameshot.nix { inherit pkgs config; })
   (import ../../programs/mic-mute.nix { inherit pkgs; })
   {
@@ -61,7 +61,7 @@ mkMerge [
 
     home.file."${config.xdg.configHome}/hypr/extra-config.conf" = {
       text = mkMerge [
-        "plugin = ${inputs.hy3.packages.x86_64-linux.hy3}/lib/libhy3.so"
+        "plugin = ${inputs'.hy3.packages.hy3}/lib/libhy3.so"
         (mkIf config.myHome.wms.wayland.hyprland.gamemode ''
           exec = hypr-gamemode
         '')
@@ -143,7 +143,7 @@ mkMerge [
 
     home.packages = with pkgs; [
       hyprland-per-window-layout
-      inputs.hy3.packages.x86_64-linux.hy3
+      inputs'.hy3.packages.hy3 # TODO: fix with easy-hosts
       hyprpolkitagent
       hyprpicker
 

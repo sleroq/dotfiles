@@ -1,4 +1,4 @@
-{ pkgs, pkgs-old, lib, config, secrets, ... }:
+{ pkgs, lib, config, secrets, inputs', ... }:
 
 let
   cfg = config.myHome.programs;
@@ -25,13 +25,7 @@ in
       default = lib.mkEnableOption "default env";
     };
     mpv.enable = lib.mkEnableOption "MPV";
-    ghostty = {
-      enable = lib.mkEnableOption "Ghostty";
-      package = lib.mkOption {
-        type = lib.types.package;
-        default = pkgs.ghostty;
-      };
-    };
+    ghostty.enable = lib.mkEnableOption "Ghostty";
     wezterm.enable = lib.mkEnableOption "Wezterm"; 
     teams.enable = lib.mkEnableOption "Teams"; 
     obs = {
@@ -46,7 +40,6 @@ in
       unsafeWebGPU = lib.mkEnableOption "unsafe webgpu"; 
     };
     accounting.enable = lib.mkEnableOption "accounting software";
-    obinskit.enable = lib.mkEnableOption "ObinsKit";
     extraPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [];
@@ -54,6 +47,7 @@ in
     };
     activity-watch.enable = lib.mkEnableOption "Activity Watch";
     wireplumberHacks.enable = lib.mkEnableOption "WirePlumber autolink";
+    exodus.enable = lib.mkEnableOption "Exodus wallet";
   };
 
   config = lib.mkMerge [
@@ -70,7 +64,7 @@ in
     (lib.mkIf (cfg.foot.enable && cfg.foot.default) {
       home.sessionVariables.TERMINAL = "foot";
     })
-    (lib.mkIf cfg.ghostty.enable (import ./ghostty.nix { inherit (cfg.ghostty) package; }))
+    (lib.mkIf cfg.ghostty.enable (import ./ghostty.nix { }))
     (lib.mkIf cfg.mpv.enable (import ./mpv.nix { inherit pkgs; }))
     (lib.mkIf cfg.wezterm.enable (
         import ./wezterm.nix { extraConfig = secrets.wezterm-ssh-domains; }
@@ -103,14 +97,13 @@ in
     })
     (lib.mkIf cfg.accounting.enable {
       home.packages = with pkgs; [
-        inputs.paisa.packages.${pkgs.system}.default
+        inputs'.paisa.packages.default
         ledger
         beancount
         beancount-language-server
         fava
       ];
     })
-    (lib.mkIf cfg.obinskit.enable { home.packages = [ pkgs-old.obinskit ]; })
     (lib.mkIf cfg.activity-watch.enable {
       home.packages = with pkgs; [
         activitywatch

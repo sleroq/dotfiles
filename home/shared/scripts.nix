@@ -1,15 +1,6 @@
 { pkgs, opts, ... }:
 
 let
-  # NixOS rebuild script for updating the system
-  nixos-update = pkgs.writeShellScriptBin "u" ''
-    set -e
-
-    HOSTNAME=$(${pkgs.nettools}/bin/hostname)
-
-    sudo nixos-rebuild switch --flake "${opts.repoPathString}/nixos/hosts/${opts.host}#$HOSTNAME"
-  '';
-
   # Disable KDE global shortcuts
   disable-global-kde = pkgs.writeShellScriptBin "disable-global-kde" ''
     hotkeysRC="$XDG_CONFIG_HOME/kglobalshortcutsrc"
@@ -115,7 +106,6 @@ let
 in
 {
   home.packages = [
-    nixos-update
     disable-global-kde
     openvault
     toggleHT

@@ -1,58 +1,82 @@
 * Dotfiles
 
-Overcomplicated nix configs for my laptop, PC and server.
+Single unified flake for NixOS + Home Manager across laptop, desktop, and server.
 
-** Docs
+** Layout
 
 #+BEGIN_SRC
-├── home
-│   ├── config
-│   │   └── [some configs are linked from here,
-│   │        because it's easier to edit the without rebuilding]
-│   ├── home.nix
-│   ├── hosts
-│   │   ├── international - laptop
-│   │   │   ├── ...
-│   │   │   └── flake.lock - separate lock files for different hosts and from system 
-│   │   └── interplanetary - PC
-│   │       ├── ...
-│   │       └── flake.lock
-│   ├── modules
-│   │   └── [home manager modules and configurations]
-│   └── shared
-│       └── [everything that's shared between all hosts]
-├── nixos
-│   ├── hosts
-│   │   ├── international - laptop
-│   │   │   ├── ...
-│   │   │   └── flake.lock - separate lock files for different hosts
-│   │   ├── interplanetary - PC
-│   │   │   ├── ...
-│   │   │   └── flake.nix
-│   │   ├── cumserver - server with lots of stuff
-│   │   │   ├── ...
-│   │   │   └── flake.lock
-│   │   └── shared
-│   │       └── everything that's shared between all desktop hosts
-│   └── modules
-│       └── [system modules and configurations]
-├── packages
-│   └── [packages, can be used both by system config and home manager]
-└── scripts
-    └── [some helper scripts here]
+├── flake.nix                     # top-level flake for NixOS + HM
+├── home/                         # Home Manager
+│   ├── config/                   # configs linked into $XDG_CONFIG_HOME
+│   ├── hosts/                    # per-host settings
+│   │   ├── international.nix     # laptop
+│   │   └── interplanetary.nix    # desktop
+│   ├── modules/                  # modules: programs, editors, wms, etc
+│   ├── secrets/                  # secrets
+│   └── shared/                   # shared settings
+├── hosts/                        # NixOS hosts
+│   ├── international/            # laptop
+│   ├── interplanetary/           # desktop
+│   └── cumserver/                # server (NixOS + services)
+├── modules/                      # reusable NixOS modules (shared across non-server hosts)
+├── shared/                       # shared NixOS config + secrets for non-servers
+│   ├── default.nix
+│   ├── secrets.nix
+│   └── secrets/                  # secrets for non-servers
+└── packages/                     # custom derivations
 #+END_SRC
 
-Note: Some configs in the home manager are linked with activation scripts, so you can edit them without rebuilding the whole system. This means that home configurations are not really pure and you won't be able to apply them to remote hosts.
+Note: Some HM configs are linked via activation scripts for local editing without rebuilds. This makes HM not strictly pure and not intended for remote application.
 
-** Install
+** Notable features
+
+I use =easy-hosts= and special input resolver to make it easier to manage per-host inputs:
+
+- Convenience attrs: =self'= and =inputs'= to avoid repeating =${pkgs.system}=.
+  - Instead of: =inputs.input-name.packages.${pkgs.system}.package-name=
+    use: =inputs'.input-name.packages.package-name=
+  - Instead of: =self.packages.${pkgs.system}.package-name=
+    use: =self'.packages.package-name=
+
+- Per-host inputs resolver that exposes two helpers to modules: =inputsResolved'= and =inputFor=.
+  - Naming convention: define host-specific inputs as =baseName-hostName= (e.g. =zed-interplanetary=).
+  - For a host =HOST=, =inputsResolved'.baseName= becomes:
+    - the host-specific input if `baseName-HOST` exists, otherwise
+    - the shared `baseName` input if it exists, otherwise `null`.
+  - =inputFor "baseName"= returns the resolved input for the current host.
+
+Example usage in modules:
+
+#+BEGIN_SRC nix
+{ lib, pkgs, inputs', ... }:
+{
+  # Host-aware: picks inputs.zed-interplanetary on "interplanetary" host, inputs.zed-international on "international" host
+  environment.systemPackages = [
+    # shorter access thanks to inputs'
+    inputs'.zed.packages.default
+    inputs'.zig.packages.master
+    inputs'.zls.packages.default
+  ];
+}
+#+END_SRC
+
+These helpers are also passed into Home Manager via =extraSpecialArgs=, so HM modules can use the same API.
+
+** Install / Rebuild
 
 1. Enable flakes
-2. =git clone https://github.com/nix-community/home-manager.git ~/somewhere=
-3. Setup secrets mentioned in =home/secrets.nix= and in =nixos/hosts/shared/secrets.nix=
-3. =scripts/u= to build current system based on hostname. or =sudo nixos-rebuild switch --flake ./nixos/hosts/whateverhost/#whateverhostname=
-4. =hu= to build home manager configs. or =nix run home-manager/master -- switch --flake ./home/hosts/whateverhost/#sleroq= for the first time time.
+2. Setup secrets mentioned in =home/secrets.nix=, =shared/secrets.nix=, and host-specific =hosts/*/secrets.nix=
+3. Switch NixOS (from repo root):
+   - =sudo nixos-rebuild switch --flake .#interplanetary=
+   - =sudo nixos-rebuild switch --flake .#international=
+   - =sudo nixos-rebuild switch --flake .#cumserver=
+4. Home Manager is managed via the NixOS module and rebuilt with the system. No separate HM flake or aliases.
+5. Per-host nixpkgs pins can be updated independently:
+   - =nix flake lock --update-input nixpkgs-interplanetary=
+   - =nix flake lock --update-input nixpkgs-international=
+   - =nix flake lock --update-input nixpkgs-cumserver=
 
 ** How to understand Nix?
 
-- [[https://github.com/hlissner/dotfiles#frequently-asked-questions][Read links at the buttom]]
+ - [[https://github.com/hlissner/dotfiles#frequently-asked-questions][Read links at the bottom]]
 - [[https://www.youtube.com/watch?v=Eni9PPPPBpg][Listen to this]]
