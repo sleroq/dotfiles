@@ -44,8 +44,8 @@
       ghostty.enable = true;
       anytype = {
         enable = true;
-        version = "0.49.1";
-        hash = "sha256-tgJQhFmfK0qQYWnl2LVwctEdkLZn+uSVyaml8xaJDbQ=";
+        version = "0.49.2";
+        hash = "sha256-NA8PozwenoIClkWry1q1Z/crhieflrlJVtBLLrKwWEk=";
       };
       mpv.enable = true;
       foot = {

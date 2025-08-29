@@ -7,6 +7,8 @@
 
   programs.nushell = {
     extraEnv = ''
+      $env.PATH = ($env.PATH | append ($env.HOME | path join '.local/bin'))
+
       # Deno
       $env.PATH = ($env.PATH | append ($env.HOME | path join '.deno/bin'))
 
@@ -19,6 +21,8 @@
 
   programs.zsh = {
     initContent = ''
+      export PATH="$PATH:$HOME/.local/bin"
+
       # Deno
       export PATH="$PATH:$HOME/.deno/bin"
 
@@ -31,6 +35,8 @@
 
   programs.bash = {
     initExtra = ''
+      export PATH="$PATH:$HOME/.local/bin"
+
       # Deno
       export PATH="$PATH:$HOME/.deno/bin"
 

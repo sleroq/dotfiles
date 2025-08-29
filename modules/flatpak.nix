@@ -17,7 +17,6 @@ in
       aggregatedIcons = pkgs.buildEnv {
         name = "system-icons";
         paths = with pkgs; [
-          libsForQt5.breeze-qt5
           gnome-themes-extra
         ];
         pathsToLink = [ "/share/icons" ];

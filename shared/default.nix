@@ -140,7 +140,7 @@
 
   sleroq = {
     apps.enable = true;
-    flatpakIntegration.enable = true;
+    flatpakIntegration.enable = false;
     kwallet.enable = true;
     virtualisation.enable = true;
     sound.enable = true;

@@ -58,10 +58,10 @@
 
   powerManagement.cpuFreqGovernor = "performance";
 
-  services.logind.extraConfig = ''
+  services.logind.settings.Login = {
     # don’t shutdown when power button is short-pressed
-    HandlePowerKey=ignore
-  '';
+    HandlePowerKey = "ignore";
+  };
 
   environment.variables = {
     # https://wiki.archlinux.org/title/Hardware_video_acceleration#Configuring_Vulkan_Video
@@ -79,6 +79,7 @@
   environment.systemPackages = [
     inputs'.winapps.packages.winapps
     inputs'.winapps.packages.winapps-launcher # optional
+    pkgs.freerdp
   ];
 
   # Define a user account

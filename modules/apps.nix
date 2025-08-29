@@ -45,7 +45,7 @@ in
 
       gamescope = {
         enable = true;
-        capSysNice = true;
+        # capSysNice = true;
       };
 
       gamemode.enable = true;
@@ -62,16 +62,16 @@ in
     };
 
 
-    services.ananicy = {
-      enable = true;
-      package = pkgs.ananicy-cpp;
-      rulesProvider = pkgs.ananicy-cpp;
-      extraRules = [
-        {
-          "name" = "gamescope";
-          "nice" = -20;
-        }
-      ];
-    };
+    # services.ananicy = {
+    #   enable = true;
+    #   package = pkgs.ananicy-cpp;
+    #   rulesProvider = pkgs.ananicy-cpp;
+    #   extraRules = [
+    #     {
+    #       "name" = "gamescope";
+    #       "nice" = -20;
+    #     }
+    #   ];
+    # };
   };
 }
