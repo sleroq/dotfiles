@@ -71,9 +71,6 @@
     sieve.url = "git+ssh://git@github.com/sleroq/sieve";
     sieve.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
-    slusha.url = "github:sleroq/slusha";
-    slusha.inputs.nixpkgs.follows = "nixpkgs-cumserver";
-
     bayan.url = "github:sleroq/bayan";
     bayan.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
@@ -132,7 +129,6 @@
                 inputs.mailserver.nixosModules.default
                 inputs.reactor.nixosModules.reactor
                 inputs.sieve.nixosModules.sieve
-                inputs.slusha.nixosModules.slusha
                 inputs.nixos-facter-modules.nixosModules.facter
               ];
               specialArgs = {

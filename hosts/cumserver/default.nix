@@ -48,6 +48,7 @@ in
     ./modules/tuwunel.nix
     ./modules/marzban.nix
     ./modules/traggo.nix
+    ./modules/slusha.nix
     bayan
     kopoka
     spoiler-images
@@ -206,18 +207,19 @@ in
     environmentFile = config.age.secrets.sieveEnv.path;
   };
 
-  # age.secrets.slushaEnv = {
-  #   owner = "slusha";
-  #   group = "slusha";
-  #   file = ./secrets/slushaEnv;
-  # };
-  # age.secrets.slushaConfig = {
-  #   owner = "slusha";
-  #   group = "slusha";
-  #   file = ./secrets/slushaConfig.js;
-  # };
-  services.slusha = {
-    enable = false;
+  age.secrets.slushaEnv = {
+    owner = "slusha";
+    group = "slusha";
+    file = ./secrets/slushaEnv;
+  };
+  age.secrets.slushaConfig = {
+    owner = "slusha";
+    group = "slusha";
+    file = ./secrets/slushaConfig.js;
+  };
+  cumserver.slusha = {
+    enable = true;
+    image = "localhost/slusha:latest";
     environmentFile = config.age.secrets.slushaEnv.path;
     configFile = config.age.secrets.slushaConfig.path;
   };
