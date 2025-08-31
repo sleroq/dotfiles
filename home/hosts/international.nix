@@ -8,6 +8,8 @@ _:
         hyprland = {
           enable = true;
           extraConfig = ''
+            monitor = eDP-1, 1920x1080@60.02700, auto, 1
+
             device {
                 name = gxtp7863:00-27c6:01e0-touchpad
                 accel_profile = adaptive
@@ -19,10 +21,11 @@ _:
       };
     };
     editors = {
-      zed.enable = false;
-      cursor.enable = false;
-      helix.enable = true;
+      zed.enable = true;
+      cursor.enable = true;
+      helix.enable = false;
     };
+    gaming.osu.enable = true;
     programs = {
       obs.enable = true;
       chromium = {

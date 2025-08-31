@@ -32,6 +32,9 @@
     home-manager-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
 
     # International flakes
+    zenbrowser-international.url = "github:youwen5/zen-browser-flake";
+    zenbrowser-international.inputs.nixpkgs.follows = "nixpkgs-international";
+
     home-manager-international.url = "github:nix-community/home-manager";
     home-manager-international.inputs.nixpkgs.follows = "nixpkgs-international";
 
@@ -41,7 +44,7 @@
     zig.url = "github:mitchellh/zig-overlay";
     zls.url = "github:zigtools/zls?rev=45b855f7ec3dccea3c9a95df0b68e27dab842ae4";
     zed-interplanetary.url = "github:zed-industries/zed?submodules=1&ref=refs/tags/v0.202.1-pre";
-    zed-international.url = "github:zed-industries/zed?submodules=1&ref=refs/tags/v0.199.3-pre";
+    zed-international.url = "github:zed-industries/zed/nightly";
 
     scrcpyPkgs.url = "github:nixos/nixpkgs/77a0bdd";
     nixpkgs-master.url = "github:nixos/nixpkgs/master";

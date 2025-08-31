@@ -19,12 +19,16 @@ in
     ];
 
     # For samba and other stuff
-    services.gvfs.enable = true;
+    services.gvfs.enable = true; # what is this and why do I need samba?
 
     # Steam remote play
     hardware.uinput.enable = true;
 
     programs = {
+      nh = {
+        enable = true;
+        flake = "/home/sleroq/develop/other/dotfiles"; # TODO: infer from args
+      };
       neovim = {
         enable = true;
         defaultEditor = true;
@@ -50,15 +54,15 @@ in
 
       gamemode.enable = true;
 
-      partition-manager.enable = true;
+      # partition-manager.enable = true;
 
       dconf.enable = true;
 
-      fuse.userAllowOther = true;
+      fuse.userAllowOther = true; # why do I need this
 
       noisetorch.enable = true;
 
-      adb.enable = true; # Phone debuggin stuff
+      adb.enable = false; # Phone debuggin stuff
     };
 
 

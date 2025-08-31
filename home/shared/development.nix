@@ -16,6 +16,9 @@
       $env.GOPATH = ($env.HOME | path join 'develop/go')
       $env.GOBIN = ($env.GOPATH | path join 'bin')
       $env.PATH = ($env.PATH | append $env.GOBIN)
+
+
+      $env.NH_FLAKE = "/home/sleroq/develop/other/dotfiles"; # TODO: infer from args
     '';
   };
 
@@ -30,6 +33,8 @@
       export GOPATH="$HOME/develop/go"
       export GOBIN="$GOPATH/bin"
       export PATH="$PATH:$GOBIN"
+
+      export NH_FLAKE="/home/sleroq/develop/other/dotfiles"; # TODO: infer from args
     '';
   };
 

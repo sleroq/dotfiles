@@ -59,7 +59,7 @@
           monero-gui
           signal-desktop
 
-          teamspeak6-client
+          # teamspeak6-client
           syncplay
 
           krita

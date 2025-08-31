@@ -6,7 +6,15 @@
     "${self}/modules/battery-life.nix"
   ];
 
-  sleroq.batteryLife.profile = "power-save";
+  services.tailscale.enable = true;
+  networking.firewall = {
+    enable = true;
+    trustedInterfaces = [ "tailscale0" ];
+    allowedUDPPorts = [ config.services.tailscale.port ];
+  };
+
+  # sleroq.batteryLife.profile = "power-save";
+  sleroq.batteryLife.profile = "performance";
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -14,10 +22,14 @@
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
   boot.initrd.systemd.enable = true;
   boot.plymouth.enable = true;
+  boot.kernelPackages = pkgs.linuxKernel.packages.linux_xanmod;
   boot.kernel.sysctl = { "vm.swappiness" = 20; };
   boot.kernelParams = [ "quiet" ];
   boot.extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
-  boot.kernelModules = [ "v4l2loopback" ];  # obs virtual camera
+  boot.kernelModules = [ "v6l2loopback" ];  # obs virtual camera
+
+  hardware.opentabletdriver.enable = true;
+  hardware.opentabletdriver.daemon.enable = true;
 
   # Setup keyfile
   boot.initrd.secrets = {
@@ -71,6 +83,7 @@
     };
   };
 
+  sleroq.virtualisation.enable = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
