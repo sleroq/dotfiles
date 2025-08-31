@@ -9,7 +9,7 @@ in
     
     minPort = lib.mkOption {
       type = lib.types.int;
-      default = 8008;
+      default = 8002;
       description = "Minimum port for bore server";
     };
     
@@ -76,6 +76,8 @@ in
         RemoveIPC = true;
       };
     };
+
+    users.groups.bore = {};
 
     users.users.bore = {
       isSystemUser = true;
