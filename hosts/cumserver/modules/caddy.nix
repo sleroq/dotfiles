@@ -19,7 +19,7 @@ in
             encode zstd gzip
 
             # Shortcut for fauna pic to avoid /u/
-            redir /fauna /u/fauna.png 308
+            redir /fauna /u/fauna-final.png 308
             file_server
 
             ${lib.optionalString config.cumserver.zipline.enable ''
