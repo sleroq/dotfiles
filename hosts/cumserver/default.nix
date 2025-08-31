@@ -215,6 +215,7 @@ in
   age.secrets.slushaConfig = {
     owner = "slusha";
     group = "slusha";
+    mode = "0644";
     file = ./secrets/slushaConfig.js;
   };
   cumserver.slusha = {
