@@ -23,7 +23,17 @@ rec {
       cursor = pkgsMaster.cursor;
     };
 
-  default = composeManyExtensions [ scrcpy cursor ];
+  opencode = final: prev:
+    let
+      pkgsMaster = import nixpkgs-master {
+        system = final.stdenv.hostPlatform.system;
+        config = prev.config or {};
+      };
+    in {
+      opencode = pkgsMaster.opencode;
+    };
+
+  default = composeManyExtensions [ scrcpy cursor opencode ];
 }
 
 
