@@ -57,6 +57,11 @@ in
         swww
       ];
 
+      # FIXME: batsignal does not work
+      services.batsignal = {
+        enable = true;
+        extraArgs = ["-p" "-f" "99"];
+      };
     })
 
     (import ../../programs/swaync.nix { })
