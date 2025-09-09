@@ -12,6 +12,9 @@
       # Deno
       $env.PATH = ($env.PATH | append ($env.HOME | path join '.deno/bin'))
 
+      # Bun
+      $env.PATH = ($env.PATH | append ($env.HOME | path join '.cache/.bun/bin'))
+
       # Golang
       $env.GOPATH = ($env.HOME | path join 'develop/go')
       $env.GOBIN = ($env.GOPATH | path join 'bin')
@@ -29,6 +32,9 @@
       # Deno
       export PATH="$PATH:$HOME/.deno/bin"
 
+      # Bun
+      export PATH="$PATH:$HOME/.cache/.bun/bin"
+
       # Golang
       export GOPATH="$HOME/develop/go"
       export GOBIN="$GOPATH/bin"
@@ -44,6 +50,9 @@
 
       # Deno
       export PATH="$PATH:$HOME/.deno/bin"
+
+      # Bun
+      export PATH="$PATH:$HOME/.cache/.bun/bin"
 
       # Golang
       export GOPATH="$HOME/develop/go"
@@ -86,5 +95,7 @@
     # exiftool
     gcc # For go build
     gnumake # Generally usefull sometimes
+    bun
+    opencode
   ];
 }
