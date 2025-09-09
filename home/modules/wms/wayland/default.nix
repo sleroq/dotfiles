@@ -57,7 +57,7 @@ in
         swww
       ];
 
-      # FIXME: batsignal does not work
+      # TODO: Do not enable on desktop
       services.batsignal = {
         enable = true;
         extraArgs = ["-p" "-f" "99"];
