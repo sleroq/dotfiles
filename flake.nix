@@ -10,7 +10,7 @@
 
     # Common NixOS flakes
     agenix.url = "github:ryantm/agenix";
-    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/heads/main";
+    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/heads/main&rev=584b844aaf72cd7ea6851117f1bd598b7467ffc1";
     hy3.url = "github:outfoxxed/hy3";
     hy3.inputs.hyprland.follows = "hyprland";
 
@@ -37,6 +37,8 @@
 
     home-manager-international.url = "github:nix-community/home-manager";
     home-manager-international.inputs.nixpkgs.follows = "nixpkgs-international";
+    vicinae.url = "github:vicinaehq/vicinae";
+    vicinae.inputs.nixpkgs.follows = "nixpkgs-international";
 
     # HM-related inputs used by home modules
     nix-gaming.url = "github:fufexan/nix-gaming";
@@ -152,6 +154,7 @@
                   (import ./home/default.nix)
                     (args // {
                       agenixModule = inputs.agenix.homeManagerModules.default;
+                      vicinae = inputs.vicinae.homeManagerModules.default;
                       inputs' = inputsResolved';
                       inherit (inputs) self;
                       inherit realConfigs;

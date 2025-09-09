@@ -1,4 +1,4 @@
-{ agenixModule, inputs', realConfigs, self, ... }:
+{ agenixModule, vicinae, inputs', realConfigs, self, ... }:
 {
   home-manager = {
     useGlobalPkgs = true;
@@ -10,6 +10,7 @@
       ./modules/gaming.nix
       ./shared
       agenixModule
+      vicinae
     ];
 
     extraSpecialArgs = {

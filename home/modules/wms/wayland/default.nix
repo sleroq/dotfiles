@@ -26,6 +26,7 @@ in
     (lib.mkIf cfg.enable {
       services.kanshi.enable = true;
 
+      # TODO: remove tofi?
       programs.tofi = {
         enable = true;
         settings = {
@@ -41,6 +42,9 @@ in
           width = "100%";
         };
       };
+      services.cliphist.enable = true;
+
+      services.vicinae.enable = true;
 
       # Packages universal for all window managers
       home.packages = with pkgs; [
@@ -53,7 +57,6 @@ in
         swww
       ];
 
-      services.cliphist.enable = true;
     })
 
     (import ../../programs/swaync.nix { })
