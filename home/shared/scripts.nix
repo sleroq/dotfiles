@@ -1,4 +1,4 @@
-{ pkgs, opts, ... }:
+{ pkgs, ... }:
 
 let
   # Disable KDE global shortcuts

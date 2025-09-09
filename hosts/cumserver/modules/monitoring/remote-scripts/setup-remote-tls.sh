@@ -64,10 +64,10 @@ fi
 # Update web.yml to include TLS configuration
 echo "Updating web.yml with TLS configuration..."
 
-cat > "$PROMETHEUS_DIR/web.yml" << 'EOF'
+cat >> "$PROMETHEUS_DIR/web.yml" << 'EOF'
 # Basic authentication
-basic_auth_users:
-  prometheus:
+# basic_auth_users:
+#   prometheus:
 
 # TLS configuration
 tls_server_config:

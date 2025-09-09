@@ -49,22 +49,14 @@ in
 
       gamescope = {
         enable = true;
-        # capSysNice = true;
+        # capSysNice = true; # breaks gamescope?
       };
 
       gamemode.enable = true;
-
-      # partition-manager.enable = true;
-
       dconf.enable = true;
-
       fuse.userAllowOther = true; # why do I need this
-
       noisetorch.enable = true;
-
-      adb.enable = false; # Phone debuggin stuff
     };
-
 
     # services.ananicy = {
     #   enable = true;

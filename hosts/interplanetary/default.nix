@@ -6,13 +6,6 @@
     "${self}/modules/webdav.nix"
   ];
 
-  services.tailscale.enable = true;
-  networking.firewall = {
-    enable = true;
-    trustedInterfaces = [ "tailscale0" ];
-    allowedUDPPorts = [ config.services.tailscale.port ];
-  };
-
   hardware.amdgpu.initrd.enable = true;
 
   # Bootloader.
@@ -82,9 +75,9 @@
 
   programs.anime-game-launcher.enable = true;
   programs.anime-games-launcher.enable = true;
+  programs.adb.enable = true; # Phone debuggin stuff
 
   environment.systemPackages = [
-    pkgs.tailscale
     inputs'.winapps.packages.winapps
     inputs'.winapps.packages.winapps-launcher # optional
     pkgs.freerdp

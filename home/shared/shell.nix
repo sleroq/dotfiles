@@ -1,4 +1,4 @@
-{ pkgs, opts, self, ... }:
+{ pkgs, self, ... }:
 
 let
   aliases = {
@@ -78,7 +78,7 @@ in
     fzf
     jq
     ripgrep
-    tldr
+    outfieldr
     onefetch
   ];
 }

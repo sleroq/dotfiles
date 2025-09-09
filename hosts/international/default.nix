@@ -6,13 +6,6 @@
     "${self}/modules/battery-life.nix"
   ];
 
-  services.tailscale.enable = true;
-  networking.firewall = {
-    enable = true;
-    trustedInterfaces = [ "tailscale0" ];
-    allowedUDPPorts = [ config.services.tailscale.port ];
-  };
-
   # sleroq.batteryLife.profile = "power-save";
   sleroq.batteryLife.profile = "performance";
 
