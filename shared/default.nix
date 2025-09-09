@@ -12,13 +12,14 @@
     ../modules/openvpn-work-vpn.nix
     ../modules/kwallet.nix
     ../modules/webdav.nix
+    ../modules/tailscale.nix
   ];
 
   nixpkgs.config.allowUnfree = true;
 
   # FIXME: There is probably some conflicts in this confiuation
   networking.nameservers = [ "1.1.1.1" "1.1.0.1" "8.8.8.8" ];
-  
+
   services = {
     nixops-dns.domain = "1.1.1.1";
     fstrim.enable = true;
@@ -139,6 +140,7 @@
   networking.networkmanager.enable = true;
 
   sleroq = {
+    tailscale.enable = true;
     apps.enable = true;
     flatpakIntegration.enable = false;
     kwallet.enable = true;
