@@ -30,9 +30,7 @@
     };
 
     editors = {
-      vscode = {
-        enable = true;
-      };
+      vscode.enable = true;
       neovim = {
         enable = true;
         enableNeovide = true;
@@ -52,7 +50,6 @@
         enable = true;
         default = true;
       };
-      lf.enable = true;
 
       extraPackages =
         let base = with pkgs; [
@@ -101,5 +98,13 @@
 
   services.syncthing.enable = true;
 
-  programs.home-manager.enable = true;
+  programs = {
+    home-manager.enable = true;
+    yazi = {
+      enable = true;
+      enableBashIntegration = true;
+      enableZshIntegration = true;
+      enableNushellIntegration = true;
+    };
+  };
 }
