@@ -103,6 +103,11 @@ in
     group = "prometheus";
     file = ./secrets/nodeExporter2Password;
   };
+  age.secrets.nodeExporter3Password = {
+    owner = "prometheus";
+    group = "prometheus";
+    file = ./secrets/nodeExporter3Password;
+  };
   cumserver.monitoring = {
     enable = true;
     grafanaPasswordPath = config.age.secrets.grafanaPassword.path;
@@ -119,6 +124,13 @@ in
         name = "Moscow";
         address = "${secrets.marzbanNode2IP}:9100";
         passwordPath = config.age.secrets.nodeExporter2Password.path;
+        enableTLS = true;
+        tlsInsecure = true;
+      }
+      {
+        name = "Germany Dokploy";
+        address = "${secrets.dokployServerIP}:9100";
+        passwordPath = config.age.secrets.nodeExporter3Password.path;
         enableTLS = true;
         tlsInsecure = true;
       }
