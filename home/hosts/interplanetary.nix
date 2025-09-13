@@ -14,6 +14,7 @@
       };
     };
     editors = {
+      datagrip.enable = false;
       zed.enable = true;
       cursor.enable = true;
       helix.enable = true;

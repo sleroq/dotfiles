@@ -7,6 +7,7 @@ in
   options.myHome.editors = {
     vscode.enable = lib.mkEnableOption "Visual Studio Code";
     cursor.enable = lib.mkEnableOption "Cursor";
+    datagrip.enable = lib.mkEnableOption "DataGrip";
     neovim = {
       enable = lib.mkEnableOption "Neovim (imports ./neovim.nix)";
       enableNeovide = lib.mkEnableOption "Neovide";
@@ -20,6 +21,11 @@ in
   config = lib.mkMerge [
     (lib.mkIf cfg.vscode.enable {
       programs.vscode.enable = true;
+    })
+
+
+    (lib.mkIf cfg.cursor.enable {
+      home.packages = [ pkgs.jetbrains.datagrip ];
     })
 
     (lib.mkIf cfg.cursor.enable {

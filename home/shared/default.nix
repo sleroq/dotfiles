@@ -55,6 +55,7 @@
         let base = with pkgs; [
           monero-gui
           signal-desktop
+          legcord
 
           # teamspeak6-client
           syncplay

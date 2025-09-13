@@ -10,7 +10,8 @@
 
     # Common NixOS flakes
     agenix.url = "github:ryantm/agenix";
-    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/heads/main&rev=584b844aaf72cd7ea6851117f1bd598b7467ffc1";
+    # hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/heads/main&rev=584b844aaf72cd7ea6851117f1bd598b7467ffc1";
+    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/heads/main&rev=46174f78b374b6cea669c48880877a8bdcf7802f";
     hy3.url = "github:outfoxxed/hy3";
     hy3.inputs.hyprland.follows = "hyprland";
 
