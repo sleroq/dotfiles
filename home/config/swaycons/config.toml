@@ -22,7 +22,7 @@ beekeeper-studio = { icon = "󰆼", color = "#fad83b" }
 chromium = { icon = "", color = "#a1c2fa", size = "13pt" }
 discord = { icon = "󰙯", color = "#404eed" }
 firefox = { icon = "", color = "#ff8817", size = "13pt" }
-foot = { icon = " " }
+kitty = { icon = " " }
 geary = { icon = "", color = "#f6d32d" }
 gnome-calendar = { icon = "", color = "#3584e4" }
 gnumeric = { icon = "󰈛", color = "#34a853" }
@@ -96,5 +96,5 @@ libreoffice-calc = { icon = "󰱿", color = "#00A500" }
 "zoom\\.us" = { icon = "󰕧", color = "#2d8cff" }
 aerc = { app_id = ["foot", "Alacritty"], icon = "󰇰" }
 litecli = { app_id = ["foot", "Alacritty"], icon = "󰆼", color = "#c74451" }
-nnn = { app_id = ["foot", "Alacritty"], icon = "󰉖" }
-pgcli = { app_id = ["foot", "Alacritty"], icon = "󰆼", color = "#c74451" }
+nnn = { app_id = ["foot", "Alacritty", "kitty"], icon = "󰉖" }
+pgcli = { app_id = ["foot", "Alacritty", "kitty"], icon = "󰆼", color = "#c74451" }

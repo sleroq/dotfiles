@@ -18,36 +18,42 @@ in
         description = "Override hash for anytype";
       };
     };
+
     lf.enable = lib.mkEnableOption "lf file manager";
     zathura.enable = lib.mkEnableOption "Zathura PDF viewer";
-    foot = {
-      enable = lib.mkEnableOption "Foot terminal";
-      default = lib.mkEnableOption "default env";
-    };
-    mpv.enable = lib.mkEnableOption "MPV";
+
+    foot.enable = lib.mkEnableOption "Foot terminal emulator";
+    foot.default = lib.mkEnableOption "default env";
+    kitty.enable = lib.mkEnableOption "Kitty terminal emulator";
+    kitty.default = lib.mkEnableOption "default env";
+    wezterm.enable = lib.mkEnableOption "Wezterm terminal emulator";
+    wezterm.default = lib.mkEnableOption "default env";
     ghostty.enable = lib.mkEnableOption "Ghostty";
-    wezterm.enable = lib.mkEnableOption "Wezterm"; 
-    teams.enable = lib.mkEnableOption "Teams"; 
+    ghostty.default = lib.mkEnableOption "default env";
+
+    mpv.enable = lib.mkEnableOption "MPV";
     obs = {
-      enable = lib.mkEnableOption "Ghostty";
+      enable = lib.mkEnableOption "OBS";
       package = lib.mkOption {
         type = lib.types.package;
         default = pkgs.obs-studio;
       };
     };
+    teams.enable = lib.mkEnableOption "Teams"; 
     chromium = {
       enable = lib.mkEnableOption "chromium";
       unsafeWebGPU = lib.mkEnableOption "unsafe webgpu"; 
     };
     accounting.enable = lib.mkEnableOption "accounting software";
+    activity-watch.enable = lib.mkEnableOption "Activity Watch";
+    wireplumberHacks.enable = lib.mkEnableOption "WirePlumber autolink";
+    exodus.enable = lib.mkEnableOption "Exodus wallet";
+
     extraPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [];
       description = "A list of extra packages to install.";
     };
-    activity-watch.enable = lib.mkEnableOption "Activity Watch";
-    wireplumberHacks.enable = lib.mkEnableOption "WirePlumber autolink";
-    exodus.enable = lib.mkEnableOption "Exodus wallet";
   };
 
   config = lib.mkMerge [
@@ -60,15 +66,27 @@ in
     })
     (lib.mkIf cfg.lf.enable (import ./lf.nix { inherit pkgs; }))
     (lib.mkIf cfg.zathura.enable (import ./zathura.nix { }))
+
     (lib.mkIf cfg.foot.enable (import ./foot.nix { inherit pkgs; }))
     (lib.mkIf (cfg.foot.enable && cfg.foot.default) {
       home.sessionVariables.TERMINAL = "foot";
     })
     (lib.mkIf cfg.ghostty.enable (import ./ghostty.nix { }))
+    (lib.mkIf (cfg.ghostty.enable && cfg.ghostty.default) {
+      home.sessionVariables.TERMINAL = "ghostty";
+    })
+    (lib.mkIf cfg.kitty.enable (import ./kitty.nix { }))
+    (lib.mkIf (cfg.kitty.enable && cfg.kitty.default) {
+      home.sessionVariables.TERMINAL = "kitty";
+    })
     (lib.mkIf cfg.mpv.enable (import ./mpv.nix { inherit pkgs; }))
     (lib.mkIf cfg.wezterm.enable (
         import ./wezterm.nix { extraConfig = secrets.wezterm-ssh-domains; }
     ))
+    (lib.mkIf (cfg.wezterm.enable && cfg.wezterm.default) {
+      home.sessionVariables.TERMINAL = "wezterm";
+    })
+
     (lib.mkIf cfg.teams.enable (import ./teams.nix { inherit pkgs; }))
     (lib.mkIf cfg.obs.enable {
       programs.obs-studio = {
@@ -111,7 +129,7 @@ in
         aw-watcher-window
       ];
     })
-    (lib.mkIf (cfg.extraPackages != []) { home.packages = cfg.extraPackages; })
     (lib.mkIf cfg.wireplumberHacks.enable (import ./wireplumber.nix { inherit lib config pkgs; }))
+    (lib.mkIf (cfg.extraPackages != []) { home.packages = cfg.extraPackages; })
   ];
 }

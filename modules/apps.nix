@@ -12,7 +12,6 @@ in
       neovim
       wget
       curl
-      foot
       nvtopPackages.full
       powertop
       inputsResolved'.zenbrowser.packages.default

@@ -27,6 +27,7 @@
 
     programs = {
       ghostty.enable = true;
+      kitty.enable = true;
       wireplumberHacks.enable = true;
       obs.enable = true;
       chromium = {
@@ -42,6 +43,7 @@
         inputs'.zig.packages.master
         inputs'.zls.packages.default
         bottles
+        qFlipper
       ];
     };
   };
