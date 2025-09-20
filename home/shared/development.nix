@@ -78,6 +78,7 @@
     # rustc
     # godot_4
     marksman
+    hadolint
 
     nixd # Nix language server
     nil # Another nix language server? (zed needs it)
@@ -96,6 +97,7 @@
     gcc # For go build
     gnumake # Generally usefull sometimes
     bun
+    pnpm
     opencode
   ];
 }
