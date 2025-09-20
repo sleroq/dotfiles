@@ -38,12 +38,12 @@ in {
     iconTheme.package = pkgs.tela-icon-theme;
     # cursorTheme.name = "Vimix-cursors";
     # cursorTheme.package = pkgs.vimix-cursors;
-    gtk3.extraConfig = {
-      gtk-application-prefer-dark-theme = true;
-    };
-    gtk4.extraConfig = {
-      gtk-application-prefer-dark-theme = true;
-    };
+    # gtk3.extraConfig = {
+    #   gtk-application-prefer-dark-theme = true;
+    # };
+    # gtk4.extraConfig = {
+    #   gtk-application-prefer-dark-theme = true;
+    # };
   };
 
   home = {
