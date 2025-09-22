@@ -74,6 +74,7 @@ lsp_zero.extend_lspconfig({
 })
 
 require('lspconfig').lua_ls.setup({})
+require('lspconfig').prismals.setup({})
 require('lspconfig').denols.setup({})
 -- require('lspconfig').ts_ls.setup({})
 require('lspconfig').lua_ls.setup({})
