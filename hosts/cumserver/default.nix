@@ -128,7 +128,7 @@ in
         tlsInsecure = true;
       }
       {
-        name = "Germany Dokploy";
+        name = "Dokploy";
         address = "${secrets.dokployServerIP}:9100";
         passwordPath = config.age.secrets.nodeExporter3Password.path;
         enableTLS = true;

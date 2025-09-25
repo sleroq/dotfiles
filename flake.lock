@@ -1885,11 +1885,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1755020484,
-        "narHash": "sha256-sK19Zm9WSW2VkMD4dbc778Um/FqrIg4WZFIHq8V+T+g=",
+        "lastModified": 1758825900,
+        "narHash": "sha256-Nsq9atVxb2m+804ZR+AZxah+tZ8cMzhyZYxN/h2Rg7c=",
         "owner": "sleroq",
         "repo": "web.cum.army",
-        "rev": "4cfc554d35e7857737100355c76df9b9c06914c8",
+        "rev": "f0200e3f06655d3c6bdb0e725ac9e098c223c713",
         "type": "github"
       },
       "original": {
