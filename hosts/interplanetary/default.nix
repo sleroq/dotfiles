@@ -56,6 +56,8 @@
     loader.efi.canTouchEfiVariables = true;
   };
 
+  services.system76-scheduler.enable = true;
+
   powerManagement.cpuFreqGovernor = "performance";
 
   services.logind.settings.Login = {

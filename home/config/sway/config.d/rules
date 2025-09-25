@@ -6,7 +6,7 @@
 for_window [app_id="keepassxc"] floating enable
 for_window [class="(?i)Lxappearance$"] floating enable
 for_window [app_id="(?i)mpv"] floating enable
-for_window [app_id="pavucontrol"] floating enable
+for_window [app_id="pwvucontrol"] floating enable
 for_window [app_id="nm-connection-editor$"] floating enable
 for_window [title="^Open Files?$"] floating enable
 for_window [app_id="org.telegram.desktop"] floating enable

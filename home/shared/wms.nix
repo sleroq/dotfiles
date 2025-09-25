@@ -4,11 +4,12 @@
   # Packages universal for all window managers
   home.packages = with pkgs; [
     networkmanagerapplet # TODO: Find better gui
-    pavucontrol # TODO: Find better volume control
+    pwvucontrol
+    coppwr
     gammastep # screen temperature
     libnotify
     glib # gsettings
-    pulseaudioFull
+    # pulseaudioFull
   ];
 
   services.gammastep = {

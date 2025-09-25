@@ -37,8 +37,8 @@
       teams.enable = true;
       exodus.enable = true;
       extraPackages = with pkgs; [
-        ollama-rocm
-        chatbox
+        # ollama-rocm
+        # chatbox
         scrcpy
         inputs'.zig.packages.master
         inputs'.zls.packages.default

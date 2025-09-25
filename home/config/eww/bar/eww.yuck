@@ -72,7 +72,7 @@
   (eventbox :onhover "${EWW_CMD} update volume_open=true"
             :onhoverlost "${EWW_CMD} update volume_open=false"
     (box :class "volume" :space-evenly false
-      (button :onclick "pavucontrol &" "󰕾")
+      (button :onclick "pwvucontrol &" "󰕾")
       (revealer :transition "slideleft"
                 :reveal volume_open
                 :duration "350ms"
