@@ -98,11 +98,6 @@ in
     group = "prometheus";
     file = ./secrets/nodeExporter1Password;
   };
-  age.secrets.nodeExporter2Password = {
-    owner = "prometheus";
-    group = "prometheus";
-    file = ./secrets/nodeExporter2Password;
-  };
   age.secrets.nodeExporter3Password = {
     owner = "prometheus";
     group = "prometheus";
@@ -117,13 +112,6 @@ in
         name = "Poland";
         address = "${secrets.marzbanNode1IP}:9100";
         passwordPath = config.age.secrets.nodeExporter1Password.path;
-        enableTLS = true;
-        tlsInsecure = true;
-      }
-      {
-        name = "Moscow";
-        address = "${secrets.marzbanNode2IP}:9100";
-        passwordPath = config.age.secrets.nodeExporter2Password.path;
         enableTLS = true;
         tlsInsecure = true;
       }

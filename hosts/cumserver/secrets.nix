@@ -40,7 +40,6 @@ let
     "secrets/zefxiEnv" = { publicKeys = commonPublicKeys; };
     "secrets/marzbanMetricsEnv" = { publicKeys = commonPublicKeys; };
     "secrets/nodeExporter1Password" = { publicKeys = commonPublicKeys; };
-    "secrets/nodeExporter2Password" = { publicKeys = commonPublicKeys; };
     "secrets/nodeExporter3Password" = { publicKeys = commonPublicKeys; };
     "secrets/ziplineEnv" = { publicKeys = commonPublicKeys; };
   };
