@@ -130,11 +130,11 @@
     },
     "crane_2": {
       "locked": {
-        "lastModified": 1755993354,
-        "narHash": "sha256-FCRRAzSaL/+umLIm3RU3O/+fJ2ssaPHseI2SSFL8yZU=",
+        "lastModified": 1758215636,
+        "narHash": "sha256-8nkzkPbdxze8CxWhKWlcLbJEU1vfLM/nVqRlTy17V54=",
         "owner": "ipetkov",
         "repo": "crane",
-        "rev": "25bd41b24426c7734278c2ff02e53258851db914",
+        "rev": "a669fe77a8b0cd6f11419d89ea45a16691ca5121",
         "type": "github"
       },
       "original": {
@@ -1262,10 +1262,10 @@
     "nixpkgs_10": {
       "locked": {
         "lastModified": 315532800,
-        "narHash": "sha256-E8CyvVDZuIsF7puIw+OLkrFmhj3qUV+iwPcNbBhdcxM=",
-        "rev": "a918bb3594dd243c2f8534b3be01b3cb4ed35fd1",
+        "narHash": "sha256-YPoFUJMpbuPvIS4FJBn2Sv/iWsui9S26gu2ufFWEY0g=",
+        "rev": "a1f79a1770d05af18111fbbe2a3ab2c42c0f6cd0",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-25.11pre854010.a918bb3594dd/nixexprs.tar.xz"
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-25.11pre864673.a1f79a1770d0/nixexprs.tar.xz"
       },
       "original": {
         "type": "tarball",
@@ -1556,11 +1556,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1756607787,
-        "narHash": "sha256-ciwAdgtlAN1PCaidWK6RuWsTBL8DVuyDCGM+X3ein5Q=",
+        "lastModified": 1758508617,
+        "narHash": "sha256-kx2uELmVnAbiekj/YFfWR26OXqXedImkhe2ocnbumTA=",
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "rev": "f46d294b87ebb9f7124f1ce13aa2a5f5acc0f3eb",
+        "rev": "d2bac276ac7e669a1f09c48614538a37e3eb6d0f",
         "type": "github"
       },
       "original": {
@@ -1864,17 +1864,18 @@
         "nixpkgs": "nixpkgs_8"
       },
       "locked": {
-        "lastModified": 1758123542,
-        "narHash": "sha256-OhI7im7PxUt2zalnD//UwXtX7K+wrPCuWBcOUTwCP7M=",
-        "owner": "vicinaehq",
-        "repo": "vicinae",
-        "rev": "2e633e046ff889323af74c5823a0fd01a911bf1c",
-        "type": "github"
+        "lastModified": 1758895940,
+        "narHash": "sha256-uMeZzceMtozjzNp4ghA36UQ7bUajGy84xDpP8RCx3vo=",
+        "ref": "refs/tags/v0.13.0",
+        "rev": "096dbdf1a51a1b76db620bb4a4d268bc37be3335",
+        "revCount": 1211,
+        "type": "git",
+        "url": "https://github.com/vicinaehq/vicinae"
       },
       "original": {
-        "owner": "vicinaehq",
-        "repo": "vicinae",
-        "type": "github"
+        "ref": "refs/tags/v0.13.0",
+        "type": "git",
+        "url": "https://github.com/vicinaehq/vicinae"
       }
     },
     "web-cum-army": {
@@ -1992,18 +1993,19 @@
         "rust-overlay": "rust-overlay_3"
       },
       "locked": {
-        "lastModified": 1758091727,
-        "narHash": "sha256-ta15eG5FEpIOeXusUJlvgk+0cQ6/RR0QkM1px+eb8YI=",
-        "owner": "zed-industries",
-        "repo": "zed",
-        "rev": "4ee2daeded8da156f2d2319b15e0c3d2a2e16dc7",
-        "type": "github"
+        "lastModified": 1758865266,
+        "narHash": "sha256-dSh1vW+v74wAu7FpdxT/kESikCwhgRRV4wL3Le1KU5c=",
+        "ref": "nightly",
+        "rev": "bcc814926361932ab682452154fd96b15eedf37f",
+        "revCount": 31380,
+        "type": "git",
+        "url": "https://github.com/zed-industries/zed"
       },
       "original": {
-        "owner": "zed-industries",
         "ref": "nightly",
-        "repo": "zed",
-        "type": "github"
+        "rev": "bcc814926361932ab682452154fd96b15eedf37f",
+        "type": "git",
+        "url": "https://github.com/zed-industries/zed"
       }
     },
     "zenbrowser-international": {
