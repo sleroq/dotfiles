@@ -770,6 +770,27 @@
         "type": "github"
       }
     },
+    "home-manager_2": {
+      "inputs": {
+        "nixpkgs": [
+          "zenbrowser-interplanetary",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1758985165,
+        "narHash": "sha256-bzthrGCHUDzUHH9F3eNl5LG5rfg4ig9x3TGjjUE23qA=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "11cc3d55ded3346a8195000ddeadde782a611e56",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
     "hy3": {
       "inputs": {
         "hyprland": [
@@ -1449,6 +1470,26 @@
         "type": "github"
       }
     },
+    "quickshell": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1758273351,
+        "narHash": "sha256-wOv1guIi9THD1NjOtBU2Xh/Avg9xv7nIjsfFSkr1NeQ=",
+        "ref": "refs/heads/master",
+        "rev": "e9a574d919a89602d2868621576b2ccae54a5cb0",
+        "revCount": 675,
+        "type": "git",
+        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+      }
+    },
     "reactor": {
       "inputs": {
         "flake-utils": "flake-utils_4",
@@ -1493,6 +1534,7 @@
         "nixpkgs-international": "nixpkgs-international",
         "nixpkgs-interplanetary": "nixpkgs-interplanetary",
         "nixpkgs-master": "nixpkgs-master",
+        "quickshell": "quickshell",
         "reactor": "reactor",
         "scrcpyPkgs": "scrcpyPkgs",
         "sieve": "sieve",
@@ -2030,20 +2072,21 @@
     },
     "zenbrowser-interplanetary": {
       "inputs": {
+        "home-manager": "home-manager_2",
         "nixpkgs": [
           "nixpkgs-interplanetary"
         ]
       },
       "locked": {
-        "lastModified": 1757304371,
-        "narHash": "sha256-EZ3Vwgh5xgXuiPUmr9e1a9dEu3hvEWhRurAKpsAwB2A=",
-        "owner": "youwen5",
+        "lastModified": 1758990052,
+        "narHash": "sha256-cqDiYb8wXGCP73Z7DhnI9KibYNIZ4jswztkztY+ED4g=",
+        "owner": "0xc000022070",
         "repo": "zen-browser-flake",
-        "rev": "3968348af022fe88468ef8de4f9683076e2e5e4b",
+        "rev": "696b6d02ab8fa25c6062e4221756dea4f8e94e65",
         "type": "github"
       },
       "original": {
-        "owner": "youwen5",
+        "owner": "0xc000022070",
         "repo": "zen-browser-flake",
         "type": "github"
       }

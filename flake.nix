@@ -14,6 +14,9 @@
     hy3.url = "github:outfoxxed/hy3";
     hy3.inputs.hyprland.follows = "hyprland";
 
+    quickshell.url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
+    quickshell.inputs.nixpkgs.follows = "nixpkgs";
+
     # Per-host nixpkgs pins
     nixpkgs-interplanetary.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-international.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";

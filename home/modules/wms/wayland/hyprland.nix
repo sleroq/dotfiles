@@ -47,6 +47,7 @@ let
 in
 mkMerge [
   (import ../../programs/eww.nix { inherit pkgs lib self; })
+  (import ../../programs/quickshell.nix { inherit pkgs; })
   (import ../../programs/flameshot.nix { inherit pkgs config; })
   (import ../../programs/mic-mute.nix { inherit pkgs; })
   {
