@@ -10,7 +10,7 @@
 
   # Bootloader.
   boot = {
-    kernelPackages = pkgs.linuxKernel.packages.linux_xanmod;
+    kernelPackages = pkgs.linuxKernel.packages.linux_zen;
     tmp.cleanOnBoot = true;
 
     plymouth = {
