@@ -1,0 +1,356 @@
+/**
+ * Decrease size of the sidebar header
+ */
+#sidebar-header {
+  display: none !important;
+  font-size: 1.2em !important;
+  padding: 2px 6px 2px 3px !important;
+  background-color: #424242
+}
+#sidebar-header #sidebar-close {
+  padding: 3px !important;
+}
+#sidebar-header #sidebar-close .toolbarbutton-icon {
+  width: 14px !important;
+  height: 14px !important;
+  opacity: 0.6 !important;
+}
+
+
+/* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/hide_tabs_toolbar.css made available under Mozilla Public License v. 2.0
+See the above repository for updates as well as full license text. */
+
+/* Hides tabs toolbar */
+/* For OSX use hide_tabs_toolbar_osx.css instead */
+
+/* Note, if you have either native titlebar or menubar enabled, then you don't really need this style.
+ * In those cases you can just use: #TabsToolbar{ visibility: collapse !important }
+ */
+
+/* IMPORTANT */
+/*
+Get window_control_placeholder_support.css
+Window controls will be all wrong without it
+*/
+
+:root[tabsintitlebar]{ --uc-toolbar-height: 40px; }
+:root[tabsintitlebar][uidensity="compact"]{ --uc-toolbar-height: 32px }
+#titlebar{
+  will-change: unset !important;
+  transition: none !important;
+  opacity: 1 !important;
+}
+#TabsToolbar{ visibility: collapse !important }
+:root[sizemode="fullscreen"] #titlebar{ position: relative }
+
+:root[sizemode="fullscreen"] #TabsToolbar > .titlebar-buttonbox-container{
+  visibility: visible !important;
+  z-index: 2;
+}
+
+:root:not([inFullscreen]) #nav-bar{
+  margin-top: calc(0px - var(--uc-toolbar-height,0px));
+}
+
+:root[tabsintitlebar] #toolbar-menubar[autohide="true"]{
+  min-height: unset !important;
+  height: var(--uc-toolbar-height,0px) !important;
+  position: relative;
+}
+
+#toolbar-menubar:is([autohide="false"],not([autohide])){
+  margin-bottom: var(--uc-toolbar-height,0px)
+}
+
+:root[tabsintitlebar] #toolbar-menubar[autohide="true"] #main-menubar{
+  flex-grow: 1;
+  align-items: stretch;
+  background-attachment: scroll, fixed, fixed;
+  background-position: 0 0, var(--lwt-background-alignment), right top;
+  background-repeat: repeat-x, var(--lwt-background-tiling), no-repeat;
+  background-size: auto 100%, var(--lwt-background-size, auto auto), auto auto;
+  padding-right: 20px;
+}
+:root[tabsintitlebar] #toolbar-menubar[autohide="true"]:not([inactive]) #main-menubar{
+  background-color: var(--lwt-accent-color,var(--toolbox-bgcolor));
+  background-image: linear-gradient(var(--toolbar-bgcolor,--toolbar-non-lwt-bgcolor),var(--toolbar-bgcolor,--toolbar-non-lwt-bgcolor)), var(--lwt-additional-images,none), var(--lwt-header-image, none);
+  mask-image: linear-gradient(to left, transparent, black 20px);
+}
+
+#toolbar-menubar:not([inactive]){ z-index: 2 }
+#toolbar-menubar[autohide="true"][inactive] > #menubar-items {
+  opacity: 0;
+  pointer-events: none;
+  margin-left: var(--uc-window-drag-space-pre,0px)
+}
+
+/* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/window_control_placeholder_support.css made available under Mozilla Public License v. 2.0
+See the above repository for updates as well as full license text. */
+
+/*
+Creates placeholders for window controls.
+This is a supporting file used by other stylesheets and is mostly
+unnecessary if window titlebar is enabled.
+
+Should preferably be imported before other stylesheets, because some values in this style are deliberately overridden by other styles.
+*/
+
+/* Modify these values to match your preferences
+These reserve extra space on both sides of the nav-bar to be able to drag the window */
+:root:is([tabsintitlebar], [sizemode="fullscreen"]) {
+  --uc-window-drag-space-pre: 30px; /* left side*/
+  --uc-window-drag-space-post: 30px; /* right side*/
+}
+
+:root:is([tabsintitlebar][sizemode="maximized"], [sizemode="fullscreen"]) {
+  --uc-window-drag-space-pre: 0px; /* Remove pre space */
+}
+
+/* Default width - used on Windows10+ */
+:root:is([tabsintitlebar], [sizemode="fullscreen"]) {
+  --uc-window-control-width: 138px;
+}
+
+@media  (-moz-platform: windows-win7),
+        (-moz-platform: windows-win8){
+  :root:is([tabsintitlebar], [sizemode="fullscreen"]) {
+    --uc-window-control-width: 105px;
+  }
+}
+/* On linux set width based on number of caption buttons.
+One button */
+@media (-moz-gtk-csd-minimize-button), (-moz-gtk-csd-maximize-button), (-moz-gtk-csd-close-button) {
+  :root:is([tabsintitlebar],[sizemode="fullscreen"]) {
+    --uc-window-control-width: 28px;
+  }
+}
+/* Two buttons */
+@media (-moz-gtk-csd-minimize-button) and (-moz-gtk-csd-maximize-button),
+       (-moz-gtk-csd-minimize-button) and (-moz-gtk-csd-close-button),
+       (-moz-gtk-csd-maximize-button) and (-moz-gtk-csd-close-button) {
+  :root:is([tabsintitlebar],[sizemode="fullscreen"]) {
+    --uc-window-control-width: 56px;
+  }
+}
+/* Three buttons */
+@media (-moz-gtk-csd-minimize-button) and (-moz-gtk-csd-maximize-button) and (-moz-gtk-csd-close-button) {
+  :root:is([tabsintitlebar],[sizemode="fullscreen"]) {
+    --uc-window-control-width: 84px;
+  }
+}
+
+@media (-moz-platform: macos){
+  :root:is([tabsintitlebar]) {
+    --uc-window-control-width: 72px;
+  }
+  :root:is([tabsintitlebar][sizemode="fullscreen"]) {
+    --uc-window-control-width: 0;
+  }
+}
+
+.titlebar-buttonbox{ color: var(--toolbar-color) }
+:root[sizemode="fullscreen"] .titlebar-buttonbox-container{ display: none }
+
+:root[sizemode="fullscreen"] #TabsToolbar > .titlebar-buttonbox-container:last-child{
+  position: absolute;
+  display: flex;
+  top: 0;
+  right:0;
+  height: 40px;
+}
+
+:root[sizemode="fullscreen"] #TabsToolbar > .titlebar-buttonbox-container:last-child{ height: 32px }
+
+#nav-bar{
+  border-inline: var(--uc-window-drag-space-pre,0px) solid transparent;
+  border-inline-style: solid !important;
+  border-right-width: calc(var(--uc-window-control-width,0px) + var(--uc-window-drag-space-post,0px));
+  background-clip: border-box !important;
+}
+
+/* Rules for window controls on left layout */
+@media (-moz-bool-pref: "userchrome.force-window-controls-on-left.enabled"),
+       (-moz-gtk-csd-reversed-placement),
+       (-moz-platform: macos){
+  :root[tabsintitlebar="true"] #nav-bar{
+    border-inline-width: calc(var(--uc-window-control-width,0px) + var(--uc-window-drag-space-post,0px)) var(--uc-window-drag-space-pre,0px)
+  }
+  :root[sizemode="fullscreen"] #TabsToolbar > .titlebar-buttonbox-container:last-child{ right: unset }
+}
+@media (-moz-bool-pref: "userchrome.force-window-controls-on-left.enabled"){
+  .titlebar-buttonbox-container{
+    order: -1 !important;
+  }
+  .titlebar-buttonbox{
+    flex-direction: row-reverse;
+  }
+}
+
+/* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/autohide_bookmarks_and_main_toolbars.css made available under Mozilla Public License v. 2.0
+See the above repository for updates as well as full license text. */
+
+#navigator-toolbox{
+  --uc-bm-padding: 4px; /* Vertical padding to be applied to bookmarks */
+  --uc-bm-height: calc(20px + 2 * var(--uc-bm-padding)); /* Might need to adjust if the toolbar has other buttons */
+  --uc-navbar-height: -40px; /* navbar is main toolbar. Use negative value */
+  --uc-autohide-toolbar-delay: 600ms; /* The toolbar is hidden after 0.6s */
+  --uc-toolbox-browser-area-overlap: -1px;
+}
+:root[uidensity="compact"] #navigator-toolbox{
+  --uc-navbar-height: -34px;
+}
+:root[uidensity="touch"] #navigator-toolbox{ --uc-bm-padding: 6px }
+
+:root[chromehidden~="directories"] #navigator-toolbox{
+  --uc-bm-height: 0px;
+}
+:root[chromehidden~="toolbar"] #navigator-toolbox{
+  --uc-navbar-height: 0px;
+}
+/* At least on Windows 10 display scaling > 100% causes 1px gap to appear below tabs depending on Firefox
+ *  density settings and whether or not menubar is enabled. 
+ */
+@media (min-resolution: 120dpi){
+  :root[uidensity="compact"] #navigator-toolbox:has(> #toolbar-menubar:is([autohide="false"],not([autohide]))){
+    --uc-toolbox-browser-area-overlap: -0.5px;
+  }
+}
+@media (min-resolution: 140dpi){
+  #navigator-toolbox{
+    --uc-toolbox-browser-area-overlap: -0.5px;
+  }
+}
+
+#navigator-toolbox,
+#sidebar-box,
+#sidebar-main,
+#sidebar-splitter,
+#tabbrowser-tabbox{
+  z-index: auto !important;
+}
+
+:root[sessionrestored] #nav-bar,
+:root[sessionrestored] #PersonalToolbar{
+  background-image: linear-gradient(var(--toolbar-bgcolor),var(--toolbar-bgcolor)), var(--lwt-additional-images,var(--toolbar-bgimage))  !important;
+  background-position: top,var(--lwt-background-alignment);
+  background-position-y: calc(0px - var(--tab-min-height) - 2*var(--tab-block-margin,0px));
+  background-repeat: repeat,var(--lwt-background-tiling);
+  transform: rotateX(90deg);
+  transform-origin: top;
+  transition: transform 135ms linear var(--uc-autohide-toolbar-delay) !important;
+  z-index: 2;
+}
+#PlacesToolbarItems > .bookmark-item,
+#OtherBookmarks,
+#PersonalToolbar > #import-button{
+  padding-block: var(--uc-bm-padding) !important;
+}
+:root[sessionrestored] #PersonalToolbar{
+  z-index: 1;
+  background-position-y: calc(0px - var(--tab-min-height) - 2*var(--tab-block-margin,0px) + var( --uc-navbar-height));
+}
+
+:root[lwtheme-image] #nav-bar,
+:root[lwtheme-image] #PersonalToolbar{
+  background-image: linear-gradient(var(--toolbar-bgcolor),var(--toolbar-bgcolor)),var(--lwt-header-image), var(--lwt-additional-images,var(--toolbar-bgimage)) !important;
+}
+
+#nav-bar[customizing],#PersonalToolbar[customizing]{ transform: none !important }
+
+#navigator-toolbox > #PersonalToolbar{
+  transform-origin: 0px var(--uc-navbar-height);
+  position: relative;
+}
+:root[sessionrestored] #urlbar[popover]{
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 135ms linear var(--uc-autohide-toolbar-delay), opacity 0ms calc(var(--uc-autohide-toolbar-delay) + 135ms);
+  transform-origin: 0px calc((var(--urlbar-container-height) - var(--urlbar-height)) / 2);
+  transform: rotateX(89.5deg);
+}
+#mainPopupSet:has(> [panelopen]:not(#ask-chat-shortcuts,#selection-shortcut-action-panel,#chat-shortcuts-options-panel,#tab-preview-panel)) ~ toolbox #urlbar[popover],
+#navigator-toolbox:is(:hover,:focus-within) #urlbar[popover],
+#urlbar-container > #urlbar[popover]:is([focused],[open]){
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: 100ms;
+  transform: rotateX(0deg);
+}
+
+:root[sessionrestored]:not([customizing]) #navigator-toolbox{
+  margin-bottom:  calc(var(--uc-toolbox-browser-area-overlap,0px) - var(--uc-bm-height) + var(--uc-navbar-height));
+}
+
+/* Make sure the bookmarks toolbar is never collapsed even if it is disabled */
+:root[sizemode="fullscreen"] #PersonalToolbar,
+#PersonalToolbar:is([collapsed=""],[collapsed="true"]){
+  min-height: initial !important;
+  max-height: initial !important;
+  visibility: hidden !important
+}
+#PersonalToolbar:is([collapsed=""],[collapsed="true"]) #PlacesToolbarItems > *,
+:root[sizemode="fullscreen"] #PersonalToolbar #PlacesToolbarItems > *{
+  visibility: hidden !important;
+}
+
+/* If bookmarks toolbar is collapsed on startup, then no items are generated, and we need to set some height for it */
+#PlacesToolbarItems:empty{
+  height: var(--uc-bm-height);
+}
+
+/* Selected tab needs higher z-index now to "hide" the broder below it */
+.tabbrowser-tab[selected]{ z-index: 3 !important; }
+
+/* SELECT TOOLBAR BEHAVIOR */
+/* Comment out or delete one of these to disable that behavior */
+
+/* Show when urlbar is focused */
+#nav-bar:focus-within + #PersonalToolbar,
+#navigator-toolbox > #nav-bar:focus-within{
+  transition-delay: 100ms !important;
+  transform: rotateX(0);
+}
+
+/* Show when cursor is over the toolbar area or when some menu panel is open */
+#mainPopupSet:has(> [panelopen]:not(#ask-chat-shortcuts,#selection-shortcut-action-panel,#chat-shortcuts-options-panel,#tab-preview-panel)) ~ #navigator-toolbox > :is(#nav-bar,#PersonalToolbar),
+#navigator-toolbox:hover > :is(#nav-bar,#PersonalToolbar){
+  transition-delay: 100ms !important;
+  transform: rotateX(0);
+}
+
+/* This makes the tab notification box show immediately below tabs, otherwise it would break the layout */
+#navigator-toolbox > div{ display: contents }
+:where(#titlebar,#navigator-toolbox > #TabsToolbar,#navigator-toolbox > #toolbar-menubar,#tab-notification-deck,.global-notificationbox,#notifications-toolbar){
+  order: -1;
+}
+:root[BookmarksToolbarOverlapsBrowser] #navigator-toolbox{
+  margin-bottom: calc(-1px - var(--uc-bm-height) + var(--uc-navbar-height)) !important;
+  z-index: auto !important;
+}
+@media (-moz-bool-pref: "browser.fullscreen.autohide"),
+       -moz-pref("browser.fullscreen.autohide"){
+  :root[sizemode="fullscreen"] #navigator-toolbox[style*="margin-top"]{
+    margin-top: calc(1px - var(--tab-min-height) - 2 * var(--tab-block-margin)) !important;
+  }
+}
+
+/* Set the following pref to enable compatibility with multi-row_bookmarks.css */
+@media (-moz-bool-pref: "userchrome.autohide-bm-and-main-toolbars.multirow-bookmarks-compat.enabled"),
+       -moz-pref("userchrome.autohide-bm-and-main-toolbars.multirow-bookmarks-compat.enabled"){
+  #navigator-toolbox{ margin-bottom: var(--uc-navbar-height) !important; }
+  #PersonalToolbar:not([customizing]){
+    min-height: 0 !important;
+    margin-bottom: 0;
+    height: 0;
+    overflow-y: visible !important;
+    z-index: 2;
+    padding-inline: 0 !important;
+  }
+  #personal-bookmarks{
+    background: inherit;
+    height: min-content;
+  }
+  #PlacesToolbarDropIndicatorHolder{
+    pointer-events: none !important;
+  }
+}

@@ -83,6 +83,7 @@
     inputs'.winapps.packages.winapps
     inputs'.winapps.packages.winapps-launcher # optional
     pkgs.freerdp
+    pkgs.firefox
   ];
 
   # Define a user account

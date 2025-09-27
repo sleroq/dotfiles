@@ -28,9 +28,6 @@
     winapps.url = "github:winapps-org/winapps";
     winapps.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
 
-    zenbrowser-interplanetary.url = "github:youwen5/zen-browser-flake";
-    zenbrowser-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
-
     home-manager-interplanetary.url = "github:nix-community/home-manager";
     home-manager-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
 
