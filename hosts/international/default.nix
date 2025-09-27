@@ -1,4 +1,4 @@
-{ config, pkgs, self, ... }:
+{ config, pkgs, self, inputs', ... }:
 
 {
   imports = [
@@ -55,6 +55,10 @@
 
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
+
+  environment.systemPackages = [
+    inputs'.zenbrowser.packages.default
+  ];
 
   # Define a user account
   users.defaultUserShell = pkgs.bash;

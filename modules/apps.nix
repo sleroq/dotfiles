@@ -14,7 +14,6 @@ in
       curl
       nvtopPackages.full
       powertop
-      inputsResolved'.zenbrowser.packages.default
     ];
 
     # For samba and other stuff
