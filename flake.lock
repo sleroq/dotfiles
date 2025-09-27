@@ -1884,16 +1884,16 @@
         "nixpkgs": "nixpkgs_8"
       },
       "locked": {
-        "lastModified": 1758895940,
-        "narHash": "sha256-uMeZzceMtozjzNp4ghA36UQ7bUajGy84xDpP8RCx3vo=",
-        "ref": "refs/tags/v0.13.0",
-        "rev": "096dbdf1a51a1b76db620bb4a4d268bc37be3335",
-        "revCount": 1211,
+        "lastModified": 1759005480,
+        "narHash": "sha256-/XiGlQKI0B0b4ci7l1y/StLJeGSktw76iBki5dE4OW4=",
+        "ref": "refs/tags/v0.13.2",
+        "rev": "8a65358181ae0f9625292ac49cabfe8b4e18f656",
+        "revCount": 1222,
         "type": "git",
         "url": "https://github.com/vicinaehq/vicinae"
       },
       "original": {
-        "ref": "refs/tags/v0.13.0",
+        "ref": "refs/tags/v0.13.2",
         "type": "git",
         "url": "https://github.com/vicinaehq/vicinae"
       }
