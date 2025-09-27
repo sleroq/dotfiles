@@ -36,6 +36,7 @@
       };
       teams.enable = true;
       exodus.enable = true;
+      mangohud.enable = true;
       extraPackages = with pkgs; [
         # ollama-rocm
         # chatbox

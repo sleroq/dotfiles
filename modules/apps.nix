@@ -43,6 +43,7 @@ in
         localNetworkGameTransfers.openFirewall = true;
         extraPackages = with pkgs; [
           gamescope
+          mangohud
         ];
       };
 
