@@ -1,4 +1,4 @@
-{ config, pkgs, self, inputs', ... }:
+{ config, pkgs, self, inputs, ... }:
 
 {
   imports = [
@@ -57,7 +57,7 @@
   services.blueman.enable = true;
 
   environment.systemPackages = [
-    inputs'.zenbrowser.packages.default
+    inputs.zenbrowser-international.packages.default
   ];
 
   # Define a user account
