@@ -151,11 +151,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1749074410,
-        "narHash": "sha256-XPRUPC4w7f2LV2GrW3aa7owgEo8FaBym5Lj9ygCPcN4=",
+        "lastModified": 1759184067,
+        "narHash": "sha256-/Rfxv6t9sdWp/WjMbI0eMCm3FZEuw34DNw8B651UwbE=",
         "owner": "sleroq",
         "repo": "cum.army",
-        "rev": "bb7dbfa737ce0cd501c30a70549bcf9db109428e",
+        "rev": "635427b3dd8008acc8273f02b9dd4c478f1fa2ba",
         "type": "github"
       },
       "original": {
