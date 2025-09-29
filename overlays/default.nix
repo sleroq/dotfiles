@@ -13,14 +13,14 @@ rec {
       scrcpy = pkgsScrcpy.scrcpy;
     };
 
-  cursor = final: prev:
+  code-cursor = final: prev:
     let
       pkgsMaster = import nixpkgs-master {
         system = final.stdenv.hostPlatform.system;
         config = prev.config or {};
       };
     in {
-      cursor = pkgsMaster.cursor;
+      code-cursor = pkgsMaster.code-cursor;
     };
 
   opencode = final: prev:
@@ -33,7 +33,7 @@ rec {
       opencode = pkgsMaster.opencode;
     };
 
-  default = composeManyExtensions [ scrcpy cursor opencode ];
+  default = composeManyExtensions [ scrcpy code-cursor opencode ];
 }
 
 
