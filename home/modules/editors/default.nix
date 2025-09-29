@@ -24,7 +24,7 @@ in
     })
 
 
-    (lib.mkIf cfg.cursor.enable {
+    (lib.mkIf cfg.datagrip.enable {
       home.packages = [ pkgs.jetbrains.datagrip ];
     })
 
