@@ -14,6 +14,16 @@ const newTab = {
 
 UC_API.Hotkeys.define(newTab).autoAttach({ suppressOriginal: true });
 
+
+const newTabAtTheEnd = {
+  id: "NewTab",
+  modifiers: "ctrl shift",
+  key: "S",
+  command: "cmd_newNavigatorTabNoEvent",
+}
+
+UC_API.Hotkeys.define(newTabAtTheEnd).autoAttach({ suppressOriginal: true });
+
 const newTabBlock = {
   id: "NewTabBlock",
   modifiers: "ctrl",
@@ -22,7 +32,6 @@ const newTabBlock = {
 }
 
 UC_API.Hotkeys.define(newTabBlock).autoAttach({ suppressOriginal: true });
-
 
 const copyCurrentURI = {
   id: "CopyCurrentURI",
