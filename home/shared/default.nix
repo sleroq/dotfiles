@@ -41,8 +41,8 @@
     programs = {
       anytype = {
         enable = true;
-        version = "0.49.2";
-        hash = "sha256-NA8PozwenoIClkWry1q1Z/crhieflrlJVtBLLrKwWEk=";
+        version = "0.50.5";
+        hash = "sha256-WIj0FDVaKi5Dm89Crqd5qz1Dr2tMYl+jLMMVepqbSvY=";
       };
       mpv.enable = true;
       kitty = {

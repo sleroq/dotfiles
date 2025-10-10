@@ -9,6 +9,7 @@ in
     image = lib.mkOption {
       type = lib.types.str;
       default = "ghcr.io/gozargah/marzban:v0.8.4";
+      # default = "ghcr.io/gozargah/marzban:v1.0.0-beta-3";
       description = "Docker image to use for Marzban";
     };
 
@@ -71,6 +72,7 @@ in
           UVICORN_PORT = toString cfg.port;
           XRAY_JSON = "/var/lib/marzban/xray_config.json";
           SQLALCHEMY_DATABASE_URL = "sqlite:////var/lib/marzban/db.sqlite3";
+          # SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:////var/lib/marzban/db.sqlite3";
         };
         inherit (cfg) extraOptions;
         volumes = [

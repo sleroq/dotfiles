@@ -6,9 +6,8 @@ _:
     userName = "Sleroq";
     userEmail = "hireme@sleroq.link";
     extraConfig = {
-      "push" = {
-        "autoSetupRemote" = "true";
-      };
+      push.autoSetupRemote = "true";
+      init.defaultBranch = "master";
     };
   };
 }

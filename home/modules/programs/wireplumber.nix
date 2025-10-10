@@ -1,6 +1,8 @@
 { pkgs, ... }:
 
 let
+  # TODO: Rewrite with pipewire-only tools
+
   # Centralized audio configuration
   audioConfig = {
     primarySink = "alsa_output.usb-R__DE_R__DE_AI-Micro_5C4F2EEB-01.analog-stereo";

@@ -9,7 +9,7 @@
     gammastep # screen temperature
     libnotify
     glib # gsettings
-    # pulseaudioFull
+    pulseaudioFull # TODO: Remove when setup-stream-audio is rewritten without pactl
   ];
 
   services.gammastep = {

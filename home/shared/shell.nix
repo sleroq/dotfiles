@@ -5,6 +5,8 @@ let
     cd = "z";
     sudo = "sudo ";
     neofetch = "fastfetch";
+    vim = "nvim";
+    vi = "nvim";
   };
 in
 {

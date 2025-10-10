@@ -1,7 +1,10 @@
-{ pkgs, opts, lib, ... }:
+{ pkgs, opts, lib, inputs', ... }:
 
 {
-  programs.neovim.enable = true;
+  programs.neovim = {
+    enable = true;
+    package = inputs'.neovim-nightly-overlay.packages.default;
+  };
 
   home.activation.neovim = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \

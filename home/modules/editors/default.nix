@@ -9,13 +9,13 @@ in
     cursor.enable = lib.mkEnableOption "Cursor";
     datagrip.enable = lib.mkEnableOption "DataGrip";
     neovim = {
-      enable = lib.mkEnableOption "Neovim (imports ./neovim.nix)";
+      enable = lib.mkEnableOption "Neovim";
       enableNeovide = lib.mkEnableOption "Neovide";
       default = lib.mkEnableOption "default env";
     };
-    helix.enable = lib.mkEnableOption "Helix (imports ./helix.nix)";
+    helix.enable = lib.mkEnableOption "Helix";
     zed.enable = lib.mkEnableOption "Zed Editor";
-    emacs.enable = lib.mkEnableOption "Emacs (imports ./emacs.nix)";
+    emacs.enable = lib.mkEnableOption "Emacs";
   };
 
   config = lib.mkMerge [
@@ -23,7 +23,7 @@ in
       programs.vscode.enable = true;
     })
 
-
+    # TODO: Get rid of package-toggle options?
     (lib.mkIf cfg.datagrip.enable {
       home.packages = [ pkgs.jetbrains.datagrip ];
     })
@@ -32,7 +32,7 @@ in
       home.packages = [ pkgs.code-cursor ];
     })
 
-    (lib.mkIf cfg.neovim.enable (import ./neovim.nix { inherit pkgs lib opts; }))
+    (lib.mkIf cfg.neovim.enable (import ./neovim.nix { inherit pkgs lib opts inputs'; }))
     (lib.mkIf (cfg.neovim.enable && cfg.neovim.default) {
       home.sessionVariables.EDITOR = "nvim";
     })
