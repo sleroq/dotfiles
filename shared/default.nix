@@ -16,6 +16,7 @@
   ];
 
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.android_sdk.accept_license = true;
 
   # FIXME: There is probably some conflicts in this confiuation
   networking.nameservers = [ "1.1.1.1" "1.1.0.1" "8.8.8.8" ];
@@ -24,7 +25,7 @@
     nixops-dns.domain = "1.1.1.1";
     fstrim.enable = true;
     journald.extraConfig = ''
-        SystemMaxUse=2G
+      SystemMaxUse=2G
     '';
   };
 
