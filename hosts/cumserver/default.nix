@@ -49,6 +49,7 @@ in
     ./modules/marzban.nix
     ./modules/traggo.nix
     ./modules/slusha.nix
+    ./modules/n8n.nix
     bayan
     kopoka
     spoiler-images
@@ -155,6 +156,8 @@ in
   #   #   };
   #   # };
   # };
+
+  # cumserver.n8n.enable = true;
 
   cumserver.oven-media-engine = {
     enable = true;
