@@ -13,6 +13,7 @@
     hyprland.url = "github:hyprwm/Hyprland";
     hy3.url = "github:outfoxxed/hy3";
     hy3.inputs.hyprland.follows = "hyprland";
+    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
 
     quickshell.url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
     quickshell.inputs.nixpkgs.follows = "nixpkgs";
@@ -40,11 +41,11 @@
 
     # HM-related inputs used by home modules
     nix-gaming.url = "github:fufexan/nix-gaming";
-    vicinae.url = "git+https://github.com/vicinaehq/vicinae?ref=refs/tags/v0.13.2"; # Lock version here to hit gh actions cache
+    vicinae.url = "git+https://github.com/vicinaehq/vicinae?ref=refs/tags/v0.14.3"; # Lock version here to hit gh actions cache
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     zig.url = "github:mitchellh/zig-overlay";
     zls.url = "github:zigtools/zls?rev=45b855f7ec3dccea3c9a95df0b68e27dab842ae4";
-    zed-interplanetary.url = "git+https://github.com/zed-industries/zed?ref=nightly&rev=bcc814926361932ab682452154fd96b15eedf37f"; # Lock to hit the cache
+    zed-interplanetary.url = "git+https://github.com/zed-industries/zed?ref=nightly&rev=37e7f305395220a39922bf525090b430c29972af"; # Lock to hit the cache
     zed-international.url = "github:zed-industries/zed/nightly";
 
     scrcpyPkgs.url = "github:nixos/nixpkgs/77a0bdd";
@@ -93,6 +94,7 @@
         inherit (inputs) scrcpyPkgs nixpkgs-master;
       };
 
+      # FIXME: This is a bit overengineered
       easy-hosts =
         let
           realConfigs = "/home/sleroq/develop/other/dotfiles/home/config";
