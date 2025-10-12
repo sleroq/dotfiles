@@ -49,6 +49,8 @@ vim.pack.add({
     { src = "https://github.com/wakatime/vim-wakatime" },
     { src = "https://github.com/j-hui/fidget.nvim" },
 
+    { src = "https://github.com/AckslD/nvim-neoclip.lua" },
+
     -- TODO: enable when I start accounting again
     -- { src = "ledger/vim-ledger" },
     -- { src = "nathangrigg/vim-beancount" },
@@ -85,6 +87,7 @@ require "marks".setup {
 }
 
 -- require("supermaven-nvim").setup({ keymaps = { accept_suggestion = "<C-l>" } })
+require("neoclip").setup({ preview = true; })
 
 local telescope = require("telescope")
 telescope.setup({
@@ -170,6 +173,7 @@ end
 
 vim.g.mapleader = " "
 map({ "v", "x" }, "<C-y>", '"+y', { desc = "System clipboard yank" })
+map({ "n" }, "<C-x>", '<Cmd>:Telescope neoclip<CR>', { desc = "Clipboard manager" }) -- maybe use registers like a chad instead of this?
 map({ "n" }, "<leader>/", tsbuiltin.live_grep, { desc = "Live grep" })
 map({ "n" }, "<leader><leader>", "<Cmd>:Telescope frecency workspace=CWD<CR>", { desc = 'Find files' })
 map({ "n" }, "<leader>ff", tsbuiltin.find_files, { desc = 'Find files' })
