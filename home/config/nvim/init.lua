@@ -49,6 +49,8 @@ vim.pack.add({
     { src = "https://github.com/wakatime/vim-wakatime" },
     { src = "https://github.com/j-hui/fidget.nvim" },
 
+    -- { src = "https://github.com/neoclide/coc.nvim", version = "release" },
+    { src = "https://github.com/prisma/vim-prisma" },
     { src = "https://github.com/AckslD/nvim-neoclip.lua" },
 
     -- TODO: enable when I start accounting again
@@ -123,16 +125,7 @@ vim.lsp.config['lua_ls'] = {
     }
 }
 
-vim.lsp.enable({ "lua_ls", "denols", "nixd", "gopls", "ts_ls" })
-
-vim.lsp.config('denols', {
-    root_markers = { "deno.json", "deno.jsonc" },
-})
-
-vim.lsp.config('ts_ls', {
-    root_markers = { "package.json" },
-    single_file_support = false,
-})
+vim.lsp.enable({ "lua_ls", "nixd", "gopls", "ts_ls" })
 
 require("oil").setup({
     lsp_file_methods = {
@@ -178,10 +171,11 @@ map({ "n" }, "<leader>/", tsbuiltin.live_grep, { desc = "Live grep" })
 map({ "n" }, "<leader><leader>", "<Cmd>:Telescope frecency workspace=CWD<CR>", { desc = 'Find files' })
 map({ "n" }, "<leader>ff", tsbuiltin.find_files, { desc = 'Find files' })
 map({ "n" }, "<leader>fF", find_noignore, { desc = 'Find files no .gitignore' })
--- map({ "n" }, "<leader>b", tsbuiltin.buffers, { desc = "Find buffers" }) -- todo why
+map({ "n" }, "<leader>b", tsbuiltin.buffers, { desc = "Find buffers" }) -- is :b tab not enough?
+map({ "n" }, "<leader>n", "<Cmd>:bn<CR>", { desc = "Next buffer" })
+map({ "n" }, "<leader>p", "<Cmd>:bp<CR>", { desc = "Prev buffers" })
 map({ "n" }, "<leader>gr", tsbuiltin.lsp_references, { desc = "Telescope tags" })
 map({ "n" }, "<leader>r", tsbuiltin.resume, { desc = "Telescope resume last pick" })
-map({ "n" }, "<leader>pu", vim.pack.update, { desc = "Run vim.pack.update()" })
 map({ "n" }, "<leader>x", "<Cmd>:bd<CR>", { desc = "Quit the current buffer." })
 map({ "n" }, "<leader>X", "<Cmd>:bd!<CR>", { desc = "Force quit the current buffer." })
 map({ "n" }, "<leader>gg", "<Cmd>:Neogit<CR>", { desc = "Open git shit" })
@@ -196,6 +190,18 @@ animate.setup({
     resize = { timing = animate.gen_timing.linear({ duration = 30, unit = 'total' }) },
     open = { timing = animate.gen_timing.linear({ duration = 30, unit = 'total' }) },
     close = { timing = animate.gen_timing.linear({ duration = 30, unit = 'total' }) },
+})
+
+-- disable ts_ls for deno project
+vim.api.nvim_create_autocmd("User", {
+  pattern = "LspAttach",
+  callback = function()
+    local cwd = vim.fn.getcwd()
+    if cwd:match("slusha") then
+      vim.cmd("LspStop ts_ls")
+      vim.cmd("LspStart denols")
+    end
+  end,
 })
 
 -- map({ "n" }, "<leader>c", "1z=")
