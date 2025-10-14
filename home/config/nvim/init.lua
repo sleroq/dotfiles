@@ -179,6 +179,7 @@ map({ "n" }, "<leader>r", tsbuiltin.resume, { desc = "Telescope resume last pick
 map({ "n" }, "<leader>x", "<Cmd>:bd<CR>", { desc = "Quit the current buffer." })
 map({ "n" }, "<leader>X", "<Cmd>:bd!<CR>", { desc = "Force quit the current buffer." })
 map({ "n" }, "<leader>gg", "<Cmd>:Neogit<CR>", { desc = "Open git shit" })
+map({ "n" }, "gd", vim.lsp.buf.definition, { desc = "Jump to definition" })
 map({ "n" }, "<leader>t", "<Cmd>:terminal<CR>", { desc = "Open terminal" })
 map({ "n", "v", "x" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format current buffer" })
 map({ "n" }, "<leader>e", "<cmd>Oil<CR>", { desc = "Open oil" })
