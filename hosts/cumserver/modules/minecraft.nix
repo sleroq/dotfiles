@@ -2,7 +2,6 @@
 
 let
   cfg = config.cumserver.minecraft;
-  anyServerEnabled = cfg.cum.enable || cfg.forever-chu.enable;
 in
 {
   options.cumserver.minecraft = {
@@ -68,8 +67,11 @@ in
         ];
       };
     }
-    (lib.mkIf anyServerEnabled { # For backup mod
-      environment.systemPackages = [ pkgs.git pkgs.git-lfs ];
+    (lib.mkIf cfg.cum.enable {
+      systemd.services.minecraft-server-cum.path = [ pkgs.git pkgs.git-lfs];
+    })
+    (lib.mkIf cfg.forever-chu.enable {
+      systemd.services.minecraft-server-forever-chu.path = [ pkgs.git pkgs.git-lfs];
     })
   ];
 }
