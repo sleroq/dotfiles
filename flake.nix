@@ -41,7 +41,7 @@
 
     # HM-related inputs used by home modules
     nix-gaming.url = "github:fufexan/nix-gaming";
-    vicinae.url = "git+https://github.com/vicinaehq/vicinae?ref=refs/tags/v0.14.3"; # Lock version here to hit gh actions cache
+    vicinae.url = "git+https://github.com/vicinaehq/vicinae?ref=refs/tags/v0.14.5"; # Lock version here to hit gh actions cache
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     zig.url = "github:mitchellh/zig-overlay";
     zls.url = "github:zigtools/zls?rev=45b855f7ec3dccea3c9a95df0b68e27dab842ae4";
@@ -56,6 +56,7 @@
     disko.inputs.nixpkgs.follows = "nixpkgs-cumserver";
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
     mailserver.url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/";
+    nix-minecraft.url = "github:Infinidoge/nix-minecraft";
 
     # FIXME: Maybe use overlays to avoid following everything?
     sleroq-link.url = "github:sleroq/sleroq.link";
@@ -128,11 +129,13 @@
               arch = "x86_64";
               tags = [ "server" ];
               modules = [
+                ({ inputs, ... }: { nixpkgs.overlays = [ inputs.nix-minecraft.overlay ]; })
                 inputs.disko.nixosModules.disko
                 inputs.mailserver.nixosModules.default
                 inputs.reactor.nixosModules.reactor
                 inputs.sieve.nixosModules.sieve
                 inputs.nixos-facter-modules.nixosModules.facter
+                inputs.nix-minecraft.nixosModules.minecraft-servers
               ];
               specialArgs = {
                 inherit inputs;
