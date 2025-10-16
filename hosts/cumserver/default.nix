@@ -50,6 +50,7 @@ in
     ./modules/traggo.nix
     ./modules/slusha.nix
     ./modules/n8n.nix
+    ./modules/minecraft.nix
     bayan
     kopoka
     spoiler-images
@@ -159,6 +160,9 @@ in
 
   # cumserver.n8n.enable = true;
 
+  cumserver.minecraft.cum.enable = true;
+  # cumserver.minecraft.forever-chu.enable = true;
+
   cumserver.oven-media-engine = {
     enable = true;
     domain = "web.cum.army";
@@ -229,6 +233,7 @@ in
   };
 
   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+    "minecraft-server"
     "sieve"
   ];
 
@@ -237,6 +242,8 @@ in
     pkgs.gitMinimal
     pkgs.fastfetch
     pkgs.btop
+    pkgs.neovim
+    pkgs.wget
   ];
 
   networking = {
