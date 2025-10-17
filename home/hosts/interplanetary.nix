@@ -9,15 +9,13 @@
             # See https://wiki.hyprland.org/Configuring/Monitors/
             monitor = DP-2, 2560x1440@180.00, auto, 1
           '';
-          gamemode = true;
+          gamemode = false;
         };
       };
     };
     editors = {
       datagrip.enable = false;
       zed.enable = true;
-      cursor.enable = true;
-      helix.enable = true;
     };
     gaming = {
       etterna.enable = true;
@@ -60,6 +58,7 @@
     };
   };
 
+  services.easyeffects.enable = true;
 }
 
 

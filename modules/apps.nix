@@ -50,7 +50,7 @@ in
       };
 
       gamemode.enable = true;
-      dconf.enable = true;
+      dconf.enable = true; # required by easyeffects and some other stuff
       fuse.userAllowOther = true; # why do I need this
       noisetorch.enable = true;
     };
