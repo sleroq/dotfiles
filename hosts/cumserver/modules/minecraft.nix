@@ -21,7 +21,7 @@ in
             cum = {
               enable = true;
               autoStart = true;
-              jvmOpts = "-Xms2G -Xmx3G";
+              jvmOpts = "-Xms2G -Xmx4G";
               package = pkgs.fabricServers.fabric-1_21_5.override {
                 loaderVersion = "0.16.14";
               };

@@ -60,6 +60,14 @@ in
   boot.loader.grub.enable = true;
   boot.tmp.cleanOnBoot = true;
 
+  swapDevices = [
+    { device = "/swapfile"; size = 8192; }
+  ];
+
+  boot.kernel.sysctl = {
+    "vm.swappiness" = 30;
+  };
+
   services.logrotate.enable = true;
   services.fail2ban.enable = true;
   services.openssh = {
