@@ -57,6 +57,7 @@
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
     mailserver.url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/";
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
+    tuwunel.url = "github:matrix-construct/tuwunel"; # FIXME: switch to nixpkgs when they catch up (if they ever do)
 
     # FIXME: Maybe use overlays to avoid following everything?
     sleroq-link.url = "github:sleroq/sleroq.link";

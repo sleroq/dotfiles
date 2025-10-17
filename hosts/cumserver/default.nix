@@ -77,7 +77,10 @@ in
   cumserver.radicale.enable = true;
   cumserver.bore.enable = false;
   cumserver.podman.enable = true;
-  cumserver.tuwunel.enable = true;
+  cumserver.tuwunel = {
+    enable = true;
+    package = inputs'.tuwunel.packages.default;
+  };
 
   age.secrets.marzbanMetricsEnv = {
     owner = "root";

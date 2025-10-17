@@ -110,7 +110,7 @@ in
             new_user_displayname_suffix = "";
 
             # Memory optimizations
-            cache_capacity_modifier = 0.3;
+            cache_capacity_modifier = 1.2;
             db_cache_capacity_mb = 64.0;
             db_write_buffer_capacity_mb = 24.0;
             dns_cache_entries = 4096;

@@ -42,6 +42,9 @@
         # From zed flake
         "https://cache.garnix.io"
         "https://zed.cachix.org"
+
+        # RocksDB still builds locally, probably issue on their end, I'm not sure what's the point of this cache
+        "https://attic.kennel.juneis.dog/conduit"
       ];
       trusted-public-keys = [
         "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
@@ -52,6 +55,8 @@
         # From zed flake
         "zed.cachix.org-1:/pHQ6dpMsAZk2DiP4WCL0p9YDNKWj2Q5FL20bNmw1cU="
         "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+
+        "conduit:eEKoUwlQGDdYmAI/Q/0slVlegqh/QmAvQd7HBSm21Wk="
       ];
       experimental-features = [ "nix-command" "flakes" ];
     };
