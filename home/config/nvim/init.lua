@@ -66,11 +66,14 @@ vim.pack.add({
     -- { src = "https://github.com/supermaven-inc/supermaven-nvim" },
 
     { src = "https://github.com/mbbill/undotree" },
+    { src = "https://github.com/NMAC427/guess-indent.nvim" },
     -- { src = "https://github.com/folke/trouble.nvim" }, -- TODO: seems usefull
     -- { src = "https://github.com/sigmaSd/deno-nvim" }, -- TODO: enable when I hit some limitation of the default config
 })
 
 vim.g.wakatime_CLIPath = "~/.nix-profile/bin/wakatime-cli"
+
+require "guess-indent".setup()
 
 -- require "vague".setup({ transparent = true })
 require "vague".setup()
