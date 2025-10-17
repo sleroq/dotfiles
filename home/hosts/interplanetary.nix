@@ -49,6 +49,17 @@
       ];
     };
   };
+
+  programs.caelestia = {
+    settings = {
+      bar.status = {
+        showBattery = false;
+        showBluetooth = false;
+        showNetwork = false;
+      };
+    };
+  };
+
 }
 
 

@@ -15,6 +15,9 @@
     hy3.inputs.hyprland.follows = "hyprland";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
 
+    caelestia_shell-interplanetary.url = "github:caelestia-dots/shell";
+    caelestia_shell-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
+
     quickshell.url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
     quickshell.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -113,6 +116,11 @@
               tags = [ "non-server" ];
               modules = [
                 inputs.home-manager-interplanetary.nixosModules.home-manager
+                ({ inputs, ... }: {
+                  home-manager = {
+                    sharedModules = [ inputs.caelestia_shell-interplanetary.homeManagerModules.default ];
+                  };
+                })
                 inputs.aagl.nixosModules.default
                 { home-manager.users.sleroq.imports = [ ./home/hosts/interplanetary.nix ]; }
               ];

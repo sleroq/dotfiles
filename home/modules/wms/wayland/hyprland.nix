@@ -46,7 +46,7 @@ let
   };
 in
 mkMerge [
-  (import ../../programs/eww.nix { inherit pkgs lib self; })
+  # (import ../../programs/eww.nix { inherit pkgs lib self; })
   (import ../../programs/quickshell.nix { inherit pkgs; })
   (import ../../programs/flameshot.nix { inherit pkgs config; })
   (import ../../programs/mic-mute.nix { inherit pkgs; })
@@ -79,6 +79,28 @@ mkMerge [
           max_fps = 60
         }
       '';
+    };
+
+    programs.caelestia = {
+      enable = true;
+      systemd = {
+        enable = true;
+        target = "graphical-session.target";
+      };
+      settings = {
+        services = {
+          weatherLocation = "43.25654,76.92848";
+          useFahrenheit = false;
+        };
+        bar.status = {
+          showBattery = false;
+        };
+        paths.wallpaperDir = "~/Pictures/wallpapers";
+        utilities.toasts.kbLayoutChanged = false;
+      };
+      cli = {
+        enable = true;
+      };
     };
 
     programs.swaylock = {
