@@ -99,7 +99,7 @@
     shell = pkgs.nushell;
     isNormalUser = true;
     description = "sleroq";
-    extraGroups = [ "networkmanager" "input" "wheel" "video" "libvirtd" "adbusers" "uinput" "kvm" ];
+    extraGroups = [ "networkmanager" "input" "wheel" "video" "libvirtd" "adbusers" "uinput" "kvm" "gamemode" ];
 
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSh54pu9bAH8DFBKPtswFJzevCft+gHZStJQ0trYGoj sleroq@cum.army"

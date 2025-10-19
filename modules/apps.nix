@@ -1,4 +1,4 @@
-{ lib, config, pkgs, inputsResolved', ... }:
+{ lib, config, pkgs, ... }:
 with lib;
 let
   cfg = config.sleroq.apps;
