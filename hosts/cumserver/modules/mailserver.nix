@@ -69,88 +69,85 @@ let
 
   generatedLoginAccounts = lib.listToAttrs (map generateLoginAccountEntry secrets.mailUsers);
 in {
-  options.cumserver.mailserver.enable = lib.mkEnableOption "Mail server";
-
-  config = lib.mkIf cfg.enable {
-    assertions = [
-      {
-        assertion = config.services.caddy.enable;
-        message = "Caddy has to be enabled for mailserver to work";
-      }
-      {
-        assertion = lib.isList secrets.mailUsers && lib.all (user: lib.isAttrs user && user ? "name" && user ? "passwordSecretName") secrets.mailUsers;
-        message = "secrets.mailUsers must be a list of users, each with at least 'name' and 'passwordSecretName'.";
-      }
-    ];
-
-    age.secrets = lib.listToAttrs (lib.map (userConf: {
-      name = userConf.passwordSecretName;
-      value = {
-        owner = "virtualMail";
-        group = "virtualMail";
-        file = ../secrets/mail/${userConf.passwordSecretName};
-      };
-    }) secrets.mailUsers) // {
-      resticMailPassword = {
-        owner = "root";
-        group = "restic-mail-backups";
-        mode = "0440";
-        file = ../secrets/resticMailPassword;
-      };
-    };
-
-    users.groups.restic-mail-backups.members = [ "virtualMail" ];
-    users.groups.restic-s3-backups.members = [ "virtualMail" ];
-
-    mailserver = {
-      inherit fqdn;
-      enable = true;
-      stateVersion = 3;
-      domains = [ "cum.army" ];
-      messageSizeLimit = 52428800; # 50MB
-      enableManageSieve = true;
-
-      # nix-shell -p mkpasswd --run 'mkpasswd -sm bcrypt'
-      loginAccounts = generatedLoginAccounts;
-
-      certificateFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.crt";
-      keyFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.key";
-      certificateScheme = "manual";
-    };
-
-    # Wait for caddy, so certs are ready on first ever boot
-    systemd.services.dovecot.after = [ "caddy.service" ];
-
-    services.caddy.virtualHosts."mail.cum.army" = {
-      extraConfig = ''
-        root * ${inputs'.sleroq-link.packages.default}
-        file_server
-        encode zstd gzip
-      '';
-    };
-
-    services.restic.backups.mailserver = {
-      user = "virtualMail";
-      repository = "s3:https://b9b008414ac92325dff304821d2a0a2c.eu.r2.cloudflarestorage.com/backups";
-      passwordFile = config.age.secrets.resticMailPassword.path;
-      environmentFile = config.age.secrets.resticS3Keys.path;
-      initialize = true;
-      paths = [ "/var/vmail" "/var/sieve" ];
-      exclude = [
-        "**/tmp/*"
-        "**/cache/*"
-        "**/log/*"
-      ];
-      pruneOpts = [
-        "--keep-daily 7"
-        "--keep-weekly 5"
-        "--keep-monthly 12"
-      ];
-      timerConfig = {
-        OnCalendar = "02:30";
-        Persistent = true;
-        RandomizedDelaySec = "1h";
-      };
-    };
+  options.cumserver.mailserver = {
+    enable = lib.mkEnableOption "Mail server";
+    backup.enable = lib.mkEnableOption "backups" // { default = true; };
   };
+
+  config = lib.mkMerge [
+    (lib.mkIf cfg.enable {
+      assertions = [
+        {
+          assertion = config.services.caddy.enable;
+          message = "Caddy has to be enabled for mailserver to work";
+        }
+        {
+          assertion = lib.isList secrets.mailUsers && lib.all (user: lib.isAttrs user && user ? "name" && user ? "passwordSecretName") secrets.mailUsers;
+          message = "secrets.mailUsers must be a list of users, each with at least 'name' and 'passwordSecretName'.";
+        }
+      ];
+
+      age.secrets = lib.listToAttrs (lib.map (userConf: {
+        name = userConf.passwordSecretName;
+        value = {
+          owner = "virtualMail";
+          group = "virtualMail";
+          file = ../secrets/mail/${userConf.passwordSecretName};
+        };
+      }) secrets.mailUsers);
+
+      mailserver = {
+        inherit fqdn;
+        enable = true;
+        stateVersion = 3;
+        domains = [ "cum.army" ];
+        messageSizeLimit = 52428800; # 50MB
+        enableManageSieve = true;
+
+        # nix-shell -p mkpasswd --run 'mkpasswd -sm bcrypt'
+        loginAccounts = generatedLoginAccounts;
+
+        certificateFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.crt";
+        keyFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.key";
+        certificateScheme = "manual";
+      };
+
+      # Wait for caddy, so certs are ready on first ever boot
+      systemd.services.dovecot.after = [ "caddy.service" ];
+
+      services.caddy.virtualHosts."mail.cum.army" = {
+        extraConfig = ''
+          root * ${inputs'.sleroq-link.packages.default}
+          file_server
+          encode zstd gzip
+        '';
+      };
+    })
+
+    (lib.mkIf (cfg.enable && cfg.backup.enable) {
+      services.restic.backups.mailserver = {
+        user = "virtualMail";
+        repository = "s3:https://b9b008414ac92325dff304821d2a0a2c.eu.r2.cloudflarestorage.com/backups";
+        passwordFile = config.age.secrets.resticMailPassword.path;
+        environmentFile = config.age.secrets.resticS3Keys.path;
+        initialize = true;
+        paths = [ "/var/vmail" "/var/sieve" ];
+        exclude = [
+          "**/tmp/*"
+          "**/cache/*"
+          "**/log/*"
+        ];
+        pruneOpts = [
+          "--keep-daily 7"
+          "--keep-weekly 5"
+          "--keep-monthly 12"
+        ];
+        timerConfig = {
+          OnCalendar = "02:30";
+          Persistent = true;
+          RandomizedDelaySec = "1h";
+        };
+      };
+    })
+  ];
 }

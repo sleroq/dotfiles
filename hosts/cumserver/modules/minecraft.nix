@@ -7,6 +7,7 @@ in
   options.cumserver.minecraft = {
       cum.enable = lib.mkEnableOption "cum.army minecraft server";
       forever-chu.enable = lib.mkEnableOption "Forever Chu minecraft server";
+      backup.enable = lib.mkEnableOption "backups" // { default = true; };
   };
 
   config = lib.mkMerge [
@@ -79,7 +80,7 @@ in
       systemd.services.minecraft-server-forever-chu.path = [ pkgs.git pkgs.git-lfs];
     })
 
-    (lib.mkIf (cfg.cum.enable || cfg.forever-chu.enable) {
+    (lib.mkIf ((cfg.cum.enable || cfg.forever-chu.enable) && cfg.backup.enable) {
       age.secrets.resticMinecraftPassword = {
         owner = "minecraft";
         group = "minecraft";
