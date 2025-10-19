@@ -97,7 +97,7 @@ in
         environmentFile = config.age.secrets.resticS3Keys.path;
         initialize = true;
         paths = [ cfg.dataDir ];
-        exclude = [ "log" ];
+        exclude = [ "log" "tmp" ];
         pruneOpts = [
           "--keep-daily 1"
           "--keep-weekly 3"
