@@ -21,12 +21,11 @@ in
             cum = {
               enable = true;
               autoStart = true;
-              jvmOpts = "-Xms2G -Xmx4G";
-              package = pkgs.fabricServers.fabric-1_21_5.override {
-                loaderVersion = "0.16.14";
-              };
+              jvmOpts = "-Xms3G -Xmx4G";
+              package = pkgs.fabricServers.fabric-1_21_5;
 
               serverProperties = {
+                player-idle-timeout = 0;
                 spawn-protection = 0;
                 server-port = 25569;
                 motd = "<3";
