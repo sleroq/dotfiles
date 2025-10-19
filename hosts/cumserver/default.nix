@@ -65,7 +65,7 @@ in
   ];
 
   boot.kernel.sysctl = {
-    "vm.swappiness" = 30;
+    "vm.swappiness" = 10;
   };
 
   services.logrotate.enable = true;
