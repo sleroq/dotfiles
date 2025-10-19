@@ -125,6 +125,9 @@ in {
     })
 
     (lib.mkIf (cfg.enable && cfg.backup.enable) {
+      users.groups.restic-mail-backups.members = [ "virtualMail" ];
+      users.groups.restic-s3-backups.members = [ "virtualMail" ];
+
       services.restic.backups.mailserver = {
         user = "virtualMail";
         repository = "s3:https://b9b008414ac92325dff304821d2a0a2c.eu.r2.cloudflarestorage.com/backups";

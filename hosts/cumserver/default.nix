@@ -204,6 +204,49 @@ in
     environmentFile = config.age.secrets.reactorEnv.path;
   };
 
+  users.groups.restic-backups.members = [ "reactor" "sieve" ];
+  users.groups.restic-s3-backups.members = [ "reactor" "sieve" ];
+
+  services.restic.backups.reactor = {
+    user = "reactor";
+    repository = "s3:https://b9b008414ac92325dff304821d2a0a2c.eu.r2.cloudflarestorage.com/bots-backups";
+    passwordFile = config.age.secrets.resticBackupsPassword.path;
+    environmentFile = config.age.secrets.resticS3Keys.path;
+    initialize = true;
+    paths = [ "/var/lib/reactor" ];
+    exclude = [ "**/log-*.jsonl" "**/*.log" ];
+    pruneOpts = [
+      "--keep-daily 7"
+      "--keep-weekly 5"
+      "--keep-monthly 12"
+    ];
+    timerConfig = {
+      OnCalendar = "03:35";
+      Persistent = true;
+      RandomizedDelaySec = "1h";
+    };
+  };
+
+  services.restic.backups.sieve = {
+    user = "sieve";
+    repository = "s3:https://b9b008414ac92325dff304821d2a0a2c.eu.r2.cloudflarestorage.com/bots-backups";
+    passwordFile = config.age.secrets.resticBackupsPassword.path;
+    environmentFile = config.age.secrets.resticS3Keys.path;
+    initialize = true;
+    paths = [ "/var/lib/sieve" ];
+    exclude = [ "**/log-*.jsonl" "**/*.log" ];
+    pruneOpts = [
+      "--keep-daily 1"
+      "--keep-weekly 3"
+      "--keep-monthly 5"
+    ];
+    timerConfig = {
+      OnCalendar = "03:35";
+      Persistent = true;
+      RandomizedDelaySec = "1h";
+    };
+  };
+
   # age.secrets.zefxiEnv = {
   #   owner = "zefxi";
   #   group = "zefxi";
@@ -264,6 +307,12 @@ in
     group = "restic-s3-backups";
     mode = "0440";
     file = ./secrets/resticS3Keys;
+  };
+  age.secrets.resticBackupsPassword = {
+    owner = "root";
+    group = "restic-backups";
+    mode = "0440";
+    file = ./secrets/resticPassword;
   };
 
   networking = {

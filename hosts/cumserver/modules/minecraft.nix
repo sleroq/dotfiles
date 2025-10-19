@@ -104,9 +104,9 @@ in
           "hs_err_pid*.log"
         ];
         pruneOpts = [
-          "--keep-daily 7"
-          "--keep-weekly 5"
-          "--keep-monthly 12"
+          "--keep-daily 1"
+          "--keep-weekly 3"
+          "--keep-monthly 5"
         ];
         timerConfig = {
           OnCalendar = "03:30";

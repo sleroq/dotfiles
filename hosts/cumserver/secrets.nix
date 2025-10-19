@@ -45,6 +45,7 @@ let
     "secrets/resticMinecraftPassword" = { publicKeys = commonPublicKeys; };
     "secrets/resticMailPassword" = { publicKeys = commonPublicKeys; };
     "secrets/resticS3Keys" = { publicKeys = commonPublicKeys; };
+    "secrets/resticPassword" = { publicKeys = commonPublicKeys; };
   };
 
 in

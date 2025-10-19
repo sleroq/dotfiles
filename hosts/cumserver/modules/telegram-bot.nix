@@ -24,58 +24,87 @@ with lib;
         default = dataDir;
         description = "Directory where ${name} will store its data";
       };
+
+      backup.enable = lib.mkEnableOption "backups" // { default = true; };
     });
 
     config = let
       cfg = config.services.${name};
-    in mkIf cfg.enable {
-      age.secrets."${name}Env" = {
-        owner = cfg.user;
-        inherit (cfg) group;
-        file = secretFile;
-      };
+    in mkMerge [
+      (mkIf cfg.enable {
+        age.secrets."${name}Env" = {
+          owner = cfg.user;
+          inherit (cfg) group;
+          file = secretFile;
+        };
 
-      users.users.${cfg.user} = {
-        isSystemUser = true;
-        inherit (cfg) group;
-      } // (optionalAttrs (dataDir != null) {
-        home = cfg.dataDir;
-        createHome = true;
-      });
-
-      users.groups.${cfg.group} = {};
-
-      systemd.services.${name} = {
-        description = "${toUpper (substring 0 1 name)}${substring 1 (stringLength name) name} Telegram Bot";
-        wantedBy = [ "multi-user.target" ];
-        after = [ "network.target" ];
-
-        serviceConfig = {
-          Type = "simple";
-          User = cfg.user;
-          Group = cfg.group;
-          Restart = "always";
-          RestartSec = "10s";
-          EnvironmentFile = config.age.secrets."${name}Env".path;
-          
-          # Security hardening
-          NoNewPrivileges = true;
-          PrivateTmp = true;
-          ProtectSystem = "strict";
-          ProtectHome = true;
-          PrivateDevices = true;
-          ProtectKernelTunables = true;
-          ProtectKernelModules = true;
-          ProtectControlGroups = true;
+        users.users.${cfg.user} = {
+          isSystemUser = true;
+          inherit (cfg) group;
         } // (optionalAttrs (dataDir != null) {
-          WorkingDirectory = cfg.dataDir;
-          ReadWritePaths = [ cfg.dataDir ];
+          home = cfg.dataDir;
+          createHome = true;
         });
 
-        script = ''
-          exec ${package}/bin/${name}
-        '';
-      };
-    };
+        users.groups.${cfg.group} = {};
+
+        systemd.services.${name} = {
+          description = "${toUpper (substring 0 1 name)}${substring 1 (stringLength name) name} Telegram Bot";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "network.target" ];
+
+          serviceConfig = {
+            Type = "simple";
+            User = cfg.user;
+            Group = cfg.group;
+            Restart = "always";
+            RestartSec = "10s";
+            EnvironmentFile = config.age.secrets."${name}Env".path;
+            
+            # Security hardening
+            NoNewPrivileges = true;
+            PrivateTmp = true;
+            ProtectSystem = "strict";
+            ProtectHome = true;
+            PrivateDevices = true;
+            ProtectKernelTunables = true;
+            ProtectKernelModules = true;
+            ProtectControlGroups = true;
+          } // (optionalAttrs (dataDir != null) {
+            WorkingDirectory = cfg.dataDir;
+            ReadWritePaths = [ cfg.dataDir ];
+          });
+
+          script = ''
+            exec ${package}/bin/${name}
+          '';
+        };
+      })
+
+      (mkIf (cfg.enable && cfg?backup && cfg?dataDir && cfg.backup.enable) {
+        users.groups.restic-backups.members = [ cfg.user ];
+        users.groups.restic-s3-backups.members = [ cfg.user ];
+
+        services.restic.backups.${name} = {
+          user = cfg.user;
+          repository = "s3:https://b9b008414ac92325dff304821d2a0a2c.eu.r2.cloudflarestorage.com/bots-backups";
+          passwordFile = config.age.secrets.resticBackupsPassword.path;
+          environmentFile = config.age.secrets.resticS3Keys.path;
+          initialize = true;
+          paths = [ cfg.dataDir ];
+          exclude = [ "**/*.log" ];
+          pruneOpts = [
+            "--keep-daily 7"
+            "--keep-weekly 5"
+            "--keep-monthly 12"
+          ];
+          timerConfig = {
+            OnCalendar = "03:35";
+            Persistent = true;
+            RandomizedDelaySec = "1h";
+          };
+        };
+      })
+    ];
   };
 } 

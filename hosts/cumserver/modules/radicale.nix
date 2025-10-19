@@ -64,7 +64,7 @@ in
       };
 
       users.groups.restic-mail-backups.members = [ "radicale" ];
-      users.groups.restic-s3-backups.members = [ "virtualMail" ];
+      users.groups.restic-s3-backups.members = [ "radicale" ];
 
       services.restic.backups.radicale = {
         user = "radicale";
