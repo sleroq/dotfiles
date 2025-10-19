@@ -177,16 +177,13 @@ in
     })
 
     (lib.mkIf (cfg.enable && cfg.backup.enable) {
-      users.groups.restic-backups.members = [ "tuwunel" ];
-      users.groups.restic-s3-backups.members = [ "tuwunel" ];
-
       services.restic.backups.tuwunel = {
-        user = "tuwunel";
+        user = "root";
         repository = "s3:https://b9b008414ac92325dff304821d2a0a2c.eu.r2.cloudflarestorage.com/bots-backups";
         passwordFile = config.age.secrets.resticBackupsPassword.path;
         environmentFile = config.age.secrets.resticS3Keys.path;
         initialize = true;
-        paths = [ "/var/lib/${stateDirectory}" ];
+        paths = [ "/var/lib/private/${stateDirectory}" ];
         pruneOpts = [ "--keep-weekly 1" ];
         exclude = [ "media" "**/*.log" ];
         timerConfig = {
@@ -194,6 +191,8 @@ in
           Persistent = true;
           RandomizedDelaySec = "1h";
         };
+        backupPrepareCommand = "systemctl stop tuwunel.service";
+        backupCleanupCommand = "systemctl start tuwunel.service";
       };
     })
   ];
