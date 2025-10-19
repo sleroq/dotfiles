@@ -90,7 +90,17 @@ in {
         group = "virtualMail";
         file = ../secrets/mail/${userConf.passwordSecretName};
       };
-    }) secrets.mailUsers);
+    }) secrets.mailUsers) // {
+      resticMailPassword = {
+        owner = "root";
+        group = "restic-mail-backups";
+        mode = "0440";
+        file = ../secrets/resticMailPassword;
+      };
+    };
+
+    users.groups.restic-mail-backups.members = [ "virtualMail" ];
+    users.groups.restic-s3-backups.members = [ "virtualMail" ];
 
     mailserver = {
       inherit fqdn;
@@ -117,6 +127,30 @@ in {
         file_server
         encode zstd gzip
       '';
+    };
+
+    services.restic.backups.mailserver = {
+      user = "virtualMail";
+      repository = "s3:https://b9b008414ac92325dff304821d2a0a2c.eu.r2.cloudflarestorage.com/backups";
+      passwordFile = config.age.secrets.resticMailPassword.path;
+      environmentFile = config.age.secrets.resticS3Keys.path;
+      initialize = true;
+      paths = [ "/var/vmail" "/var/sieve" ];
+      exclude = [
+        "**/tmp/*"
+        "**/cache/*"
+        "**/log/*"
+      ];
+      pruneOpts = [
+        "--keep-daily 7"
+        "--keep-weekly 5"
+        "--keep-monthly 12"
+      ];
+      timerConfig = {
+        OnCalendar = "02:30";
+        Persistent = true;
+        RandomizedDelaySec = "1h";
+      };
     };
   };
 }

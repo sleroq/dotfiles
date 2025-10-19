@@ -255,7 +255,16 @@ in
     pkgs.btop
     pkgs.neovim
     pkgs.wget
+    pkgs.dust
   ];
+
+  # Shared backups
+  age.secrets.resticS3Keys = {
+    owner = "root";
+    group = "restic-s3-backups";
+    mode = "0440";
+    file = ./secrets/resticS3Keys;
+  };
 
   networking = {
     hostName = "cumserver";

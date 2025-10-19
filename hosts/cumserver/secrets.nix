@@ -43,6 +43,8 @@ let
     "secrets/nodeExporter3Password" = { publicKeys = commonPublicKeys; };
     "secrets/ziplineEnv" = { publicKeys = commonPublicKeys; };
     "secrets/resticMinecraftPassword" = { publicKeys = commonPublicKeys; };
+    "secrets/resticMailPassword" = { publicKeys = commonPublicKeys; };
+    "secrets/resticS3Keys" = { publicKeys = commonPublicKeys; };
   };
 
 in
