@@ -292,6 +292,7 @@ in
   ];
 
   environment.systemPackages = map lib.lowPrio [
+    pkgs.tailscale
     pkgs.curl
     pkgs.gitMinimal
     pkgs.fastfetch
@@ -313,6 +314,13 @@ in
     group = "restic-backups";
     mode = "0440";
     file = ./secrets/resticPassword;
+  };
+
+  services.tailscale.enable = true;
+  networking.firewall = {
+    enable = true;
+    trustedInterfaces = [ "tailscale0" ];
+    allowedUDPPorts = [ config.services.tailscale.port ];
   };
 
   networking = {
