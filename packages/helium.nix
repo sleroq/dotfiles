@@ -22,5 +22,5 @@ in appimageTools.wrapType2 rec {
         --replace 'Exec=AppRun' 'Exec=${pname}'
       cp -r ${contents}/usr/share/icons $out/share
     '';
-};
+}
 
