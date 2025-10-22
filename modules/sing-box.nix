@@ -9,14 +9,14 @@ let
   settingsFormat = pkgs.formats.json { };
 
   sing-box-beta = pkgs.sing-box.overrideAttrs (oldAttrs: rec {
-    version = "1.12.0-beta.31";
+    version = "1.12.11";
     src = pkgs.fetchFromGitHub {
       owner = "SagerNet";
       repo = "sing-box";
       tag = "v${version}";
-      hash = "sha256-WwwZePdEokhLIOMJLSZV5oIEuufr+1hPaiONYaz+Nzk=";
+      hash = "sha256-K28Lf5WOd0RNpk7nRettrJLc5WrGgqki5Dj4zxfmZ+4=";
     };
-    vendorHash = "sha256-t76QBdgTprVM5g6ytl0nG+daO6WEnI1Q5gA3bPMRR9Y=";
+    vendorHash = "sha256-+p2esP5sKNSPJ2ig9R58PflsMPlrGv+MJCwX0ESMmbc=";
     tags = [
       "with_quic"
       "with_dhcp"
