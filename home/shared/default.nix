@@ -41,9 +41,15 @@
     programs = {
       anytype = {
         enable = true;
-        version = "0.50.5";
-        hash = "sha256-WIj0FDVaKi5Dm89Crqd5qz1Dr2tMYl+jLMMVepqbSvY=";
+        version = "0.50.13-alpha";
+        hash = "sha256-bVWsgLsWDCa7AH4Yg4vNm828HLMsawnCpx1EnoWCUXA=";
       };
+      helium = {
+        enable = true;
+        version = "0.5.7.1";
+        hash = "sha256-A+fNcW7ujbeYqOb+gxzQ0p19J14csfFyok0RVRFxo60=";
+      };
+
       mpv.enable = true;
       kitty = {
         enable = true;
@@ -98,13 +104,5 @@
 
   services.syncthing.enable = true;
 
-  programs = {
-    home-manager.enable = true;
-    yazi = {
-      enable = true;
-      enableBashIntegration = true;
-      enableZshIntegration = true;
-      enableNushellIntegration = true;
-    };
-  };
+  programs.home-manager.enable = true;
 }
