@@ -6,7 +6,7 @@ in
 {
   options.myHome.programs = {
     anytype = {
-      enable = lib.mkEnableOption "chromium";
+      enable = lib.mkEnableOption "anytype";
       version = lib.mkOption {
         type = lib.types.str;
         default = "";
@@ -19,6 +19,17 @@ in
       };
     };
 
+    helium = {
+      enable = lib.mkEnableOption "helium";
+      version = lib.mkOption {
+        type = lib.types.str;
+        description = "Override version for helium";
+      };
+      hash = lib.mkOption {
+        type = lib.types.str;
+        description = "Override hash for helium";
+      };
+    };
     lf.enable = lib.mkEnableOption "lf file manager";
     zathura.enable = lib.mkEnableOption "Zathura PDF viewer";
 
@@ -60,9 +71,12 @@ in
   config = lib.mkMerge [
     (lib.mkIf cfg.anytype.enable {
       home.packages = [
-        (pkgs.callPackage ../../../packages/anytype.nix {
-          inherit (cfg.anytype) version hash;
-        })
+        (pkgs.callPackage ../../../packages/anytype.nix { inherit (cfg.anytype) version hash; })
+      ];
+    })
+    (lib.mkIf cfg.helium.enable {
+      home.packages = [
+        (pkgs.callPackage ../../../packages/helium.nix { inherit (cfg.helium) version hash; })
       ];
     })
     (lib.mkIf cfg.lf.enable (import ./lf.nix { inherit pkgs; }))

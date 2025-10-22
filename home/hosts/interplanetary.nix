@@ -43,7 +43,7 @@
         inputs'.zls.packages.default
         bottles
         qFlipper
-        android-studio-full
+        # android-studio-full
       ];
     };
   };
