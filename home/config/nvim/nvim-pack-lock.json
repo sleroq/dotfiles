@@ -1,0 +1,34 @@
+{
+  "plugins": {
+    "diffview.nvim": [],
+    "fidget.nvim": [],
+    "gitsigns.nvim": [],
+    "guess-indent.nvim": [],
+    "lualine.nvim": [],
+    "marks.nvim": [],
+    "neogit": [],
+    "nvim-lspconfig": [],
+    "nvim-neoclip.lua": [],
+    "nvim-treesitter": {
+      "version": "'main'"
+    },
+    "nvim-web-devicons": [],
+    "oil.nvim": [],
+    "opencode.nvim": {
+      "rev": "b51972a",
+      "src": "https://github.com/NickvanDyke/opencode.nvim"
+    },
+    "plenary.nvim": [],
+    "telescope-frecency.nvim": [],
+    "telescope-ui-select.nvim": [],
+    "telescope.nvim": {
+      "version": "'master'"
+    },
+    "undotree": [],
+    "vague.nvim": {
+      "rev": "ac4ecda"
+    },
+    "vim-prisma": [],
+    "which-key.nvim": []
+  }
+}
