@@ -46,10 +46,9 @@ let
   };
 in
 mkMerge [
-  # (import ../../programs/eww.nix { inherit pkgs lib self; })
-  (import ../../programs/quickshell.nix { inherit pkgs; })
   (import ../../programs/flameshot.nix { inherit pkgs config; })
   (import ../../programs/mic-mute.nix { inherit pkgs; })
+  (import ../../programs/caelestia.nix { inherit pkgs; })
   {
     home.activation.hyprland = hm.dag.entryAfter [ "writeBoundary" ] ''
       mkdir -p $HOME/.config/hypr
@@ -81,92 +80,9 @@ mkMerge [
       '';
     };
 
-    programs.caelestia = {
-      enable = true;
-      systemd = {
-        enable = true;
-        target = "graphical-session.target";
-      };
-      settings = {
-        services = {
-          weatherLocation = "43.25654,76.92848";
-          useFahrenheit = false;
-        };
-        bar.status = {
-          showBattery = false;
-        };
-        paths.wallpaperDir = "~/Pictures/wallpapers";
-        utilities.toasts.kbLayoutChanged = false;
-      };
-      cli = {
-        enable = true;
-      };
-    };
-
-    programs.swaylock = {
-      enable = true;
-      settings = {
-        color = "111111";
-        ignore-empty-password = true;
-        indicator-radius = "40";
-        indicator-thickness = "10";
-        inside-clear-color = "222222";
-        inside-color = "1d2021";
-        inside-ver-color = "ff99441c";
-        inside-wrong-color = "ffffff1c";
-        key-hl-color = "ffffff80";
-        line-clear-color = "00000000";
-        line-color = "00000000";
-        line-ver-color = "00000000";
-        line-wrong-color = "00000000";
-        ring-clear-color = "ff994430";
-        ring-color = "282828";
-        ring-ver-color = "ffffff00";
-        ring-wrong-color = "ffffff55";
-        separator-color = "22222260";
-        text-caps-lock-color = "00000000";
-        text-clear-color = "222222";
-        text-ver-color = "00000000";
-        text-wrong-color = "00000000";
-      };
-    };
-
-    services = {
-      hypridle = {
-        enable = true;
-
-        settings = {
-          general = {
-            after_sleep_cmd = "hyprctl dispatch dpms on";
-            ignore_dbus_inhibit = false;
-            lock_cmd = "swaylock";
-          };
-
-          listener = [
-            {
-              timeout = 900;
-              on-timeout = "swaylock";
-            }
-            {
-              timeout = 1200;
-              on-timeout = "hyprctl dispatch dpms off";
-              on-resume = "hyprctl dispatch dpms on";
-            }
-          ];
-        };
-      };
-    };
-
-    # TODO: move to quickshell when hyprperks config drops if it's any good
-    # otherwise try to simplify https://github.com/Rexcrazy804/Zaphkiel
-    # programs.quickshell = {
-    #   enable = true;
-    #   package = inputs.quickshell.packages.${pkgs.system}.default;
-    # };
-
     home.packages = with pkgs; [
       hyprland-per-window-layout
-      inputs'.hy3.packages.hy3 # TODO: fix with easy-hosts
+      inputs'.hy3.packages.hy3
       hyprpolkitagent
       hyprpicker
 
