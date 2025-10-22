@@ -44,7 +44,10 @@ in
       };
       services.cliphist.enable = true;
 
-      services.vicinae.enable = true;
+      services.vicinae = {
+        enable = true;
+        useLayerShell = false;
+      };
 
       # Packages universal for all window managers
       home.packages = with pkgs; [
