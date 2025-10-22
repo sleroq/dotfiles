@@ -51,26 +51,33 @@ in
     };
 
     eza = {
+      enable = false;
+      enableBashIntegration = true;
+      enableZshIntegration = true;
+      enableNushellIntegration = true;
+    };
+
+    yazi = {
       enable = true;
       enableBashIntegration = true;
       enableZshIntegration = true;
       enableNushellIntegration = true;
     };
-  };
 
-  programs.zoxide = {
-    enable = true;
-    enableNushellIntegration = true;
-    enableZshIntegration = true;
-  };
+    zoxide = {
+      enable = true;
+      enableNushellIntegration = true;
+      enableZshIntegration = true;
+    };
 
-  programs.carapace = {
-    enable = true;
-    enableNushellIntegration = true;
-    enableZshIntegration = true;
-  };
+    carapace = {
+      enable = true;
+      enableNushellIntegration = true;
+      enableZshIntegration = true;
+    };
 
-  programs.fastfetch.enable = true;
+    fastfetch.enable = true;
+  };
 
   home.packages = with pkgs; [
     bat

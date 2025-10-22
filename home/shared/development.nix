@@ -1,8 +1,8 @@
 { pkgs, ... }:
 {
   imports = [
-    ../modules/programs/gitui.nix
-    ../modules/programs/zellij.nix
+    # ../modules/programs/gitui.nix
+    # ../modules/programs/zellij.nix
   ];
 
   programs.nushell = {

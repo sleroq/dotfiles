@@ -3,9 +3,9 @@ _:
 {
   programs.git = {
     enable = true;
-    userName = "Sleroq";
-    userEmail = "hireme@sleroq.link";
-    extraConfig = {
+    settings = {
+      user.name = "Sleroq";
+      user.email = "hireme@sleroq.link";
       push.autoSetupRemote = "true";
       init.defaultBranch = "master";
     };
