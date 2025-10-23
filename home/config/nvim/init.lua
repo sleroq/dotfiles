@@ -17,7 +17,7 @@ vim.o.mouse = ""
 vim.o.updatetime = 2000
 vim.o.swapfile = false
 vim.opt.splitright = true
-vim.opt.expandtab = true -- fuck the tabs
+vim.opt.expandtab = true
 vim.cmd.packadd("nohlsearch")
 
 -- experimental stuff
@@ -25,31 +25,48 @@ vim.o.path = "**"         -- for the find command, maybe helps with completion a
 vim.opt.lazyredraw = true -- presumably better for ssh
 
 vim.pack.add({
+    -- To make sure neovim is not too fast:
     { src = "https://github.com/nvim-treesitter/nvim-treesitter",        version = "main" },
+    -- 16k+ loc of lua bloat to show results of fuzzy search:
     { src = "https://github.com/nvim-telescope/telescope.nvim",          version = "master" },
 
+    -- To avoid learning git cli:
     { src = "https://github.com/NeogitOrg/neogit" },
-    -- neogit deps:
+    -- deps for neogit:
     { src = "https://github.com/nvim-lua/plenary.nvim" },
     { src = "https://github.com/sindrets/diffview.nvim" },
 
+    -- Highlights what lines have been changed (can't remember myself):
     { src = "https://github.com/lewis6991/gitsigns.nvim" },
 
+    -- colortheme because default ones not cool enough:
     { src = "https://github.com/vague2k/vague.nvim" },
+    -- workaround for skill issue using marks. this really helps for small brain:
     { src = "https://github.com/chentoast/marks.nvim" },
+
+    -- bloated file manager to avoid learning cd and ls:
     { src = "https://github.com/stevearc/oil.nvim" },
+
+    -- can't code if I don't see pretty icon on my screen:
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
+
+    -- maybe actually usefull stuff:
     { src = "https://github.com/neovim/nvim-lspconfig" },
+
+    -- more bloat:
     { src = "https://github.com/nvim-telescope/telescope-ui-select.nvim" }, -- TODO: use atleast once?
+    -- another workaround for skill issue using marks
     { src = "https://github.com/nvim-telescope/telescope-frecency.nvim" },
 
+    -- workaround for bad memory of keymaps (and helps with usage of registers)
     { src = "https://github.com/folke/which-key.nvim" },
-    { src = "https://github.com/nvim-lualine/lualine.nvim" },
-    -- { src = "https://github.com/folke/todo-comments.nvim" }, -- FIXME: does not work
+    -- TODO: not even sure why I need this -- TODO: not even sure why I need this.
+    -- it's so useless there is nothing to replace it with
+    -- { src = "https://github.com/nvim-lualine/lualine.nvim" },
+    --
+    -- { src = "https://github.com/j-hui/fidget.nvim" }, -- pretty LSP status
 
-    { src = "https://github.com/j-hui/fidget.nvim" },
-
-    -- { src = "https://github.com/neoclide/coc.nvim", version = "release" },
+    -- { src = "https://github.com/neoclide/coc.nvim", version = "release" }, -- vsc*de addons to use prisma LSP server or other proprietary stuff
     { src = "https://github.com/prisma/vim-prisma" },
     { src = "https://github.com/AckslD/nvim-neoclip.lua" },
 
@@ -63,26 +80,34 @@ vim.pack.add({
     -- { src = "hrsh7th/cmp-buffer" },
     -- { src = "hrsh7th/cmp-path" },
     -- { src = "onsails/lspkind.nvim" },
+    -- to avoid learning to type fast and setting up proper completion
     { src = "https://github.com/supermaven-inc/supermaven-nvim" },
+    -- workaround for stupidity (asking agent about the code)
     { src = "https://github.com/NickvanDyke/opencode.nvim" },
-    { src = "https://github.com/folke/snacks.nvim" }, -- dep for opencode
+    -- another bloat dependency because opencode can't use telescope
+    { src = "https://github.com/folke/snacks.nvim" },
 
     { src = "https://github.com/mbbill/undotree" },
+    -- not even sure if this is a skill issue or what,
+    -- but I have different indentation in different projects
     { src = "https://github.com/NMAC427/guess-indent.nvim" },
     -- { src = "https://github.com/folke/trouble.nvim" }, -- TODO: seems usefull
     -- { src = "https://github.com/sigmaSd/deno-nvim" }, -- TODO: enable when I hit some limitation of the default config
 
     -- https://github.com/coffebar/neovim-project -- maybe this
+    { src = "https://github.com/folke/zen-mode.nvim" },
 })
 
 require "guess-indent".setup({})
 
--- require "vague".setup({ transparent = true })
-require "vague".setup()
-vim.cmd("colorscheme vague")
+-- require "vague".setup({ transparent = true }) -- distracting but pretty
+-- require "vague".setup()
+-- vim.cmd("colorscheme vague")
+vim.cmd("colorscheme slate")
+-- vim.cmd("colorscheme quiet")
 vim.cmd(":hi statusline guibg=NONE")
 
-require "lualine".setup({}) -- FIXME: is it for weak?
+-- require "lualine".setup({}) -- FIXME: is it for weak?
 
 require "marks".setup {
     builtin_marks = { "<", ">", "^" },
@@ -190,12 +215,12 @@ map({ "n" }, "<leader>t", "<Cmd>:vs | te<CR>", { desc = "Open terminal" })
 map({ "n", "v", "x" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format current buffer" })
 map({ "n" }, "<leader>e", "<cmd>Oil<CR>", { desc = "Open oil" })
 
-if vim.g.neovide then
-    map("n", "<sc-v>", 'l"+P', { noremap = true })
-    map("v", "<sc-v>", '"+P', { noremap = true })
-    map("i", "<sc-v>", '<ESC>"+p', { noremap = true })
-    map("n", "<sc-v>", '"+p', { noremap = true })
-    map("t", "<sc-v>", '<C-\\><C-n>"+Pi', { noremap = true })
+if vim.g.neovide then -- Copy paste for neovide
+    map("n", "<sc-v>", 'l"+P')
+    map("v", "<sc-v>", '"+P')
+    map("i", "<sc-v>", '<ESC>"+p')
+    map("n", "<sc-v>", '"+p')
+    map("t", "<sc-v>", '<C-\\><C-n>"+Pi')
     vim.o.guifont = "JetBrainsMono Nerd Font:h14"
 end
 
@@ -213,6 +238,16 @@ map("n", "<S-C-u>", function() opencode.command("messages_half_page_up") end,
     { desc = "Messages half page up" })
 map("n", "<S-C-d>", function() opencode.command("messages_half_page_down") end,
     { desc = "Messages half page down" })
+
+local zen = require("zen-mode")
+local toggle_zen = function()
+    zen.toggle({
+        window = {
+            backdrop = 0,
+        },
+    })
+end
+map({ "n" }, "<leader>z", toggle_zen, { desc = "Toggle zen mode" })
 
 -- disable ts_ls for deno project
 vim.api.nvim_create_autocmd("User", {
