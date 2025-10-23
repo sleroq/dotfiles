@@ -30,7 +30,7 @@
     };
 
     editors = {
-      vscode.enable = true;
+      # vscode.enable = true;
       neovim = {
         enable = true;
         enableNeovide = true;
@@ -39,11 +39,11 @@
     };
 
     programs = {
-      anytype = {
-        enable = true;
-        version = "0.50.13-alpha";
-        hash = "sha256-bVWsgLsWDCa7AH4Yg4vNm828HLMsawnCpx1EnoWCUXA=";
-      };
+      # anytype = {
+      #   enable = true;
+      #   version = "0.50.13-alpha";
+      #   hash = "sha256-bVWsgLsWDCa7AH4Yg4vNm828HLMsawnCpx1EnoWCUXA=";
+      # };
       helium = {
         enable = true;
         version = "0.5.7.1";
@@ -58,15 +58,15 @@
 
       extraPackages =
         let base = with pkgs; [
-          monero-gui
-          signal-desktop
+          # monero-gui
+          # signal-desktop
           legcord
 
           # teamspeak6-client
           syncplay
 
-          krita
-          libreoffice-fresh
+          # krita
+          # libreoffice-fresh
           xournalpp
           picard # music tagger
 
@@ -84,7 +84,7 @@
           nomacs # Image viewer
 
           # CLI
-          rclone
+          # rclone
           gdb
           ffmpeg
 
@@ -93,7 +93,7 @@
           remmina
           # nomachine-client
           # rustdesk
-          vial
+          # vial
           inputs'.agenix.packages.default
         ];
         in base ++ lib.optionals (lib.attrByPath [ "myHome" "programs" "exodus" "enable" ] false config) [ pkgs.exodus ];

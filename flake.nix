@@ -18,6 +18,9 @@
     caelestia_shell-interplanetary.url = "github:caelestia-dots/shell";
     caelestia_shell-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
 
+    caelestia_shell-international.url = "github:caelestia-dots/shell";
+    caelestia_shell-international.inputs.nixpkgs.follows = "nixpkgs-international";
+
     quickshell.url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
     quickshell.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -34,10 +37,6 @@
 
     home-manager-interplanetary.url = "github:nix-community/home-manager";
     home-manager-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
-
-    # International flakes
-    zenbrowser-international.url = "github:youwen5/zen-browser-flake";
-    zenbrowser-international.inputs.nixpkgs.follows = "nixpkgs-international";
 
     home-manager-international.url = "github:nix-community/home-manager";
     home-manager-international.inputs.nixpkgs.follows = "nixpkgs-international";
@@ -116,12 +115,10 @@
               tags = [ "non-server" ];
               modules = [
                 inputs.home-manager-interplanetary.nixosModules.home-manager
-                ({ inputs, ... }: {
-                  home-manager = {
-                    sharedModules = [ inputs.caelestia_shell-interplanetary.homeManagerModules.default ];
-                  };
-                })
                 inputs.aagl.nixosModules.default
+                { home-manager = {
+                    sharedModules = [ inputs.caelestia_shell-interplanetary.homeManagerModules.default ];
+                };}
                 { home-manager.users.sleroq.imports = [ ./home/hosts/interplanetary.nix ]; }
               ];
             };
@@ -130,6 +127,9 @@
               tags = [ "non-server" ];
               modules = [
                 inputs.home-manager-international.nixosModules.home-manager
+                { home-manager = {
+                    sharedModules = [ inputs.caelestia_shell-international.homeManagerModules.default ];
+                };}
                 { home-manager.users.sleroq.imports = [ ./home/hosts/international.nix ]; }
               ];
             };

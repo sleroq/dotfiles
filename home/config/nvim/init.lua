@@ -50,7 +50,7 @@ vim.pack.add({
     -- can't code if I don't see pretty icon on my screen:
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
 
-    -- maybe actually usefull stuff:
+    -- maybe actually useful stuff:
     { src = "https://github.com/neovim/nvim-lspconfig" },
 
     -- more bloat:
@@ -91,7 +91,7 @@ vim.pack.add({
     -- not even sure if this is a skill issue or what,
     -- but I have different indentation in different projects
     { src = "https://github.com/NMAC427/guess-indent.nvim" },
-    -- { src = "https://github.com/folke/trouble.nvim" }, -- TODO: seems usefull
+    -- { src = "https://github.com/folke/trouble.nvim" }, -- TODO: seems useful
     -- { src = "https://github.com/sigmaSd/deno-nvim" }, -- TODO: enable when I hit some limitation of the default config
 
     -- https://github.com/coffebar/neovim-project -- maybe this
@@ -103,8 +103,8 @@ require "guess-indent".setup({})
 -- require "vague".setup({ transparent = true }) -- distracting but pretty
 -- require "vague".setup()
 -- vim.cmd("colorscheme vague")
-vim.cmd("colorscheme slate")
--- vim.cmd("colorscheme quiet")
+vim.cmd("colorscheme quiet")
+vim.cmd("set bg=light")
 vim.cmd(":hi statusline guibg=NONE")
 
 -- require "lualine".setup({}) -- FIXME: is it for weak?

@@ -202,6 +202,30 @@
     "caelestia-cli": {
       "inputs": {
         "caelestia-shell": [
+          "caelestia_shell-international"
+        ],
+        "nixpkgs": [
+          "caelestia_shell-international",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1760637553,
+        "narHash": "sha256-I3fN6TsYfOtKFc1iVy/vXYR7Ck3JRTPncnQaZC6eLJ8=",
+        "owner": "caelestia-dots",
+        "repo": "cli",
+        "rev": "4593b823d730f46168d2eccd061467adb1754a57",
+        "type": "github"
+      },
+      "original": {
+        "owner": "caelestia-dots",
+        "repo": "cli",
+        "type": "github"
+      }
+    },
+    "caelestia-cli_2": {
+      "inputs": {
+        "caelestia-shell": [
           "caelestia_shell-interplanetary"
         ],
         "nixpkgs": [
@@ -223,13 +247,35 @@
         "type": "github"
       }
     },
-    "caelestia_shell-interplanetary": {
+    "caelestia_shell-international": {
       "inputs": {
         "caelestia-cli": "caelestia-cli",
         "nixpkgs": [
-          "nixpkgs-interplanetary"
+          "nixpkgs-international"
         ],
         "quickshell": "quickshell"
+      },
+      "locked": {
+        "lastModified": 1761208545,
+        "narHash": "sha256-rlhP4YHqbqSULj/Q3PkaN5mla8btYBBvs/qCiLCGLVM=",
+        "owner": "caelestia-dots",
+        "repo": "shell",
+        "rev": "223207235e41e3476aefae4e9f4a8724dcd02e8b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "caelestia-dots",
+        "repo": "shell",
+        "type": "github"
+      }
+    },
+    "caelestia_shell-interplanetary": {
+      "inputs": {
+        "caelestia-cli": "caelestia-cli_2",
+        "nixpkgs": [
+          "nixpkgs-interplanetary"
+        ],
+        "quickshell": "quickshell_2"
       },
       "locked": {
         "lastModified": 1760837100,
@@ -2269,7 +2315,7 @@
     "quickshell": {
       "inputs": {
         "nixpkgs": [
-          "caelestia_shell-interplanetary",
+          "caelestia_shell-international",
           "nixpkgs"
         ]
       },
@@ -2288,6 +2334,27 @@
       }
     },
     "quickshell_2": {
+      "inputs": {
+        "nixpkgs": [
+          "caelestia_shell-interplanetary",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1760822546,
+        "narHash": "sha256-cy3wJQQzQbZ/EYUfTDuMiP/haPOjkqGgWOPPl7K9oiM=",
+        "ref": "refs/heads/master",
+        "rev": "3e2ce40b18af943f9ba370ed73565e9f487663ef",
+        "revCount": 697,
+        "type": "git",
+        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+      }
+    },
+    "quickshell_3": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs"
@@ -2350,6 +2417,7 @@
         "aagl": "aagl",
         "agenix": "agenix",
         "bayan": "bayan",
+        "caelestia_shell-international": "caelestia_shell-international",
         "caelestia_shell-interplanetary": "caelestia_shell-interplanetary",
         "cum-army": "cum-army",
         "disko": "disko",
@@ -2371,7 +2439,7 @@
         "nixpkgs-international": "nixpkgs-international",
         "nixpkgs-interplanetary": "nixpkgs-interplanetary",
         "nixpkgs-master": "nixpkgs-master",
-        "quickshell": "quickshell_2",
+        "quickshell": "quickshell_3",
         "reactor": "reactor",
         "scrcpyPkgs": "scrcpyPkgs",
         "sieve": "sieve",
@@ -2383,7 +2451,6 @@
         "winapps": "winapps",
         "zed-international": "zed-international",
         "zed-interplanetary": "zed-interplanetary",
-        "zenbrowser-international": "zenbrowser-international",
         "zig": "zig",
         "zls": "zls"
       }
@@ -2979,26 +3046,6 @@
         "owner": "zed-industries",
         "repo": "zed",
         "rev": "7d9cfb9527d248618be39f6ed60ba30006243f98",
-        "type": "github"
-      }
-    },
-    "zenbrowser-international": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs-international"
-        ]
-      },
-      "locked": {
-        "lastModified": 1759982773,
-        "narHash": "sha256-HlTQoXRytul3jjek7vRV0Qk7voDB3Fy8RSIzDSvHIAQ=",
-        "owner": "youwen5",
-        "repo": "zen-browser-flake",
-        "rev": "f2f8aff94529e763665b807bad23396aed9d1fe8",
-        "type": "github"
-      },
-      "original": {
-        "owner": "youwen5",
-        "repo": "zen-browser-flake",
         "type": "github"
       }
     },

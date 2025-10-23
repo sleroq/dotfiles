@@ -56,10 +56,6 @@
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
-  environment.systemPackages = [
-    inputs.zenbrowser-international.packages.default
-  ];
-
   # Define a user account
   users.defaultUserShell = pkgs.bash;
   users.users.sleroq = {

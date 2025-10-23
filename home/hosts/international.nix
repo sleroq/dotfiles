@@ -21,19 +21,19 @@ _:
       };
     };
     editors = {
-      zed.enable = true;
-      cursor.enable = true;
-      helix.enable = false;
+      # zed.enable = true;
+      # cursor.enable = true;
+      # helix.enable = false;
     };
     gaming.osu.enable = true;
     programs = {
-      wireplumberHacks.enable = true;
-      obs.enable = true;
+      # wireplumberHacks.enable = true;
+      # obs.enable = true;
       chromium = {
         enable = true;
         unsafeWebGPU = true;
       };
-      exodus.enable = true;
+      # exodus.enable = true;
     };
   };
 }
