@@ -39,11 +39,11 @@
     };
 
     programs = {
-      # anytype = {
-      #   enable = true;
-      #   version = "0.50.13-alpha";
-      #   hash = "sha256-bVWsgLsWDCa7AH4Yg4vNm828HLMsawnCpx1EnoWCUXA=";
-      # };
+      anytype = {
+        enable = true;
+        version = "0.50.17-alpha";
+        hash = "sha256-uSqAjGrUJ4aptEGEtpxtW04t12MC/RVbxK5UsCm8hyI=";
+      };
       helium = {
         enable = true;
         version = "0.5.7.1";

@@ -4,7 +4,19 @@
       "rev": "4516612",
       "src": "https://github.com/sindrets/diffview.nvim"
     },
+    "faster.nvim": {
+      "rev": "2e7a50f",
+      "src": "https://github.com/pteroctopus/faster.nvim"
+    },
     "fidget.nvim": [],
+    "fogbell.vim": {
+      "rev": "274cc13",
+      "src": "https://github.com/jaredgorski/fogbell.vim"
+    },
+    "gitlab.nvim": {
+      "rev": "e29909c",
+      "src": "https://github.com/harrisoncramer/gitlab.nvim"
+    },
     "gitsigns.nvim": {
       "rev": "20ad441",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
@@ -21,9 +33,17 @@
       "rev": "f353e8c",
       "src": "https://github.com/chentoast/marks.nvim"
     },
+    "monochrome.nvim": {
+      "rev": "2de78d9",
+      "src": "https://github.com/kdheepak/monochrome.nvim"
+    },
     "neogit": {
       "rev": "524ae32f",
       "src": "https://github.com/NeogitOrg/neogit"
+    },
+    "nui.nvim": {
+      "rev": "de74099",
+      "src": "https://github.com/MunifTanjim/nui.nvim"
     },
     "nvim-lspconfig": {
       "rev": "52a8932",

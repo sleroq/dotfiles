@@ -19,6 +19,9 @@ vim.o.swapfile = false
 vim.opt.splitright = true
 vim.opt.expandtab = true
 vim.cmd.packadd("nohlsearch")
+vim.cmd.packadd("cfilter")
+vim.o.grepprg = "rg --vimgrep --hidden --glob '!.git/*' --glob '!node_modules/*'"
+vim.opt.shell = "bash"
 
 -- experimental stuff
 vim.o.path = "**"         -- for the find command, maybe helps with completion as well
@@ -39,8 +42,6 @@ vim.pack.add({
     -- Highlights what lines have been changed (can't remember myself):
     { src = "https://github.com/lewis6991/gitsigns.nvim" },
 
-    -- colortheme because default ones not cool enough:
-    { src = "https://github.com/vague2k/vague.nvim" },
     -- workaround for skill issue using marks. this really helps for small brain:
     { src = "https://github.com/chentoast/marks.nvim" },
 
@@ -62,8 +63,6 @@ vim.pack.add({
     { src = "https://github.com/folke/which-key.nvim" },
     -- TODO: not even sure why I need this -- TODO: not even sure why I need this.
     -- it's so useless there is nothing to replace it with
-    -- { src = "https://github.com/nvim-lualine/lualine.nvim" },
-    --
     -- { src = "https://github.com/j-hui/fidget.nvim" }, -- pretty LSP status
 
     -- { src = "https://github.com/neoclide/coc.nvim", version = "release" }, -- vsc*de addons to use prisma LSP server or other proprietary stuff
@@ -96,18 +95,20 @@ vim.pack.add({
 
     -- https://github.com/coffebar/neovim-project -- maybe this
     { src = "https://github.com/folke/zen-mode.nvim" },
+
+    -- Maybe this is useful for work
+    { src = "https://github.com/harrisoncramer/gitlab.nvim" },
+    { src = "https://github.com/MunifTanjim/nui.nvim" }, -- Dep for gitlab.nvim
+
+    -- Workaround for bloated config - so stuff gets disabled on large files
+    { src = "https://github.com/pteroctopus/faster.nvim" },
+
+    { src = "https://github.com/kdheepak/monochrome.nvim" },
+    { src = "https://github.com/vague2k/vague.nvim" },
 })
 
+require("faster").setup()
 require "guess-indent".setup({})
-
--- require "vague".setup({ transparent = true }) -- distracting but pretty
--- require "vague".setup()
--- vim.cmd("colorscheme vague")
-vim.cmd("colorscheme quiet")
-vim.cmd("set bg=light")
-vim.cmd(":hi statusline guibg=NONE")
-
--- require "lualine".setup({}) -- FIXME: is it for weak?
 
 require "marks".setup {
     builtin_marks = { "<", ">", "^" },
@@ -175,6 +176,18 @@ require("oil").setup({
     },
 })
 
+require("neogit").setup({
+    kind = "replace",
+})
+
+require("diffview")
+local gitlab = require("gitlab")
+gitlab.setup({
+    connection_settings = {
+        insecure = true,
+    },
+})
+
 local tsbuiltin = require("telescope.builtin")
 local map = vim.keymap.set
 
@@ -210,10 +223,14 @@ map({ "n" }, "<leader>r", tsbuiltin.resume, { desc = "Telescope resume last pick
 map({ "n" }, "<leader>x", "<Cmd>:bd<CR>", { desc = "Quit the current buffer." })
 map({ "n" }, "<leader>X", "<Cmd>:bd!<CR>", { desc = "Force quit the current buffer." })
 map({ "n" }, "<leader>gg", "<Cmd>:Neogit<CR>", { desc = "Open git shit" })
+map({ "n" }, "<leader>gm", gitlab.choose_merge_request, { desc = "Open git shit" })
 map({ "n" }, "gd", vim.lsp.buf.definition, { desc = "Jump to definition" })
-map({ "n" }, "<leader>t", "<Cmd>:vs | te<CR>", { desc = "Open terminal" })
+
 map({ "n", "v", "x" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format current buffer" })
 map({ "n" }, "<leader>e", "<cmd>Oil<CR>", { desc = "Open oil" })
+
+vim.api.nvim_create_user_command("TermNu", function() vim.cmd("terminal nu") end, {})
+map({ "n" }, "<leader>t", "<Cmd>:vs | TermNu<CR>", { desc = "Open terminal" })
 
 if vim.g.neovide then -- Copy paste for neovide
     map("n", "<sc-v>", 'l"+P')
@@ -222,6 +239,8 @@ if vim.g.neovide then -- Copy paste for neovide
     map("n", "<sc-v>", '"+p')
     map("t", "<sc-v>", '<C-\\><C-n>"+Pi')
     vim.o.guifont = "JetBrainsMono Nerd Font:h14"
+    vim.g.neovide_cursor_vfx_mode = "pixiedust"
+    vim.g.neovide_opacity = 0.8
 end
 
 local opencode = require("opencode")
@@ -240,6 +259,24 @@ map("n", "<S-C-d>", function() opencode.command("messages_half_page_down") end,
     { desc = "Messages half page down" })
 
 local zen = require("zen-mode")
+zen.setup({
+    plugins = {
+        kitty = {
+            enabled = true,
+        },
+        neovide = {
+            enabled = true,
+            disable_animations = {
+                neovide_opacity = 1,
+                neovide_cursor_animate_command_line = true,
+                neovide_scroll_animation_length = 0.3,
+                neovide_position_animation_length = 0.15,
+                neovide_cursor_animation_length = 0.15,
+                neovide_cursor_vfx_mode = "pixiedust",
+            },
+        },
+    },
+})
 local toggle_zen = function()
     zen.toggle({
         window = {
@@ -289,3 +326,6 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
         vim.bo.filetype = "sh"
     end,
 })
+
+-- require "vague".setup()
+vim.cmd("colorscheme monochrome")
