@@ -224,6 +224,7 @@ map({ "n" }, "<leader>x", "<Cmd>:bd<CR>", { desc = "Quit the current buffer." })
 map({ "n" }, "<leader>X", "<Cmd>:bd!<CR>", { desc = "Force quit the current buffer." })
 map({ "n" }, "<leader>gg", "<Cmd>:Neogit<CR>", { desc = "Open git shit" })
 map({ "n" }, "<leader>gm", gitlab.choose_merge_request, { desc = "Open git shit" })
+map({ "n" }, "<leader>u", "<Cmd>:UndotreeToggle<CR>", { desc = "Open undotree" })
 map({ "n" }, "gd", vim.lsp.buf.definition, { desc = "Jump to definition" })
 
 map({ "n", "v", "x" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format current buffer" })
