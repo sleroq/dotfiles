@@ -1,4 +1,4 @@
-{ pkgs, self, ... }:
+{ pkgs, self, enableSshAuthSocket ? true, ... }:
 
 let
   aliases = {
@@ -8,16 +8,18 @@ let
     vim = "nvim";
     vi = "nvim";
   };
-  vars = { # FIXME: Probably not needed, need to check
+  vars = if enableSshAuthSocket then {
     SSH_AUTH_SOCK = "/run/user/1000/ssh-agent";
-  };
+  } else {};
 in
 {
   imports = [
     ../modules/programs/starship.nix
     ../modules/programs/btop.nix
   ];
-  home.sessionVariables.SSH_AUTH_SOCK = "/run/user/1000/ssh-agent";
+  home.sessionVariables = if enableSshAuthSocket then {
+    SSH_AUTH_SOCK = "/run/user/1000/ssh-agent";
+  } else {};
 
   programs = {
     bash = {
