@@ -12,7 +12,7 @@ in
       neovim
       wget
       curl
-      nvtopPackages.full
+      # nvtopPackages.full
       powertop
     ];
 

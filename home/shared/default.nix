@@ -41,13 +41,13 @@
     programs = {
       anytype = {
         enable = true;
-        version = "0.50.17-alpha";
-        hash = "sha256-uSqAjGrUJ4aptEGEtpxtW04t12MC/RVbxK5UsCm8hyI=";
+        version = "0.50.25-alpha";
+        hash = "sha256-9wi5Ph621AAr+eGUTfUAhKcITOv2J1dhZ9Gmpdme0qg=";
       };
       helium = {
         enable = true;
-        version = "0.5.7.1";
-        hash = "sha256-A+fNcW7ujbeYqOb+gxzQ0p19J14csfFyok0RVRFxo60=";
+        version = "0.5.8.1";
+        hash = "sha256-d8kwLEU6qgEgp7nlEwdfRevB1JrbEKHRe8+GhGpGUig=";
       };
 
       mpv.enable = true;

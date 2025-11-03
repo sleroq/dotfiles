@@ -73,6 +73,6 @@ in {
           "sha256-BvVE9qupMjw7JRqFUj1J0a4ys6kc9fOLBPx2bGaapTk="
           "Fuchsia-Pop";
 
-    packages = [ pkgs.libsForQt5.qt5ct pkgs.qt6ct pkgs.material-symbols ];
+    packages = [ pkgs.libsForQt5.qt5ct pkgs.qt6Packages.qt6ct pkgs.material-symbols ];
   };
 }

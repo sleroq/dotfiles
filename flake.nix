@@ -2,7 +2,8 @@
   description = "Unified NixOS and Home Manager configurations";
 
   inputs = {
-    nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
+    # these should not be used for any system and just for building. but I'm not verifying that anywhere
+    nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz"; 
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
@@ -32,8 +33,6 @@
     # Interplanetary flakes
     aagl.url = "github:ezKEa/aagl-gtk-on-nix";
     aagl.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
-    winapps.url = "github:winapps-org/winapps";
-    winapps.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
 
     home-manager-interplanetary.url = "github:nix-community/home-manager";
     home-manager-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";

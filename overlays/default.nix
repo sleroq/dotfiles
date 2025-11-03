@@ -31,6 +31,15 @@ rec {
       };
     in {
       opencode = pkgsMaster.opencode;
+        # .overrideAttrs (oldAttrs: {
+        #   version = "0.15.23";
+        #   src = final.fetchFromGitHub {
+        #     owner = "sst";
+        #     repo = "opencode";
+        #     tag = "v0.15.23";
+        #     hash = "sha256-0sxqhpfkjffm2c0gsgxzjfcnqp7034a9sdrhjqzfjczrqr8akxrl"; # bad hash
+        #   };
+        # });
     };
 
   default = composeManyExtensions [ scrcpy code-cursor opencode ];

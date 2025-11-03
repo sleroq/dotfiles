@@ -122,12 +122,11 @@
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
     noto-fonts
-    noto-fonts-emoji
+    noto-fonts-color-emoji
     noto-fonts-cjk-sans
     noto-fonts-cjk-serif
     noto-fonts-cjk-sans-static
     noto-fonts-cjk-serif-static
-    noto-fonts-extra
     roboto
   ];
 

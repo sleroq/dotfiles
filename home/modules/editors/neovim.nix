@@ -27,7 +27,6 @@
     luajitPackages.luarocks
     luajitPackages.jsregexp
     tailwindcss-language-server
-    wakatime
     sqlite
     lua
   ];
