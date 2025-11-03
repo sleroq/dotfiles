@@ -12,7 +12,7 @@
   };
 
   # Brightness cli tool
-  programs.light.enable = true;
+  programs.light.enable = true; # TODO: make it laptop only?
   programs.xwayland.enable = true;
 
   programs.hyprland = {

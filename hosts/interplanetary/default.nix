@@ -75,15 +75,11 @@
   hardware.opentabletdriver.enable = true;
   hardware.opentabletdriver.daemon.enable = true;
 
-  programs.anime-game-launcher.enable = true;
-  programs.anime-games-launcher.enable = true;
+  # programs.anime-game-launcher.enable = true;
+  # programs.anime-games-launcher.enable = true;
   programs.adb.enable = true; # Phone debuggin stuff
 
-  environment.systemPackages = [
-    inputs'.winapps.packages.winapps
-    inputs'.winapps.packages.winapps-launcher # optional
-    pkgs.freerdp
-  ];
+  environment.systemPackages = [ pkgs.freerdp ]; # FIXME: Is this not included in remmina package or whatever?
 
   # Define a user account
   users.defaultUserShell = pkgs.bash;
@@ -98,16 +94,13 @@
     ];
   };
 
-  # For android studio
-  services.udev.packages = [
-    pkgs.android-udev-rules
-  ];
-  
+  # This allows to run electron from node_modules and other things
+  # but I need to keep this in mind when making nix packages
   programs.nix-ld.enable = true;
-  programs.nix-ld.libraries = with pkgs; [
+  # programs.nix-ld.libraries = with pkgs; [
     # Add any missing dynamic libraries for unpackaged programs
     # here, NOT in environment.systemPackages
-  ];
+  # ];
 
   services.openssh = {
     enable = true;
