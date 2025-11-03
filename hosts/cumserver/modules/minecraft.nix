@@ -26,6 +26,7 @@ in
               package = pkgs.fabricServers.fabric-1_21_5;
 
               serverProperties = {
+                difficulty = "normal";
                 player-idle-timeout = 0;
                 spawn-protection = 0;
                 server-port = 25569;
@@ -102,11 +103,12 @@ in
           "logs"
           "crash-reports"
           "hs_err_pid*.log"
+          "**/DistantHorizons.sqlite"
         ];
         pruneOpts = [
           "--keep-daily 1"
-          "--keep-weekly 3"
-          "--keep-monthly 5"
+          "--keep-weekly 1"
+          "--keep-monthly 2"
         ];
         timerConfig = {
           OnCalendar = "03:30";
