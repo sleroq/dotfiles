@@ -8,18 +8,23 @@ let
     vim = "nvim";
     vi = "nvim";
   };
+  vars = { # FIXME: Probably not needed, need to check
+    SSH_AUTH_SOCK = "/run/user/1000/ssh-agent";
+  };
 in
 {
   imports = [
     ../modules/programs/starship.nix
     ../modules/programs/btop.nix
   ];
+  home.sessionVariables.SSH_AUTH_SOCK = "/run/user/1000/ssh-agent";
 
   programs = {
     bash = {
       enable = true;
       enableCompletion = true;
       shellAliases = aliases;
+      sessionVariables = vars;
     };
 
     zsh = {
@@ -27,6 +32,7 @@ in
       enableCompletion = true;
       autosuggestion.enable = true;
       shellAliases = aliases;
+      sessionVariables = vars;
     };
 
     nushell = {
@@ -34,6 +40,7 @@ in
       configFile.source = self + /home/config/nushell/config.nu;
       envFile.source = self + /home/config/nushell/env.nu;
       shellAliases = aliases;
+      environmentVariables = vars;
     };
 
     starship = {

@@ -15,6 +15,8 @@
     ../modules/tailscale.nix
   ];
 
+  programs.ssh.startAgent = true;
+
   # Fixes for low memory situations:
   zramSwap = {
     enable = true;
