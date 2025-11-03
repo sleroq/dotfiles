@@ -29,6 +29,7 @@
     nixpkgs-interplanetary.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-international.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-cumserver.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
+    nixpkgs-portable.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
 
     # Interplanetary flakes
     aagl.url = "github:ezKEa/aagl-gtk-on-nix";
@@ -84,13 +85,19 @@
 
     spoiler-images.url = "github:sleroq/spoiler-images";
     spoiler-images.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+
+    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs-portable";
+    
+    home-manager-portable.url = "github:nix-community/home-manager";
+    home-manager-portable.inputs.nixpkgs.follows = "nixpkgs-portable";
   };
 
   outputs = { self, nixpkgs, ... }@inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [ inputs.easy-hosts.flakeModule ];
 
-      systems = [ "x86_64-nixos" ];
+      systems = [ "x86_64-nixos" "aarch64-darwin" ];
 
       flake.overlays = import ./overlays/default.nix {
         inherit self nixpkgs;
@@ -150,6 +157,27 @@
                 secrets = import ./hosts/cumserver/secrets/default.nix;
               };
             };
+
+            portable = {
+              tags = [ "macos" "non-server" ];
+              modules = [
+                inputs.nix-darwin.nixosModules.darwin
+                inputs.home-manager-portable.nixosModules.home-manager
+                ({ inputs, inputsResolved', ... } @ args:
+                  (import ./hosts/portable/default.nix)
+                    (args // {
+                      agenixModule = inputs.agenix.homeManagerModules.default;
+                      inputs' = inputsResolved';
+                      inherit (inputs) self;
+                      inherit realConfigs;
+                    }))
+                { home-manager.users.sleroq.imports = [ ./home/hosts/portable.nix ]; }
+              ];
+              specialArgs = {
+                inherit inputs;
+                secrets = { }; # Empty secrets for portable
+              };
+            };
           };
 
         shared.modules = [
@@ -161,7 +189,7 @@
         perTag = tag:
           {
             modules = builtins.concatLists [
-              (nixpkgs.lib.optionals (tag == "non-server") [
+              (nixpkgs.lib.optionals (tag == "non-server" && tag != "macos") [
                 ({ inputs, inputsResolved', ... } @ args:
                   (import ./home/default.nix)
                     (args // {
@@ -176,7 +204,7 @@
             ];
 
             specialArgs =
-              nixpkgs.lib.optionalAttrs (tag == "non-server") {
+              nixpkgs.lib.optionalAttrs (tag == "non-server" && tag != "macos") {
                 secrets = import ./shared/secrets/default.nix;
               };
           };
