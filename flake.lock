@@ -1343,6 +1343,26 @@
         "type": "github"
       }
     },
+    "home-manager-portable": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-portable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1762183399,
+        "narHash": "sha256-vr2aL1QLfERYTfYBgK8cW3T9eSdSEThH462wKaGlmEU=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "a5fee077929ae2f2800c3087dce5e1abb4edfbc6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
     "hy3": {
       "inputs": {
         "hyprland": [
@@ -1769,6 +1789,27 @@
         "type": "github"
       }
     },
+    "nix-darwin": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-portable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1762186368,
+        "narHash": "sha256-dzLBZKccS0jMefj+WAYwsk7gKDluqavC7I4KfFwVh8k=",
+        "owner": "nix-darwin",
+        "repo": "nix-darwin",
+        "rev": "69921864a70b58787abf5ba189095566c3f0ffd3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-darwin",
+        "ref": "master",
+        "repo": "nix-darwin",
+        "type": "github"
+      }
+    },
     "nix-filter": {
       "locked": {
         "lastModified": 1757882181,
@@ -1961,6 +2002,19 @@
         "ref": "master",
         "repo": "nixpkgs",
         "type": "github"
+      }
+    },
+    "nixpkgs-portable": {
+      "locked": {
+        "lastModified": 315532800,
+        "narHash": "sha256-V4RaAKo7vdHu9CQNUs6AZpW2jLQr2DuZiiIfZ++YJqI=",
+        "rev": "7241bcbb4f099a66aafca120d37c65e8dda32717",
+        "type": "tarball",
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-25.11pre888688.7241bcbb4f09/nixexprs.tar.xz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz"
       }
     },
     "nixpkgs-stable": {
@@ -2379,11 +2433,13 @@
         "flake-parts": "flake-parts",
         "home-manager-international": "home-manager-international",
         "home-manager-interplanetary": "home-manager-interplanetary",
+        "home-manager-portable": "home-manager-portable",
         "hy3": "hy3",
         "hyprland": "hyprland",
         "kopoka": "kopoka",
         "mailserver": "mailserver",
         "neovim-nightly-overlay": "neovim-nightly-overlay",
+        "nix-darwin": "nix-darwin",
         "nix-gaming": "nix-gaming",
         "nix-minecraft": "nix-minecraft",
         "nixos-facter-modules": "nixos-facter-modules",
@@ -2392,6 +2448,7 @@
         "nixpkgs-international": "nixpkgs-international",
         "nixpkgs-interplanetary": "nixpkgs-interplanetary",
         "nixpkgs-master": "nixpkgs-master",
+        "nixpkgs-portable": "nixpkgs-portable",
         "quickshell": "quickshell_3",
         "reactor": "reactor",
         "scrcpyPkgs": "scrcpyPkgs",

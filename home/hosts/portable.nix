@@ -1,10 +1,10 @@
-{ ... }:
+{ pkgs, self, inputs', config, ... }:
 
 {
   imports = [
     ../shared/git.nix
     ../shared/development.nix
-    (import ../shared/shell.nix { enableSshAuthSocket = false; })
+    (import ../shared/shell.nix { inherit pkgs self; enableSshAuthSocket = false; })
   ];
 
   home = {
@@ -13,9 +13,18 @@
     stateVersion = "25.05";
   };
 
+  age = {
+    identityPaths = [ (config.home.homeDirectory + "/.ssh/id_ed25519") ];
+  };
+
   age.secrets.ssh-config = {
     file = ../secrets/ssh-config;
-    path = ".ssh/config";
+    path = config.home.homeDirectory + "/.ssh/config";
+  };
+
+  age.secrets.test = {
+    file = ../secrets/ssh-config;
+    path = "/Users/sleroq/test";
   };
 
   myHome = {
@@ -26,6 +35,12 @@
         enableNeovide = true;
         default = true;
       };
+    };
+
+    programs = {
+      extraPackages = [
+        inputs'.agenix.packages.default
+      ];
     };
   };
 }

@@ -118,7 +118,7 @@
         {
           hosts = {
             interplanetary = withNixpkgsFor "interplanetary" {
-              tags = [ "non-server" ];
+              tags = [ "linux-personal" ];
               modules = [
                 inputs.home-manager-interplanetary.nixosModules.home-manager
                 inputs.aagl.nixosModules.default
@@ -130,7 +130,7 @@
             };
 
             international = withNixpkgsFor "international" {
-              tags = [ "non-server" ];
+              tags = [ "linux-personal" ];
               modules = [
                 inputs.home-manager-international.nixosModules.home-manager
                 { home-manager = {
@@ -158,23 +158,40 @@
               };
             };
 
-            portable = {
-              tags = [ "macos" "non-server" ];
+            portable = withNixpkgsFor "portable" {
+              tags = [ "macos" ];
+              arch = "aarch64";
+              class = "darwin";
+
               modules = [
-                inputs.nix-darwin.nixosModules.darwin
-                inputs.home-manager-portable.nixosModules.home-manager
+                inputs.agenix.darwinModules.default
+                inputs.home-manager-portable.darwinModules.home-manager
                 ({ inputs, inputsResolved', ... } @ args:
-                  (import ./hosts/portable/default.nix)
-                    (args // {
-                      agenixModule = inputs.agenix.homeManagerModules.default;
-                      inputs' = inputsResolved';
-                      inherit (inputs) self;
-                      inherit realConfigs;
-                    }))
-                { home-manager.users.sleroq.imports = [ ./home/hosts/portable.nix ]; }
+                  {
+                    home-manager = {
+                      useGlobalPkgs = true;
+                      useUserPackages = true;
+                      sharedModules = [
+                        inputs.agenix.homeManagerModules.default
+                        ./home/modules/programs
+                        ./home/modules/editors
+                      ];
+                      users.sleroq.imports = [ ./home/hosts/portable.nix ]; 
+                  
+                      extraSpecialArgs = {
+                        inherit self; 
+                        inputs' = inputsResolved';
+                        opts = {
+                          realConfigs = "/Users/sleroq/develop/dotfiles/home/config";
+                        };
+                      };
+                    };
+                  }
+                )
               ];
               specialArgs = {
                 inherit inputs;
+                username = "sleroq";
                 secrets = { }; # Empty secrets for portable
               };
             };
@@ -182,14 +199,13 @@
 
         shared.modules = [
           (import ./lib/inputs-resolver.nix)
-          inputs.agenix.nixosModules.default
           ({ inputs, ... }: { nixpkgs.overlays = [ inputs.self.overlays.default ]; })
         ];
 
         perTag = tag:
           {
             modules = builtins.concatLists [
-              (nixpkgs.lib.optionals (tag == "non-server" && tag != "macos") [
+              (nixpkgs.lib.optionals (tag == "linux-personal") [
                 ({ inputs, inputsResolved', ... } @ args:
                   (import ./home/default.nix)
                     (args // {
@@ -201,10 +217,13 @@
                     }))
                 ./shared
               ])
+              (nixpkgs.lib.optionals (tag != "macos") [
+                inputs.agenix.nixosModules.default
+              ])
             ];
 
             specialArgs =
-              nixpkgs.lib.optionalAttrs (tag == "non-server" && tag != "macos") {
+              nixpkgs.lib.optionalAttrs (tag == "linux-personal") {
                 secrets = import ./shared/secrets/default.nix;
               };
           };

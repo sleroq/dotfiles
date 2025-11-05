@@ -1,14 +1,17 @@
-{ agenixModule, inputs', realConfigs, self, ... }:
+ { inputs', realConfigs, self, pkgs, ... }:
 
 {
-  system = {
-    stateVersion = "25.05";
-  };
+  imports = [ ./aerospace.nix ];
 
+  system = {
+    stateVersion = 6;
+  };
+  nixpkgs.hostPlatform = "aarch64-darwin";
+
+  nix.optimise.automatic = true;
   nix = {
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
-      auto-optimise-store = true;
       substituters = [
         "https://nix-community.cachix.org"
         "https://cache.nixos.org/"
@@ -19,27 +22,14 @@
     };
   };
 
+  # programs.nh = {
+  #   enable = true;
+  #   flake = "/Users/sleroq/develop/other/dotfiles"; # TODO: infer from args
+  # };
+
+  system.primaryUser = "sleroq";
   users.users.sleroq = {
     name = "sleroq";
     home = "/Users/sleroq";
-  };
-
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    sharedModules = [
-      ../../home/modules/programs
-      ../../home/modules/editors
-      ../../home/modules/gaming.nix
-      agenixModule
-    ];
-
-    extraSpecialArgs = {
-      inherit inputs' self;
-      secrets = import ./secrets/default.nix;
-      opts = {
-        inherit realConfigs;
-      };
-    };
   };
 }
