@@ -25,9 +25,10 @@
       push.autoSetupRemote = "true";
       init.defaultBranch = "master";
       rerere.enabled = true;
+      commit.gpgSign = true;
       gpg = {
         format = "ssh";
-        ssh.allowedSignersFile = ".ssh/allowed-signers";
+        ssh.allowedSignersFile = "~/.ssh/allowed-signers";
       };
     };
     ignores = [
