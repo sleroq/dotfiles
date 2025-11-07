@@ -4,6 +4,10 @@
       "rev": "4516612",
       "src": "https://github.com/sindrets/diffview.nvim"
     },
+    "dressing.nvim": {
+      "rev": "2d7c2db",
+      "src": "https://github.com/stevearc/dressing.nvim"
+    },
     "faster.nvim": {
       "rev": "2e7a50f",
       "src": "https://github.com/pteroctopus/faster.nvim"

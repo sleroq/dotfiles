@@ -98,6 +98,7 @@ vim.pack.add({
 
     -- Maybe this is useful for work
     { src = "https://github.com/harrisoncramer/gitlab.nvim" },
+    { src = "https://github.com/stevearc/dressing.nvim" }, -- Recommended dep for gitlab.nvim
     { src = "https://github.com/MunifTanjim/nui.nvim" }, -- Dep for gitlab.nvim
 
     -- Workaround for bloated config - so stuff gets disabled on large files
@@ -291,7 +292,7 @@ map({ "n" }, "<leader>z", toggle_zen, { desc = "Toggle zen mode" })
 vim.api.nvim_create_autocmd("User", {
     pattern = "LspAttach",
     callback = function()
-        local cwd = vim.fn.getcwd()
+        local cwd = vim.fn.getcwd() -- this doesn't work on macOS for some reason
         if cwd:match("slusha") then
             vim.cmd("LspStop ts_ls")
             vim.cmd("LspStart denols")
