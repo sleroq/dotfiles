@@ -10,6 +10,7 @@
 
   nix.optimise.automatic = true;
   nix = {
+    # gc.automatic = true; # FIXME
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
       substituters = [
@@ -27,6 +28,7 @@
   #   flake = "/Users/sleroq/develop/other/dotfiles"; # TODO: infer from args
   # };
 
+  # Tailscale? https://github.com/nix-darwin/nix-darwin/blob/b8c7ac030211f18bd1f41eae0b815571853db7a2/modules/services/tailscale.nix
   system.primaryUser = "sleroq";
   users.users.sleroq = {
     name = "sleroq";

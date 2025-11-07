@@ -1,4 +1,4 @@
-{ pkgs, self, inputs', config, ... }:
+{ pkgs, self, inputs', config, lib, ... }:
 
 {
   imports = [
@@ -19,13 +19,12 @@
 
   age.secrets.ssh-config = {
     file = ../secrets/ssh-config;
-    path = config.home.homeDirectory + "/.ssh/config";
+    path = "${config.home.homeDirectory}/.ssh/config";
   };
 
-  age.secrets.test = {
-    file = ../secrets/ssh-config;
-    path = "/Users/sleroq/test";
-  };
+  # Fix for https://github.com/ryantm/agenix/issues/308
+  launchd.agents."activate-agenix".config.KeepAlive =
+    lib.mkForce { SuccessfulExit = false; };
 
   myHome = {
     editors = {
@@ -38,6 +37,7 @@
     };
 
     programs = {
+      ghostty.enable = true;
       extraPackages = [
         inputs'.agenix.packages.default
       ];

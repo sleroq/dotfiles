@@ -86,7 +86,7 @@ in
     (lib.mkIf (cfg.foot.enable && cfg.foot.default) {
       home.sessionVariables.TERMINAL = "foot";
     })
-    (lib.mkIf cfg.ghostty.enable (import ./ghostty.nix { }))
+    (lib.mkIf cfg.ghostty.enable (import ./ghostty.nix { inherit pkgs; }))
     (lib.mkIf (cfg.ghostty.enable && cfg.ghostty.default) {
       home.sessionVariables.TERMINAL = "ghostty";
     })

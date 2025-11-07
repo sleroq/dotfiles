@@ -1,18 +1,20 @@
-_:
+{ pkgs, ... }:
 
 {
   programs.ghostty = {
+    package = null;
     enable = true;
     settings = {
+      # command = "${pkgs.nushell}/bin/nu";
       font-family = "JetBrainsMono Nerd Font";
       theme = "Catppuccin Frappe";
-      confirm-close-surface = false;
-      background = "#000000";
+      # confirm-close-surface = false;
+      # background = "#000000";
       font-size = 14;
       cursor-style = "block";
-      window-decoration = false;
-      background-opacity = 0.5;
-      gtk-tabs-location = "hidden";
+      # window-decoration = false;
+      # background-opacity = 0.5;
+      # gtk-tabs-location = "hidden";
 
       keybind = [
         "alt+w=toggle_window_decorations"
