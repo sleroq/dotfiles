@@ -8,7 +8,8 @@ _:
       start-at-login = false;
       enable-normalization-flatten-containers = true;
       enable-normalization-opposite-orientation-for-nested-containers = true;
-      accordion-padding = 0;# 30;
+      # accordion-padding = 0;# 30;
+      accordion-padding = 30;
       default-root-container-layout = "accordion"; #"tiles";
       default-root-container-orientation = "auto";
       on-focused-monitor-changed = ["move-mouse monitor-lazy-center"];
@@ -60,8 +61,6 @@ _:
         alt-shift-d = "move-node-to-workspace D";
         alt-shift-f = "move-node-to-workspace F";
 
-        alt-tab = "workspace-back-and-forth";
-        alt-shift-tab = "move-workspace-to-monitor --wrap-around next";
         alt-shift-semicolon = "mode service";
       };
       mode.service.binding = {
