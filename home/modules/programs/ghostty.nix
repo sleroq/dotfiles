@@ -1,4 +1,5 @@
-{ pkgs, ... }:
+# MacOS only config basically
+_:
 
 {
   programs.ghostty = {
@@ -8,13 +9,8 @@
       # command = "${pkgs.nushell}/bin/nu";
       font-family = "JetBrainsMono Nerd Font";
       theme = "Catppuccin Frappe";
-      # confirm-close-surface = false;
-      # background = "#000000";
-      font-size = 14;
+      font-size = 16;
       cursor-style = "block";
-      # window-decoration = false;
-      # background-opacity = 0.5;
-      # gtk-tabs-location = "hidden";
 
       keybind = [
         "alt+w=toggle_window_decorations"
