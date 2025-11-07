@@ -319,6 +319,7 @@ vim.api.nvim_create_autocmd("FileType", {
         end
     end,
 })
+vim.api.nvim_create_user_command("SwitchToDeno", function() vim.cmd("LspStop ts_ls"); vim.cmd("LspStart denols") end, {})
 
 vim.api.nvim_create_autocmd("PackChanged", { callback = function() nts.update() end })
 

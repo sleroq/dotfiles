@@ -2,7 +2,7 @@ _:
 
 {
   services.aerospace = {
-    enable = true;
+    # enable = true;
     settings = {
       after-startup-command = [];
       start-at-login = false;

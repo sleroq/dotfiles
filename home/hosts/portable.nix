@@ -38,8 +38,11 @@
 
     programs = {
       ghostty.enable = true;
-      extraPackages = [
+      extraPackages = with pkgs; [
         inputs'.agenix.packages.default
+        mpv
+        ffmpeg
+        wget
       ];
     };
   };
