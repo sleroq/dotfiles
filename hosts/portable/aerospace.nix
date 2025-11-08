@@ -1,6 +1,7 @@
 _:
 
 {
+  # https://nikitabobko.github.io/AeroSpace/guide#default-config
   services.aerospace = {
     # enable = true;
     settings = {

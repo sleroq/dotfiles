@@ -9,7 +9,7 @@ _:
       # command = "${pkgs.nushell}/bin/nu";
       font-family = "JetBrainsMono Nerd Font";
       theme = "Catppuccin Frappe";
-      font-size = 16;
+      font-size = 18;
       cursor-style = "block";
 
       keybind = [
