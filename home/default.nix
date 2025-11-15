@@ -19,6 +19,7 @@
       opts = {
         inherit realConfigs;
       };
+      enableSshAuthSocket = true;
     };
   };
 }
