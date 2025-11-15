@@ -3,7 +3,7 @@
 
   inputs = {
     # these should not be used for any system and just for building. but I'm not verifying that anywhere
-    nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz"; 
+    nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
@@ -88,7 +88,7 @@
 
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs-portable";
-    
+
     home-manager-portable.url = "github:nix-community/home-manager";
     home-manager-portable.inputs.nixpkgs.follows = "nixpkgs-portable";
   };
@@ -107,7 +107,8 @@
       # FIXME: This is a bit overengineered
       easy-hosts =
         let
-          realConfigs = "/home/sleroq/develop/other/dotfiles/home/config";
+          username = "sleroq";
+          realConfigs = "/home/${username}/develop/other/dotfiles/home/config";
           withNixpkgsFor = name: extra:
             let key = "nixpkgs-" + name; in
             extra // {
@@ -119,24 +120,30 @@
           hosts = {
             interplanetary = withNixpkgsFor "interplanetary" {
               tags = [ "linux-personal" ];
+              specialArgs = { inherit username; };
               modules = [
                 inputs.home-manager-interplanetary.nixosModules.home-manager
                 inputs.aagl.nixosModules.default
-                { home-manager = {
-                    sharedModules = [ inputs.caelestia_shell-interplanetary.homeManagerModules.default ];
-                };}
-                { home-manager.users.sleroq.imports = [ ./home/hosts/interplanetary.nix ]; }
+                {
+                  home-manager.sharedModules = [
+                    inputs.caelestia_shell-interplanetary.homeManagerModules.default
+                  ];
+                }
+                { home-manager.users.${username}.imports = [ ./home/hosts/interplanetary.nix ]; }
               ];
             };
 
             international = withNixpkgsFor "international" {
               tags = [ "linux-personal" ];
+              specialArgs = { inherit username; };
               modules = [
                 inputs.home-manager-international.nixosModules.home-manager
-                { home-manager = {
-                    sharedModules = [ inputs.caelestia_shell-international.homeManagerModules.default ];
-                };}
-                { home-manager.users.sleroq.imports = [ ./home/hosts/international.nix ]; }
+                {
+                  home-manager.sharedModules = [
+                    inputs.caelestia_shell-international.homeManagerModules.default
+                  ];
+                }
+                { home-manager.users.${username}.imports = [ ./home/hosts/international.nix ]; }
               ];
             };
 
@@ -147,7 +154,7 @@
                 ({ inputs, ... }: { nixpkgs.overlays = [ inputs.nix-minecraft.overlay ]; })
                 inputs.disko.nixosModules.disko
                 inputs.mailserver.nixosModules.default
-                inputs.reactor.nixosModules.reactor
+                inputs.reactor.nixosModules.reactor # TODO: Avoid using system modules for stuff like this
                 inputs.sieve.nixosModules.sieve
                 inputs.nixos-facter-modules.nixosModules.facter
                 inputs.nix-minecraft.nixosModules.minecraft-servers
@@ -166,7 +173,7 @@
               modules = [
                 inputs.agenix.darwinModules.default
                 inputs.home-manager-portable.darwinModules.home-manager
-                ({ inputs, inputsResolved', ... } @ args:
+                ({ inputs, inputsResolved', ... }:
                   {
                     home-manager = {
                       useGlobalPkgs = true;
@@ -176,13 +183,14 @@
                         ./home/modules/programs
                         ./home/modules/editors
                       ];
-                      users.sleroq.imports = [ ./home/hosts/portable.nix ]; 
-                  
+                      users.${username}.imports = [ ./home/hosts/portable.nix ];
+
                       extraSpecialArgs = {
-                        inherit self; 
+                        inherit self;
                         inputs' = inputsResolved';
                         opts = {
-                          realConfigs = "/Users/sleroq/develop/dotfiles/home/config";
+                          inherit username;
+                          realConfigs = "/Users/${username}/develop/dotfiles/home/config";
                         };
                       };
                     };
@@ -190,9 +198,7 @@
                 )
               ];
               specialArgs = {
-                inherit inputs;
-                username = "sleroq";
-                secrets = { }; # Empty secrets for portable
+                inherit inputs username;
               };
             };
           };
