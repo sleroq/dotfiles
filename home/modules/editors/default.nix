@@ -14,7 +14,14 @@ in
       default = lib.mkEnableOption "default env";
     };
     helix.enable = lib.mkEnableOption "Helix";
-    zed.enable = lib.mkEnableOption "Zed Editor";
+    zed = {
+      enable = lib.mkEnableOption "Zed Editor";
+      package = lib.mkOption {
+        type = lib.types.nullOr lib.types.package;
+        default = inputs'.zed.packages.default;
+        description = "The Zed package to use. Set to null to enable config without installing.";
+      };
+    };
     emacs.enable = lib.mkEnableOption "Emacs";
   };
 
@@ -48,8 +55,6 @@ in
 
     (lib.mkIf cfg.emacs.enable (import ./emacs.nix { inherit pkgs lib opts; }))
 
-    (lib.mkIf cfg.zed.enable {
-      home.packages = [ inputs'.zed.packages.default ];
-    })
+    (lib.mkIf cfg.zed.enable (import ./zed.nix { inherit pkgs lib opts inputs' config; }))
   ];
 }
