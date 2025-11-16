@@ -43,6 +43,7 @@
         inputs'.zls.packages.default
         bottles
         qFlipper
+        opencode
         # android-studio-full
       ];
     };
@@ -60,5 +61,3 @@
 
   services.easyeffects.enable = true;
 }
-
-

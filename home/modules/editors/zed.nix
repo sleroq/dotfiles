@@ -1,4 +1,4 @@
-{ pkgs, opts, lib, inputs', config, ... }:
+{ opts, lib, config, ... }:
 
 let
   cfg = config.myHome.editors.zed;
@@ -9,8 +9,13 @@ in
     package = cfg.package;
   };
 
-  home.activation.zed = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  home.activation.zedSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
-        ${opts.realConfigs}/zed $HOME/.config
+        ${opts.realConfigs}/zed/settings.json $HOME/.config/zed/settings.json
+  '';
+
+  home.activation.zedKeymap = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+        ${opts.realConfigs}/zed/keymap.json $HOME/.config/zed/keymap.json
   '';
 }

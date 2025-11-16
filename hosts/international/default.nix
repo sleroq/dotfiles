@@ -1,4 +1,4 @@
-{ config, pkgs, self, inputs, ... }:
+{ config, pkgs, self, username, ... }:
 
 {
   imports = [
@@ -44,7 +44,7 @@
     allowDiscards = true;
   };
 
-  networking.hostName = "sleroq-international";
+  networking.hostName = "sleroq-international"; # TODO: infer from flake definition somehow
   networking.wireless.iwd.enable = true;
 
   # Enable networking
@@ -58,10 +58,10 @@
 
   # Define a user account
   users.defaultUserShell = pkgs.bash;
-  users.users.sleroq = {
+  users.users.${username} = {
     shell = pkgs.nushell;
     isNormalUser = true;
-    description = "sleroq";
+    description = "The main user";
     extraGroups = [ "networkmanager" "input" "wheel" "docker" "video" "libvirtd" "adbusers" ];
 
     openssh.authorizedKeys.keys = [

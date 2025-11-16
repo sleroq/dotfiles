@@ -1,4 +1,4 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, flakeRoot, ... }:
 with lib;
 let
   cfg = config.sleroq.apps;
@@ -25,7 +25,7 @@ in
     programs = {
       nh = {
         enable = true;
-        flake = "/home/sleroq/develop/other/dotfiles"; # TODO: infer from args
+        flake = flakeRoot;
       };
       neovim = {
         enable = true;

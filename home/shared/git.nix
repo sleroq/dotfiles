@@ -34,6 +34,7 @@
     ignores = [
       "AGENTS.md"
       ".gitlab.nvim"
+      ".aider*"
     ];
     includes = [
       {

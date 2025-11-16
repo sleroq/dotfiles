@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, opts, ... }:
 {
   imports = [
     # ../modules/programs/gitui.nix
@@ -21,7 +21,8 @@
       $env.PATH = ($env.PATH | append $env.GOBIN)
 
 
-      $env.NH_FLAKE = "/home/sleroq/develop/other/dotfiles"; # TODO: infer from args
+       $env.NH_FLAKE = "${opts.flakeRoot}";
+
     '';
   };
 
@@ -40,7 +41,8 @@
       export GOBIN="$GOPATH/bin"
       export PATH="$PATH:$GOBIN"
 
-      export NH_FLAKE="/home/sleroq/develop/other/dotfiles"; # TODO: infer from args
+       export NH_FLAKE="${opts.flakeRoot}";
+
     '';
   };
 
@@ -61,6 +63,8 @@
     '';
   };
 
+  # TODO: optional opencode configuration?
+
   # TODO: Seems bloated, too much dev tools?
   # Do I really need nix/lua lsp
   home.packages = with pkgs; [
@@ -75,7 +79,7 @@
     nodePackages_latest.typescript-language-server
     gopls
     cargo
-    # rustc
+    rustc
     # godot_4
     marksman
     hadolint
@@ -98,6 +102,6 @@
     gnumake # Generally usefull sometimes
     bun
     pnpm
-    opencode
+    sshfs
   ];
 }

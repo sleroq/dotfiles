@@ -1,4 +1,4 @@
-_:
+{ pkgs, ... }:
 
 {
   myHome = {
@@ -34,8 +34,7 @@ _:
         unsafeWebGPU = true;
       };
       # exodus.enable = true;
+      extraPackages = with pkgs; [ opencode ];
     };
   };
 }
-
-

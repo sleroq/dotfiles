@@ -1,4 +1,6 @@
-{ pkgs, self, enableSshAuthSocket ? true, ... }:
+# TODO: Refactor, this is messed up
+# But I don't want to test anything...
+{ pkgs, self, enableSshAuthSocket ? true, extraAliases ? {}, ... }:
 
 let
   aliases = {
@@ -7,7 +9,7 @@ let
     neofetch = "fastfetch";
     vim = "nvim";
     vi = "nvim";
-  };
+  } // extraAliases;
   vars = if enableSshAuthSocket then {
     SSH_AUTH_SOCK = "/run/user/1000/ssh-agent";
   } else {};

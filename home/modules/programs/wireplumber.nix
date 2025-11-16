@@ -2,6 +2,7 @@
 
 let
   # TODO: Rewrite with pipewire-only tools
+  # TODO: Solve crackling, probably difference in bitrates
 
   # Centralized audio configuration
   audioConfig = {
