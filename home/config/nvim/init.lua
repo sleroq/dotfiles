@@ -106,6 +106,7 @@ vim.pack.add({
 
     { src = "https://github.com/kdheepak/monochrome.nvim" },
     { src = "https://github.com/vague2k/vague.nvim" },
+    { src = "https://github.com/rose-pine/neovim" },
 })
 
 require("faster").setup()
@@ -330,5 +331,8 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     end,
 })
 
--- require "vague".setup()
-vim.cmd("colorscheme monochrome")
+-- require("vague").setup({ transparent = true })
+-- require("vague").setup()
+-- vim.cmd("colorscheme vague")
+vim.cmd("colorscheme rose-pine")
+-- vim.cmd("colorscheme monochrome")

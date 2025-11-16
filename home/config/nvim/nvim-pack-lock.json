@@ -45,6 +45,10 @@
       "rev": "524ae32f",
       "src": "https://github.com/NeogitOrg/neogit"
     },
+    "neovim": {
+      "rev": "eb3ff49",
+      "src": "https://github.com/rose-pine/neovim"
+    },
     "nui.nvim": {
       "rev": "de74099",
       "src": "https://github.com/MunifTanjim/nui.nvim"
