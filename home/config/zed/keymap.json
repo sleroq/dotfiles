@@ -13,40 +13,9 @@
     }
   },
   {
-    "context": "Workspace && !(Editor && vim_mode == insert) && !Terminal",
-    "bindings": {
-      "space b": "tab_switcher::ToggleAll"
-    }
-  },
-  {
     "context": "Workspace",
     "bindings": {
       "cmd-shift-a": "tab_switcher::ToggleAll"
-    }
-  },
-  {
-    "context": "Pane && !(Editor && vim_mode == insert) && !Terminal",
-    "bindings": {
-      "space /": "pane::DeploySearch"
-    }
-  },
-  {
-    "context": "Workspace && !Editor && !Terminal",
-    "bindings": {
-      "space /": "pane::DeploySearch"
-    }
-  },
-  // {
-  // TODO: Where does it even trigger?
-  //   "context": "ProjectSearchBar",
-  //   "bindings": {
-  //     "space /": "search::FocusSearch"
-  //   }
-  // },
-  {
-    "context": "Workspace && !(Editor && vim_mode == insert) && !Terminal",
-    "bindings": {
-      "space t": "workspace::NewCenterTerminal"
     }
   }
 ]
