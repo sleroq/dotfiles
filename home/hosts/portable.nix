@@ -16,7 +16,6 @@ in
 {
   imports = [
     ../shared/git.nix
-    ../shared/development.nix
     (import ../shared/shell.nix {
       inherit pkgs self;
       enableSshAuthSocket = false;
@@ -56,6 +55,12 @@ in
         enableNeovide = true;
         default = true;
       };
+    };
+
+    development = {
+      enable = true;
+      enableBrew = true;
+      darwinMagicShit = true;
     };
 
     programs = {

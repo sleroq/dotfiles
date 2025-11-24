@@ -8,6 +8,7 @@
       ./modules/programs
       ./modules/editors
       ./modules/gaming.nix
+      ./modules/development.nix
       ./shared
       agenixModule
       vicinae

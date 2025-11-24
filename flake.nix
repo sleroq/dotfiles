@@ -215,6 +215,7 @@
                           inputs.agenix.homeManagerModules.default
                           ./home/modules/programs
                           ./home/modules/editors
+                          ./home/modules/development.nix
                         ];
                         users.${username}.imports = [ ./home/hosts/portable.nix ];
 
