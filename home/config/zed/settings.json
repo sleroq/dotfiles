@@ -7,6 +7,55 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "show_edit_predictions": false,
+  "language_models": {
+    "openai_compatible": {
+      "Opencode Zen": {
+        "api_url": "https://opencode.ai/zen/v1",
+        "available_models": [
+          {
+            "name": "kimi-k2",
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": false,
+              "parallel_tool_calls": true,
+              "prompt_cache_key": true
+            }
+          },
+          {
+            "name": "glm-4.6",
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": false,
+              "parallel_tool_calls": true,
+              "prompt_cache_key": true
+            }
+          },
+          {
+            "name": "grok-code",
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": false,
+              "parallel_tool_calls": true,
+              "prompt_cache_key": true
+            }
+          }
+        ]
+      }
+    }
+  },
+  "search": {
+    "include_ignored": false
+  },
   "tab_bar": {
     "show": false
   },
@@ -15,9 +64,14 @@
     "enabled": false
   },
   "agent": {
+    "default_profile": "ask",
+    "inline_assistant_model": {
+      "provider": "Opencode Zen",
+      "model": "kimi-k2"
+    },
     "default_model": {
-      "provider": "openrouter",
-      "model": "moonshotai/kimi-k2-thinking"
+      "provider": "Opencode Zen",
+      "model": "kimi-k2"
     },
     "model_parameters": []
   },
