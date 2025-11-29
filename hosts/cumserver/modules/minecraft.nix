@@ -22,7 +22,7 @@ in
             cum = {
               enable = true;
               autoStart = true;
-              jvmOpts = "-Xms3G -Xmx4G";
+              jvmOpts = "-Xms3G -Xmx5G";
               package = pkgs.fabricServers.fabric-1_21_5;
 
               serverProperties = {
@@ -49,7 +49,7 @@ in
             forever-chu = {
               enable = true;
               autoStart = true;
-              jvmOpts = "-Xms2G -Xmx3G";
+              jvmOpts = "-Xms2G -Xmx5G";
               package = pkgs.fabricServers.fabric-1_21_5.override {
                 loaderVersion = "0.16.14";
               };
