@@ -54,6 +54,8 @@ in
         inherit (cfg) package;
         inherit stateDirectory;
 
+        # TODO: configure element calls
+        # https://matrix-construct.github.io/tuwunel/configuration/examples.html#example-configuration
         settings = {
           global = lib.mkMerge [
             {

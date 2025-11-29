@@ -98,6 +98,7 @@ vim.pack.add({
 
     -- Maybe this is useful for work
     { src = "https://github.com/harrisoncramer/gitlab.nvim" },
+    { src = "https://github.com/stevearc/dressing.nvim" }, -- Recommended dep for gitlab.nvim
     { src = "https://github.com/MunifTanjim/nui.nvim" }, -- Dep for gitlab.nvim
 
     -- Workaround for bloated config - so stuff gets disabled on large files
@@ -105,6 +106,7 @@ vim.pack.add({
 
     { src = "https://github.com/kdheepak/monochrome.nvim" },
     { src = "https://github.com/vague2k/vague.nvim" },
+    { src = "https://github.com/rose-pine/neovim" },
 })
 
 require("faster").setup()
@@ -291,7 +293,7 @@ map({ "n" }, "<leader>z", toggle_zen, { desc = "Toggle zen mode" })
 vim.api.nvim_create_autocmd("User", {
     pattern = "LspAttach",
     callback = function()
-        local cwd = vim.fn.getcwd()
+        local cwd = vim.fn.getcwd() -- this doesn't work on macOS for some reason
         if cwd:match("slusha") then
             vim.cmd("LspStop ts_ls")
             vim.cmd("LspStart denols")
@@ -318,6 +320,7 @@ vim.api.nvim_create_autocmd("FileType", {
         end
     end,
 })
+vim.api.nvim_create_user_command("SwitchToDeno", function() vim.cmd("LspStop ts_ls"); vim.cmd("LspStart denols") end, {})
 
 vim.api.nvim_create_autocmd("PackChanged", { callback = function() nts.update() end })
 
@@ -328,5 +331,8 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     end,
 })
 
--- require "vague".setup()
-vim.cmd("colorscheme monochrome")
+-- require("vague").setup({ transparent = true })
+-- require("vague").setup()
+-- vim.cmd("colorscheme vague")
+vim.cmd("colorscheme rose-pine")
+-- vim.cmd("colorscheme monochrome")

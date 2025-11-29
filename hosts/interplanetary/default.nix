@@ -1,4 +1,4 @@
-{ config, pkgs, self, inputs', ... }:
+{ config, pkgs, self, username, ... }:
 
 {
   imports = [
@@ -70,7 +70,7 @@
     RADV_PERFTEST = "video_decode,video_encode";
   };
 
-  networking.hostName = "sleroq-interplanetary";
+  networking.hostName = "sleroq-interplanetary"; # TODO: infer from flake definition somehow
 
   hardware.opentabletdriver.enable = true;
   hardware.opentabletdriver.daemon.enable = true;
@@ -83,10 +83,10 @@
 
   # Define a user account
   users.defaultUserShell = pkgs.bash;
-  users.users.sleroq = {
+  users.users.${username} = {
     shell = pkgs.nushell;
     isNormalUser = true;
-    description = "sleroq";
+    description = "The main user";
     extraGroups = [ "networkmanager" "input" "wheel" "video" "libvirtd" "adbusers" "uinput" "kvm" "gamemode" ];
 
     openssh.authorizedKeys.keys = [

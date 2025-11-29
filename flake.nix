@@ -3,7 +3,7 @@
 
   inputs = {
     # these should not be used for any system and just for building. but I'm not verifying that anywhere
-    nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz"; 
+    nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
@@ -88,16 +88,20 @@
 
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs-portable";
-    
+
     home-manager-portable.url = "github:nix-community/home-manager";
     home-manager-portable.inputs.nixpkgs.follows = "nixpkgs-portable";
   };
 
-  outputs = { self, nixpkgs, ... }@inputs:
+  outputs =
+    { self, nixpkgs, ... }@inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [ inputs.easy-hosts.flakeModule ];
 
-      systems = [ "x86_64-nixos" "aarch64-darwin" ];
+      systems = [
+        "x86_64-nixos"
+        "aarch64-darwin"
+      ];
 
       flake.overlays = import ./overlays/default.nix {
         inherit self nixpkgs;
@@ -107,114 +111,160 @@
       # FIXME: This is a bit overengineered
       easy-hosts =
         let
-          realConfigs = "/home/sleroq/develop/other/dotfiles/home/config";
-          withNixpkgsFor = name: extra:
-            let key = "nixpkgs-" + name; in
-            extra // {
+          username = "sleroq";
+          withNixpkgsFor =
+            name: extra:
+            let
+              key = "nixpkgs-" + name;
+            in
+            extra
+            // {
+              # TODO: Refactor
               nixpkgs = if builtins.hasAttr key inputs then builtins.getAttr key inputs else inputs.nixpkgs;
-              specialArgs = (extra.specialArgs or { }) // { easyHostsHost = name; };
+              specialArgs = (extra.specialArgs or { }) // {
+                easyHostsHost = name;
+              };
             };
         in
         {
           hosts = {
             interplanetary = withNixpkgsFor "interplanetary" {
               tags = [ "linux-personal" ];
+
+              specialArgs = {
+                inherit username;
+                flakeRoot = "/home/sleroq/develop/other/dotfiles";
+              };
               modules = [
                 inputs.home-manager-interplanetary.nixosModules.home-manager
                 inputs.aagl.nixosModules.default
-                { home-manager = {
-                    sharedModules = [ inputs.caelestia_shell-interplanetary.homeManagerModules.default ];
-                };}
-                { home-manager.users.sleroq.imports = [ ./home/hosts/interplanetary.nix ]; }
+                {
+                  home-manager.sharedModules = [
+                    inputs.caelestia_shell-interplanetary.homeManagerModules.default
+                  ];
+                }
+                { home-manager.users.${username}.imports = [ ./home/hosts/interplanetary.nix ]; }
               ];
             };
 
             international = withNixpkgsFor "international" {
               tags = [ "linux-personal" ];
+
+              specialArgs = {
+                inherit username;
+                flakeRoot = "/home/sleroq/develop/other/dotfiles";
+              };
               modules = [
                 inputs.home-manager-international.nixosModules.home-manager
-                { home-manager = {
-                    sharedModules = [ inputs.caelestia_shell-international.homeManagerModules.default ];
-                };}
-                { home-manager.users.sleroq.imports = [ ./home/hosts/international.nix ]; }
+                {
+                  home-manager.sharedModules = [
+                    inputs.caelestia_shell-international.homeManagerModules.default
+                  ];
+                }
+                { home-manager.users.${username}.imports = [ ./home/hosts/international.nix ]; }
               ];
             };
 
             cumserver = withNixpkgsFor "cumserver" {
               arch = "x86_64";
               tags = [ "server" ];
-              modules = [
-                ({ inputs, ... }: { nixpkgs.overlays = [ inputs.nix-minecraft.overlay ]; })
-                inputs.disko.nixosModules.disko
-                inputs.mailserver.nixosModules.default
-                inputs.reactor.nixosModules.reactor
-                inputs.sieve.nixosModules.sieve
-                inputs.nixos-facter-modules.nixosModules.facter
-                inputs.nix-minecraft.nixosModules.minecraft-servers
-              ];
+
               specialArgs = {
                 inherit inputs;
                 secrets = import ./hosts/cumserver/secrets/default.nix;
               };
-            };
-
-            portable = withNixpkgsFor "portable" {
-              tags = [ "macos" ];
-              arch = "aarch64";
-              class = "darwin";
-
               modules = [
-                inputs.agenix.darwinModules.default
-                inputs.home-manager-portable.darwinModules.home-manager
-                ({ inputs, inputsResolved', ... } @ args:
+                (
+                  { inputs, ... }:
                   {
-                    home-manager = {
-                      useGlobalPkgs = true;
-                      useUserPackages = true;
-                      sharedModules = [
-                        inputs.agenix.homeManagerModules.default
-                        ./home/modules/programs
-                        ./home/modules/editors
-                      ];
-                      users.sleroq.imports = [ ./home/hosts/portable.nix ]; 
-                  
-                      extraSpecialArgs = {
-                        inherit self; 
-                        inputs' = inputsResolved';
-                        opts = {
-                          realConfigs = "/Users/sleroq/develop/dotfiles/home/config";
-                        };
-                      };
-                    };
+                    nixpkgs.overlays = [ inputs.nix-minecraft.overlay ];
                   }
                 )
+                inputs.disko.nixosModules.disko
+                inputs.mailserver.nixosModules.default
+                inputs.reactor.nixosModules.reactor # TODO: Avoid using system modules for stuff like this
+                inputs.sieve.nixosModules.sieve
+                inputs.nixos-facter-modules.nixosModules.facter
+                inputs.nix-minecraft.nixosModules.minecraft-servers
               ];
-              specialArgs = {
-                inherit inputs;
-                username = "sleroq";
-                secrets = { }; # Empty secrets for portable
-              };
             };
+
+            portable =
+              let
+                flakeRoot = "/home/sleroq/develop/other/dotfiles";
+              in
+              withNixpkgsFor "portable" {
+                tags = [ "macos" ];
+                arch = "aarch64";
+                class = "darwin";
+
+                specialArgs = {
+                  inherit username flakeRoot;
+                };
+
+                modules = [
+                  inputs.agenix.darwinModules.default
+                  inputs.home-manager-portable.darwinModules.home-manager
+                  (
+                    { inputs, inputsResolved', ... }:
+                    {
+                      home-manager = {
+                        useGlobalPkgs = true;
+                        useUserPackages = true;
+                        sharedModules = [
+                          inputs.agenix.homeManagerModules.default
+                          ./home/modules/programs
+                          ./home/modules/editors
+                          ./home/modules/development.nix
+                        ];
+                        users.${username}.imports = [ ./home/hosts/portable.nix ];
+
+                        extraSpecialArgs = {
+                          inherit self;
+                          inputs' = inputsResolved';
+                          opts = rec {
+                            inherit username;
+                            flakeRoot = "/Users/sleroq/develop/dotfiles";
+                            realConfigs = "${flakeRoot}/home/config";
+                          };
+                        };
+                      };
+                    }
+                  )
+                ];
+              };
           };
 
-        shared.modules = [
-          (import ./lib/inputs-resolver.nix)
-          ({ inputs, ... }: { nixpkgs.overlays = [ inputs.self.overlays.default ]; })
-        ];
+          shared.modules = [
+            (import ./lib/inputs-resolver.nix)
+            (
+              { inputs, ... }:
+              {
+                nixpkgs.overlays = [ inputs.self.overlays.default ];
+              }
+            )
+          ];
 
-        perTag = tag:
-          {
+          perTag = tag: {
             modules = builtins.concatLists [
               (nixpkgs.lib.optionals (tag == "linux-personal") [
-                ({ inputs, inputsResolved', ... } @ args:
-                  (import ./home/default.nix)
-                    (args // {
+                (
+                  { inputs, inputsResolved', ... }@args:
+                  (import ./home/default.nix) (
+                    args
+                    // rec {
                       agenixModule = inputs.agenix.homeManagerModules.default;
                       vicinae = inputs.vicinae.homeManagerModules.default;
                       inputs' = inputsResolved';
                       inherit (inputs) self;
-                      inherit realConfigs;
-                    }))
+
+                      # FIXME: Feels like this should really be per-host, without this confusing grouping
+                      flakeRoot = "/Users/sleroq/develop/dotfiles";
+                      realConfigs = "${flakeRoot}/home/config";
+                    }
+                  )
+                )
+
                 ./shared
               ])
               (nixpkgs.lib.optionals (tag != "macos") [
@@ -222,11 +272,10 @@
               ])
             ];
 
-            specialArgs =
-              nixpkgs.lib.optionalAttrs (tag == "linux-personal") {
-                secrets = import ./shared/secrets/default.nix;
-              };
+            specialArgs = nixpkgs.lib.optionalAttrs (tag == "linux-personal") {
+              secrets = import ./shared/secrets/default.nix;
+            };
           };
-      };
+        };
     };
 }

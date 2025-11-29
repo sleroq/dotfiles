@@ -1,17 +1,17 @@
-_:
+{ config, ... }:
 
 {
   age.secrets.gitconfig-work = {
     file = ../secrets/gitconfig-work;
-    path = ".gitconfig-work";
+    path = "${config.home.homeDirectory}/.gitconfig-work";
   };
   age.secrets.allowed-signers-work = {
     file = ../secrets/allowed-signers-work;
-    path = ".ssh/allowed-signers-work";
+    path = "${config.home.homeDirectory}/.ssh/allowed-signers-work";
   };
   age.secrets.allowed-signers = {
     file = ../secrets/allowed-signers;
-    path = ".ssh/allowed-signers";
+    path = "${config.home.homeDirectory}/.ssh/allowed-signers";
   };
 
   programs.git = {
@@ -25,18 +25,24 @@ _:
       push.autoSetupRemote = "true";
       init.defaultBranch = "master";
       rerere.enabled = true;
+      commit.gpgSign = true;
       gpg = {
         format = "ssh";
-        ssh.allowedSignersFile = ".ssh/allowed-signers";
+        ssh.allowedSignersFile = "~/.ssh/allowed-signers";
       };
     };
     ignores = [
       "AGENTS.md"
       ".gitlab.nvim"
+      ".aider*"
     ];
     includes = [
       {
         condition = "gitdir:~/Job/";
+        path = "~/.gitconfig-work";
+      }
+      {
+        condition = "gitdir:~/develop/frg/";
         path = "~/.gitconfig-work";
       }
     ];

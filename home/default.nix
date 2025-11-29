@@ -1,4 +1,4 @@
-{ agenixModule, vicinae, inputs', realConfigs, self, ... }:
+{ agenixModule, vicinae, inputs', realConfigs, flakeRoot, self, ... }:
 {
   home-manager = {
     useGlobalPkgs = true;
@@ -8,17 +8,19 @@
       ./modules/programs
       ./modules/editors
       ./modules/gaming.nix
+      ./modules/development.nix
       ./shared
       agenixModule
       vicinae
     ];
 
     extraSpecialArgs = {
-      inherit inputs' self;
+      inherit inputs' self flakeRoot;
       secrets = import ./secrets/default.nix;
       opts = {
-        inherit realConfigs;
+        inherit realConfigs flakeRoot;
       };
+      enableSshAuthSocket = true;
     };
   };
 }
