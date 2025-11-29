@@ -1,13 +1,13 @@
 # This direcotry is meant for configurations relevant on every host
 
-{ pkgs, inputs', lib, config, ... }:
+{ pkgs, inputs', lib, config, self, ... }:
 
 {
   imports = [
     ./git.nix
     ./theming.nix
     ./wms.nix
-    ./shell.nix
+    (import ../shared/shell.nix { inherit pkgs self; enableSshAuthSocket = false; })
     ./development.nix
     ./scripts.nix
   ];
@@ -41,8 +41,8 @@
     programs = {
       anytype = {
         enable = true;
-        version = "0.50.25-alpha";
-        hash = "sha256-9wi5Ph621AAr+eGUTfUAhKcITOv2J1dhZ9Gmpdme0qg=";
+        version = "0.50.31-alpha";
+        hash = "sha256-oCz2JIcUsTt2GDAwsI1DO6Va7NyBVANeeI3xD/2TIc4=";
       };
       helium = {
         enable = true;
