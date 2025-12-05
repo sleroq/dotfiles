@@ -185,6 +185,13 @@
     };
   };
 
+  # Mouse fix for gaming
+  services.libinput.mouse.additionalOptions = ''
+    [Never Debounce]
+    MatchUdevType=mouse
+    ModelBouncingKeys=1
+  '';
+
   age.secrets.sing-box-outbounds = {
     file = ./secrets/sing-box-outbounds.jsonc;
     mode = "0644";
