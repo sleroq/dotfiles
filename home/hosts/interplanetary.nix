@@ -24,7 +24,6 @@
     };
 
     programs = {
-      ghostty.enable = true;
       kitty.enable = true;
       wireplumberHacks.enable = true;
       obs.enable = true;

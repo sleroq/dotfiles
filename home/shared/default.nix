@@ -8,9 +8,9 @@
     ./theming.nix
     ./wms.nix
     (import ../shared/shell.nix { inherit pkgs self; enableSshAuthSocket = false; })
-    ./development.nix
     ./scripts.nix
   ];
+
 
   home = {
     username = "sleroq";
@@ -97,6 +97,10 @@
           inputs'.agenix.packages.default
         ];
         in base ++ lib.optionals (lib.attrByPath [ "myHome" "programs" "exodus" "enable" ] false config) [ pkgs.exodus ];
+    };
+
+    development = {
+      enable = true;
     };
   };
 

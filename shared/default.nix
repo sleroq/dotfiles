@@ -172,7 +172,7 @@
   sleroq = {
     tailscale.enable = true;
     apps.enable = true;
-    flatpakIntegration.enable = true;
+    # flatpakIntegration.enable = true;
     kwallet.enable = false;
     sound.enable = true;
     wms.enable = true;
