@@ -1,4 +1,4 @@
-{ inputs', pkgs, lib, config, ... }:
+{ inputs', pkgs, lib, config, opts, ... }:
 
 let
   cfg = config.myHome.gaming;
@@ -35,8 +35,15 @@ in
     (lib.mkIf cfg.etterna.enable { home.packages = [ pkgs.etterna ]; })
 
     (lib.mkIf cfg.minecraft.enable {
+      home.activation.waywall = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+            ${opts.realConfigs}/waywall $HOME/.config
+      '';
+
       home.packages = [
         pkgs.prismlauncher
+        pkgs.graalvmPackages.graalvm-oracle
+        pkgs.waywall
       ];
     })
   ];
