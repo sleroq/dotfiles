@@ -22,9 +22,6 @@
     caelestia_shell-international.url = "github:caelestia-dots/shell";
     caelestia_shell-international.inputs.nixpkgs.follows = "nixpkgs-international";
 
-    quickshell.url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
-    quickshell.inputs.nixpkgs.follows = "nixpkgs";
-
     # Per-host nixpkgs pins
     nixpkgs-interplanetary.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-international.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
@@ -259,7 +256,7 @@
                       inherit (inputs) self;
 
                       # FIXME: Feels like this should really be per-host, without this confusing grouping
-                      flakeRoot = "/Users/sleroq/develop/dotfiles";
+                      flakeRoot = "/home/sleroq/develop/other/dotfiles";
                       realConfigs = "${flakeRoot}/home/config";
                     }
                   )

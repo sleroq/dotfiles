@@ -1,5 +1,9 @@
 {
   "plugins": {
+    "atlas.vim": {
+      "rev": "f254465adbcae565d9cf8c987f5a797c1f9cf922",
+      "src": "https://github.com/huyvohcmc/atlas.vim"
+    },
     "diffview.nvim": {
       "rev": "4516612",
       "src": "https://github.com/sindrets/diffview.nvim"
@@ -12,7 +16,6 @@
       "rev": "2e7a50f",
       "src": "https://github.com/pteroctopus/faster.nvim"
     },
-    "fidget.nvim": [],
     "fogbell.vim": {
       "rev": "274cc13",
       "src": "https://github.com/jaredgorski/fogbell.vim"
@@ -28,6 +31,10 @@
     "guess-indent.nvim": {
       "rev": "84a4987",
       "src": "https://github.com/NMAC427/guess-indent.nvim"
+    },
+    "komau.vim": {
+      "rev": "c525eebc9a46e889144216dc3a965783abaccf98",
+      "src": "https://github.com/ntk148v/komau.vim"
     },
     "lualine.nvim": {
       "rev": "3946f01",
