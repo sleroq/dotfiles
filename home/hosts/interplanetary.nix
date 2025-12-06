@@ -4,6 +4,7 @@
   myHome = {
     wms = {
       wayland = {
+        sway.enable = true;
         hyprland = {
           extraConfig = ''
             # See https://wiki.hyprland.org/Configuring/Monitors/

@@ -58,7 +58,6 @@ mkMerge [
     '';
 
 
-
     home.file."${config.xdg.configHome}/hypr/extra-config.conf" = {
       text = mkMerge [
         "plugin = ${inputs'.hy3.packages.hy3}/lib/libhy3.so"
