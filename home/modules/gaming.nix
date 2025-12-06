@@ -41,9 +41,49 @@ in
       '';
 
       home.packages = [
-        pkgs.prismlauncher
         pkgs.graalvmPackages.graalvm-oracle
-        pkgs.waywall
+
+        (pkgs.prismlauncher.override {
+          additionalLibs = with pkgs; [
+            xorg.libXtst
+            libxkbcommon
+            libxt
+            libxinerama # unsure
+            libdecor # unsure
+
+            # waywall deps
+            libGL
+            libspng
+            libxkbcommon
+            luajit
+            wayland
+            wayland-protocols
+            xorg.libxcb
+            xwayland
+
+            (glfw
+              .overrideAttrs (old: {
+                pname = "glfw-waywall";
+                patches = [
+                  (pkgs.fetchpatch {
+                    url = "https://raw.githubusercontent.com/tesselslate/waywall/be3e018bb5f7c25610da73cc320233a26dfce948/contrib/glfw.patch";
+                    sha256 = "0w8hpv0zclg42yy1l5rg1yz5hfn4r5q8gbhl7h1fwlazhlaw6pcj";
+                  })
+                ];
+              }))
+          ];
+          additionalPrograms = [
+            (pkgs.waywall.overrideAttrs (old: {
+              src = pkgs.fetchFromGitHub {
+                owner = "tesselslate";
+                repo = "waywall";
+                rev = "ed76c2b605d19905617d9060536e980fd49410bf";
+                hash = "sha256-ev/A5ksqmWz6hpwUIoxg2k9BwzE4BNCZO4tpXq790zo=";
+              };
+            }))
+          ];
+          jdks = [ pkgs.jdk21 pkgs.graalvmPackages.graalvm-oracle ];
+        })
       ];
     })
   ];
