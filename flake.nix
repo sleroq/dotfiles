@@ -11,8 +11,8 @@
 
     # Common NixOS flakes
     agenix.url = "github:ryantm/agenix";
-    hyprland.url = "github:hyprwm/Hyprland";
-    hy3.url = "github:outfoxxed/hy3";
+    hyprland.url = "github:hyprwm/Hyprland/967c3c7404d4fa00234e29c70df3e263386d2597";
+    hy3.url = "github:outfoxxed/hy3/16dae4d8f853b0d3e8434ee9941f9fc0155b8952";
     hy3.inputs.hyprland.follows = "hyprland";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
 
