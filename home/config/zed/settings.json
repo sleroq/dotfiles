@@ -10,6 +10,23 @@
   "show_edit_predictions": false,
   "language_models": {
     "openai_compatible": {
+      "llama.cpp": {
+        "api_url": "http://127.0.0.1:8085",
+        "available_models": [
+          {
+            "name": "Qwen3-Coder-30B-A3B-Instruct-GGUF",
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": false,
+              "parallel_tool_calls": false,
+              "prompt_cache_key": false
+            }
+          }
+        ]
+      },
       "Opencode Zen": {
         "api_url": "https://opencode.ai/zen/v1",
         "available_models": [
@@ -59,7 +76,7 @@
   "tab_bar": {
     "show": false
   },
-  "disable_ai": true,
+  "disable_ai": false,
   "indent_guides": {
     "enabled": false
   },
@@ -70,8 +87,8 @@
       "model": "kimi-k2"
     },
     "default_model": {
-      "provider": "Opencode Zen",
-      "model": "kimi-k2"
+      "provider": "llama.cpp",
+      "model": "Qwen3-Coder-30B-A3B-Instruct-GGUF"
     },
     "model_parameters": []
   },
