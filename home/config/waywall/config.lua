@@ -31,7 +31,8 @@ local launch_paceman_key = "Shift-P"
 local toggle_fullscreen_key = "Shift-O"
 
 -- during game actions
-local toggle_ninbot_key = "*-apostrophe"
+-- local toggle_ninbot_key = "*-apostrophe"
+local toggle_ninbot_key = "Ctrl-k"
 local toggle_remaps_key = "Insert"
 
 
