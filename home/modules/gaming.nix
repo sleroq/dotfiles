@@ -45,6 +45,10 @@ in
 
         (pkgs.prismlauncher.override {
           additionalLibs = with pkgs; [
+            # Required for ninjabot
+            fontconfig
+            libx11
+
             xorg.libXtst
             libxkbcommon
             libxt
