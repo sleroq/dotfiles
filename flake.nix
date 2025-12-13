@@ -39,8 +39,7 @@
     home-manager-international.inputs.nixpkgs.follows = "nixpkgs-international";
 
     # HM-related inputs used by home modules
-    # nix-gaming.url = "github:fufexan/nix-gaming";
-    nix-gaming.url = "github:TLATER/nix-gaming"; # TODO: Switch to nix-gaming when they catch up
+    nix-gaming.url = "github:fufexan/nix-gaming";
 
     vicinae.url = "git+https://github.com/vicinaehq/vicinae?ref=refs/tags/v0.15.2"; # Lock version here to hit gh actions cache
     emacs-overlay.url = "github:nix-community/emacs-overlay";

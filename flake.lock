@@ -1779,15 +1779,15 @@
         "nixpkgs": "nixpkgs_7"
       },
       "locked": {
-        "lastModified": 1765505604,
-        "narHash": "sha256-ldyzNBEwP9qIXz087HGJ73OH8hp1YoPDgtK9aaii1PU=",
-        "owner": "TLATER",
+        "lastModified": 1765658151,
+        "narHash": "sha256-MlXee9Azlt/gPmSnNQf2sadj2nH52mbQT/GVRe9U/RI=",
+        "owner": "fufexan",
         "repo": "nix-gaming",
-        "rev": "2597ac42bcf2b32253ab6acab70264fdbb2b102e",
+        "rev": "585f84a96283c5495121c60f19e3e741507c9f2b",
         "type": "github"
       },
       "original": {
-        "owner": "TLATER",
+        "owner": "fufexan",
         "repo": "nix-gaming",
         "type": "github"
       }
@@ -1883,11 +1883,11 @@
     },
     "nixpkgs-cumserver": {
       "locked": {
-        "lastModified": 315532800,
-        "narHash": "sha256-3UQM6lGoqJ1CWB98nfd//2eibA9umV9xAURtIfYBc6E=",
-        "rev": "63bdb5d90fa2fa11c42f9716ad1e23565613b07c",
+        "lastModified": 1765425892,
+        "narHash": "sha256-OBdknbI70/pL0qqAszx8VdGp29y5po+C9Q/78RjYb4g=",
+        "rev": "5d6bdbddb4695a62f0d00a3620b37a15275a5093",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-25.11pre880071.63bdb5d90fa2/nixexprs.tar.xz"
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.05pre910211.5d6bdbddb469/nixexprs.tar.xz"
       },
       "original": {
         "type": "tarball",
