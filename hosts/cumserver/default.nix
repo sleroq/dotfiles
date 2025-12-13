@@ -79,6 +79,10 @@ in
 
   services.qemuGuest.enable = true;
 
+  services.journald.extraConfig = ''
+    SystemMaxUse=500M
+  '';
+
   cumserver.caddy.enable = true;
   cumserver.matterbridge.enable = true;
   cumserver.mailserver.enable = true;
