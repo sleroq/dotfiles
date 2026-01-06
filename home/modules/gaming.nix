@@ -26,13 +26,11 @@ in
 
     (lib.mkIf cfg.osu.enable {
       home.packages = with inputs'.nix-gaming.packages; [
-        # (osu-lazer-bin.override { releaseStream = "tachyon"; })
-        (osu-lazer-bin.override { releaseStream = "lazer"; })
         osu-lazer-bin
         pkgs.opentabletdriver
       ];
     })
-    
+
     (lib.mkIf cfg.etterna.enable { home.packages = [ pkgs.etterna ]; })
 
     (lib.mkIf cfg.minecraft.enable {
