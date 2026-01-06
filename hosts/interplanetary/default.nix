@@ -96,7 +96,8 @@
 
   # This allows to run electron from node_modules and other things
   # but I need to keep this in mind when making nix packages
-  programs.nix-ld.enable = true;
+  # btw Stardew Valley SMAPI does not work with nix-ld enabled lol
+  # programs.nix-ld.enable = true;
   # programs.nix-ld.libraries = with pkgs; [
     # Add any missing dynamic libraries for unpackaged programs
     # here, NOT in environment.systemPackages
