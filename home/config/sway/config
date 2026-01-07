@@ -23,11 +23,11 @@ gaps inner 6
 # titlebar_separator disable
 
 # Idle configuration
-exec swayidle -w \
-  timeout 900 'swaylock -f -c 000000' \
-  timeout 1200 'swaymsg "output * dpms off"' \
-  resume 'swaymsg "output * dpms on"' \
-  before-sleep 'swaylock -f -c 000000'
+# exec swayidle -w \
+#   timeout 900 'swaylock -f -c 000000' \
+#   timeout 1200 'swaymsg "output * dpms off"' \
+#   resume 'swaymsg "output * dpms on"' \
+#   before-sleep 'swaylock -f -c 000000'
 
 output DP-2 mode 2560x1440@180.000Hz
 
