@@ -92,7 +92,7 @@
     },
     "default_model": {
       "provider": "llama.cpp",
-      "model": "Qwen3-Coder-30B-A3B-Instruct-GGUF"
+      "model": "Qwen3-Coder-30B-A3B-Instruct-GGUF",
     },
     "model_parameters": [],
   },
@@ -116,22 +116,16 @@
       "args": [],
       "projects": [
         {
-          "paths": [
-            "/home/oleg/develop/apps/ashot-slave"
-          ]
+          "paths": ["/home/oleg/develop/apps/ashot-slave"],
         },
         {
-          "paths": [
-            "/home/oleg/develop/frg-automonitoring/v2/./"
-          ]
+          "paths": ["/home/oleg/develop/frg-automonitoring/v2/./"],
         },
         {
-          "paths": [
-            "/home/oleg/develop/manana-tasks/frg-watcher/./"
-          ]
-        }
-      ]
-    }
+          "paths": ["/home/oleg/develop/manana-tasks/frg-watcher/./"],
+        },
+      ],
+    },
   ],
   "autosave": "on_focus_change",
   "format_on_save": "on",

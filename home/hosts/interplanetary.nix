@@ -15,7 +15,7 @@
       };
     };
     editors = {
-      datagrip.enable = false;
+      datagrip.enable = true;
       zed.enable = true;
     };
     gaming = {
@@ -44,6 +44,7 @@
         bottles
         qFlipper
         opencode
+        blender
         # android-studio-full
       ];
     };

@@ -61,10 +61,10 @@ in
       ];
 
       # TODO: Do not enable on desktop
-      services.batsignal = {
-        enable = true;
-        extraArgs = ["-p" "-f" "99"];
-      };
+      # services.batsignal = {
+      #   enable = true;
+      #   extraArgs = ["-p" "-f" "99"];
+      # };
     })
 
     # (import ../../programs/swaync.nix { })

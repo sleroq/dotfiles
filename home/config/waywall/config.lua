@@ -23,8 +23,8 @@ local stretched_measure = false
 -- ==== KEYBINDS ====
 -- resolution change actions
 local thin = { key = "*-Alt_L", f3_safe = false }
-local wide = { key = "*-B", f3_safe = true }
-local tall = { key = "*-F4", f3_safe = false }
+local wide = { key = "Ctrl-B", f3_safe = true }
+local tall = { key = "Shift-B", f3_safe = false }
 
 -- startup actions
 local launch_paceman_key = "Shift-P"
@@ -33,13 +33,13 @@ local toggle_fullscreen_key = "Shift-O"
 -- during game actions
 -- local toggle_ninbot_key = "*-apostrophe"
 local toggle_ninbot_key = "Ctrl-k"
-local toggle_remaps_key = "Insert"
+local toggle_remaps_key = "Shift-backspace"
 
 
 -- ==== MISC ====
 local remaps_text_config = { text = "rebinds off", x = 100, y = 100, size = 2 }
 local res_1440 = false
-local sens_change = { enabled = false, normal = 1.0, tall = 0.1 } -- make sure raw input is off
+local sens_change = { enabled = true, normal = 1.0, tall = 0.1 } -- make sure raw input is off
 
 
 

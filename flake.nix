@@ -40,11 +40,12 @@
 
     # HM-related inputs used by home modules
     nix-gaming.url = "github:fufexan/nix-gaming";
+
     vicinae.url = "git+https://github.com/vicinaehq/vicinae?ref=refs/tags/v0.15.2"; # Lock version here to hit gh actions cache
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     zig.url = "github:mitchellh/zig-overlay";
     zls.url = "github:zigtools/zls?rev=45b855f7ec3dccea3c9a95df0b68e27dab842ae4";
-    zed-interplanetary.url = "github:zed-industries/zed/7d9cfb9527d248618be39f6ed60ba30006243f98"; # Lock to hit the cache
+    zed-interplanetary.url = "github:zed-industries/zed/nightly"; # Lock to hit the cache
     zed-international.url = "github:zed-industries/zed/nightly";
 
     scrcpyPkgs.url = "github:nixos/nixpkgs/77a0bdd";

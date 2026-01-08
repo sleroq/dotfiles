@@ -26,12 +26,11 @@ in
 
     (lib.mkIf cfg.osu.enable {
       home.packages = with inputs'.nix-gaming.packages; [
-      #   (osu-lazer-bin.override { releaseStream = "tachyon"; })
-        (osu-lazer-bin.override { releaseStream = "lazer"; })
+        osu-lazer-bin
         pkgs.opentabletdriver
       ];
     })
-    
+
     (lib.mkIf cfg.etterna.enable { home.packages = [ pkgs.etterna ]; })
 
     (lib.mkIf cfg.minecraft.enable {
@@ -65,16 +64,16 @@ in
             xorg.libxcb
             xwayland
 
-            (glfw
-              .overrideAttrs (old: {
-                pname = "glfw-waywall";
-                patches = [
-                  (pkgs.fetchpatch {
-                    url = "https://raw.githubusercontent.com/tesselslate/waywall/be3e018bb5f7c25610da73cc320233a26dfce948/contrib/glfw.patch";
-                    sha256 = "0w8hpv0zclg42yy1l5rg1yz5hfn4r5q8gbhl7h1fwlazhlaw6pcj";
-                  })
-                ];
-              }))
+            (glfw.override { withMinecraftPatch = true; })
+              # .overrideAttrs (old: {
+              #   pname = "glfw-waywall";
+              #   patches = [
+              #     (pkgs.fetchpatch {
+              #       url = "https://raw.githubusercontent.com/tesselslate/waywall/be3e018bb5f7c25610da73cc320233a26dfce948/contrib/glfw.patch";
+              #       sha256 = "8Sho5Yoj/FpV7utWz3aCXNvJKwwJ3ZA3qf1m2WNxm5M=";
+              #     })
+              #   ];
+              # }))
           ];
           additionalPrograms = [
             (pkgs.waywall.overrideAttrs (old: {
