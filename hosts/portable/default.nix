@@ -7,11 +7,19 @@
     stateVersion = 6;
   };
   nixpkgs.hostPlatform = "aarch64-darwin";
+  nixpkgs.config.allowUnfree = true;
 
   nix = {
     enable = false;
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [ "nix-command" "flakes" "external-builers" ];
+      external-builders = [
+        {
+          systems = [ "aarch64-linux" "x86_64-linux" ];
+          program = "/usr/local/bin/determinate-nixd";
+          args = [ "builder" ];
+        }
+      ];
       substituters = [
         "https://nix-community.cachix.org"
         "https://cache.nixos.org"

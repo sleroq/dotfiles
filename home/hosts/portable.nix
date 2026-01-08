@@ -72,6 +72,9 @@ in
         wget
         dust
         ollama
+        amp-cli
+
+        nixos-rebuild
       ];
     };
   };
