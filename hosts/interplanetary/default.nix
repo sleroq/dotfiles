@@ -77,9 +77,8 @@
 
   # programs.anime-game-launcher.enable = true;
   # programs.anime-games-launcher.enable = true;
-  programs.adb.enable = true; # Phone debuggin stuff
 
-  environment.systemPackages = [ pkgs.freerdp ]; # FIXME: Is this not included in remmina package or whatever?
+  environment.systemPackages = [ pkgs.freerdp pkgs.android-tools ]; # FIXME: Is this not included in remmina package or whatever?
 
   # Define a user account
   users.defaultUserShell = pkgs.bash;
