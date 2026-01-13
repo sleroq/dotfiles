@@ -27,26 +27,21 @@ in
   ];
 
   config = mkIf cfg.enable {
+    home.sessionPath = [
+      "${config.home.homeDirectory}/.local/bin"
+      "${config.home.homeDirectory}/.deno/bin"
+      "${config.home.homeDirectory}/.bun/bin"
+      "${config.home.homeDirectory}/develop/go/bin"
+    ] ++ lib.optional brewEnabled "/opt/homebrew/bin";
+
+    home.sessionVariables = {
+      GOPATH = "${config.home.homeDirectory}/develop/go";
+      GOBIN = "${config.home.homeDirectory}/develop/go/bin";
+      NH_FLAKE = opts.flakeRoot;
+    };
 
     programs.nushell = {
       extraEnv = ''
-        $env.PATH = ($env.PATH | append ($env.HOME | path join '.local/bin'))
-
-        # Deno
-        $env.PATH = ($env.PATH | append ($env.HOME | path join '.deno/bin'))
-
-        # Bun
-        $env.PATH = ($env.PATH | append ($env.HOME | path join '.cache/.bun/bin'))
-
-        # Golang
-        $env.GOPATH = ($env.HOME | path join 'develop/go')
-        $env.GOBIN = ($env.GOPATH | path join 'bin')
-        $env.PATH = ($env.PATH | append $env.GOBIN)
-
-        $env.NH_FLAKE = "${opts.flakeRoot}";
-
-        ${if brewEnabled then ''$env.PATH = ($env.PATH | split row (char esep) | prepend '/opt/homebrew/bin')'' else ""}
-
         ${if darwinMagicShit then ''
           $env.CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER = (xcrun --find clang | str trim)
           $env.CC = (xcrun --find clang | str trim)
@@ -58,21 +53,6 @@ in
 
     programs.zsh = {
       initContent = ''
-        export PATH="$PATH:$HOME/.local/bin"
-
-        # Deno
-        export PATH="$PATH:$HOME/.deno/bin"
-
-        # Bun
-        export PATH="$PATH:$HOME/.cache/.bun/bin"
-
-        # Golang
-        export GOPATH="$HOME/develop/go"
-        export GOBIN="$GOPATH/bin"
-        export PATH="$PATH:$GOBIN"
-
-        export NH_FLAKE="${opts.flakeRoot}";
-
         ${if brewEnabled then ''eval "$(/opt/homebrew/bin/brew shellenv)"'' else ""}
 
         ${if darwinMagicShit then ''
@@ -86,21 +66,6 @@ in
 
     programs.bash = {
       initExtra = ''
-        export PATH="$PATH:$HOME/.local/bin"
-
-        # Deno
-        export PATH="$PATH:$HOME/.deno/bin"
-
-        # Bun
-        export PATH="$PATH:$HOME/.cache/.bun/bin"
-
-        # Golang
-        export GOPATH="$HOME/develop/go"
-        export GOBIN="$GOPATH/bin"
-        export PATH="$PATH:$GOBIN"
-
-        export NH_FLAKE="${opts.flakeRoot}";
-
         ${if brewEnabled then ''eval "$(/opt/homebrew/bin/brew shellenv)"'' else ""}
 
         ${if darwinMagicShit then ''
