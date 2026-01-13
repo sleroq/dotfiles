@@ -67,7 +67,7 @@ in
       } // cfg.ohMyOpencode.config);
 
       home.activation.installOhMyOpencode = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        PATH="${pkgs.bun}/bin:$PATH"
+        PATH="${pkgs.bun}/bin:$HOME/.bun/bin:$PATH"
         if ! command -v oh-my-opencode &> /dev/null; then
           run ${pkgs.bun}/bin/bun install -g oh-my-opencode
         fi
