@@ -1,4 +1,5 @@
 /hosts/cumserver/secrets/*.nix filter=git-crypt diff=git-crypt
 /shared/secrets/*.nix filter=git-crypt diff=git-crypt
 /home/secrets/*.nix filter=git-crypt diff=git-crypt
+/home/config/zed/settings.json filter=git-crypt diff=git-crypt
 /.gitattributes !filter !diff
