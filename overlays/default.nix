@@ -44,5 +44,3 @@ rec {
 
   default = composeManyExtensions [ scrcpy code-cursor opencode ];
 }
-
-

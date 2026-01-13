@@ -58,6 +58,7 @@
     mailserver.url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/";
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
     tuwunel.url = "github:matrix-construct/tuwunel"; # FIXME: switch to nixpkgs when they catch up (if they ever do)
+    tuwunel.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     # FIXME: Maybe use overlays to avoid following everything?
     sleroq-link.url = "github:sleroq/sleroq.link";
@@ -86,6 +87,7 @@
 
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs-portable";
+    determinate.url = "github:DeterminateSystems/determinate";
 
     home-manager-portable.url = "github:nix-community/home-manager";
     home-manager-portable.inputs.nixpkgs.follows = "nixpkgs-portable";
@@ -201,6 +203,7 @@
                 };
 
                 modules = [
+                  inputs.determinate.darwinModules.default
                   inputs.agenix.darwinModules.default
                   inputs.home-manager-portable.darwinModules.home-manager
                   (
