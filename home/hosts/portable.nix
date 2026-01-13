@@ -64,6 +64,10 @@ in
     };
 
     programs = {
+      opencode = {
+        enable = true;
+        package = null;
+      };
       ghostty.enable = true;
       extraPackages = with pkgs; [
         inputs'.agenix.packages.default

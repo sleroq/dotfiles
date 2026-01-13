@@ -34,7 +34,8 @@
         unsafeWebGPU = true;
       };
       # exodus.enable = true;
-      extraPackages = with pkgs; [ opencode ];
+      opencode.enable = true;
+      extraPackages = with pkgs; [];
     };
   };
 }

@@ -32,6 +32,7 @@
         enable = true;
         unsafeWebGPU = true;
       };
+      opencode.enable = true;
       teams.enable = true;
       exodus.enable = true;
       mangohud.enable = true;
@@ -43,7 +44,6 @@
         inputs'.zls.packages.default
         bottles
         qFlipper
-        opencode
         blender
         # android-studio-full
       ];

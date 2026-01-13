@@ -4,6 +4,10 @@ let
   cfg = config.myHome.programs;
 in
 {
+  imports = [
+    ./opencode.nix
+  ];
+
   options.myHome.programs = {
     anytype = {
       enable = lib.mkEnableOption "anytype";
