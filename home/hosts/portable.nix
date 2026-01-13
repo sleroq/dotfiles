@@ -66,7 +66,7 @@ in
     programs = {
       opencode = {
         enable = true;
-        package = null;
+        useBun = true;
       };
       ghostty.enable = true;
       extraPackages = with pkgs; [

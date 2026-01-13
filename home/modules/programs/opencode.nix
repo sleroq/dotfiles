@@ -7,10 +7,10 @@ in
   options.myHome.programs.opencode = {
     enable = lib.mkEnableOption "OpenCode AI coding assistant";
 
-    package = lib.mkOption {
-      type = lib.types.nullOr lib.types.package;
-      default = pkgs.opencode;
-      description = "The opencode package to use. Set to null to only install configuration.";
+    useBun = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Install opencode using activation script with bun instead of using nixpkgs package.";
     };
 
     ohMyOpencode = {
@@ -51,8 +51,17 @@ in
   };
 
   config = lib.mkIf cfg.enable (lib.mkMerge [
-    (lib.mkIf (cfg.package != null) {
-      home.packages = [ cfg.package ];
+    (lib.mkIf (!cfg.useBun) {
+      home.packages = [ pkgs.opencode ];
+    })
+
+    (lib.mkIf cfg.useBun {
+      home.activation.installOpencode = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        PATH="${pkgs.bun}/bin:$HOME/.bun/bin:$PATH"
+        if ! command -v opencode &> /dev/null; then
+          run ${pkgs.bun}/bin/bun install -g opencode
+        fi
+      '';
     })
 
     {

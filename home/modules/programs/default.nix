@@ -54,10 +54,10 @@ in
         default = pkgs.obs-studio;
       };
     };
-    teams.enable = lib.mkEnableOption "Teams"; 
+    teams.enable = lib.mkEnableOption "Teams";
     chromium = {
       enable = lib.mkEnableOption "chromium";
-      unsafeWebGPU = lib.mkEnableOption "unsafe webgpu"; 
+      unsafeWebGPU = lib.mkEnableOption "unsafe webgpu";
     };
     accounting.enable = lib.mkEnableOption "accounting software";
     activity-watch.enable = lib.mkEnableOption "Activity Watch";
