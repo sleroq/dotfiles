@@ -85,9 +85,15 @@ in
             livekit.livekit_service_url = "https://${domain}/livekit/jwt";
           }}` 200
 
-          # lk-jwt-service endpoint (strips /livekit prefix)
-          handle /livekit/sfu/get {
-            uri strip_prefix /livekit
+          # lk-jwt-service endpoint with CORS support for external Element/Cinny clients
+          handle_path /livekit/jwt/* {
+            header Access-Control-Allow-Origin *
+            header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+            header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+            
+            @options method OPTIONS
+            respond @options 204
+            
             reverse_proxy 127.0.0.1:${toString cfg.jwtServicePort}
           }
 
