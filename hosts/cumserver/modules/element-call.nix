@@ -65,7 +65,7 @@ in
 
     # Add LIVEKIT_FULL_ACCESS_HOMESERVERS to restrict room creation to our homeserver
     # The NixOS module doesn't expose this option, so we override the systemd service
-    systemd.services.lk-jwt-service.environment.LIVEKIT_FULL_ACCESS_HOMESERVERS = 
+    systemd.services.lk-jwt-service.environment.LIVEKIT_FULL_ACCESS_HOMESERVERS =
       config.cumserver.tuwunel.mainDomain;
 
     services.caddy.virtualHosts."${domain}" = {
@@ -85,15 +85,7 @@ in
             livekit.livekit_service_url = "https://${domain}/livekit/jwt";
           }}` 200
 
-          # lk-jwt-service endpoint with CORS support for external Element/Cinny clients
           handle_path /livekit/jwt/* {
-            header Access-Control-Allow-Origin *
-            header Access-Control-Allow-Methods "GET, POST, OPTIONS"
-            header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
-            
-            @options method OPTIONS
-            respond @options 204
-            
             reverse_proxy 127.0.0.1:${toString cfg.jwtServicePort}
           }
 
