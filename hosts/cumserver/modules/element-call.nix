@@ -63,6 +63,11 @@ in
       port = cfg.jwtServicePort;
     };
 
+    # Add LIVEKIT_FULL_ACCESS_HOMESERVERS to restrict room creation to our homeserver
+    # The NixOS module doesn't expose this option, so we override the systemd service
+    systemd.services.lk-jwt-service.environment.LIVEKIT_FULL_ACCESS_HOMESERVERS = 
+      config.cumserver.tuwunel.mainDomain;
+
     services.caddy.virtualHosts."${domain}" = {
       extraConfig = ''
         # Element Call frontend
