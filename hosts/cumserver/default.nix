@@ -9,20 +9,20 @@
 }:
 let
   serviceWrapper = import ./modules/telegram-bot.nix { inherit config lib pkgs; };
-  
+
   bayan = serviceWrapper.mkTelegramBot {
     name = "bayan";
     package = inputs'.bayan.packages.default;
     secretFile = ./secrets/bayanEnv;
     dataDir = "/var/lib/bayan";
   };
-  
+
   kopoka = serviceWrapper.mkTelegramBot {
     name = "kopoka";
     package = inputs'.kopoka.packages.default;
     secretFile = ./secrets/kopokaEnv;
   };
-  
+
   spoiler-images = serviceWrapper.mkTelegramBot {
     name = "spoiler-images";
     package = inputs'.spoiler-images.packages.default;
@@ -169,7 +169,7 @@ in
     enable = true;
     environmentFile = config.age.secrets.ziplineEnv.path;
   };
-  
+
   # cumserver.broadcast-box = {
   #   enable = true;
   #   # image = "localhost/meow:latest";
@@ -199,7 +199,7 @@ in
     videoHeight = 1080;
     videoBitrate = 5000000;
 
-    # WebRTC optimizations  
+    # WebRTC optimizations
     webrtcRtx = true;
     webrtcJitterBuffer = true;
     webrtcUlpfec = true;
@@ -358,7 +358,7 @@ in
           }
         ];
       };
-      
+
       ipv6.addresses = [
         {
           address = secrets.ipv6;
