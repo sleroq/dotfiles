@@ -46,6 +46,7 @@ in
     ./modules/broadcast-box.nix
     ./modules/oven-media-engine.nix
     ./modules/tuwunel.nix
+    ./modules/element-call.nix
     ./modules/marzban.nix
     ./modules/traggo.nix
     ./modules/slusha.nix
@@ -92,6 +93,16 @@ in
   cumserver.tuwunel = {
     enable = true;
     package = inputs'.tuwunel.packages.default;
+  };
+
+  age.secrets.livekitKeys = {
+    owner = "root";
+    group = "root";
+    file = ./secrets/livekitKeys;
+  };
+  cumserver.element-call = {
+    enable = true;
+    livekitKeyFile = config.age.secrets.livekitKeys.path;
   };
 
   age.secrets.marzbanMetricsEnv = {

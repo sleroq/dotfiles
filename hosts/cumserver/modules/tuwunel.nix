@@ -54,7 +54,6 @@ in
         inherit (cfg) package;
         inherit stateDirectory;
 
-        # TODO: configure element calls
         # https://matrix-construct.github.io/tuwunel/configuration/examples.html#example-configuration
         settings = {
           global = lib.mkMerge [
@@ -130,6 +129,18 @@ in
             }
             cfg.settings
           ];
+
+          # Well-known configuration for client discovery and Element Call (MSC4143)
+          well_known = {
+            client = "https://${cfg.domain}";
+            server = "${cfg.domain}:443";
+            rtc_transports = [
+              {
+                type = "livekit";
+                livekit_service_url = "https://call.cum.army/livekit/jwt";
+              }
+            ];
+          };
         };
       };
 
@@ -161,7 +172,18 @@ in
 
               handle_path /.well-known/matrix/client {
                   header Access-Control-Allow-Origin *
-                  respond `{"m.homeserver": {"base_url": "https://${config.cumserver.tuwunel.domain}"}}` 200
+                  header Content-Type application/json
+                  respond `${builtins.toJSON {
+                    "m.homeserver" = {
+                      base_url = "https://${config.cumserver.tuwunel.domain}";
+                    };
+                    "org.matrix.msc4143.rtc_foci" = [
+                      {
+                        type = "livekit";
+                        livekit_service_url = "https://call.cum.army/livekit/jwt";
+                      }
+                    ];
+                  }}` 200
               }
             '';
           };
