@@ -22,7 +22,7 @@ in
             cum = {
               enable = true;
               autoStart = true;
-              jvmOpts = "-Xms3G -Xmx5G";
+              jvmOpts = "-Xms3G -Xmx4G";
               package = pkgs.fabricServers.fabric-1_21_5;
 
               serverProperties = {
