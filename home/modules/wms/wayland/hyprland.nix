@@ -1,28 +1,28 @@
-{ pkgs, opts, lib, inputs', config, self, ... }:
+{ pkgs, opts, lib, inputs', config, ... }:
 
 with lib;
 let
   hyprlandScripts = {
     followMouseToggle = pkgs.writeShellScriptBin "hypr-follow-mouse-toggle" ''
       #!/usr/bin/env sh
-      
+
       FOLLOWMOUSE=$(hyprctl getoption input:follow_mouse | awk 'NR==1{print $2}')
-      
+
       if [ "$FOLLOWMOUSE" = 1 ] ; then
           hyprctl --batch "\
               keyword input:follow_mouse 0;\
               keyword input:float_switch_override_focus 0"
           exit
       fi
-      
+
       hyprctl reload
     '';
 
     gamemode = pkgs.writeShellScriptBin "hypr-gamemode" ''
       #!/usr/bin/env sh
-      
+
       HYPRGAMEMODE=$(hyprctl getoption animations:enabled | awk 'NR==1{print $2}')
-      
+
       if [ "$HYPRGAMEMODE" = 1 ] ; then
           hyprctl --batch "\
               keyword animations:enabled 0;\

@@ -26,7 +26,6 @@
 
     programs = {
       kitty.enable = true;
-      wireplumberHacks.enable = true;
       obs.enable = true;
       chromium = {
         enable = true;
