@@ -27,7 +27,6 @@
     };
     gaming.osu.enable = true;
     programs = {
-      # wireplumberHacks.enable = true;
       # obs.enable = true;
       chromium = {
         enable = true;

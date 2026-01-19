@@ -61,7 +61,6 @@ in
     };
     accounting.enable = lib.mkEnableOption "accounting software";
     activity-watch.enable = lib.mkEnableOption "Activity Watch";
-    wireplumberHacks.enable = lib.mkEnableOption "WirePlumber autolink";
     exodus.enable = lib.mkEnableOption "Exodus wallet";
     mangohud.enable = lib.mkEnableOption "MangoHUD";
 
@@ -148,7 +147,6 @@ in
         aw-watcher-window
       ];
     })
-    (lib.mkIf cfg.wireplumberHacks.enable (import ./wireplumber.nix { inherit lib config pkgs; }))
     (lib.mkIf cfg.mangohud.enable (import ./mangohud.nix { }))
     (lib.mkIf (cfg.extraPackages != []) { home.packages = cfg.extraPackages; })
   ];
