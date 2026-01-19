@@ -1,11 +1,16 @@
 { config, lib, pkgs, ... }:
 let
   cfg = config.cumserver.element-call;
-  domain = "call.cum.army";
 in
 {
   options.cumserver.element-call = {
     enable = lib.mkEnableOption "Element Call with LiveKit backend";
+
+    domain = lib.mkOption {
+      type = lib.types.str;
+      default = "call.cum.army";
+      description = "Domain name for Element Call";
+    };
 
     livekitKeyFile = lib.mkOption {
       type = lib.types.path;
@@ -49,6 +54,10 @@ in
         assertion = config.services.caddy.enable;
         message = "Caddy must be enabled for Element Call to work";
       }
+      {
+        assertion = config.cumserver.tuwunel.enable;
+        message = "Tuwunel must be enabled for Element Call to work";
+      }
     ];
 
     services.livekit = {
@@ -58,7 +67,7 @@ in
 
     services.lk-jwt-service = {
       enable = true;
-      livekitUrl = "wss://${domain}/livekit/sfu";
+      livekitUrl = "wss://${cfg.domain}/livekit/sfu";
       keyFile = cfg.livekitKeyFile;
       port = cfg.jwtServicePort;
     };
@@ -68,7 +77,7 @@ in
     systemd.services.lk-jwt-service.environment.LIVEKIT_FULL_ACCESS_HOMESERVERS =
       config.cumserver.tuwunel.mainDomain;
 
-    services.caddy.virtualHosts."${domain}" = {
+    services.caddy.virtualHosts."${cfg.domain}" = {
       extraConfig = ''
         # Element Call frontend
         root * ${pkgs.element-call}
@@ -82,7 +91,7 @@ in
                 server_name = config.cumserver.tuwunel.mainDomain;
               };
             };
-            livekit.livekit_service_url = "https://${domain}/livekit/jwt";
+            livekit.livekit_service_url = "https://${cfg.domain}/livekit/jwt";
           }}` 200
 
           handle_path /livekit/jwt/* {
