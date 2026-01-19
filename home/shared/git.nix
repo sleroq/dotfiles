@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 
 {
   age.secrets.gitconfig-work = {
@@ -13,6 +13,8 @@
     file = ../secrets/allowed-signers;
     path = "${config.home.homeDirectory}/.ssh/allowed-signers";
   };
+
+  home.packages = [ pkgs.gnupg pkgs.gh ];
 
   programs.git = {
     enable = true;
