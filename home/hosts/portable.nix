@@ -27,9 +27,6 @@ in
     inherit (opts) username;
     homeDirectory = "/Users/${opts.username}"; # TODO: is this needed?
     stateVersion = "25.05";
-
-    # Adding opencode installed separately to the path
-    # sessionPath = [ "${config.home.homeDirectory}/.opencode/bin" ];
   };
 
   # TODO: Move to the system config?
