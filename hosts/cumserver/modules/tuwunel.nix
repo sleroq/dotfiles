@@ -134,10 +134,10 @@ in
           well_known = {
             client = "https://${cfg.domain}";
             server = "${cfg.domain}:443";
-            rtc_transports = [
+            rtc_transports = lib.optionals config.cumserver.element-call.enable [
               {
                 type = "livekit";
-                livekit_service_url = "https://call.cum.army/livekit/jwt";
+                livekit_service_url = "https://${config.cumserver.element-call.domain}/livekit/jwt";
               }
             ];
           };
@@ -173,17 +173,20 @@ in
               handle_path /.well-known/matrix/client {
                   header Access-Control-Allow-Origin *
                   header Content-Type application/json
-                  respond `${builtins.toJSON {
-                    "m.homeserver" = {
-                      base_url = "https://${config.cumserver.tuwunel.domain}";
-                    };
-                    "org.matrix.msc4143.rtc_foci" = [
-                      {
-                        type = "livekit";
-                        livekit_service_url = "https://call.cum.army/livekit/jwt";
-                      }
-                    ];
-                  }}` 200
+                  respond `${builtins.toJSON (
+                    {
+                      "m.homeserver" = {
+                        base_url = "https://${config.cumserver.tuwunel.domain}";
+                      };
+                    } // lib.optionalAttrs config.cumserver.element-call.enable {
+                      "org.matrix.msc4143.rtc_foci" = [
+                        {
+                          type = "livekit";
+                          livekit_service_url = "https://${config.cumserver.element-call.domain}/livekit/jwt";
+                        }
+                      ];
+                    }
+                  )}` 200
               }
             '';
           };
