@@ -104,6 +104,9 @@ in
 
         header {
           # Enable CORS for WebRTC
+          -Access-Control-Allow-Origin
+          -Access-Control-Allow-Methods
+          -Access-Control-Allow-Headers
           Access-Control-Allow-Origin *
           Access-Control-Allow-Methods "GET, POST, OPTIONS"
           Access-Control-Allow-Headers "Content-Type, Authorization"
