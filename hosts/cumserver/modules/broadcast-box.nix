@@ -94,31 +94,35 @@ in
 
     services.caddy.virtualHosts.${cfg.domain} = {
       extraConfig = ''
-        reverse_proxy 127.0.0.1:${toString cfg.port}
-
         @websockets {
           header Connection *Upgrade*
           header Upgrade websocket
         }
-        reverse_proxy @websockets 127.0.0.1:${toString cfg.port}
-
-        header {
-          # Enable CORS for WebRTC
-          -Access-Control-Allow-Origin
-          -Access-Control-Allow-Methods
-          -Access-Control-Allow-Headers
-          Access-Control-Allow-Origin *
-          Access-Control-Allow-Methods "GET, POST, OPTIONS"
-          Access-Control-Allow-Headers "Content-Type, Authorization"
-
-          X-Content-Type-Options nosniff
-          X-Frame-Options DENY
-          X-XSS-Protection "1; mode=block"
-          Referrer-Policy strict-origin-when-cross-origin
-        }
-
         @options method OPTIONS
-        respond @options 204
+
+        # Force directive ordering so that CORS headers are applied to both
+        # proxied requests and the OPTIONS preflight response.
+        route {
+          header {
+            # Enable CORS for WebRTC
+            # The upstream may also set CORS headers; ensure we don't emit duplicates.
+            -Access-Control-Allow-Origin
+            -Access-Control-Allow-Methods
+            -Access-Control-Allow-Headers
+            Access-Control-Allow-Origin *
+            Access-Control-Allow-Methods "GET, POST, OPTIONS"
+            Access-Control-Allow-Headers "Content-Type, Authorization"
+
+            X-Content-Type-Options nosniff
+            X-Frame-Options DENY
+            X-XSS-Protection "1; mode=block"
+            Referrer-Policy strict-origin-when-cross-origin
+          }
+
+          respond @options 204
+          reverse_proxy @websockets 127.0.0.1:${toString cfg.port}
+          reverse_proxy 127.0.0.1:${toString cfg.port}
+        }
       '';
     };
   };
