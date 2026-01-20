@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ inputs', config, lib, ... }:
 let
   cfg = config.cumserver.broadcast-box;
 in
@@ -81,6 +81,7 @@ in
         NAT_1_TO_1_IP = (builtins.head config.networking.interfaces.ens3.ipv4.addresses).address;
         NETWORK_TEST_ON_START = "false";
         DISABLE_STATUS = "true";
+        DISABLE_FRONTEND = "1";
       } // cfg.extraEnvironment;
 
       environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
@@ -118,8 +119,20 @@ in
           }
 
           respond @options 204
-          reverse_proxy @websockets 127.0.0.1:${toString cfg.port}
-          reverse_proxy 127.0.0.1:${toString cfg.port}
+
+          # API and WebSockets go to the container
+          handle /api/* {
+            reverse_proxy @websockets 127.0.0.1:${toString cfg.port}
+            reverse_proxy 127.0.0.1:${toString cfg.port}
+          }
+
+          # Everything else serves the static frontend from web-cum-army
+          handle {
+            root * ${inputs'.web-cum-army.packages.default}
+            try_files {path} /index.html
+            file_server
+            encode zstd gzip
+          }
         }
       '';
     };
