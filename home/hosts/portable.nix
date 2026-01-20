@@ -74,6 +74,7 @@ in
         dust
         ollama
         amp-cli
+        scrcpy
 
         nixos-rebuild
       ];
