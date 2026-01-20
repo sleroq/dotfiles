@@ -105,13 +105,11 @@ in
         route {
           header {
             # Enable CORS for WebRTC
-            # The upstream may also set CORS headers; ensure we don't emit duplicates.
-            -Access-Control-Allow-Origin
-            -Access-Control-Allow-Methods
-            -Access-Control-Allow-Headers
-            Access-Control-Allow-Origin *
-            Access-Control-Allow-Methods "GET, POST, OPTIONS"
-            Access-Control-Allow-Headers "Content-Type, Authorization"
+            # Use deferred header setting (>) to overwrite any upstream values,
+            # avoiding duplicated headers like "*, *".
+            >Access-Control-Allow-Origin *
+            >Access-Control-Allow-Methods "GET, POST, OPTIONS"
+            >Access-Control-Allow-Headers "Content-Type, Authorization"
 
             X-Content-Type-Options nosniff
             X-Frame-Options DENY
