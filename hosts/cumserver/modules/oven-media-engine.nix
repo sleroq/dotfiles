@@ -1,7 +1,7 @@
-{ inputs', config, lib, pkgs, ... }:
+{ inputs', config, lib, pkgs, secrets, ... }:
 let
   cfg = config.cumserver.oven-media-engine;
-  
+
   configFile = pkgs.writeText "ovenmediaengine-config.xml" ''
     <?xml version="1.0" encoding="UTF-8"?>
     <Server version="8">
@@ -28,9 +28,9 @@ let
                         <WorkerCount>1</WorkerCount>
                     </Signalling>
                     <IceCandidates>
-                        <IceCandidate>*:${toString cfg.webrtcPortRangeStart}-${toString cfg.webrtcPortRangeEnd}/udp</IceCandidate>
-                        <TcpRelay>*:${toString cfg.turnPort}</TcpRelay>
-                        <TcpForce>true</TcpForce>
+                        <IceCandidate>${secrets.ipv4}:${toString cfg.webrtcPortRangeStart}-${toString cfg.webrtcPortRangeEnd}/udp</IceCandidate>
+                        <TcpRelay>${secrets.ipv4}:${toString cfg.turnPort}</TcpRelay>
+                        <TcpForce>false</TcpForce>
                         <TcpRelayWorkerCount>1</TcpRelayWorkerCount>
                     </IceCandidates>
                 </WebRTC>
@@ -51,9 +51,9 @@ let
                         <WorkerCount>1</WorkerCount>
                     </Signalling>
                     <IceCandidates>
-                        <IceCandidate>*:${toString cfg.webrtcPortRangeStart}-${toString cfg.webrtcPortRangeEnd}/udp</IceCandidate>
-                        <TcpRelay>*:${toString cfg.turnPort}</TcpRelay>
-                        <TcpForce>true</TcpForce>
+                        <IceCandidate>${secrets.ipv4}:${toString cfg.webrtcPortRangeStart}-${toString cfg.webrtcPortRangeEnd}/udp</IceCandidate>
+                        <TcpRelay>${secrets.ipv4}:${toString cfg.turnPort}</TcpRelay>
+                        <TcpForce>false</TcpForce>
                         <TcpRelayWorkerCount>1</TcpRelayWorkerCount>
                     </IceCandidates>
                 </WebRTC>
@@ -141,91 +141,91 @@ in
 {
   options.cumserver.oven-media-engine = {
     enable = lib.mkEnableOption "OvenMediaEngine streaming server";
-    
+
     image = lib.mkOption {
       type = lib.types.str;
       default = "airensoft/ovenmediaengine:latest";
       description = "Docker image to use for OvenMediaEngine";
     };
-    
+
     domain = lib.mkOption {
       type = lib.types.str;
       description = "Domain name for OvenMediaEngine";
       example = "stream.example.com";
     };
-    
+
     port = lib.mkOption {
       type = lib.types.port;
       default = 3333;
       description = "WebRTC signaling port (HTTP)";
     };
-    
+
     srtPort = lib.mkOption {
       type = lib.types.port;
       default = 9999;
       description = "SRT input port (UDP)";
     };
-    
+
     turnPort = lib.mkOption {
       type = lib.types.port;
       default = 3478;
       description = "TURN server port";
     };
-    
+
     tcpPort = lib.mkOption {
       type = lib.types.port;
       default = 9000;
       description = "Additional TCP port";
     };
-    
+
     webrtcPortRangeStart = lib.mkOption {
       type = lib.types.port;
       default = 10000;
       description = "WebRTC media port range start";
     };
-    
+
     webrtcPortRangeEnd = lib.mkOption {
       type = lib.types.port;
-      default = 10009;
+      default = 11000;
       description = "WebRTC media port range end";
     };
-    
+
     stunServer = lib.mkOption {
       type = lib.types.str;
       default = "stun.l.google.com:19302";
       description = "STUN server for WebRTC";
     };
-    
+
     privacyProtection = lib.mkOption {
       type = lib.types.bool;
       default = false;
       description = "Enable privacy protection (GDPR compliance)";
     };
-    
+
     hardwareAcceleration = lib.mkOption {
       type = lib.types.bool;
       default = false;
       description = "Enable hardware acceleration (GPU)";
     };
-    
+
     webrtcTimeout = lib.mkOption {
       type = lib.types.int;
       default = 30000;
       description = "WebRTC timeout in milliseconds";
     };
-    
+
     webrtcRtx = lib.mkOption {
       type = lib.types.bool;
       default = false;
       description = "Enable WebRTC RTX (retransmission)";
     };
-    
+
     webrtcUlpfec = lib.mkOption {
       type = lib.types.bool;
       default = false;
       description = "Enable WebRTC ULPFEC (forward error correction)";
     };
-    
+
     webrtcJitterBuffer = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -293,25 +293,25 @@ in
       default = "opus";
       description = "Audio codec for transcoding. Opus is required for WebRTC compatibility.";
     };
-    
+
     audioBitrate = lib.mkOption {
       type = lib.types.int;
       default = 128000;
       description = "Audio bitrate in bps";
     };
-    
+
     dataDir = lib.mkOption {
       type = lib.types.str;
       default = "/var/lib/ovenmediaengine";
       description = "Data directory for OvenMediaEngine";
     };
-    
+
     customConfigFile = lib.mkOption {
       type = lib.types.nullOr lib.types.path;
       default = null;
       description = "Path to custom OvenMediaEngine configuration file. If null, uses generated default config.";
     };
-    
+
     optimizeNetworkBuffers = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -343,6 +343,7 @@ in
       ];
       allowedUDPPorts = [
         cfg.srtPort
+        cfg.turnPort
       ];
       allowedUDPPortRanges = [
         { from = cfg.webrtcPortRangeStart; to = cfg.webrtcPortRangeEnd; }
@@ -365,20 +366,21 @@ in
         inherit (cfg) image;
         autoStart = true;
         pull = "newer";
-        
+
         ports = [
           "127.0.0.1:${toString cfg.port}:3333"
           "0.0.0.0:${toString cfg.srtPort}:9999/udp"
           "0.0.0.0:${toString cfg.turnPort}:3478"
+          "0.0.0.0:${toString cfg.turnPort}:3478/udp"
           "0.0.0.0:${toString cfg.tcpPort}:9000"
-        ] ++ map (port: "0.0.0.0:${toString port}:${toString port}/udp") 
+        ] ++ map (port: "0.0.0.0:${toString port}:${toString port}/udp")
           (lib.range cfg.webrtcPortRangeStart cfg.webrtcPortRangeEnd);
-        
+
         volumes = [
           "${if cfg.customConfigFile != null then cfg.customConfigFile else configFile}:/opt/ovenmediaengine/bin/origin_conf/Server.xml:ro"
           "${cfg.dataDir}:/var/lib/ovenmediaengine"
         ];
-        
+
         extraOptions = [
           "--hostname=ovenmediaengine"
           "--ulimit=nofile=65536:65536"
@@ -393,14 +395,14 @@ in
           handle /app/* {
             reverse_proxy 127.0.0.1:${toString cfg.port}
           }
-          
+
           # Everything else serves the static website
           handle {
             root * ${inputs'.web-cum-army.packages.default}
             file_server
             encode zstd gzip
           }
-          
+
           header {
             X-Content-Type-Options nosniff
             X-Frame-Options DENY
@@ -411,4 +413,4 @@ in
       };
     };
   };
-} 
+}

@@ -170,40 +170,31 @@ in
     environmentFile = config.age.secrets.ziplineEnv.path;
   };
 
-  # cumserver.broadcast-box = {
-  #   enable = true;
-  #   # image = "localhost/meow:latest";
-  #   domain = "web.cum.army";
-  #   # profiles.enable = true;
-  #   # profiles.streamProfiles = {
-  #   #   "saygex2_1b2e45eb-360c-4d75-a29f-0ecff7e88762" = {
-  #   #     streamKey = "saygex2";
-  #   #     isPublic = true;
-  #   #     motd = "Welcome to my stream!";
-  #   #   };
-  #   # };
-  # };
+  cumserver.broadcast-box = {
+    enable = true;
+    domain = "web.cum.army";
+  };
 
   # cumserver.n8n.enable = true;
 
   cumserver.minecraft.cum.enable = true;
   # cumserver.minecraft.forever-chu.enable = true;
 
-  cumserver.oven-media-engine = {
-    enable = true;
-    domain = "web.cum.army";
+  # cumserver.oven-media-engine = {
+  #   enable = true;
+  #   domain = "web.cum.army";
 
-    videoBypass = true;
-    videoCodec = "h264";
-    videoWidth = 1920;
-    videoHeight = 1080;
-    videoBitrate = 5000000;
+  #   videoBypass = false;
+  #   videoCodec = "h264";
+  #   videoWidth = 1920;
+  #   videoHeight = 1080;
+  #   videoBitrate = 5000000;
 
-    # WebRTC optimizations
-    webrtcRtx = true;
-    webrtcJitterBuffer = true;
-    webrtcUlpfec = true;
-  };
+  #   # WebRTC optimizations
+  #   webrtcRtx = true;
+  #   webrtcJitterBuffer = true;
+  #   webrtcUlpfec = true;
+  # };
 
   services.bayan.enable = true;
   services.kopoka.enable = true;
