@@ -52,5 +52,9 @@ rec {
         # });
     };
 
-  default = composeManyExtensions [ scrcpy beans code-cursor opencode ];
+  broadcast-box = final: prev: {
+    broadcast-box = final.callPackage ../packages/broadcast-box.nix { };
+  };
+
+  default = composeManyExtensions [ scrcpy beans code-cursor opencode broadcast-box ];
 }

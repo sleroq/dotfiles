@@ -1,4 +1,10 @@
-{ inputs', config, lib, ... }:
+{
+  inputs',
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.cumserver.broadcast-box;
 in
@@ -38,7 +44,7 @@ in
 
     extraEnvironment = lib.mkOption {
       type = lib.types.attrsOf lib.types.str;
-      default = {};
+      default = { };
       description = "Additional environment variables";
       example = {
         DISABLE_STATUS = "false";
@@ -72,10 +78,13 @@ in
         NETWORK_TEST_ON_START = "false";
         DISABLE_STATUS = true;
         DISABLE_FRONTEND = "true";
-      } // cfg.extraEnvironment;
+      }
+      // cfg.extraEnvironment;
     };
 
-    systemd.services.broadcast-box.serviceConfig.EnvironmentFile = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
+    systemd.services.broadcast-box.serviceConfig.EnvironmentFile = lib.optional (
+      cfg.environmentFile != null
+    ) cfg.environmentFile;
 
     # Open UDP port in firewall for WebRTC traffic
     networking.firewall = {
@@ -138,7 +147,7 @@ in
           handle {
             root * ${
               inputs'.web-cum-army.packages.default.override {
-                siteTitle = "Web Cum Streaming";
+                siteTitle = "Broadcast Box";
                 apiPath = "https://${cfg.domain}/api";
               }
             }
