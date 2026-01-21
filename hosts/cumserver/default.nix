@@ -173,7 +173,6 @@ in
   cumserver.broadcast-box = {
     enable = true;
     domain = "web.cum.army";
-    extraEnvironment.DISABLE_STATUS = "";
   };
 
   # cumserver.n8n.enable = true;

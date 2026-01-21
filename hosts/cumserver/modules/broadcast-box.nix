@@ -81,7 +81,7 @@ in
         NAT_1_TO_1_IP = (builtins.head config.networking.interfaces.ens3.ipv4.addresses).address;
         NETWORK_TEST_ON_START = "false";
         DISABLE_STATUS = "true";
-        DISABLE_FRONTEND = "1";
+        DISABLE_FRONTEND = "true";
       } // cfg.extraEnvironment;
 
       environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
@@ -99,26 +99,16 @@ in
           header Connection *Upgrade*
           header Upgrade websocket
         }
-        @options method OPTIONS
 
-        # Force directive ordering so that CORS headers are applied to both
-        # proxied requests and the OPTIONS preflight response.
+        # Force directive ordering so that headers are applied to both
+        # proxied requests and the response.
         route {
           header {
-            # Enable CORS for WebRTC
-            # Use deferred header setting (>) to overwrite any upstream values,
-            # avoiding duplicated headers like "*, *".
-            >Access-Control-Allow-Origin *
-            >Access-Control-Allow-Methods "GET, POST, OPTIONS"
-            >Access-Control-Allow-Headers "Content-Type, Authorization"
-
             X-Content-Type-Options nosniff
             X-Frame-Options DENY
             X-XSS-Protection "1; mode=block"
             Referrer-Policy strict-origin-when-cross-origin
           }
-
-          respond @options 204
 
           # API and WebSockets go to the container
           handle /api/* {
@@ -128,7 +118,12 @@ in
 
           # Everything else serves the static frontend from web-cum-army
           handle {
-            root * ${inputs'.web-cum-army.packages.default}
+            root * ${
+              inputs'.web-cum-army.packages.default.override {
+                siteTitle = "Web Cum Streaming";
+                apiPath = "https://${cfg.domain}/api";
+              }
+            }
             try_files {path} /index.html
             file_server
             encode zstd gzip
