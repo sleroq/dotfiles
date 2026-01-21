@@ -1,7 +1,6 @@
 ---
 description: "External research agent for documentation, examples, and best practices."
 mode: subagent
-model: opencode/gpt-5.2
 temperature: 0.1
 tools:
   write: false
