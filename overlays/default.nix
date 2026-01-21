@@ -1,8 +1,18 @@
-{ self, scrcpyPkgs, nixpkgs-master, nixpkgs }:
+{ self, scrcpyPkgs, nixpkgs-master, nixpkgs-beans, nixpkgs }:
 let
   inherit (nixpkgs.lib) composeManyExtensions;
 in
 rec {
+  beans = final: prev:
+    let
+      nixpkgsBeans = import nixpkgs-beans {
+        system = final.stdenv.hostPlatform.system;
+        config = prev.config or {};
+      };
+    in {
+      beans = nixpkgsBeans.beans;
+    };
+
   scrcpy = final: prev:
     let
       pkgsScrcpy = import scrcpyPkgs {
@@ -42,5 +52,5 @@ rec {
         # });
     };
 
-  default = composeManyExtensions [ scrcpy code-cursor opencode ];
+  default = composeManyExtensions [ scrcpy beans code-cursor opencode ];
 }

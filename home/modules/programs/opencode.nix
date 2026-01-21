@@ -22,6 +22,8 @@ in
 
   config = lib.mkIf cfg.enable (
     lib.mkMerge [
+      { home.packages = [ pkgs.beans ]; }
+
       (lib.mkIf (!cfg.useBun) {
         home.packages = [ pkgs.opencode ];
       })

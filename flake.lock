@@ -2035,6 +2035,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-beans": {
+      "locked": {
+        "lastModified": 1768847154,
+        "narHash": "sha256-v8B1KH/bKdnw2HBIiW2t+JUqygmtqv6lterdHbAcoR0=",
+        "owner": "sleroq",
+        "repo": "nixpkgs",
+        "rev": "92c8c297c17769e2affffa03b2d8b4c812db49e7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sleroq",
+        "ref": "init-beans",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs-cumserver": {
       "locked": {
         "lastModified": 1765425892,
@@ -2554,6 +2570,7 @@
         "nix-minecraft": "nix-minecraft",
         "nixos-facter-modules": "nixos-facter-modules",
         "nixpkgs": "nixpkgs_11",
+        "nixpkgs-beans": "nixpkgs-beans",
         "nixpkgs-cumserver": "nixpkgs-cumserver",
         "nixpkgs-international": "nixpkgs-international",
         "nixpkgs-interplanetary": "nixpkgs-interplanetary",

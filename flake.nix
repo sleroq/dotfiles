@@ -50,6 +50,7 @@
 
     scrcpyPkgs.url = "github:nixos/nixpkgs/77a0bdd";
     nixpkgs-master.url = "github:nixos/nixpkgs/master";
+    nixpkgs-beans.url = "github:sleroq/nixpkgs/init-beans";
 
     # Cumserver flakes
     disko.url = "github:nix-community/disko";
@@ -105,7 +106,7 @@
 
       flake.overlays = import ./overlays/default.nix {
         inherit self nixpkgs;
-        inherit (inputs) scrcpyPkgs nixpkgs-master;
+        inherit (inputs) scrcpyPkgs nixpkgs-beans nixpkgs-master ;
       };
 
       # FIXME: This is a bit overengineered
