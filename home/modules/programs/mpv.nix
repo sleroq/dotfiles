@@ -15,6 +15,7 @@
       screenshot-directory = "~/Pictures/Screenshots/mpv";
       alang = "eng";
       slang = "eng";
+      vo = "gpu";
     };
   };
 }
