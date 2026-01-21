@@ -99,29 +99,19 @@ in
           header Connection *Upgrade*
           header Upgrade websocket
         }
-        @options method OPTIONS
 
-        # Force directive ordering so that CORS headers are applied to both
-        # proxied requests and the OPTIONS preflight response.
+        # Force directive ordering so that headers are applied to both
+        # proxied requests and the response.
         route {
           header {
-            # Enable CORS for WebRTC
-            # Use deferred header setting (>) to overwrite any upstream values,
-            # avoiding duplicated headers like "*, *".
-            >Access-Control-Allow-Origin *
-            >Access-Control-Allow-Methods "GET, POST, OPTIONS"
-            >Access-Control-Allow-Headers "Content-Type, Authorization"
-
             X-Content-Type-Options nosniff
             X-Frame-Options DENY
             X-XSS-Protection "1; mode=block"
             Referrer-Policy strict-origin-when-cross-origin
           }
 
-          respond @options 204
-
           # API and WebSockets go to the container
-          handle /api/* {
+          handle_path /api/* {
             reverse_proxy @websockets 127.0.0.1:${toString cfg.port}
             reverse_proxy 127.0.0.1:${toString cfg.port}
           }
