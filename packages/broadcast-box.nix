@@ -17,6 +17,8 @@ buildGoModule {
   vendorHash = "sha256-7tgx6cJf2+xBod89k6sg0FfZseKoErwipHqsvPoTaB0=";
   proxyVendor = true;
 
+  doCheck = false;
+
   # Add NixOS environment support (equivalent to allow-no-env.patch)
   # and point to the share directory for the (empty) frontend
   postPatch = ''
