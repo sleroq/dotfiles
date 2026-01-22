@@ -8,7 +8,7 @@
       "disable": true
     }
   },
-  "small_model": "opencode/kimi-k2",
+  "small_model": "opencode/kimi-k2-thinking",
   "mcp": {
     "grep": {
       "type": "remote",
