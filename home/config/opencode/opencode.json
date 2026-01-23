@@ -1,5 +1,5 @@
 {
-  "plugin": ["opencode-antigravity-auth"],
+  "plugin": ["opencode-antigravity-auth@latest"],
   "agent": {
     "build": {
       "disable": true
