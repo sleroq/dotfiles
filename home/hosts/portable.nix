@@ -75,8 +75,6 @@ in
         ollama
         amp-cli
         scrcpy
-
-        nixos-rebuild
       ];
     };
   };
