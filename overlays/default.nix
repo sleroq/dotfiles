@@ -14,10 +14,13 @@ rec {
     };
 
   scrcpy = final: prev:
+    # Only apply scrcpy overlay on non-Darwin systems
+    # (Darwin systems should use scrcpy from their own nixpkgs)
+    if prev.stdenv.isDarwin then {} else
     let
       pkgsScrcpy = import scrcpyPkgs {
         system = final.stdenv.hostPlatform.system;
-        config = prev.config or {};
+        config = prev.config or{};
       };
     in {
       scrcpy = pkgsScrcpy.scrcpy;
