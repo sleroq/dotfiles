@@ -12,12 +12,12 @@ let
     (index: index + 1)
     numberOfMailPasswords;
 
-  passwordFilePaths = builtins.map
-    (n: "${mailSecretBasePath}${passwordNamePrefix}${builtins.toString n}")
+  passwordFilePaths = map
+    (n: "${mailSecretBasePath}${passwordNamePrefix}${toString n}")
     mailPasswordNumbers;
 
   generatedPasswordEntries = builtins.listToAttrs (
-    builtins.map
+    map
       (filePath: {
         name = filePath;
         value = { publicKeys = commonPublicKeys; };
