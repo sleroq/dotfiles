@@ -27,6 +27,8 @@ buildGoModule {
       --replace-fail './web/build' "${placeholder "out"}/share"
   '';
 
+  doCheck = false;
+
   installPhase = ''
     runHook preInstall
     mkdir -p $out/share

@@ -29,36 +29,10 @@ in
       default = 8080;
       description = "UDP port for WebRTC traffic";
     };
-
-    image = lib.mkOption {
-      type = lib.types.str;
-      default = "seaduboi/broadcast-box:latest";
-      description = "Docker image to use for Broadcast Box";
-    };
-
-    environmentFile = lib.mkOption {
-      type = lib.types.nullOr lib.types.path;
-      default = null;
-      description = "Path to environment file containing sensitive configuration";
-    };
-
-    extraEnvironment = lib.mkOption {
-      type = lib.types.attrsOf lib.types.str;
-      default = { };
-      description = "Additional environment variables";
-      example = {
-        DISABLE_STATUS = "false";
-        NETWORK_TEST_ON_START = "false";
-      };
-    };
   };
 
   config = lib.mkIf cfg.enable {
     assertions = [
-      # {
-      #   assertion = config.virtualisation.oci-containers.backend != null;
-      #   message = "OCI containers backend must be configured for Marzban to work";
-      # }
       {
         assertion = config.services.caddy.enable;
         message = "broadcast-box requires Caddy to be enabled for reverse proxy. Set services.caddy.enable = true";
@@ -76,49 +50,14 @@ in
         NETWORK_TYPES = "udp4";
         NAT_1_TO_1_IP = (builtins.head config.networking.interfaces.ens3.ipv4.addresses).address;
         NETWORK_TEST_ON_START = "false";
-        DISABLE_STATUS = true;
-        DISABLE_FRONTEND = "true";
-      }
-      // cfg.extraEnvironment;
+        DISABLE_STATUS = false;
+        DISABLE_FRONTEND = true;
+      };
     };
 
-    systemd.services.broadcast-box.serviceConfig.EnvironmentFile = lib.optional (
-      cfg.environmentFile != null
-    ) cfg.environmentFile;
-
-    # Open UDP port in firewall for WebRTC traffic
     networking.firewall = {
       allowedUDPPorts = [ cfg.udpPort ];
     };
-
-    # virtualisation.oci-containers.containers.broadcast-box = {
-    #   inherit (cfg) image;
-    #   autoStart = true;
-    #
-    #   ports = [
-    #     "127.0.0.1:${toString cfg.port}:8080"
-    #     "0.0.0.0:${toString cfg.udpPort}:${toString cfg.udpPort}/udp"
-    #   ];
-    #
-    #   environment = {
-    #     HTTP_ADDRESS = ":8080";
-    #     ENABLE_HTTP_REDIRECT = "false";
-    #     UDP_MUX_PORT = toString cfg.udpPort;
-    #     NETWORK_TYPES = "udp4";
-    #     NAT_1_TO_1_IP = (builtins.head config.networking.interfaces.ens3.ipv4.addresses).address;
-    #     NETWORK_TEST_ON_START = "false";
-    #     DISABLE_STATUS = "true";
-    #     DISABLE_FRONTEND = "true";
-    #   } // cfg.extraEnvironment;
-    #
-    #   environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
-    #
-    #   extraOptions = [
-    #     "--hostname=broadcast-box"
-    #     "--sysctl=net.ipv6.conf.all.disable_ipv6=1"
-    #     "--sysctl=net.ipv6.conf.default.disable_ipv6=1"
-    #   ];
-    # };
 
     services.caddy.virtualHosts.${cfg.domain} = {
       extraConfig = ''
