@@ -89,6 +89,19 @@ in
                 apiPath = "https://${cfg.domain}/api";
               }
             }
+
+            @index {
+              file
+              path / /index.html
+            }
+            header @index Cache-Control "no-cache, no-store, must-revalidate"
+
+            @static {
+              file
+              path *.js *.css *.png *.jpg *.jpeg *.gif *.svg *.woff *.woff2
+            }
+            header @static Cache-Control "public, max-age=31536000, immutable"
+
             try_files {path} /index.html
             file_server
             encode zstd gzip
