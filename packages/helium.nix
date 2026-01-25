@@ -1,5 +1,4 @@
 {
-  fetchurl,
   appimageTools,
   version ? "0.5.7.1",
   hash ? "sha256-AiLuEQhJoyPo1pTmAWvnXMj5pdA/CBO6JvZZVG71W7M="
@@ -7,7 +6,7 @@
 
 let
   pname = "helium";
-  src = fetchurl {
+  src = builtins.fetchurl {
     url = "https://github.com/imputnet/helium-linux/releases/download/${version}/${pname}-${version}-x86_64.AppImage";
     sha256 = hash;
   };
@@ -23,4 +22,3 @@ in appimageTools.wrapType2 rec {
       cp -r ${contents}/usr/share/icons $out/share
     '';
 }
-

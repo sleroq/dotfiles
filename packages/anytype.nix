@@ -10,9 +10,9 @@ let
   pname = "anytype";
   name = "Anytype-${version}";
   src = builtins.fetchurl {
-    inherit hash;
     url = "https://github.com/anyproto/anytype-ts/releases/download/v${version}/${name}.AppImage";
     name = "Anytype-${version}.AppImage";
+    sha256 = hash;
   };
   appimageContents = appimageTools.extractType2 { inherit pname version src; };
 in
