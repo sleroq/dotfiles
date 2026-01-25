@@ -1,25 +1,25 @@
-{ lib,
-  fetchurl,
+{
+  lib,
   appimageTools,
   makeWrapper,
   version ? "0.46.5",
-  hash ? "sha256-AiLuEQhJoyPo1pTmAWvnXMj5pdA/CBO6JvZZVG71W7M="
+  hash ? "sha256-AiLuEQhJoyPo1pTmAWvnXMj5pdA/CBO6JvZZVG71W7M=",
 }:
 
 let
   pname = "anytype";
   name = "Anytype-${version}";
-  src = fetchurl {
+  src = builtins.fetchurl {
     inherit hash;
     url = "https://github.com/anyproto/anytype-ts/releases/download/v${version}/${name}.AppImage";
     name = "Anytype-${version}.AppImage";
   };
   appimageContents = appimageTools.extractType2 { inherit pname version src; };
-in appimageTools.wrapType2 {
+in
+appimageTools.wrapType2 {
   inherit pname version src;
 
-  extraPkgs = pkgs: (appimageTools.defaultFhsEnvArgs.multiPkgs pkgs)
-    ++ [ pkgs.libsecret ];
+  extraPkgs = pkgs: (appimageTools.defaultFhsEnvArgs.multiPkgs pkgs) ++ [ pkgs.libsecret ];
 
   extraInstallCommands = ''
     # mv $out/bin/${pname} $out/bin/${pname}
