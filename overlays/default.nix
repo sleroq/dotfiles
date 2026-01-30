@@ -76,10 +76,10 @@ rec {
   };
 
   default = composeManyExtensions [
-    scrcpy
+    # scrcpy
     beans
     code-cursor
-    opencode
+    # opencode
     broadcast-box
   ];
 }

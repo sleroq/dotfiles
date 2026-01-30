@@ -14,6 +14,7 @@
     hyprland.url = "github:hyprwm/Hyprland/ab1d80f3d6aebd57a0971b53a1993b1c1dfe0b09";
     hy3.url = "github:outfoxxed/hy3/3287049e79e9e51431de8c09f9192a18afa1bf35";
     hy3.inputs.hyprland.follows = "hyprland";
+
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
 
     caelestia_shell-interplanetary.url = "github:caelestia-dots/shell";
@@ -69,6 +70,7 @@
     cum-army.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     web-cum-army.url = "github:sleroq/web.cum.army";
+    # web-cum-army.url = "/home/sleroq/develop/other/web.cum.army";
     web-cum-army.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     reactor.url = "github:sleroq/reactor";
