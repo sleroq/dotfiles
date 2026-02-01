@@ -23,7 +23,7 @@ in
               enable = true;
               autoStart = true;
               jvmOpts = "-Xms3G -Xmx4G";
-              package = pkgs.fabricServers.fabric-1_21_5;
+              package = pkgs.fabricServers.fabric-1_21_11;
 
               serverProperties = {
                 difficulty = "normal";
