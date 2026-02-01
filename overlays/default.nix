@@ -25,13 +25,10 @@ rec {
     final: prev:
     # Only apply scrcpy overlay on non-Darwin systems
     # (Darwin systems should use scrcpy from their own nixpkgs)
-    if prev.stdenv.isDarwin then
-      { }
-    else
       let
         pkgsScrcpy = import scrcpyPkgs {
           system = final.stdenv.hostPlatform.system;
-          config = prev.config or { };
+          config = builtins.removeAttrs (prev.config or { }) [ "replaceStdenv" ];
         };
       in
       {
@@ -76,7 +73,7 @@ rec {
   };
 
   default = composeManyExtensions [
-    # scrcpy
+    scrcpy
     beans
     code-cursor
     # opencode
