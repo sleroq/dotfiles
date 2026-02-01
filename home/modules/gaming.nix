@@ -21,7 +21,7 @@ in
 
   config = lib.mkMerge [
     {
-      home.packages = [ pkgs.protonup-qt ];
+      home.packages = [ pkgs.protonplus ];
     }
 
     (lib.mkIf cfg.osu.enable {
