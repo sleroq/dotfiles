@@ -53,6 +53,7 @@ in
     ./modules/n8n.nix
     ./modules/minecraft.nix
     ./modules/frp.nix
+    ./modules/restic.nix
     bayan
     kopoka
     spoiler-images
