@@ -148,6 +148,11 @@ in
                     }
                 ];
             }
+        ] ++ lib.optionals (config.cumserver.frp.enable or false) [
+          {
+            job_name = "frps";
+            static_configs = [{ targets = [ "127.0.0.1:7500" ]; }];
+          }
         ] ++ (map (node: {
             job_name = "node-${lib.strings.toLower node.name}";
             static_configs = [{
