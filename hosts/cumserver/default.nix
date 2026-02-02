@@ -52,6 +52,8 @@ in
     ./modules/slusha.nix
     ./modules/n8n.nix
     ./modules/minecraft.nix
+    ./modules/frp.nix
+    ./modules/restic.nix
     bayan
     kopoka
     spoiler-images
@@ -94,6 +96,8 @@ in
     enable = true;
     package = inputs'.tuwunel.packages.default;
   };
+
+  cumserver.frp.enable = true;
 
   age.secrets.livekitKeys = {
     owner = "root";
