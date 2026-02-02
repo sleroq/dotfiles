@@ -194,7 +194,7 @@
 
             portable =
               let
-                flakeRoot = "/home/sleroq/develop/other/dotfiles";
+                flakeRoot = "/Users/sleroq/develop/dotfiles";
               in
               withNixpkgsFor "portable" {
                 tags = [ "macos" ];
