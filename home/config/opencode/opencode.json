@@ -24,6 +24,24 @@
   "experimental": {
     "openTelemetry": true
   },
-  "default_agent": "minerva",
+  "default_agent": "athena",
+  "provider": {
+    "llama.cpp": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "llama-server (local)",
+      "options": {
+        "baseURL": "http://127.0.0.1:8080/v1"
+      },
+      "models": {
+        "qwen3-vl": {
+          "name": "Qwen3-VL",
+          "limit": {
+            "context": 81920,
+            "output": 65536
+          }
+        }
+      }
+    }
+  },
   "$schema": "https://opencode.ai/config.json"
 }
