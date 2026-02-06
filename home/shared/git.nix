@@ -1,20 +1,27 @@
 { config, pkgs, ... }:
 
 {
-  age.secrets.gitconfig-work = {
-    file = ../secrets/gitconfig-work;
-    path = "${config.home.homeDirectory}/.gitconfig-work";
+  age.secrets.gitconfig-wrk = {
+    file = ../secrets/gitconfig-wrk;
+    path = "${config.home.homeDirectory}/.gitconfig-wrk";
   };
-  age.secrets.allowed-signers-work = {
-    file = ../secrets/allowed-signers-work;
-    path = "${config.home.homeDirectory}/.ssh/allowed-signers-work";
+  age.secrets.gitignore-wrk = {
+    file = ../secrets/gitignore-wrk;
+    path = "${config.home.homeDirectory}/.gitignore-wrk";
+  };
+  age.secrets.allowed-signers-wrk = {
+    file = ../secrets/allowed-signers-wrk;
+    path = "${config.home.homeDirectory}/.ssh/allowed-signers-wrk";
   };
   age.secrets.allowed-signers = {
     file = ../secrets/allowed-signers;
     path = "${config.home.homeDirectory}/.ssh/allowed-signers";
   };
 
-  home.packages = [ pkgs.gnupg pkgs.gh ];
+  home.packages = [
+    pkgs.gnupg
+    pkgs.gh
+  ];
 
   programs.git = {
     enable = true;
@@ -34,18 +41,25 @@
       };
     };
     ignores = [
-      "AGENTS.md"
       ".gitlab.nvim"
       ".aider*"
     ];
     includes = [
       {
         condition = "gitdir:~/Job/";
-        path = "~/.gitconfig-work";
+        path = "~/.gitconfig-wrk";
       }
       {
         condition = "gitdir:~/develop/frg/";
-        path = "~/.gitconfig-work";
+        path = "~/.gitconfig-wrk";
+      }
+      {
+        condition = "gitdir:~/Job/";
+        path = "~/.gitignore-wrk";
+      }
+      {
+        condition = "gitdir:~/develop/frg/";
+        path = "~/.gitignore-wrk";
       }
     ];
   };
