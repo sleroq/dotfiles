@@ -65,7 +65,7 @@ mkMerge [
           exec = hypr-gamemode
         '')
         (mkIf (config.myHome.gaming.osu.enable && config.myHome.gaming.osu.enableTearing) ''
-          windowrulev2 = immediate, class:^(osu!)$
+          windowrule = match:class ^(osu!)$, immediate on
         '')
         config.myHome.wms.wayland.hyprland.extraConfig
       ];
