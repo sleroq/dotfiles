@@ -3,11 +3,11 @@
 {
   age.secrets.gitconfig-wrk = {
     file = ../secrets/gitconfig-wrk;
-    path = "${config.home.homeDirectory}/.gitconfig-wrk";
+    path = "${config.home.homeDirectory}/.config/git/includes/gitconfig-wrk";
   };
   age.secrets.gitignore-wrk = {
     file = ../secrets/gitignore-wrk;
-    path = "${config.home.homeDirectory}/.gitignore-wrk";
+    path = "${config.home.homeDirectory}/.config/git/includes/gitignore-wrk";
   };
   age.secrets.allowed-signers-wrk = {
     file = ../secrets/allowed-signers-wrk;
@@ -47,19 +47,19 @@
     includes = [
       {
         condition = "gitdir:~/Job/";
-        path = "~/.gitconfig-wrk";
+        path = "~/.config/git/includes/gitconfig-wrk";
       }
       {
         condition = "gitdir:~/develop/frg/";
-        path = "~/.gitconfig-wrk";
+        path = "~/.config/git/includes/gitconfig-wrk";
       }
       {
         condition = "gitdir:~/Job/";
-        path = "~/.gitignore-wrk";
+        path = "~/.config/git/includes/gitignore-wrk";
       }
       {
         condition = "gitdir:~/develop/frg/";
-        path = "~/.gitignore-wrk";
+        path = "~/.config/git/includes/gitignore-wrk";
       }
     ];
   };
