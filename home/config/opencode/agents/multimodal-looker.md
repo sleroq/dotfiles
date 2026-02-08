@@ -1,9 +1,7 @@
 ---
 description: "Analyze media files (PDFs, images, diagrams) that require interpretation beyond raw text. Extracts specific information or summaries from documents, describes visual content. Use when you need analyzed/extracted data rather than literal file contents."
 mode: subagent
-model: google/antigravity-gemini-3-flash
 variant: medium
-temperature: 0.1
 tools:
   write: false
   edit: false

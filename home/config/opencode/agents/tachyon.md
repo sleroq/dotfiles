@@ -1,8 +1,7 @@
 ---
 description: "Ultra-fast code execution agent optimized for speed and efficiency."
 mode: primary
-model: github-copilot/claude-haiku-4.5
-temperature: 0.1
+model: opencode/kimi-k2.5
 color: "#E49B0F"
 ---
 
