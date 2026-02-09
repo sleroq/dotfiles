@@ -18,6 +18,9 @@
     path = "${config.home.homeDirectory}/.ssh/allowed-signers";
   };
 
+  home.file.".config/git/includes/gitignore-anytype".source = ../config/git/gitignore-anytype;
+  home.file.".config/git/includes/gitconfig-anytype".source = ../config/git/gitconfig-anytype;
+
   home.packages = [
     pkgs.gnupg
     pkgs.gh
@@ -46,20 +49,16 @@
     ];
     includes = [
       {
-        condition = "gitdir:~/Job/";
+        condition = "gitdir:~/Job/**";
         path = "~/.config/git/includes/gitconfig-wrk";
       }
       {
-        condition = "gitdir:~/develop/frg/";
+        condition = "gitdir:~/develop/frg/**";
         path = "~/.config/git/includes/gitconfig-wrk";
       }
       {
-        condition = "gitdir:~/Job/";
-        path = "~/.config/git/includes/gitignore-wrk";
-      }
-      {
-        condition = "gitdir:~/develop/frg/";
-        path = "~/.config/git/includes/gitignore-wrk";
+        condition = "gitdir:~/develop/temp/anyproto/**";
+        path = "~/.config/git/includes/gitconfig-anytype";
       }
     ];
   };
