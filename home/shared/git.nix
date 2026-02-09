@@ -5,6 +5,10 @@
     file = ../secrets/gitconfig-wrk;
     path = "${config.home.homeDirectory}/.config/git/includes/gitconfig-wrk";
   };
+  age.secrets.gitconfig-wrk-global = {
+    file = ../secrets/gitconfig-wrk-global;
+    path = "${config.home.homeDirectory}/.config/git/includes/gitconfig-wrk-global";
+  };
   age.secrets.gitignore-wrk = {
     file = ../secrets/gitignore-wrk;
     path = "${config.home.homeDirectory}/.config/git/includes/gitignore-wrk";
@@ -51,6 +55,9 @@
       {
         condition = "gitdir:~/Job/**";
         path = "~/.config/git/includes/gitconfig-wrk";
+      }
+      {
+        path = "~/.config/git/includes/gitconfig-wrk-global";
       }
       {
         condition = "gitdir:~/develop/frg/**";
