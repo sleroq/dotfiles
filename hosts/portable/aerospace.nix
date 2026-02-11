@@ -11,10 +11,10 @@ _:
       enable-normalization-opposite-orientation-for-nested-containers = true;
       # accordion-padding = 0;# 30;
       accordion-padding = 30;
-      default-root-container-layout = "accordion"; #"tiles";
+      default-root-container-layout = "accordion";
       default-root-container-orientation = "auto";
       on-focused-monitor-changed = ["move-mouse monitor-lazy-center"];
-      automatically-unhide-macos-hidden-apps = false;
+      automatically-unhide-macos-hidden-apps = true;
       key-mapping.preset = "qwerty";
       gaps = {
         inner = {
@@ -29,8 +29,12 @@ _:
         };
       };
       mode.main.binding = {
+        cmd-h = []; # Disable "hide application"
+        cmd-alt-h = []; # Disable "hide others"
+
         alt-slash = "layout tiles horizontal vertical";
         alt-comma = "layout accordion horizontal vertical";
+        alt-period = ["layout floating tiling" "mode main"];
         alt-h = "focus left";
         alt-j = "focus down";
         alt-k = "focus up";
@@ -64,6 +68,7 @@ _:
 
         alt-shift-semicolon = "mode service";
       };
+
       mode.service.binding = {
         esc = ["reload-config" "mode main"];
         r = ["flatten-workspace-tree" "mode main"];
