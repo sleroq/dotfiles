@@ -4,7 +4,7 @@ let
   cumserver = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGNy4lHOvczy/vR4hf+uk6ciJGpkw5mqu3oC+9hTDbqf";
   commonPublicKeys = [ sleroq portable cumserver ];
 
-  numberOfMailPasswords = 5;
+  numberOfMailPasswords = 6;
   mailSecretBasePath = "secrets/mail/";
   passwordNamePrefix = "password";
 
