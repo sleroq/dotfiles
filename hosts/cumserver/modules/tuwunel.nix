@@ -106,6 +106,7 @@ in
               url_preview_domain_explicit_allowlist = [
                 "x.com" "fixupx.com" "twitterfx.com" "t.me" "youtube.com" "github.com" "reddit.com"
                 "pkg.go.dev" "go.dev" "matrix.org" "spec.matrix.org" "steamcommunity.com" "store.steampowered.com"
+                "youtu.be" "youtube.com" "www.linux.org.ru" "www.opennet.ru" "habr.com"
               ];
               url_preview_url_contains_allowlist = [];
               url_preview_domain_explicit_denylist = [];
