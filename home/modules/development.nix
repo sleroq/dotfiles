@@ -117,6 +117,8 @@ in
       bun
       pnpm
       sshfs
+
+      pre-commit # Some repos use this (e.g. anytype)
     ];
   };
 }
