@@ -8,18 +8,18 @@ _: {
     settings = {
       general.idle.timeouts = [
         {
-          timeout = 600;
+          timeout = 600000;
           idleAction = "lock";
         }
         {
-          timeout = 800;
+          timeout = 800000;
           idleActon = "dpms off";
           returnAction = "dpms on";
         }
         {
-          timeout = 1200;
+          timeout = 120000;
           idleAction = ["systemctl" "suspend-then-hibernate"];
-        } 
+        }
       ];
       services = {
         weatherLocation = "43.25654,76.92848";

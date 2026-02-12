@@ -107,9 +107,8 @@ in {
         # nix-shell -p mkpasswd --run 'mkpasswd -sm bcrypt'
         loginAccounts = generatedLoginAccounts;
 
-        certificateFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.crt";
-        keyFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.key";
-        certificateScheme = "manual";
+        x509.certificateFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.crt";
+        x509.privateKeyFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.key";
       };
 
       # Wait for caddy, so certs are ready on first ever boot

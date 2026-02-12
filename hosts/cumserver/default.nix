@@ -94,7 +94,8 @@ in
   cumserver.podman.enable = true;
   cumserver.tuwunel = {
     enable = true;
-    package = inputs'.tuwunel.packages.default;
+    # Disabled to avoid building package locally, especially on mac
+    # package = inputs'.tuwunel.packages.default;
   };
 
   cumserver.frp.enable = true;
@@ -268,15 +269,15 @@ in
   #   environmentFile = config.age.secrets.zefxiEnv.path;
   # };
 
-  age.secrets.sieveEnv = {
-    owner = "sieve";
-    group = "sieve";
-    file = ./secrets/sieveEnv;
-  };
-  services.sieve = {
-    enable = true;
-    environmentFile = config.age.secrets.sieveEnv.path;
-  };
+  # age.secrets.sieveEnv = {
+  #   owner = "sieve";
+  #   group = "sieve";
+  #   file = ./secrets/sieveEnv;
+  # };
+  # services.sieve = {
+  #   enable = false;
+  #   environmentFile = config.age.secrets.sieveEnv.path;
+  # };
 
   age.secrets.slushaEnv = {
     owner = "slusha";
