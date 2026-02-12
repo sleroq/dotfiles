@@ -8,6 +8,7 @@ in
   "secrets/flameshot-auth-token" = { publicKeys = commonPublicKeys; };
   "secrets/ssh-config" = { publicKeys = commonPublicKeys; };
   "secrets/gitconfig-wrk" = { publicKeys = commonPublicKeys; };
+  "secrets/gitconfig-wrk-global" = { publicKeys = commonPublicKeys; };
   "secrets/gitignore-wrk" = { publicKeys = commonPublicKeys; };
   "secrets/allowed-signers" = { publicKeys = commonPublicKeys; };
   "secrets/allowed-signers-wrk" = { publicKeys = commonPublicKeys; };

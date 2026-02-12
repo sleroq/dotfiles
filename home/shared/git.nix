@@ -5,6 +5,10 @@
     file = ../secrets/gitconfig-wrk;
     path = "${config.home.homeDirectory}/.config/git/includes/gitconfig-wrk";
   };
+  age.secrets.gitconfig-wrk-global = {
+    file = ../secrets/gitconfig-wrk-global;
+    path = "${config.home.homeDirectory}/.config/git/includes/gitconfig-wrk-global";
+  };
   age.secrets.gitignore-wrk = {
     file = ../secrets/gitignore-wrk;
     path = "${config.home.homeDirectory}/.config/git/includes/gitignore-wrk";
@@ -17,6 +21,9 @@
     file = ../secrets/allowed-signers;
     path = "${config.home.homeDirectory}/.ssh/allowed-signers";
   };
+
+  home.file.".config/git/includes/gitignore-anytype".source = ../config/git/gitignore-anytype;
+  home.file.".config/git/includes/gitconfig-anytype".source = ../config/git/gitconfig-anytype;
 
   home.packages = [
     pkgs.gnupg
@@ -46,20 +53,19 @@
     ];
     includes = [
       {
-        condition = "gitdir:~/Job/";
+        condition = "gitdir:~/Job/**";
         path = "~/.config/git/includes/gitconfig-wrk";
       }
       {
-        condition = "gitdir:~/develop/frg/";
+        path = "~/.config/git/includes/gitconfig-wrk-global";
+      }
+      {
+        condition = "gitdir:~/develop/frg/**";
         path = "~/.config/git/includes/gitconfig-wrk";
       }
       {
-        condition = "gitdir:~/Job/";
-        path = "~/.config/git/includes/gitignore-wrk";
-      }
-      {
-        condition = "gitdir:~/develop/frg/";
-        path = "~/.config/git/includes/gitignore-wrk";
+        condition = "gitdir:~/develop/temp/anyproto/**";
+        path = "~/.config/git/includes/gitconfig-anytype";
       }
     ];
   };

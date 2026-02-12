@@ -40,7 +40,7 @@ in
     };
 
     nushell = {
-      enable = true;
+      enable = false;
       configFile.source = self + /home/config/nushell/config.nu;
       envFile.source = self + /home/config/nushell/env.nu;
       shellAliases = aliases;
