@@ -21,6 +21,7 @@ in
         default = inputs'.zed.packages.default;
         description = "The Zed package to use. Set to null to enable config without installing.";
       };
+      default = lib.mkEnableOption "default env";
     };
     emacs.enable = lib.mkEnableOption "Emacs";
   };
@@ -56,5 +57,8 @@ in
     (lib.mkIf cfg.emacs.enable (import ./emacs.nix { inherit pkgs lib opts; }))
 
     (lib.mkIf cfg.zed.enable (import ./zed.nix { inherit pkgs lib opts inputs' config; }))
+    (lib.mkIf (cfg.zed.enable && cfg.zed.default) {
+      home.sessionVariables.EDITOR = "zed";
+    })
   ];
 }

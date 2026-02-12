@@ -29,8 +29,7 @@ _:
         };
       };
       mode.main.binding = {
-        cmd-q = []; # Disable "quit application" because I quit multi-window applications accidentally
-        cmd-shift-q = []; # Even scarier
+        cmd-shift-q = []; # Scary useless hotkey
         cmd-h = []; # Disable "hide application"
         cmd-alt-h = []; # Disable "hide others"
 

@@ -46,12 +46,12 @@ in
       zed = {
         enable = true;
         package = null;
-      };
-      neovim = {
-        enable = true;
-        enableNeovide = true;
         default = true;
       };
+      # neovim = {
+      #   enable = true;
+      #   enableNeovide = true;
+      # };
     };
 
     development = {

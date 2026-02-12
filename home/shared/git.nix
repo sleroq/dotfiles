@@ -28,7 +28,6 @@
   home.packages = [
     pkgs.gnupg
     pkgs.gh
-    pkgs.gitbutler
   ];
 
   programs.git = {
