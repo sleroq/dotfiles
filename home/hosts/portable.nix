@@ -48,10 +48,7 @@ in
         package = null;
         default = true;
       };
-      # neovim = {
-      #   enable = true;
-      #   enableNeovide = true;
-      # };
+      neovim.enable = true;
     };
 
     development = {
