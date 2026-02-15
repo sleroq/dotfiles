@@ -3013,11 +3013,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1769368061,
-        "narHash": "sha256-KHDHatxTzN/97qxLI8t53wPqkLa3n24uAxZxd/+mMis=",
+        "lastModified": 1771197739,
+        "narHash": "sha256-Y8tijbqwhzjC4rAJ3d0ugFvNROgzVndHDj4JD1FtCmA=",
         "owner": "sleroq",
         "repo": "web.cum.army",
-        "rev": "a97b1b0c00f5977845bb9e6f0971aa68ecd70713",
+        "rev": "960d266af3667f5bbf9b3ce80d8945e6ec8c3b9a",
         "type": "github"
       },
       "original": {
