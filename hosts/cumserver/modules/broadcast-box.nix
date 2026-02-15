@@ -38,6 +38,12 @@ in
       }
     ];
 
+    services.redis.servers.broadcast-box = {
+      enable = true;
+      bind = "127.0.0.1";
+      port = 6379;
+    };
+
     services.broadcast-box = {
       enable = true;
       web = {
@@ -45,6 +51,7 @@ in
         port = cfg.port;
       };
       settings = {
+        REDIS_URL = "redis://localhost:6379/0";
         UDP_MUX_PORT = cfg.udpPort;
         NETWORK_TYPES = "udp4";
         NAT_1_TO_1_IP = (builtins.head config.networking.interfaces.ens3.ipv4.addresses).address;
