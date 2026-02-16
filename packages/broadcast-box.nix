@@ -5,25 +5,17 @@
 }:
 buildGoModule {
   pname = "broadcast-box";
-  version = "chat-98aba8d";
+  version = "chat";
 
   src = fetchFromGitHub {
     owner = "sleroq";
     repo = "broadcast-box";
-    rev = "c9210a0aa31709fef7e5621999a6e98a93bcfb87";
-    hash = "sha256-HuuS6sUX6YJ18p5cjXAHcY4/bGfVoxMCIZQpEmwnVxs=";
+    rev = "09a9e6b70a9c027ddf71b5197c8ad7d02ad146d3";
+    hash = "sha256-LOSwDLbT+njqnQJLQMrssHtPLUQJfrA7REstAsU0n40=";
   };
 
-  vendorHash = "sha256-7tgx6cJf2+xBod89k6sg0FfZseKoErwipHqsvPoTaB0=";
+  vendorHash = "sha256-Cf/CEKs7/HcLHh/D8H4alLyq8ZWh/SD+oVb9la6uR2w=";
   proxyVendor = true;
-
-  # Add NixOS environment support (equivalent to allow-no-env.patch)
-  # and point to the share directory for the (empty) frontend
-  postPatch = ''
-    substituteInPlace main.go \
-      --replace-fail 'if os.Getenv("APP_ENV") == "development" {' 'if os.Getenv("APP_ENV") == "nixos" { return nil } else if os.Getenv("APP_ENV") == "development" {' \
-      --replace-fail './web/build' "${placeholder "out"}/share"
-  '';
 
   doCheck = false;
 

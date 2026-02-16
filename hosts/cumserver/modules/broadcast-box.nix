@@ -32,6 +32,12 @@ in
       default = 8080;
       description = "UDP port for WebRTC traffic";
     };
+
+    stateDirectory = lib.mkOption {
+      type = lib.types.str;
+      default = "broadcast-box";
+      description = "State directory name under /var/lib/private for Broadcast Box";
+    };
   };
 
   config = lib.mkMerge [
@@ -72,9 +78,19 @@ in
           NETWORK_TYPES = "udp4";
           NAT_1_TO_1_IP = (builtins.head config.networking.interfaces.ens3.ipv4.addresses).address;
           NETWORK_TEST_ON_START = "false";
+          LOGGING_DIRECTORY = "/var/lib/private/${cfg.stateDirectory}/logs";
+          STREAM_PROFILE_PATH = "/var/lib/private/${cfg.stateDirectory}/profiles";
           DISABLE_STATUS = false;
           DISABLE_FRONTEND = true;
         };
+      };
+
+      systemd.services.broadcast-box.serviceConfig = {
+        WorkingDirectory = "/var/lib/private/${cfg.stateDirectory}";
+        StateDirectory = cfg.stateDirectory;
+        StateDirectoryMode = "0700";
+        RuntimeDirectory = "broadcast-box";
+        RuntimeDirectoryMode = "0750";
       };
 
       networking.firewall = {
