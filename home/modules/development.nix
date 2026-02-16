@@ -32,12 +32,14 @@ in
       "${config.home.homeDirectory}/.deno/bin"
       "${config.home.homeDirectory}/.bun/bin"
       "${config.home.homeDirectory}/develop/go/bin"
+      "${config.home.homeDirectory}/.local/share/pnpm"
     ] ++ lib.optional brewEnabled "/opt/homebrew/bin";
 
     home.sessionVariables = {
       GOPATH = "${config.home.homeDirectory}/develop/go";
       GOBIN = "${config.home.homeDirectory}/develop/go/bin";
       NH_FLAKE = opts.flakeRoot;
+      PNPM_HOME = "${config.home.homeDirectory}/.local/share/pnpm";
     };
 
     programs.nushell = {
