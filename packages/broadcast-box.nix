@@ -10,8 +10,8 @@ buildGoModule {
   src = fetchFromGitHub {
     owner = "sleroq";
     repo = "broadcast-box";
-    rev = "7ad558ad2cbdd781e59da24744f76acc13f98988";
-    hash = "sha256-ffREwNUH2UMBh/q7e4c2Q6EhxmlnPciqjSIxlDnjxE8=";
+    rev = "09a9e6b70a9c027ddf71b5197c8ad7d02ad146d3";
+    hash = "sha256-LOSwDLbT+njqnQJLQMrssHtPLUQJfrA7REstAsU0n40=";
   };
 
   vendorHash = "sha256-Cf/CEKs7/HcLHh/D8H4alLyq8ZWh/SD+oVb9la6uR2w=";
