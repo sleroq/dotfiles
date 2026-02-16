@@ -42,6 +42,11 @@ in
       enable = true;
       bind = "127.0.0.1";
       port = 6379;
+      appendOnly = true;
+      save = [
+        [ 60 1 ]
+        [ 300 10 ]
+      ];
     };
 
     services.broadcast-box = {
