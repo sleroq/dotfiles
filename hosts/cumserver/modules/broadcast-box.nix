@@ -80,7 +80,7 @@ in
           NETWORK_TEST_ON_START = "false";
           LOGGING_DIRECTORY = "/var/lib/private/${cfg.stateDirectory}/logs";
           STREAM_PROFILE_PATH = "/var/lib/private/${cfg.stateDirectory}/profiles";
-          DISABLE_STATUS = false;
+          DISABLE_STATUS = true;
           DISABLE_FRONTEND = true;
         };
       };
