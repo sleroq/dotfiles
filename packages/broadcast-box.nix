@@ -10,11 +10,11 @@ buildGoModule {
   src = fetchFromGitHub {
     owner = "sleroq";
     repo = "broadcast-box";
-    rev = "09a9e6b70a9c027ddf71b5197c8ad7d02ad146d3";
-    hash = "sha256-LOSwDLbT+njqnQJLQMrssHtPLUQJfrA7REstAsU0n40=";
+    rev = "0b3ed04a284e735f4e95ad5a25f95295d77278f2";
+    hash = "sha256-i8mcG+w4xueJ4+/qHva8Dz9oDu3Igo7hyrHgJX9pwYg=";
   };
 
-  vendorHash = "sha256-Cf/CEKs7/HcLHh/D8H4alLyq8ZWh/SD+oVb9la6uR2w=";
+  vendorHash = "sha256-3/ZuNHU1MJD5ew7abWU81EF/G2fJ6eQLslSEnv7m+Xg=";
   proxyVendor = true;
 
   doCheck = false;
