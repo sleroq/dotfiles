@@ -36,6 +36,7 @@
       exodus.enable = true;
       mangohud.enable = true;
       extraPackages = with pkgs; [
+        obsidian
         # ollama-rocm
         # chatbox
         scrcpy
