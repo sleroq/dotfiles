@@ -1,3 +1,13 @@
+---
+# cache
+title: ""
+status: todo
+type: task
+priority: normal
+created_at: 2026-02-19T13:44:47Z
+updated_at: 2026-02-19T13:44:52Z
+---
+
 # Fix: Add cache.nixos.org to Darwin Configuration
 
 ## Problem
@@ -5,6 +15,21 @@ Darwin host building from source because:
 - Only `cache.flakehub.com` is configured (via Determinate Nix)
 - `nixpkgs-portable` locked to recent revision `eb8d947de7b0` (Feb 1, 2026)
 - Revision not available in cache.flakehub.com, causing source builds
+
+## Verification (2026-02-19)
+
+| Check | Status |
+|---|---|
+| `hosts/shared-darwin.nix` created | ❌ Does not exist |
+| `cache.nixos.org` in config | ✅ Exists in `shared/default.nix:62` |
+| Applied to portable darwin host | ❌ **No** |
+
+**Root Cause:** The `./shared` module (containing cache.nixos.org config at `shared/default.nix:62`) is only included for `linux-personal` tagged hosts (`flake.nix:274`). The portable darwin host is tagged `macos` (`flake.nix:202`), so it doesn't receive the cache configuration.
+
+```nix
+# flake.nix:274 - only applies to linux-personal
+./shared  # <-- NOT included for macos tag
+```
 
 ## Solution: Add cache.nixos.org
 
