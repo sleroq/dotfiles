@@ -177,7 +177,27 @@ in
 
   cumserver.broadcast-box = {
     enable = true;
-    domain = "web.cum.army";
+    instances = {
+      production = {
+        domain = "web.cum.army";
+        port = 8080;
+        udpPort = 8080;
+        redisPort = 6379;
+        redisDb = 0;
+        stateDirectory = "broadcast-box";
+        backup.enable = true;
+      };
+
+      testing = {
+        domain = "test-web.cum.army";
+        port = 8081;
+        udpPort = 8081;
+        redisPort = 6380;
+        redisDb = 1;
+        stateDirectory = "broadcast-box-testing";
+        backup.enable = false;
+      };
+    };
   };
 
   # cumserver.n8n.enable = true;
