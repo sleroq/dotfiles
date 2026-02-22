@@ -72,6 +72,7 @@ in
         ollama
         amp-cli
         scrcpy
+        typst
       ];
     };
   };
