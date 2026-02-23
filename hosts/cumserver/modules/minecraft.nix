@@ -49,7 +49,7 @@ in
             forever-chu = {
               enable = true;
               autoStart = true;
-              jvmOpts = "-Xms2G -Xmx5G -XX:+UseZGC";
+              jvmOpts = "-Xms2G -Xmx5G -XX:+UseZGC -XX:MaxDirectMemorySize=1G -XX:MaxMetaspaceSize=512M";
               package = pkgs.fabricServers.fabric-1_21_5.override {
                 loaderVersion = "0.16.14";
               };
