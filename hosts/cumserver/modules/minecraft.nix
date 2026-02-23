@@ -79,6 +79,10 @@ in
     })
     (lib.mkIf cfg.forever-chu.enable {
       systemd.services.minecraft-server-forever-chu.path = [ pkgs.git pkgs.git-lfs];
+      systemd.services.minecraft-server-forever-chu.serviceConfig = {
+        MemoryHigh = "7G";
+        MemoryMax = "8G";
+      };
     })
 
     (lib.mkIf ((cfg.cum.enable || cfg.forever-chu.enable) && cfg.backup.enable) {
