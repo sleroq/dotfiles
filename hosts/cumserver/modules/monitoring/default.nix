@@ -78,6 +78,7 @@ in
           security = {
             admin_user = "sleroq";
             admin_password = "$__file{${cfg.grafanaPasswordPath}}";
+            secret_key = "$__file{${cfg.grafanaPasswordPath}}";
           };
         };
         provision = {
