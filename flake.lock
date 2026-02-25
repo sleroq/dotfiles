@@ -1889,11 +1889,11 @@
         "systems": "systems_6"
       },
       "locked": {
-        "lastModified": 1769936216,
-        "narHash": "sha256-ezgoxbHXGQMufga7aaZNhYZYiXQhaGV4jLAZy0fBhzA=",
+        "lastModified": 1771641457,
+        "narHash": "sha256-TIekRGfeCwuEmYcWex40RTx0Gd46pqmyUtxdFKb5juI=",
         "owner": "Infinidoge",
         "repo": "nix-minecraft",
-        "rev": "ff6604fa8d25c1e1c135a261ddd6b3dcc4443129",
+        "rev": "c4e2b8969e09067da9d44b6b5762e1e896418f40",
         "type": "github"
       },
       "original": {
@@ -2019,11 +2019,11 @@
     },
     "nixpkgs-cumserver": {
       "locked": {
-        "lastModified": 1771207753,
-        "narHash": "sha256-7o+iRF++GO/gGrgrRMlnld2V/3QIzpdwMKViVkHtMEQ=",
-        "rev": "d1c15b7d5806069da59e819999d70e1cec0760bf",
+        "lastModified": 1771423170,
+        "narHash": "sha256-V/p5M4cAMbu/MJBDn5YABy5QJgCFpsgrnXVVc2Uo5+k=",
+        "rev": "bcc4a9d9533c033d806a46b37dc444f9b0da49dd",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.05pre946960.d1c15b7d5806/nixexprs.tar.xz"
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.05pre948338.bcc4a9d9533c/nixexprs.tar.xz"
       },
       "original": {
         "type": "tarball",
@@ -2972,11 +2972,11 @@
         "rocksdb": "rocksdb"
       },
       "locked": {
-        "lastModified": 1770392937,
-        "narHash": "sha256-xKmksDPNfSb/o6T2lBFTKjs9YdA3ATVcXcn03SICvEY=",
+        "lastModified": 1771751936,
+        "narHash": "sha256-QCpRObIjMyoYD5aZ/42wx5poF/F9MdSqMqIeSJYilbg=",
         "owner": "matrix-construct",
         "repo": "tuwunel",
-        "rev": "94162974f95f40cf2689c430c2684d98064d08f0",
+        "rev": "d23f7f7e819681e25aac5ffa84897efdf2d8d43e",
         "type": "github"
       },
       "original": {
