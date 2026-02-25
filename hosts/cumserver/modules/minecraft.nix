@@ -22,7 +22,7 @@ in
             cum = {
               enable = true;
               autoStart = true;
-              jvmOpts = "-Xms3G -Xmx4G -XX:+UseZGC";
+              jvmOpts = "-Xms2G -Xmx4G -XX:MaxDirectMemorySize=1G -XX:MaxMetaspaceSize=512M"; #  -XX:+UseZGC
               package = pkgs.fabricServers.fabric-1_21_11;
 
               serverProperties = {
@@ -76,12 +76,16 @@ in
     }
     (lib.mkIf cfg.cum.enable {
       systemd.services.minecraft-server-cum.path = [ pkgs.git pkgs.git-lfs];
+      systemd.services.minecraft-server-forever-chu.serviceConfig = {
+        MemoryHigh = "6G";
+        MemoryMax = "7G";
+      };
     })
     (lib.mkIf cfg.forever-chu.enable {
       systemd.services.minecraft-server-forever-chu.path = [ pkgs.git pkgs.git-lfs];
       systemd.services.minecraft-server-forever-chu.serviceConfig = {
-        MemoryHigh = "7G";
-        MemoryMax = "8G";
+        MemoryHigh = "6G";
+        MemoryMax = "7G";
       };
     })
 
