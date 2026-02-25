@@ -77,15 +77,15 @@ in
     (lib.mkIf cfg.cum.enable {
       systemd.services.minecraft-server-cum.path = [ pkgs.git pkgs.git-lfs];
       systemd.services.minecraft-server-forever-chu.serviceConfig = {
-        MemoryHigh = "6G";
-        MemoryMax = "7G";
+        MemoryHigh = "4G";
+        MemoryMax = "5G";
       };
     })
     (lib.mkIf cfg.forever-chu.enable {
       systemd.services.minecraft-server-forever-chu.path = [ pkgs.git pkgs.git-lfs];
       systemd.services.minecraft-server-forever-chu.serviceConfig = {
-        MemoryHigh = "6G";
-        MemoryMax = "7G";
+        MemoryHigh = "4G";
+        MemoryMax = "5G";
       };
     })
 
