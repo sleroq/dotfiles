@@ -21,6 +21,12 @@ in
       description = "Domain name for the Matrix server";
     };
 
+    clientDomain = lib.mkOption {
+      type = lib.types.str;
+      default = "cum.army";
+      description = "Domain name used for Matrix web clients";
+    };
+
     port = lib.mkOption {
       type = lib.types.port;
       default = 8008;
@@ -195,7 +201,7 @@ in
              '';
            };
 
-          "element.${config.cumserver.tuwunel.mainDomain}" = {
+          "element.${config.cumserver.tuwunel.clientDomain}" = {
             extraConfig = ''
               tls ${config.age.secrets.cf-fullchain.path} ${config.age.secrets.cf-privkey.path}
 
@@ -213,7 +219,7 @@ in
             '';
           };
 
-          "cinny.${config.cumserver.tuwunel.mainDomain}" = {
+          "cinny.${config.cumserver.tuwunel.clientDomain}" = {
             extraConfig = ''
               tls ${config.age.secrets.cf-fullchain.path} ${config.age.secrets.cf-privkey.path}
 
@@ -223,7 +229,7 @@ in
               handle /config.json {
                 header Content-Type application/json
                 respond `${builtins.toJSON {
-                  allowCustomHomeservers = false;
+                  allowCustomHomeservers = true;
                   homeserverList = [ config.cumserver.tuwunel.mainDomain ];
                   defaultHomeserver = 0;
                   hashRouter = {
