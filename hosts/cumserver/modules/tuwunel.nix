@@ -191,6 +191,60 @@ in
                       ];
                     }
                   )}` 200
+               }
+             '';
+           };
+
+          "element.${config.cumserver.tuwunel.mainDomain}" = {
+            extraConfig = ''
+              tls ${config.age.secrets.cf-fullchain.path} ${config.age.secrets.cf-privkey.path}
+
+              root * ${pkgs.element-web.override {
+                conf = {
+                  showLabsSettings = true;
+                  default_server_config."m.homeserver" = {
+                    base_url = "https://${config.cumserver.tuwunel.domain}";
+                    server_name = config.cumserver.tuwunel.mainDomain;
+                  };
+                };
+              }}
+              file_server
+              encode zstd gzip
+            '';
+          };
+
+          "cinny.${config.cumserver.tuwunel.mainDomain}" = {
+            extraConfig = ''
+              tls ${config.age.secrets.cf-fullchain.path} ${config.age.secrets.cf-privkey.path}
+
+              root * ${pkgs.cinny}
+              encode zstd gzip
+
+              handle /config.json {
+                header Content-Type application/json
+                respond `${builtins.toJSON {
+                  allowCustomHomeservers = false;
+                  homeserverList = [ config.cumserver.tuwunel.mainDomain ];
+                  defaultHomeserver = 0;
+                  hashRouter = {
+                    enabled = false;
+                    basename = "/";
+                  };
+                  featuredCommunities = {
+                    openAsDefault = false;
+                    servers = [
+                      config.cumserver.tuwunel.mainDomain
+                      "matrix.org"
+                    ];
+                    spaces = [ "!FwtFmFqM4bwuaWtRKB:sleroq.link" ];
+                    rooms = [];
+                  };
+                }}` 200
+              }
+
+              handle {
+                try_files {path} /index.html
+                file_server
               }
             '';
           };
