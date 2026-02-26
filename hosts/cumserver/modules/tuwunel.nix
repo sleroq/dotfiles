@@ -203,8 +203,6 @@ in
 
           "element.${config.cumserver.tuwunel.clientDomain}" = {
             extraConfig = ''
-              tls ${config.age.secrets.cf-fullchain.path} ${config.age.secrets.cf-privkey.path}
-
               root * ${pkgs.element-web.override {
                 conf = {
                   showLabsSettings = true;
@@ -221,8 +219,6 @@ in
 
           "cinny.${config.cumserver.tuwunel.clientDomain}" = {
             extraConfig = ''
-              tls ${config.age.secrets.cf-fullchain.path} ${config.age.secrets.cf-privkey.path}
-
               root * ${pkgs.cinny}
               encode zstd gzip
 
