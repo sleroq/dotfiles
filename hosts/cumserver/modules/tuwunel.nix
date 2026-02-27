@@ -154,23 +154,10 @@ in
         };
       };
 
-      age.secrets.cf-fullchain = {
-        owner = "caddy";
-        group = "caddy";
-        file = ../secrets/cf-fullchain.pem;
-      };
-      age.secrets.cf-privkey = {
-        owner = "caddy";
-        group = "caddy";
-        file = ../secrets/cf-privkey.pem;
-      };
-
       services.caddy.virtualHosts = {
           "${config.cumserver.tuwunel.mainDomain}" = {
             serverAliases = [ "www.${config.cumserver.tuwunel.mainDomain}" ];
             extraConfig = ''
-              tls ${config.age.secrets.cf-fullchain.path} ${config.age.secrets.cf-privkey.path}
-
               root * ${inputs'.sleroq-link.packages.default}
               file_server
               encode zstd gzip
@@ -253,8 +240,6 @@ in
 
           "${config.cumserver.tuwunel.domain}" = {
             extraConfig = ''
-              tls ${config.age.secrets.cf-fullchain.path} ${config.age.secrets.cf-privkey.path}
-
               handle /_matrix/* {
                 reverse_proxy 127.0.0.1:${toString config.cumserver.tuwunel.port}
               }
