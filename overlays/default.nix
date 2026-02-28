@@ -25,15 +25,15 @@ rec {
     final: prev:
     # Only apply scrcpy overlay on non-Darwin systems
     # (Darwin systems should use scrcpy from their own nixpkgs)
-      let
-        pkgsScrcpy = import scrcpyPkgs {
-          system = final.stdenv.hostPlatform.system;
-          config = builtins.removeAttrs (prev.config or { }) [ "replaceStdenv" ];
-        };
-      in
-      {
-        scrcpy = pkgsScrcpy.scrcpy;
+    let
+      pkgsScrcpy = import scrcpyPkgs {
+        system = final.stdenv.hostPlatform.system;
+        config = removeAttrs (prev.config or { }) [ "replaceStdenv" ];
       };
+    in
+    {
+      scrcpy = pkgsScrcpy.scrcpy;
+    };
 
   code-cursor =
     final: prev:
