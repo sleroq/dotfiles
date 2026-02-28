@@ -35,6 +35,7 @@ in
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
     ./modules/caddy.nix
+    ./modules/keycloak.nix
     ./modules/matterbridge.nix
     ./modules/mailserver.nix
     ./modules/navidrome.nix
@@ -94,6 +95,8 @@ in
   cumserver.radicale.enable = true;
   cumserver.bore.enable = false;
   cumserver.podman.enable = true;
+
+
   cumserver.tuwunel = {
     enable = true;
     # Disabled to avoid building package locally, especially on mac
@@ -101,6 +104,13 @@ in
   };
 
   cumserver.frp.enable = true;
+
+  age.secrets.keycloak = {
+    owner = "keycloak";
+    group = "keycloak";
+    file = ./secrets/keycloakPassword;
+  };
+  cumserver.keycloak.enable = true;
 
   age.secrets.livekitKeys = {
     owner = "root";
@@ -129,9 +139,10 @@ in
 
   cumserver.traggo.enable = false;
 
-  age.secrets.grafanaPassword = { owner = "grafana";
-      group = "grafana";
-      file = ./secrets/grafanaPassword;
+  age.secrets.grafanaPassword = {
+    owner = "grafana";
+    group = "grafana";
+    file = ./secrets/grafanaPassword;
   };
   age.secrets.nodeExporter1Password = {
     owner = "prometheus";
@@ -195,15 +206,15 @@ in
         backup.enable = true;
       };
 
-      testing = {
-        domain = "test-web.cum.army";
-        port = 8081;
-        udpPort = 8081;
-        redisPort = 6380;
-        redisDb = 1;
-        stateDirectory = "broadcast-box-testing";
-        backup.enable = false;
-      };
+      # testing = {
+      #   domain = "test-web.cum.army";
+      #   port = 8081;
+      #   udpPort = 8081;
+      #   redisPort = 6380;
+      #   redisDb = 1;
+      #   stateDirectory = "broadcast-box-testing";
+      #   backup.enable = false;
+      # };
     };
   };
 
@@ -242,8 +253,14 @@ in
     environmentFile = config.age.secrets.reactorEnv.path;
   };
 
-  users.groups.restic-backups.members = [ "reactor" "sieve" ];
-  users.groups.restic-s3-backups.members = [ "reactor" "sieve" ];
+  users.groups.restic-backups.members = [
+    "reactor"
+    "sieve"
+  ];
+  users.groups.restic-s3-backups.members = [
+    "reactor"
+    "sieve"
+  ];
 
   services.restic.backups.reactor = {
     user = "reactor";
@@ -252,7 +269,10 @@ in
     environmentFile = config.age.secrets.resticS3Keys.path;
     initialize = true;
     paths = [ "/var/lib/reactor" ];
-    exclude = [ "**/log-*.jsonl" "**/*.log" ];
+    exclude = [
+      "**/log-*.jsonl"
+      "**/*.log"
+    ];
     pruneOpts = [
       "--keep-daily 7"
       "--keep-weekly 5"
@@ -272,7 +292,10 @@ in
     environmentFile = config.age.secrets.resticS3Keys.path;
     initialize = true;
     paths = [ "/var/lib/sieve" ];
-    exclude = [ "**/log-*.jsonl" "**/*.log" ];
+    exclude = [
+      "**/log-*.jsonl"
+      "**/*.log"
+    ];
     pruneOpts = [
       "--keep-daily 1"
       "--keep-weekly 3"
@@ -324,10 +347,12 @@ in
     configFile = config.age.secrets.slushaConfig.path;
   };
 
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-    "minecraft-server"
-    "sieve"
-  ];
+  nixpkgs.config.allowUnfreePredicate =
+    pkg:
+    builtins.elem (lib.getName pkg) [
+      "minecraft-server"
+      "sieve"
+    ];
 
   environment.systemPackages = map lib.lowPrio [
     pkgs.tailscale
@@ -423,7 +448,10 @@ in
     options = "--delete-older-than 7d";
   };
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   system.stateVersion = "24.05";
 }

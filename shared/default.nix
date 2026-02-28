@@ -131,6 +131,7 @@
     noto-fonts-cjk-serif
     noto-fonts-cjk-sans-static
     noto-fonts-cjk-serif-static
+    inter
     roboto
   ];
 

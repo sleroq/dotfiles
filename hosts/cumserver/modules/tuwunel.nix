@@ -1,4 +1,11 @@
-{ config, inputs', lib, secrets, pkgs, ... }:
+{
+  config,
+  inputs',
+  lib,
+  secrets,
+  pkgs,
+  ...
+}:
 let
   cfg = config.cumserver.tuwunel;
   stateDirectory = "matrix-conduit";
@@ -7,7 +14,9 @@ in
   options.cumserver.tuwunel = {
     enable = lib.mkEnableOption "Tuwunel Matrix server";
 
-    backup.enable = lib.mkEnableOption "backups" // { default = true; };
+    backup.enable = lib.mkEnableOption "backups" // {
+      default = true;
+    };
 
     mainDomain = lib.mkOption {
       type = lib.types.str;
@@ -41,7 +50,7 @@ in
 
     settings = lib.mkOption {
       type = lib.types.attrs;
-      default = {};
+      default = { };
       description = "Additional settings for the Matrix server";
     };
   };
@@ -108,14 +117,29 @@ in
               allow_public_room_directory_without_auth = false;
               lockdown_public_room_directory = false;
               allow_device_name_federation = false;
-              url_preview_domain_contains_allowlist = [];
+              url_preview_domain_contains_allowlist = [ ];
               url_preview_domain_explicit_allowlist = [
-                "x.com" "fixupx.com" "twitterfx.com" "t.me" "youtube.com" "github.com" "reddit.com"
-                "pkg.go.dev" "go.dev" "matrix.org" "spec.matrix.org" "steamcommunity.com" "store.steampowered.com"
-                "youtu.be" "youtube.com" "www.linux.org.ru" "www.opennet.ru" "habr.com"
+                "x.com"
+                "fixupx.com"
+                "twitterfx.com"
+                "t.me"
+                "youtube.com"
+                "github.com"
+                "reddit.com"
+                "pkg.go.dev"
+                "go.dev"
+                "matrix.org"
+                "spec.matrix.org"
+                "steamcommunity.com"
+                "store.steampowered.com"
+                "youtu.be"
+                "youtube.com"
+                "www.linux.org.ru"
+                "www.opennet.ru"
+                "habr.com"
               ];
-              url_preview_url_contains_allowlist = [];
-              url_preview_domain_explicit_denylist = [];
+              url_preview_url_contains_allowlist = [ ];
+              url_preview_domain_explicit_denylist = [ ];
               url_preview_max_spider_size = 384000;
               url_preview_check_root_domain = false;
               allow_profile_lookup_federation_requests = true;
@@ -136,74 +160,61 @@ in
               allow_local_presence = false;
               allow_incoming_presence = false;
               allow_outgoing_presence = false;
+
+              identity_provider = [
+                {
+                  brand = "keycloak";
+                  client_id = "tuwunel";
+                  client_secret = secrets.tuwunel.oidcClientSecret;
+                  issuer_url = "https://${config.cumserver.keycloak.domain}/realms/meow";
+                  discovery_url = "https://${config.cumserver.keycloak.domain}/realms/meow/.well-known/openid-configuration";
+                  callback_url = "https://${cfg.domain}/_matrix/client/unstable/login/sso/callback/tuwunel";
+
+                  # optional:
+                  # default = true;
+                  # name = "Company SSO";
+                  # scope = [ "openid" "profile" "email" ];
+                  # userid_claims = [ "sub" ];
+                  # discovery = true;
+                }
+              ];
+
+              # Well-known configuration for client discovery and Element Call (MSC4143)
+              well_known = {
+                client = "https://${cfg.domain}";
+                server = "${cfg.domain}:443";
+                rtc_transports = lib.optionals config.cumserver.element-call.enable [
+                  {
+                    type = "livekit";
+                    livekit_service_url = "https://${config.cumserver.element-call.domain}/livekit/jwt";
+                  }
+                ];
+              };
             }
             cfg.settings
           ];
-
-          # Well-known configuration for client discovery and Element Call (MSC4143)
-          well_known = {
-            client = "https://${cfg.domain}";
-            server = "${cfg.domain}:443";
-            rtc_transports = lib.optionals config.cumserver.element-call.enable [
-              {
-                type = "livekit";
-                livekit_service_url = "https://${config.cumserver.element-call.domain}/livekit/jwt";
-              }
-            ];
-          };
         };
       };
 
-      age.secrets.cf-fullchain = {
-        owner = "caddy";
-        group = "caddy";
-        file = ../secrets/cf-fullchain.pem;
-      };
-      age.secrets.cf-privkey = {
-        owner = "caddy";
-        group = "caddy";
-        file = ../secrets/cf-privkey.pem;
-      };
-
       services.caddy.virtualHosts = {
-          "${config.cumserver.tuwunel.mainDomain}" = {
-            serverAliases = [ "www.${config.cumserver.tuwunel.mainDomain}" ];
-            extraConfig = ''
-              tls ${config.age.secrets.cf-fullchain.path} ${config.age.secrets.cf-privkey.path}
+        "${config.cumserver.tuwunel.mainDomain}" = {
+          serverAliases = [ "www.${config.cumserver.tuwunel.mainDomain}" ];
+          extraConfig = ''
+            root * ${inputs'.sleroq-link.packages.default}
+            encode zstd gzip
 
-              root * ${inputs'.sleroq-link.packages.default}
-              file_server
-              encode zstd gzip
+            handle /.well-known/* {
+              reverse_proxy 127.0.0.1:${toString config.cumserver.tuwunel.port}
+            }
 
-              handle_path /.well-known/matrix/server {
-                  header Access-Control-Allow-Origin *
-                  respond `{"m.server": "${config.cumserver.tuwunel.domain}:443"}` 200
-              }
+            file_server
+          '';
+        };
 
-              handle_path /.well-known/matrix/client {
-                  header Access-Control-Allow-Origin *
-                  header Content-Type application/json
-                  respond `${builtins.toJSON (
-                    {
-                      "m.homeserver" = {
-                        base_url = "https://${config.cumserver.tuwunel.domain}";
-                      };
-                    } // lib.optionalAttrs config.cumserver.element-call.enable {
-                      "org.matrix.msc4143.rtc_foci" = [
-                        {
-                          type = "livekit";
-                          livekit_service_url = "https://${config.cumserver.element-call.domain}/livekit/jwt";
-                        }
-                      ];
-                    }
-                  )}` 200
-               }
-             '';
-           };
-
-          "element.${config.cumserver.tuwunel.clientDomain}" = {
-            extraConfig = ''
-              root * ${pkgs.element-web.override {
+        "element.${config.cumserver.tuwunel.clientDomain}" = {
+          extraConfig = ''
+            root * ${
+              pkgs.element-web.override {
                 conf = {
                   showLabsSettings = true;
                   default_server_config."m.homeserver" = {
@@ -211,20 +222,22 @@ in
                     server_name = config.cumserver.tuwunel.mainDomain;
                   };
                 };
-              }}
-              file_server
-              encode zstd gzip
-            '';
-          };
+              }
+            }
+            file_server
+            encode zstd gzip
+          '';
+        };
 
-          "cinny.${config.cumserver.tuwunel.clientDomain}" = {
-            extraConfig = ''
-              root * ${pkgs.cinny}
-              encode zstd gzip
+        "cinny.${config.cumserver.tuwunel.clientDomain}" = {
+          extraConfig = ''
+            root * ${pkgs.cinny}
+            encode zstd gzip
 
-              handle /config.json {
-                header Content-Type application/json
-                respond `${builtins.toJSON {
+            handle /config.json {
+              header Content-Type application/json
+              respond `${
+                builtins.toJSON {
                   allowCustomHomeservers = true;
                   homeserverList = [ config.cumserver.tuwunel.mainDomain ];
                   defaultHomeserver = 0;
@@ -239,25 +252,24 @@ in
                       "matrix.org"
                     ];
                     spaces = [ "!FwtFmFqM4bwuaWtRKB:sleroq.link" ];
-                    rooms = [];
+                    rooms = [ ];
                   };
-                }}` 200
-              }
+                }
+              }` 200
+            }
 
-              handle {
-                try_files {path} /index.html
-                file_server
-              }
-            '';
-          };
+            handle {
+              try_files {path} /index.html
+              file_server
+            }
+          '';
+        };
 
-          "${config.cumserver.tuwunel.domain}" = {
-            extraConfig = ''
-              tls ${config.age.secrets.cf-fullchain.path} ${config.age.secrets.cf-privkey.path}
-
-              handle /_matrix/* {
-                reverse_proxy 127.0.0.1:${toString config.cumserver.tuwunel.port}
-              }
+        "${config.cumserver.tuwunel.domain}" = {
+          extraConfig = ''
+            handle /_matrix/* {
+              reverse_proxy 127.0.0.1:${toString config.cumserver.tuwunel.port}
+            }
           '';
         };
       };
@@ -272,7 +284,10 @@ in
         initialize = true;
         paths = [ "/var/lib/private/${stateDirectory}" ];
         pruneOpts = [ "--keep-weekly 1" ];
-        exclude = [ "media" "**/*.log" ];
+        exclude = [
+          "media"
+          "**/*.log"
+        ];
         timerConfig = {
           OnCalendar = "weekly";
           Persistent = true;
