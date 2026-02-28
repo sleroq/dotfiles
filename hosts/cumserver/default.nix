@@ -48,6 +48,8 @@ in
     ./modules/tuwunel.nix
     ./modules/element-call.nix
     ./modules/marzban.nix
+    ./modules/remnawave.nix
+    ./modules/manictime.nix
     ./modules/traggo.nix
     ./modules/slusha.nix
     ./modules/n8n.nix
@@ -120,7 +122,12 @@ in
     metricsEnvironmentFile = config.age.secrets.marzbanMetricsEnv.path;
   };
 
-  cumserver.traggo.enable = true;
+  cumserver.manictime = {
+    enable = false;
+    domain = "time.cum.army";
+  };
+
+  cumserver.traggo.enable = false;
 
   age.secrets.grafanaPassword = { owner = "grafana";
       group = "grafana";
