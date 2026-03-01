@@ -133,7 +133,32 @@
     noto-fonts-cjk-serif-static
     inter
     roboto
+    noto-fonts
+    noto-fonts-color-emoji
+    twemoji-color-font
   ];
+
+  # WARNING: Do not toch, firefox will fucking explode
+  fonts.fontconfig.localConf = ''
+    <fontconfig>
+      <alias>
+        <family>Apple Color Emoji</family>
+        <prefer><family>Twitter Color Emoji</family></prefer>
+      </alias>
+      <alias>
+        <family>Segoe UI Emoji</family>
+        <prefer><family>Twitter Color Emoji</family></prefer>
+      </alias>
+      <alias>
+        <family>Noto Color Emoji</family>
+        <prefer><family>Twitter Color Emoji</family></prefer>
+      </alias>
+      <alias>
+        <family>emoji</family>
+        <prefer><family>Twitter Color Emoji</family></prefer>
+      </alias>
+    </fontconfig>
+  '';
 
   environment.shells = with pkgs; [ bash nushell ];
   environment.pathsToLink = [ "/share/bash" "/share/nushell" ];

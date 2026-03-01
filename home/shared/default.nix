@@ -46,8 +46,8 @@
       };
       helium = {
         enable = true;
-        version = "0.8.3.1";
-        hash = "18xlws93x03cb0xiylfyahx31w7yb9rwyihric4n9b7s9xknss8q";
+        version = "0.9.4.1";
+        hash = "1s4yhbzcmh9wwg5mnk19m72r48px7259vy0z4yfqpb2fxid1v61p";
       };
 
       mpv.enable = true;

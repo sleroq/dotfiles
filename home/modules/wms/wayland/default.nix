@@ -44,6 +44,7 @@ in
       };
       services.cliphist.enable = true;
       services.vicinae.enable = true;
+      services.vicinae.package = inputs'.vicinae.packages.default;
 
       # Packages universal for all window managers
       home.packages = with pkgs; [

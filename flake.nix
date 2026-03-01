@@ -44,7 +44,7 @@
     # HM-related inputs used by home modules
     nix-gaming.url = "github:fufexan/nix-gaming";
 
-    vicinae.url = "git+https://github.com/vicinaehq/vicinae?ref=refs/tags/v0.19.8"; # Lock version here to hit gh actions cache
+    vicinae.url = "git+https://github.com/vicinaehq/vicinae?ref=refs/tags/v0.20.1"; # Lock version here to hit gh actions cache
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     zig.url = "github:mitchellh/zig-overlay";
     zls.url = "github:zigtools/zls?rev=45b855f7ec3dccea3c9a95df0b68e27dab842ae4";
@@ -53,7 +53,6 @@
 
     scrcpyPkgs.url = "github:nixos/nixpkgs/77a0bdd";
     nixpkgs-master.url = "github:nixos/nixpkgs/master";
-    nixpkgs-beans.url = "github:sleroq/nixpkgs/init-beans";
 
     # Cumserver flakes
     disko.url = "github:nix-community/disko";
@@ -72,7 +71,6 @@
     cum-army.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     web-cum-army.url = "github:sleroq/web.cum.army";
-    # web-cum-army.url = "/home/sleroq/develop/other/web.cum.army";
     web-cum-army.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     reactor.url = "github:sleroq/reactor";
@@ -110,7 +108,7 @@
 
       flake.overlays = import ./overlays/default.nix {
         inherit self nixpkgs;
-        inherit (inputs) scrcpyPkgs nixpkgs-beans nixpkgs-master ;
+        inherit (inputs) scrcpyPkgs nixpkgs-master;
       };
 
       # FIXME: This is a bit overengineered

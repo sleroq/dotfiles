@@ -70,6 +70,7 @@ in
 
     yazi = {
       enable = true;
+      shellWrapperName = "y";
       enableBashIntegration = true;
       enableZshIntegration = true;
       enableNushellIntegration = true;
