@@ -99,8 +99,7 @@ in
 
   cumserver.tuwunel = {
     enable = true;
-    # Disabled to avoid building package locally, especially on mac
-    # package = inputs'.tuwunel.packages.default;
+    guest.enable = true;
   };
 
   cumserver.frp.enable = true;
