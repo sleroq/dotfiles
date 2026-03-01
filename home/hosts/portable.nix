@@ -10,7 +10,7 @@
 
 let
   darwin-aliases = {
-    nix-switch = "nh darwin switch --hostname $HOST";
+    nix-switch = "nh darwin switch --hostname portable";
   };
 in
 {
@@ -62,10 +62,10 @@ in
         enable = true;
         useBun = true;
       };
+      # mpv.enable = true; # waiting for fix
       ghostty.enable = true;
       extraPackages = with pkgs; [
         inputs'.agenix.packages.default
-        mpv
         ffmpeg
         wget
         dust

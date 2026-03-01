@@ -1,15 +1,13 @@
 # MacOS only config basically
-_:
-# { pkgs, ... }:
+{ pkgs, ... }:
 
 {
   programs.ghostty = {
     package = null;
     enable = true;
     settings = {
-      # command = "${pkgs.nushell}/bin/nu";
+      command = "${pkgs.nushell}/bin/nu";
       font-family = "JetBrainsMono Nerd Font";
-      # theme = "Catppuccin Frappe";
       theme = "dark:Rose Pine,light:Rose Pine Dawn";
       font-size = 18;
       cursor-style = "block";

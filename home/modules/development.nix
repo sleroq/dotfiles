@@ -118,7 +118,6 @@ in
       gnumake # Generally usefull sometimes
       bun
       pnpm
-      sshfs
 
       pre-commit # Some repos use this (e.g. anytype)
     ];
