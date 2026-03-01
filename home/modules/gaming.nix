@@ -48,7 +48,7 @@ in
             fontconfig
             libx11
 
-            xorg.libXtst
+            libxtst
             libxkbcommon
             libxt
             libxinerama # unsure
@@ -61,7 +61,7 @@ in
             luajit
             wayland
             wayland-protocols
-            xorg.libxcb
+            libxcb
             xwayland
 
             (glfw.override { withMinecraftPatch = true; })

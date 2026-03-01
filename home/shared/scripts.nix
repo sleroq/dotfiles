@@ -88,16 +88,16 @@ let
   # Toggle touchpad on/off for X11
   touchpad-toggle = pkgs.writeShellScriptBin "touchpad-toggle" ''
     declare -i ID
-    ID=$(${pkgs.xorg.xinput}/bin/xinput list | ${pkgs.gnugrep}/bin/grep -Eio '(touchpad|glidepoint)\s*id=[0-9]{1,2}' | ${pkgs.gnugrep}/bin/grep -Eo '[0-9]{1,2}')
+    ID=$(${pkgs.xinput}/bin/xinput list | ${pkgs.gnugrep}/bin/grep -Eio '(touchpad|glidepoint)\s*id=[0-9]{1,2}' | ${pkgs.gnugrep}/bin/grep -Eo '[0-9]{1,2}')
     declare -i STATE
-    STATE=$(${pkgs.xorg.xinput}/bin/xinput list-props "$ID" | ${pkgs.gnugrep}/bin/grep 'Device Enabled' | ${pkgs.gawk}/bin/awk '{print $4}')
+    STATE=$(${pkgs.xinput}/bin/xinput list-props "$ID" | ${pkgs.gnugrep}/bin/grep 'Device Enabled' | ${pkgs.gawk}/bin/awk '{print $4}')
     if [ "$STATE" -eq 1 ]
     then
-        ${pkgs.xorg.xinput}/bin/xinput disable "$ID"
+        ${pkgs.xinput}/bin/xinput disable "$ID"
         # echo "Touchpad disabled."
         ${pkgs.libnotify}/bin/notify-send -a 'Touchpad' 'Touchpad Disabled' -i input-touchpad
     else
-        ${pkgs.xorg.xinput}/bin/xinput enable "$ID"
+        ${pkgs.xinput}/bin/xinput enable "$ID"
         # echo "Touchpad enabled."
         ${pkgs.libnotify}/bin/notify-send -a 'Touchpad' 'Touchpad Enabled' -i input-touchpad
     fi
@@ -111,4 +111,4 @@ in
     toggleHT
     touchpad-toggle
   ];
-} 
+}
