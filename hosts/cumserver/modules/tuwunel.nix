@@ -286,6 +286,23 @@ in
               pkgs.element-web.override {
                 conf = {
                   showLabsSettings = true;
+                  jitsi = {
+                    preferred_domain = "meet.jit.si";
+                  };
+                  features = {
+                    feature_video_rooms = true;
+                    feature_element_call_video_rooms = true;
+                    feature_group_calls = true;
+                    feature_notifications = true;
+                    feature_ask_to_join = true;
+                    feature_new_room_list = true;
+                    feature_share_history_on_invite = true;
+                    feature_pinning = true;
+                    feature_jump_to_date = true;
+                    feature_mjolnir = true;
+                    feature_bridge_state = true;
+                    feature_custom_themes = true;
+                  };
                   default_server_config."m.homeserver" = {
                     base_url = "https://${config.cumserver.tuwunel.domain}";
                     server_name = config.cumserver.tuwunel.mainDomain;
