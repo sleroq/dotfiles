@@ -112,9 +112,7 @@ in
           message = "cumserver.tuwunel.turn.secret must be set when TURN is enabled";
         }
         {
-          assertion =
-            (!cfg.turn.enable)
-            || (cfg.turn.tls.certFile != "" && cfg.turn.tls.keyFile != "");
+          assertion = (!cfg.turn.enable) || (cfg.turn.tls.certFile != "" && cfg.turn.tls.keyFile != "");
           message = "cumserver.tuwunel.turn.tls.certFile and keyFile must be set when TURN is enabled";
         }
       ];
@@ -199,10 +197,9 @@ in
               url_preview_check_root_domain = false;
               allow_profile_lookup_federation_requests = true;
 
-              turn_uris =
-                lib.optionals cfg.turn.enable [
-                  "turns:${cfg.turn.domain}:5349?transport=tcp"
-                ];
+              turn_uris = lib.optionals cfg.turn.enable [
+                "turns:${cfg.turn.domain}:5349?transport=tcp"
+              ];
               turn_secret = lib.optionalString cfg.turn.enable cfg.turn.secret;
 
               log = "info";
@@ -289,6 +286,17 @@ in
                   jitsi = {
                     preferred_domain = "meet.jit.si";
                   };
+                  room_directory = {
+                    servers = [
+                      config.cumserver.tuwunel.mainDomain
+                      "matrix.org"
+                      "mozilla.org"
+                      "unredacted.org"
+                    ];
+                  };
+                  setting_defaults = {
+                    "MessageComposerInput.showStickersButton" = false;
+                  };
                   features = {
                     feature_video_rooms = true;
                     feature_element_call_video_rooms = true;
@@ -303,9 +311,14 @@ in
                     feature_bridge_state = true;
                     feature_custom_themes = true;
                   };
-                  default_server_config."m.homeserver" = {
-                    base_url = "https://${config.cumserver.tuwunel.domain}";
-                    server_name = config.cumserver.tuwunel.mainDomain;
+                  default_server_config = {
+                    "m.homeserver" = {
+                      base_url = "https://${config.cumserver.tuwunel.domain}";
+                      server_name = config.cumserver.tuwunel.mainDomain;
+                    };
+                    "m.identity_server" = {
+                      base_url = "https://vector.im";
+                    };
                   };
                 }
                 // lib.optionalAttrs config.cumserver.element-call.enable {
@@ -342,9 +355,20 @@ in
                     servers = [
                       config.cumserver.tuwunel.mainDomain
                       "matrix.org"
+                      "mozilla.org"
+                      "unredacted.org"
                     ];
-                    spaces = [ "!FwtFmFqM4bwuaWtRKB:sleroq.link" ];
-                    rooms = [ ];
+                    spaces = [
+                      "!FwtFmFqM4bwuaWtRKB:sleroq.link"
+                      "!brXHJeAtqliwNGqHQx:lossy.network"
+                      "#science-space:matrix.org"
+                      "#community:matrix.org"
+                      "#cinny-space:matrix.org"
+                    ];
+                    rooms = [
+                      "#cinny:matrix.org"
+                      "#gentoo:matrix.org"
+                    ];
                   };
                 }
               }` 200
