@@ -90,18 +90,6 @@ in
         description = "Additional settings for the guest Matrix instance";
       };
 
-      federationAllowedIPs = lib.mkOption {
-        type = lib.types.listOf lib.types.str;
-        default =
-          [
-            "127.0.0.1/32"
-            "::1/128"
-          ]
-          ++ lib.optional (secrets ? ipv4) "${secrets.ipv4}/32"
-          ++ lib.optional (secrets ? ipv6) "${secrets.ipv6}/128";
-        description = "CIDRs allowed to federate with the guest homeserver";
-      };
-
       user = lib.mkOption {
         type = lib.types.nonEmptyStr;
         default = guestDefaultUser;
@@ -291,7 +279,7 @@ in
                 } // lib.optionalAttrs config.cumserver.element-call.enable {
                   element_call = {
                     url = "https://${config.cumserver.element-call.domain}";
-                    guest_spa_url = "https://${config.cumserver.element-call.domain}";
+                    guest_spa_url = "https://${config.cumserver.element-call.guestDomain}";
                   };
                 };
               }
@@ -357,24 +345,8 @@ in
 
         "${cfg.guest.domain}" = {
           extraConfig = ''
-            route {
-              @guestFederation path /_matrix/federation/*
-              @guestFederationAllowed {
-                path /_matrix/federation/*
-                remote_ip ${lib.concatStringsSep " " cfg.guest.federationAllowedIPs}
-              }
-
-              handle @guestFederation {
-                handle @guestFederationAllowed {
-                  reverse_proxy 127.0.0.1:${toString cfg.guest.port}
-                }
-
-                respond "forbidden" 403
-              }
-
-              handle /_matrix/* {
-                reverse_proxy 127.0.0.1:${toString cfg.guest.port}
-              }
+            handle /_matrix/* {
+              reverse_proxy 127.0.0.1:${toString cfg.guest.port}
             }
           '';
         };
@@ -387,7 +359,7 @@ in
           global = lib.recursiveUpdate
             {
               server_name = cfg.guest.mainDomain;
-              trusted_servers = [ cfg.mainDomain ];
+              trusted_servers = [ "matrix.org" "m.sleroq.link" ];
 
               address = [ "127.0.0.1" ];
               port = [ cfg.guest.port ];
@@ -504,8 +476,6 @@ in
             PrivateUsers = true;
             PrivateIPC = true;
             RemoveIPC = true;
-            IPAddressDeny = "any";
-            IPAddressAllow = cfg.guest.federationAllowedIPs;
             RestrictAddressFamilies = [
               "AF_INET"
               "AF_INET6"
