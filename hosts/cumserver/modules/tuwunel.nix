@@ -291,7 +291,7 @@ in
                 } // lib.optionalAttrs config.cumserver.element-call.enable {
                   element_call = {
                     url = "https://${config.cumserver.element-call.domain}";
-                    guest_spa_url = "https://${config.cumserver.element-call.guestDomain}";
+                    guest_spa_url = "https://${config.cumserver.element-call.domain}";
                   };
                 };
               }
