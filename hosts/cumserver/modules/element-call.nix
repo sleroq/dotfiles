@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 let
   cfg = config.cumserver.element-call;
 in
@@ -99,15 +99,43 @@ in
           path /sfu/get* /healthz*
         }
 
+        @livekit_paths {
+          path /rtc* /twirp*
+        }
+
+        @websocket {
+          header Connection *Upgrade*
+          header Upgrade websocket
+        }
+
         handle @jwt_service {
           reverse_proxy 127.0.0.1:${toString cfg.jwtServicePort}
         }
 
+        handle @livekit_paths {
+          reverse_proxy 127.0.0.1:${toString cfg.livekitPort}
+        }
+
+        handle @websocket {
+          reverse_proxy 127.0.0.1:${toString cfg.livekitPort}
+        }
+
+        handle /config.json {
+          header Content-Type application/json
+          respond `${
+            builtins.toJSON {
+              default_server_config."m.homeserver" = {
+                base_url = "https://${config.cumserver.tuwunel.domain}";
+                server_name = config.cumserver.tuwunel.mainDomain;
+              };
+            }
+          }` 200
+        }
+
         handle {
-          reverse_proxy 127.0.0.1:${toString cfg.livekitPort} {
-            header_up Connection "upgrade"
-            header_up Upgrade {http.request.header.Upgrade}
-          }
+          root * ${pkgs.element-call}
+          try_files {path} /index.html
+          file_server
         }
       '';
     };

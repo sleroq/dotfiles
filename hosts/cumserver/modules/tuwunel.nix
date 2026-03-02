@@ -9,7 +9,6 @@
 let
   cfg = config.cumserver.tuwunel;
   stateDirectory = "matrix-conduit";
-  caddyCertDir = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${cfg.turn.domain}";
 in
 {
   options.cumserver.tuwunel = {
@@ -67,13 +66,13 @@ in
 
         certFile = lib.mkOption {
           type = lib.types.str;
-          default = "${caddyCertDir}/${cfg.turn.domain}.crt";
+          default = "/var/lib/acme/${cfg.turn.domain}/fullchain.pem";
           description = "Path to Coturn TLS certificate file";
         };
 
         keyFile = lib.mkOption {
           type = lib.types.str;
-          default = "${caddyCertDir}/${cfg.turn.domain}.key";
+          default = "/var/lib/acme/${cfg.turn.domain}/key.pem";
           description = "Path to Coturn TLS private key file";
         };
       };
@@ -267,6 +266,14 @@ in
         };
       };
 
+      security.acme = lib.mkIf (cfg.turn.enable && cfg.turn.tls.enable) {
+        acceptTerms = true;
+        defaults.email = config.services.caddy.email;
+        certs."${cfg.turn.domain}" = {
+          webroot = "/var/lib/acme/acme-challenge";
+        };
+      };
+
       services.caddy.virtualHosts = {
         "${config.cumserver.tuwunel.mainDomain}" = {
           serverAliases = [ "www.${config.cumserver.tuwunel.mainDomain}" ];
@@ -348,6 +355,17 @@ in
             }
           '';
         };
+
+        "${cfg.turn.domain}" = {
+          extraConfig = ''
+            handle /.well-known/acme-challenge/* {
+              root * /var/lib/acme/acme-challenge
+              file_server
+            }
+
+            respond ""
+          '';
+        };
       };
 
       services.coturn = lib.mkIf cfg.turn.enable {
@@ -368,7 +386,7 @@ in
       };
 
       systemd.services.coturn.serviceConfig.SupplementaryGroups = lib.optionals cfg.turn.tls.enable [
-        "caddy"
+        "acme"
       ];
 
       networking.firewall = lib.mkIf cfg.turn.enable {
