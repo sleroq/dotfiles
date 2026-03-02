@@ -97,10 +97,7 @@ in
   cumserver.podman.enable = true;
 
 
-  cumserver.tuwunel = {
-    enable = true;
-    guest.enable = true;
-  };
+  cumserver.tuwunel.enable = true;
 
   cumserver.frp.enable = true;
 
