@@ -311,6 +311,7 @@ in
                 // lib.optionalAttrs config.cumserver.element-call.enable {
                   element_call = {
                     url = "https://${config.cumserver.element-call.domain}";
+                    use_exclusively = true;
                   };
                 };
               }
