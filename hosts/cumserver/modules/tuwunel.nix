@@ -54,6 +54,36 @@ in
       description = "Additional settings for the Matrix server";
     };
 
+    turn = {
+      enable = lib.mkEnableOption "Coturn for Matrix calls" // {
+        default = true;
+      };
+
+      domain = lib.mkOption {
+        type = lib.types.str;
+        default = "turn.${cfg.mainDomain}";
+        description = "Domain used by Matrix clients to reach TURN";
+      };
+
+      secret = lib.mkOption {
+        type = lib.types.str;
+        default = lib.attrByPath [ "tuwunel" "turnSecret" ] "" secrets;
+        description = "Coturn static auth secret used by Tuwunel and LiveKit";
+      };
+
+      minPort = lib.mkOption {
+        type = lib.types.port;
+        default = 50201;
+        description = "Coturn relay UDP range start";
+      };
+
+      maxPort = lib.mkOption {
+        type = lib.types.port;
+        default = 65535;
+        description = "Coturn relay UDP range end";
+      };
+    };
+
   };
 
   config = lib.mkMerge [
@@ -62,6 +92,10 @@ in
         {
           assertion = config.services.caddy.enable;
           message = "Caddy has to be enabled for tuwunel Matrix server to work";
+        }
+        {
+          assertion = (!cfg.turn.enable) || (cfg.turn.secret != "");
+          message = "cumserver.tuwunel.turn.secret must be set when TURN is enabled";
         }
       ];
 
@@ -144,6 +178,13 @@ in
               url_preview_max_spider_size = 384000;
               url_preview_check_root_domain = false;
               allow_profile_lookup_federation_requests = true;
+
+              turn_uris = lib.optionals cfg.turn.enable [
+                "turn:${cfg.turn.domain}:3478?transport=udp"
+                "turn:${cfg.turn.domain}:3478?transport=tcp"
+                "turns:${cfg.turn.domain}:5349?transport=tcp"
+              ];
+              turn_secret = lib.optionalString cfg.turn.enable cfg.turn.secret;
 
               log = "info";
               new_user_displayname_suffix = "";
@@ -278,6 +319,35 @@ in
             }
           '';
         };
+      };
+
+      services.coturn = lib.mkIf cfg.turn.enable {
+        enable = true;
+        realm = cfg.mainDomain;
+        use-auth-secret = true;
+        no-cli = true;
+        min-port = cfg.turn.minPort;
+        max-port = cfg.turn.maxPort;
+        extraConfig = ''
+          static-auth-secret=${cfg.turn.secret}
+        '';
+      };
+
+      networking.firewall = lib.mkIf cfg.turn.enable {
+        allowedTCPPorts = [
+          3478
+          5349
+        ];
+        allowedUDPPorts = [
+          3478
+          5349
+        ];
+        allowedUDPPortRanges = [
+          {
+            from = cfg.turn.minPort;
+            to = cfg.turn.maxPort;
+          }
+        ];
       };
     })
 

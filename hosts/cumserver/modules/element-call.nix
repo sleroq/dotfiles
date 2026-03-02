@@ -63,6 +63,16 @@ in
     services.livekit = {
       enable = true;
       keyFile = cfg.livekitKeyFile;
+      settings = {
+        rtc.turn_servers = lib.optionals config.cumserver.tuwunel.turn.enable [
+          {
+            host = config.cumserver.tuwunel.turn.domain;
+            port = 5349;
+            protocol = "tls";
+            secret = config.cumserver.tuwunel.turn.secret;
+          }
+        ];
+      };
     };
 
     services.lk-jwt-service = {
