@@ -212,7 +212,7 @@ in
               stream_width_default = 16;
               db_pool_workers = 8;
 
-              allow_local_presence = false;
+              allow_local_presence = true;
               allow_incoming_presence = false;
               allow_outgoing_presence = false;
 
@@ -365,7 +365,7 @@ in
               port = [ cfg.guest.port ];
               database_path = "/var/lib/${cfg.guest.stateDirectory}/";
 
-              max_request_size = 20000000;
+              max_request_size = 200000;
               zstd_compression = false;
               gzip_compression = false;
               brotli_compression = false;
@@ -397,7 +397,7 @@ in
               log_guest_registrations = true;
               allow_guests_auto_join_rooms = true;
               allow_registration = false;
-              allow_federation = true;
+              allow_federation = false;
               allow_public_room_directory_over_federation = false;
               allow_public_room_directory_without_auth = false;
               lockdown_public_room_directory = true;
