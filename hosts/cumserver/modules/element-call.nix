@@ -12,24 +12,6 @@ in
       description = "Domain name for Element Call";
     };
 
-    guestDomain = lib.mkOption {
-      type = lib.types.str;
-      default = "call-guest.cum.army";
-      description = "Domain for guest Element Call links";
-    };
-
-    guestHomeserverDomain = lib.mkOption {
-      type = lib.types.str;
-      default = "guest.sleroq.link";
-      description = "Matrix server_name used by guest Element Call";
-    };
-
-    guestHomeserverBaseUrl = lib.mkOption {
-      type = lib.types.str;
-      default = "https://guest-m.sleroq.link";
-      description = "Guest homeserver base_url used by guest Element Call";
-    };
-
     livekitKeyFile = lib.mkOption {
       type = lib.types.path;
       description = "Path to file containing LiveKit API key and secret in format 'key: secret'";
@@ -122,27 +104,6 @@ in
           }
 
           # Serve Element Call SPA with fallback to index.html
-          try_files {path} {path}/ /index.html
-          file_server
-        }
-      '';
-    };
-
-    services.caddy.virtualHosts."${cfg.guestDomain}" = {
-      extraConfig = ''
-        root * ${pkgs.element-call}
-
-        route {
-          respond /config.json `${builtins.toJSON {
-            default_server_config = {
-              "m.homeserver" = {
-                base_url = cfg.guestHomeserverBaseUrl;
-                server_name = cfg.guestHomeserverDomain;
-              };
-            };
-            livekit.livekit_service_url = "https://${cfg.domain}/livekit/jwt";
-          }}` 200
-
           try_files {path} {path}/ /index.html
           file_server
         }

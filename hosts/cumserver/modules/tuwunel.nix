@@ -9,9 +9,6 @@
 let
   cfg = config.cumserver.tuwunel;
   stateDirectory = "matrix-conduit";
-  tomlFormat = pkgs.formats.toml { };
-  guestDefaultUser = "tuwunel-guest";
-  guestDefaultGroup = "tuwunel-guest";
 in
 {
   options.cumserver.tuwunel = {
@@ -57,57 +54,6 @@ in
       description = "Additional settings for the Matrix server";
     };
 
-    guest = {
-      enable = lib.mkEnableOption "guest Tuwunel instance for anonymous calls";
-
-      mainDomain = lib.mkOption {
-        type = lib.types.str;
-        default = "guest.sleroq.link";
-        description = "Server-name domain for the guest Matrix instance";
-      };
-
-      domain = lib.mkOption {
-        type = lib.types.str;
-        default = "guest-m.sleroq.link";
-        description = "Client-server API domain for the guest Matrix instance";
-      };
-
-      port = lib.mkOption {
-        type = lib.types.port;
-        default = 8108;
-        description = "Internal port for the guest Matrix server";
-      };
-
-      stateDirectory = lib.mkOption {
-        type = lib.types.str;
-        default = "matrix-conduit-guest";
-        description = "State directory for the guest Matrix instance";
-      };
-
-      settings = lib.mkOption {
-        type = lib.types.attrs;
-        default = { };
-        description = "Additional settings for the guest Matrix instance";
-      };
-
-      user = lib.mkOption {
-        type = lib.types.nonEmptyStr;
-        default = guestDefaultUser;
-        description = "User that the guest Tuwunel instance runs as";
-      };
-
-      group = lib.mkOption {
-        type = lib.types.nonEmptyStr;
-        default = guestDefaultGroup;
-        description = "Group that the guest Tuwunel instance runs as";
-      };
-
-      extraEnvironment = lib.mkOption {
-        type = lib.types.attrsOf lib.types.str;
-        default = { };
-        description = "Extra environment variables for the guest Tuwunel instance";
-      };
-    };
   };
 
   config = lib.mkMerge [
@@ -279,7 +225,6 @@ in
                 } // lib.optionalAttrs config.cumserver.element-call.enable {
                   element_call = {
                     url = "https://${config.cumserver.element-call.domain}";
-                    guest_spa_url = "https://${config.cumserver.element-call.guestDomain}";
                   };
                 };
               }
@@ -332,177 +277,8 @@ in
             }
           '';
         };
-      } // lib.optionalAttrs cfg.guest.enable {
-        "${cfg.guest.mainDomain}" = {
-          extraConfig = ''
-            handle /.well-known/* {
-              reverse_proxy 127.0.0.1:${toString cfg.guest.port}
-            }
-
-            file_server
-          '';
-        };
-
-        "${cfg.guest.domain}" = {
-          extraConfig = ''
-            handle /_matrix/* {
-              reverse_proxy 127.0.0.1:${toString cfg.guest.port}
-            }
-          '';
-        };
       };
     })
-
-    (lib.mkIf (cfg.enable && cfg.guest.enable) (
-      let
-        guestConfigFile = tomlFormat.generate "tuwunel-guest.toml" {
-          global = lib.recursiveUpdate
-            {
-              server_name = cfg.guest.mainDomain;
-              trusted_servers = [ "matrix.org" "m.sleroq.link" ];
-
-              address = [ "127.0.0.1" ];
-              port = [ cfg.guest.port ];
-              database_path = "/var/lib/${cfg.guest.stateDirectory}/";
-
-              max_request_size = 200000;
-              zstd_compression = false;
-              gzip_compression = false;
-              brotli_compression = false;
-
-              ip_range_denylist = [
-                "127.0.0.0/8"
-                "10.0.0.0/8"
-                "172.16.0.0/12"
-                "192.168.0.0/16"
-                "100.64.0.0/10"
-                "192.0.0.0/24"
-                "169.254.0.0/16"
-                "192.88.99.0/24"
-                "198.18.0.0/15"
-                "192.0.2.0/24"
-                "198.51.100.0/24"
-                "203.0.113.0/24"
-                "224.0.0.0/4"
-                "::1/128"
-                "fe80::/10"
-                "fc00::/7"
-                "2001:db8::/32"
-                "ff00::/8"
-                "fec0::/10"
-              ];
-
-              allow_legacy_media = false;
-              allow_guest_registration = true;
-              log_guest_registrations = true;
-              allow_guests_auto_join_rooms = true;
-              allow_registration = false;
-              allow_federation = false;
-              allow_public_room_directory_over_federation = false;
-              allow_public_room_directory_without_auth = false;
-              lockdown_public_room_directory = true;
-              allow_device_name_federation = false;
-              allow_profile_lookup_federation_requests = true;
-
-              log = "info";
-              new_user_displayname_suffix = "";
-
-              allow_local_presence = false;
-              allow_incoming_presence = false;
-              allow_outgoing_presence = false;
-
-              well_known = {
-                client = "https://${cfg.guest.domain}";
-                server = "${cfg.guest.domain}:443";
-                rtc_transports = lib.optionals config.cumserver.element-call.enable [
-                  {
-                    type = "livekit";
-                    livekit_service_url = "https://${config.cumserver.element-call.domain}/livekit/jwt";
-                  }
-                ];
-              };
-            }
-            cfg.guest.settings;
-        };
-      in
-      {
-        users.users = lib.mkIf (cfg.guest.user == guestDefaultUser) {
-          ${guestDefaultUser} = {
-            group = cfg.guest.group;
-            home = "/var/lib/${cfg.guest.stateDirectory}/";
-            isSystemUser = true;
-          };
-        };
-
-        users.groups = lib.mkIf (cfg.guest.group == guestDefaultGroup) {
-          ${guestDefaultGroup} = { };
-        };
-
-        systemd.services.tuwunel-guest = {
-          description = "Tuwunel Matrix Server (guest)";
-          documentation = [ "https://matrix-construct.github.io/tuwunel/" ];
-          wantedBy = [ "multi-user.target" ];
-          wants = [ "network-online.target" ];
-          after = [ "network-online.target" ];
-          environment = lib.mkMerge [
-            { TUWUNEL_CONFIG = guestConfigFile; }
-            cfg.guest.extraEnvironment
-          ];
-          startLimitBurst = 5;
-          startLimitIntervalSec = 60;
-          serviceConfig = {
-            Type = "notify";
-
-            DynamicUser = true;
-            User = cfg.guest.user;
-            Group = cfg.guest.group;
-
-            DevicePolicy = "closed";
-            LockPersonality = true;
-            MemoryDenyWriteExecute = true;
-            NoNewPrivileges = true;
-            ProtectClock = true;
-            ProtectControlGroups = true;
-            ProtectHome = true;
-            ProtectHostname = true;
-            ProtectKernelLogs = true;
-            ProtectKernelModules = true;
-            ProtectKernelTunables = true;
-            ProtectProc = "invisible";
-            ProtectSystem = "strict";
-            PrivateDevices = true;
-            PrivateMounts = true;
-            PrivateTmp = true;
-            PrivateUsers = true;
-            PrivateIPC = true;
-            RemoveIPC = true;
-            RestrictAddressFamilies = [
-              "AF_INET"
-              "AF_INET6"
-              "AF_UNIX"
-            ];
-            RestrictNamespaces = true;
-            RestrictRealtime = true;
-            RestrictSUIDSGID = true;
-            SystemCallArchitectures = "native";
-            SystemCallFilter = [
-              "@system-service @resources"
-              "~@clock @debug @module @mount @reboot @swap @cpu-emulation @obsolete @timer @chown @setuid @privileged @keyring @ipc"
-            ];
-            SystemCallErrorNumber = "EPERM";
-
-            StateDirectory = cfg.guest.stateDirectory;
-            StateDirectoryMode = "0700";
-            RuntimeDirectory = "tuwunel-guest";
-            RuntimeDirectoryMode = "0750";
-
-            ExecStart = lib.getExe cfg.package;
-            Restart = "on-failure";
-            RestartSec = 10;
-          };
-        };
-      }
-    ))
 
     (lib.mkIf (cfg.enable && cfg.backup.enable) {
       services.restic.backups.tuwunel = {
