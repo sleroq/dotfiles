@@ -5,7 +5,7 @@
   enableSshAuthSocket ? true,
   extraAliases ? { },
   ...
-}@args:
+}:
 
 let
   aliases = {
@@ -47,7 +47,6 @@ in
       inherit
         lib
         config
-        args
         aliases
         vars
         ;

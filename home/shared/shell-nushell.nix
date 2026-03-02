@@ -1,7 +1,6 @@
 {
   lib,
   config,
-  args,
   aliases,
   vars,
   ...
@@ -59,19 +58,14 @@ let
 
   paths =
     lib.concatLists [
+      [ "${config.home.homeDirectory}/.nix-profile/bin" ]
+      [ "/etc/profiles/per-user/${config.home.username}/bin" ]
+      [ "/nix/var/nix/profiles/default/bin" ]
+      [ "/run/current-system/sw/bin" ]
       [ "${config.home.homeDirectory}/.local/bin" ]
       config.home.sessionPath
       [ "${config.home.profileDirectory}/bin" ]
-    ]
-    ++ lib.optionals (args ? darwinConfig) (
-      lib.splitString ":" args.darwinConfig.environment.systemPath
-    )
-    ++ lib.optionals (args ? nixosConfig) (
-      lib.concatLists [
-        [ "/run/wrappers/bin" ]
-        (map (p: "${p}/bin") args.nixosConfig.environment.profiles)
-      ]
-    );
+    ];
 
   binPaths = lib.pipe paths [
     (map (
@@ -111,7 +105,9 @@ in
         ${binPaths}
       ]
 
-      $env.PATH = ($env.PATH | split row (char esep) | where { |p| $p not-in $nix_paths } | append $nix_paths)
+      let existing_nix_paths = ($nix_paths | where { |p| $p | path exists })
+
+      $env.PATH = ($env.PATH | split row (char esep) | where { |p| $p not-in $existing_nix_paths } | append $existing_nix_paths)
     '')
   ];
   settings = {
