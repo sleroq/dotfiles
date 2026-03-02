@@ -393,7 +393,7 @@ in
               port = [ cfg.guest.port ];
               database_path = "/var/lib/${cfg.guest.stateDirectory}/";
 
-              max_request_size = 200000;
+              max_request_size = 20000000;
               zstd_compression = false;
               gzip_compression = false;
               brotli_compression = false;
