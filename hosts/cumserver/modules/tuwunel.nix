@@ -356,7 +356,7 @@ in
     (lib.mkIf (cfg.enable && cfg.guest.enable) (
       let
         guestConfigFile = tomlFormat.generate "tuwunel-guest.toml" {
-          global = lib.mkMerge [
+          global = lib.recursiveUpdate
             {
               server_name = cfg.guest.mainDomain;
               trusted_servers = [ "matrix.org" "m.sleroq.link" ];
@@ -422,8 +422,7 @@ in
                 ];
               };
             }
-            cfg.guest.settings
-          ];
+            cfg.guest.settings;
         };
       in
       {
