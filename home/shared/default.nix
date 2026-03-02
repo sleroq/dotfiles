@@ -7,7 +7,15 @@
     ./git.nix
     ./theming.nix
     ./wms.nix
-    (import ../shared/shell.nix { inherit pkgs self; enableSshAuthSocket = false; })
+    (import ../shared/shell.nix {
+      inherit
+        pkgs
+        self
+        lib
+        config
+        ;
+      enableSshAuthSocket = false;
+    })
     ./scripts.nix
   ];
 

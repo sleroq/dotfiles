@@ -1,10 +1,85 @@
-# TODO: Refactor, this is messed up
-# But I don't want to test anything...
-{ pkgs, self, enableSshAuthSocket ? true, extraAliases ? {}, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  enableSshAuthSocket ? true,
+  extraAliases ? { },
+  ...
+}@args:
 
 let
+  exportToNuEnv =
+    envVars:
+    lib.concatStringsSep "\n" (
+      lib.mapAttrsToList (
+        n: v:
+        let
+          replaceVars =
+            varsIn: varsOut: value:
+            "$env.${n} = ${
+              if builtins.typeOf value == "string" then
+                "\"${builtins.replaceStrings varsIn varsOut value}\""
+              else
+                toString value
+            }";
+          replaceVarPresets =
+            value:
+            builtins.replaceStrings
+              [ "$\\{${n}:+:$${n}}\"" ]
+              [
+                ''" + (do { let x = ($env.${n}? | default ""); if $x == "" { "" } else { ":" + $x } }) | split row (char esep) | uniq''
+              ]
+              value;
+        in
+        lib.pipe v [
+          (replaceVars [ "$HOME" "$USER" ] [ config.home.homeDirectory config.home.username ])
+          replaceVarPresets
+        ]
+      ) envVars
+    );
+
+  esepDirListToList = var: ''
+    "${var}" :{
+      from_string: { |s|
+        $s
+        | default ""
+        | split row (char esep)
+        | where ($it | str length) > 0
+        | path expand --no-symlink
+      }
+      to_string: { |v|
+        $v
+        | path expand --no-symlink
+        | str join (char esep)
+      }
+    }
+  '';
+
+  paths =
+    lib.concatLists [
+      [ "${config.home.homeDirectory}/.local/bin" ]
+      config.home.sessionPath
+      [ "${config.home.profileDirectory}/bin" ]
+    ]
+    ++ lib.optionals (args ? darwinConfig) (lib.splitString ":" args.darwinConfig.environment.systemPath)
+    ++ lib.optionals (args ? nixosConfig) (
+      lib.concatLists [
+        [ "/run/wrappers/bin" ]
+        (map (p: "${p}/bin") args.nixosConfig.environment.profiles)
+      ]
+    );
+
+  binPaths = lib.pipe paths [
+    (map (
+      builtins.replaceStrings
+        [ "$USER" "$HOME" "\${XDG_STATE_HOME}" ]
+        [ config.home.username config.home.homeDirectory config.xdg.stateHome ]
+    ))
+    lib.unique
+    (lib.concatMapStringsSep "\n          " (p: ''"${p}"''))
+  ];
+
   aliases = {
-    cd = "z";
     sudo = "sudo ";
     neofetch = "fastfetch";
     vim = "nvim";
@@ -41,10 +116,45 @@ in
 
     nushell = {
       enable = true;
-      configFile.source = self + /home/config/nushell/config.nu;
-      envFile.source = self + /home/config/nushell/env.nu;
       shellAliases = aliases;
       environmentVariables = vars;
+      extraEnv = lib.mkBefore ''
+        ${exportToNuEnv config.home.sessionVariables}
+      '';
+      extraConfig = lib.mkMerge [
+        (lib.mkBefore ''
+          $env.ENV_CONVERSIONS = {
+            ${esepDirListToList "Path"}
+            ${esepDirListToList "PATH"}
+            ${esepDirListToList "TERMINFO_DIRS"}
+            ${esepDirListToList "XDG_CONFIG_DIRS"}
+            ${esepDirListToList "XDG_DATA_DIRS"}
+            ${esepDirListToList "XCURSOR_PATH"}
+          }
+
+          const NU_LIB_DIRS = [
+            ($nu.default-config-dir | path join 'scripts')
+            ($nu.data-dir | path join 'completions')
+          ]
+        '')
+        (lib.mkAfter ''
+          let nix_paths = [
+            ${binPaths}
+          ]
+
+          $env.PATH = ($env.PATH | split row (char esep) | where { |p| $p not-in $nix_paths } | append $nix_paths)
+        '')
+      ];
+      settings = {
+        show_banner = false;
+        buffer_editor = "nvim";
+        history = {
+          max_size = 1100000;
+          sync_on_enter = true;
+          file_format = "sqlite";
+          isolation = true;
+        };
+      };
     };
 
     starship = {
@@ -78,8 +188,10 @@ in
 
     zoxide = {
       enable = true;
+      enableBashIntegration = true;
       enableNushellIntegration = true;
       enableZshIntegration = true;
+      options = [ "--cmd" "cd" ];
     };
 
     carapace = {

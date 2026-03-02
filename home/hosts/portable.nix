@@ -17,7 +17,12 @@ in
   imports = [
     ../shared/git.nix
     (import ../shared/shell.nix {
-      inherit pkgs self;
+      inherit
+        pkgs
+        self
+        lib
+        config
+        ;
       enableSshAuthSocket = false;
       extraAliases = darwin-aliases;
     })
