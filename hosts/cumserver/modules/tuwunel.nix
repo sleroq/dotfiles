@@ -9,6 +9,7 @@
 let
   cfg = config.cumserver.tuwunel;
   stateDirectory = "matrix-conduit";
+  caddyCertDir = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${cfg.turn.domain}";
 in
 {
   options.cumserver.tuwunel = {
@@ -59,6 +60,24 @@ in
         default = true;
       };
 
+      tls = {
+        enable = lib.mkEnableOption "TURN over TLS (turns://)" // {
+          default = true;
+        };
+
+        certFile = lib.mkOption {
+          type = lib.types.str;
+          default = "${caddyCertDir}/${cfg.turn.domain}.crt";
+          description = "Path to Coturn TLS certificate file";
+        };
+
+        keyFile = lib.mkOption {
+          type = lib.types.str;
+          default = "${caddyCertDir}/${cfg.turn.domain}.key";
+          description = "Path to Coturn TLS private key file";
+        };
+      };
+
       domain = lib.mkOption {
         type = lib.types.str;
         default = "turn.${cfg.mainDomain}";
@@ -96,6 +115,10 @@ in
         {
           assertion = (!cfg.turn.enable) || (cfg.turn.secret != "");
           message = "cumserver.tuwunel.turn.secret must be set when TURN is enabled";
+        }
+        {
+          assertion = (!cfg.turn.enable) || (!cfg.turn.tls.enable) || (cfg.turn.tls.certFile != "" && cfg.turn.tls.keyFile != "");
+          message = "cumserver.tuwunel.turn.tls.certFile and keyFile must be set when TURN TLS is enabled";
         }
       ];
 
@@ -182,6 +205,7 @@ in
               turn_uris = lib.optionals cfg.turn.enable [
                 "turn:${cfg.turn.domain}:3478?transport=udp"
                 "turn:${cfg.turn.domain}:3478?transport=tcp"
+              ] ++ lib.optionals cfg.turn.tls.enable [
                 "turns:${cfg.turn.domain}:5349?transport=tcp"
               ];
               turn_secret = lib.optionalString cfg.turn.enable cfg.turn.secret;
@@ -330,8 +354,16 @@ in
         max-port = cfg.turn.maxPort;
         extraConfig = ''
           static-auth-secret=${cfg.turn.secret}
+          ${lib.optionalString cfg.turn.tls.enable ''
+            cert=${cfg.turn.tls.certFile}
+            pkey=${cfg.turn.tls.keyFile}
+            tls-listening-port=5349
+          ''}
         '';
       };
+
+      systemd.services.coturn.serviceConfig.SupplementaryGroups =
+        lib.optionals cfg.turn.tls.enable [ "caddy" ];
 
       networking.firewall = lib.mkIf cfg.turn.enable {
         allowedTCPPorts = [

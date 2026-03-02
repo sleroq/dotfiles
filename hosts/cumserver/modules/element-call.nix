@@ -64,14 +64,20 @@ in
       enable = true;
       keyFile = cfg.livekitKeyFile;
       settings = {
-        rtc.turn_servers = lib.optionals config.cumserver.tuwunel.turn.enable [
-          {
-            host = config.cumserver.tuwunel.turn.domain;
-            port = 5349;
-            protocol = "tls";
-            secret = config.cumserver.tuwunel.turn.secret;
-          }
-        ];
+        port = cfg.livekitPort;
+        rtc = {
+          tcp_port = cfg.livekitRtcTcpPort;
+          port_range_start = cfg.livekitRtcUdpPortStart;
+          port_range_end = cfg.livekitRtcUdpPortEnd;
+          turn_servers = lib.optionals config.cumserver.tuwunel.turn.enable [
+            {
+              host = config.cumserver.tuwunel.turn.domain;
+              port = 5349;
+              protocol = "tls";
+              secret = config.cumserver.tuwunel.turn.secret;
+            }
+          ];
+        };
       };
     };
 
