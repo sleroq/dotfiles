@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 let
   cfg = config.cumserver.element-call;
 in
@@ -31,13 +31,13 @@ in
 
     livekitRtcUdpPortStart = lib.mkOption {
       type = lib.types.port;
-      default = 50000;
+      default = 50100;
       description = "LiveKit RTC UDP port range start";
     };
 
     livekitRtcUdpPortEnd = lib.mkOption {
       type = lib.types.port;
-      default = 51000;
+      default = 50200;
       description = "LiveKit RTC UDP port range end";
     };
 
@@ -67,7 +67,7 @@ in
 
     services.lk-jwt-service = {
       enable = true;
-      livekitUrl = "wss://${cfg.domain}/livekit/sfu";
+      livekitUrl = "wss://${cfg.domain}";
       keyFile = cfg.livekitKeyFile;
       port = cfg.jwtServicePort;
     };
@@ -79,33 +79,19 @@ in
 
     services.caddy.virtualHosts."${cfg.domain}" = {
       extraConfig = ''
-        # Element Call frontend
-        root * ${pkgs.element-call}
+        @jwt_service {
+          path /sfu/get* /healthz*
+        }
 
-        route {
-          # Config endpoint for Element Call standalone app
-          respond /config.json `${builtins.toJSON {
-            default_server_config = {
-              "m.homeserver" = {
-                base_url = "https://${config.cumserver.tuwunel.domain}";
-                server_name = config.cumserver.tuwunel.mainDomain;
-              };
-            };
-            livekit.livekit_service_url = "https://${cfg.domain}/livekit/jwt";
-          }}` 200
+        handle @jwt_service {
+          reverse_proxy 127.0.0.1:${toString cfg.jwtServicePort}
+        }
 
-          handle_path /livekit/jwt/* {
-            reverse_proxy 127.0.0.1:${toString cfg.jwtServicePort}
+        handle {
+          reverse_proxy 127.0.0.1:${toString cfg.livekitPort} {
+            header_up Connection "upgrade"
+            header_up Upgrade {http.request.header.Upgrade}
           }
-
-          # LiveKit SFU WebSocket endpoint
-          handle_path /livekit/sfu* {
-            reverse_proxy 127.0.0.1:${toString cfg.livekitPort}
-          }
-
-          # Serve Element Call SPA with fallback to index.html
-          try_files {path} {path}/ /index.html
-          file_server
         }
       '';
     };
@@ -113,7 +99,10 @@ in
     networking.firewall = {
       allowedTCPPorts = [ cfg.livekitRtcTcpPort ];
       allowedUDPPortRanges = [
-        { from = cfg.livekitRtcUdpPortStart; to = cfg.livekitRtcUdpPortEnd; }
+        {
+          from = cfg.livekitRtcUdpPortStart;
+          to = cfg.livekitRtcUdpPortEnd;
+        }
       ];
     };
   };

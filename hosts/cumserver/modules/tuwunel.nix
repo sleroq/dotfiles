@@ -187,7 +187,7 @@ in
                 rtc_transports = lib.optionals config.cumserver.element-call.enable [
                   {
                     type = "livekit";
-                    livekit_service_url = "https://${config.cumserver.element-call.domain}/livekit/jwt";
+                    livekit_service_url = "https://${config.cumserver.element-call.domain}";
                   }
                 ];
               };
@@ -222,7 +222,8 @@ in
                     base_url = "https://${config.cumserver.tuwunel.domain}";
                     server_name = config.cumserver.tuwunel.mainDomain;
                   };
-                } // lib.optionalAttrs config.cumserver.element-call.enable {
+                }
+                // lib.optionalAttrs config.cumserver.element-call.enable {
                   element_call = {
                     url = "https://${config.cumserver.element-call.domain}";
                   };
