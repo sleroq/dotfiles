@@ -140,12 +140,8 @@ in
                 server_name = cfg.guestHomeserverDomain;
               };
             };
-            livekit.livekit_service_url = "https://${cfg.guestDomain}/livekit/jwt";
+            livekit.livekit_service_url = "https://${cfg.domain}/livekit/jwt";
           }}` 200
-
-          handle_path /livekit/jwt/* {
-            reverse_proxy 127.0.0.1:${toString cfg.jwtServicePort}
-          }
 
           try_files {path} {path}/ /index.html
           file_server
