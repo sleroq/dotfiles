@@ -117,7 +117,10 @@ in
           message = "cumserver.tuwunel.turn.secret must be set when TURN is enabled";
         }
         {
-          assertion = (!cfg.turn.enable) || (!cfg.turn.tls.enable) || (cfg.turn.tls.certFile != "" && cfg.turn.tls.keyFile != "");
+          assertion =
+            (!cfg.turn.enable)
+            || (!cfg.turn.tls.enable)
+            || (cfg.turn.tls.certFile != "" && cfg.turn.tls.keyFile != "");
           message = "cumserver.tuwunel.turn.tls.certFile and keyFile must be set when TURN TLS is enabled";
         }
       ];
@@ -202,12 +205,14 @@ in
               url_preview_check_root_domain = false;
               allow_profile_lookup_federation_requests = true;
 
-              turn_uris = lib.optionals cfg.turn.enable [
-                "turn:${cfg.turn.domain}:3478?transport=udp"
-                "turn:${cfg.turn.domain}:3478?transport=tcp"
-              ] ++ lib.optionals cfg.turn.tls.enable [
-                "turns:${cfg.turn.domain}:5349?transport=tcp"
-              ];
+              turn_uris =
+                lib.optionals cfg.turn.enable [
+                  "turn:${cfg.turn.domain}:3478?transport=udp"
+                  "turn:${cfg.turn.domain}:3478?transport=tcp"
+                ]
+                ++ lib.optionals (cfg.turn.enable && cfg.turn.tls.enable) [
+                  "turns:${cfg.turn.domain}:5349?transport=tcp"
+                ];
               turn_secret = lib.optionalString cfg.turn.enable cfg.turn.secret;
 
               log = "info";
@@ -362,18 +367,13 @@ in
         '';
       };
 
-      systemd.services.coturn.serviceConfig.SupplementaryGroups =
-        lib.optionals cfg.turn.tls.enable [ "caddy" ];
+      systemd.services.coturn.serviceConfig.SupplementaryGroups = lib.optionals cfg.turn.tls.enable [
+        "caddy"
+      ];
 
       networking.firewall = lib.mkIf cfg.turn.enable {
-        allowedTCPPorts = [
-          3478
-          5349
-        ];
-        allowedUDPPorts = [
-          3478
-          5349
-        ];
+        allowedTCPPorts = [ 3478 ] ++ lib.optionals cfg.turn.tls.enable [ 5349 ];
+        allowedUDPPorts = [ 3478 ] ++ lib.optionals cfg.turn.tls.enable [ 5349 ];
         allowedUDPPortRanges = [
           {
             from = cfg.turn.minPort;
