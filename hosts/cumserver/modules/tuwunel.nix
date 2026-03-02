@@ -60,10 +60,6 @@ in
       };
 
       tls = {
-        enable = lib.mkEnableOption "TURN over TLS (turns://)" // {
-          default = true;
-        };
-
         certFile = lib.mkOption {
           type = lib.types.str;
           default = "/var/lib/acme/${cfg.turn.domain}/fullchain.pem";
@@ -118,9 +114,8 @@ in
         {
           assertion =
             (!cfg.turn.enable)
-            || (!cfg.turn.tls.enable)
             || (cfg.turn.tls.certFile != "" && cfg.turn.tls.keyFile != "");
-          message = "cumserver.tuwunel.turn.tls.certFile and keyFile must be set when TURN TLS is enabled";
+          message = "cumserver.tuwunel.turn.tls.certFile and keyFile must be set when TURN is enabled";
         }
       ];
 
@@ -206,10 +201,6 @@ in
 
               turn_uris =
                 lib.optionals cfg.turn.enable [
-                  "turn:${cfg.turn.domain}:3478?transport=udp"
-                  "turn:${cfg.turn.domain}:3478?transport=tcp"
-                ]
-                ++ lib.optionals (cfg.turn.enable && cfg.turn.tls.enable) [
                   "turns:${cfg.turn.domain}:5349?transport=tcp"
                 ];
               turn_secret = lib.optionalString cfg.turn.enable cfg.turn.secret;
@@ -266,7 +257,7 @@ in
         };
       };
 
-      security.acme = lib.mkIf (cfg.turn.enable && cfg.turn.tls.enable) {
+      security.acme = lib.mkIf cfg.turn.enable {
         acceptTerms = true;
         defaults.email = config.services.caddy.email;
         certs."${cfg.turn.domain}" = {
@@ -377,21 +368,19 @@ in
         max-port = cfg.turn.maxPort;
         extraConfig = ''
           static-auth-secret=${cfg.turn.secret}
-          ${lib.optionalString cfg.turn.tls.enable ''
-            cert=${cfg.turn.tls.certFile}
-            pkey=${cfg.turn.tls.keyFile}
-            tls-listening-port=5349
-          ''}
+          cert=${cfg.turn.tls.certFile}
+          pkey=${cfg.turn.tls.keyFile}
+          tls-listening-port=5349
         '';
       };
 
-      systemd.services.coturn.serviceConfig.SupplementaryGroups = lib.optionals cfg.turn.tls.enable [
+      systemd.services.coturn.serviceConfig.SupplementaryGroups = lib.optionals cfg.turn.enable [
         "acme"
       ];
 
       networking.firewall = lib.mkIf cfg.turn.enable {
-        allowedTCPPorts = [ 3478 ] ++ lib.optionals cfg.turn.tls.enable [ 5349 ];
-        allowedUDPPorts = [ 3478 ] ++ lib.optionals cfg.turn.tls.enable [ 5349 ];
+        allowedTCPPorts = [ 5349 ];
+        allowedUDPPorts = [ 5349 ];
         allowedUDPPortRanges = [
           {
             from = cfg.turn.minPort;
