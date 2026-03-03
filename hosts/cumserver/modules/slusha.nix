@@ -79,10 +79,10 @@ in
         environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
 
         volumes = [
-          "${cfg.dataDir}/slusha.sqlite:/app/slusha.sqlite:U"
-          "${cfg.dataDir}/tmp:/app/tmp:U"
-          "${cfg.dataDir}/log:/app/log:U"
-        ] ++ lib.optional (cfg.configFile != null) "${cfg.configFile}:/app/slusha.config.js:ro";
+          "${cfg.dataDir}/slusha.sqlite:/home/nonroot/app/slusha.sqlite:U"
+          "${cfg.dataDir}/tmp:/home/nonroot/app/tmp:U"
+          "${cfg.dataDir}/log:/home/nonroot/app/log:U"
+        ] ++ lib.optional (cfg.configFile != null) "${cfg.configFile}:/home/nonroot/app/slusha.config.js:ro";
       };
     })
 
