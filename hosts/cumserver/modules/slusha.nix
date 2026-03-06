@@ -38,12 +38,6 @@ in
       description = "Environment file containing secrets (e.g., BOT_TOKEN, AI_TOKEN)";
     };
 
-    configFile = lib.mkOption {
-      type = lib.types.nullOr lib.types.path;
-      default = null;
-      description = "Path to slusha.config.js to mount read-only inside the container";
-    };
-
     user = lib.mkOption {
       type = lib.types.str;
       default = "slusha";
@@ -99,10 +93,10 @@ in
         environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
 
         volumes = [
-          "${cfg.dataDir}/data:/home/nonroot/app/data:U"
+          "${cfg.cataDir}/data:/home/nonroot/app/data:U"
           "${cfg.dataDir}/tmp:/home/nonroot/app/tmp:U"
           "${cfg.dataDir}/log:/home/nonroot/app/log:U"
-        ] ++ lib.optional (cfg.configFile != null) "${cfg.configFile}:/home/nonroot/app/slusha.config.js:ro";
+        ];
       };
 
       services.caddy.virtualHosts.${cfg.domain} = {
