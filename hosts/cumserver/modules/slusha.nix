@@ -38,17 +38,6 @@ in
       description = "Environment file containing secrets (e.g., BOT_TOKEN, AI_TOKEN)";
     };
 
-    user = lib.mkOption {
-      type = lib.types.str;
-      default = "slusha";
-      description = "Host user to own dataDir and run the container";
-    };
-
-    group = lib.mkOption {
-      type = lib.types.str;
-      default = "slusha";
-      description = "Host group to own dataDir and run the container";
-    };
   };
 
   config = lib.mkMerge [
@@ -64,21 +53,12 @@ in
         }
       ];
 
-      users.users.${cfg.user} = {
-        isSystemUser = true;
-        group = cfg.group;
-        home = cfg.dataDir;
-        createHome = true;
-      };
-
-      users.groups.${cfg.group} = {};
-
-      # Ensure persistent dirs and files exist with correct ownership
+      # Distroless nonroot image uses uid/gid 65532
       systemd.tmpfiles.rules = [
-        "d ${cfg.dataDir} 0750 ${cfg.user} ${cfg.group} -"
-        "d ${cfg.dataDir}/tmp 0750 ${cfg.user} ${cfg.group} -"
-        "d ${cfg.dataDir}/log 0750 ${cfg.user} ${cfg.group} -"
-        "d ${cfg.dataDir}/data 0750 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.dataDir} 0750 65532 65532 -"
+        "d ${cfg.dataDir}/tmp 0750 65532 65532 -"
+        "d ${cfg.dataDir}/log 0750 65532 65532 -"
+        "d ${cfg.dataDir}/data 0750 65532 65532 -"
       ];
 
       virtualisation.oci-containers.containers.slusha = {
@@ -92,10 +72,12 @@ in
 
         environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
 
+        user = "65532:65532";
+
         volumes = [
-          "${cfg.dataDir}/data:/home/nonroot/app/data:U"
-          "${cfg.dataDir}/tmp:/home/nonroot/app/tmp:U"
-          "${cfg.dataDir}/log:/home/nonroot/app/log:U"
+          "${cfg.dataDir}/data:/home/nonroot/app/data"
+          "${cfg.dataDir}/tmp:/home/nonroot/app/tmp"
+          "${cfg.dataDir}/log:/home/nonroot/app/log"
         ];
       };
 
@@ -108,11 +90,8 @@ in
     })
 
     (lib.mkIf (cfg.enable && cfg.backup.enable) {
-      users.groups.restic-backups.members = [ cfg.user ];
-      users.groups.restic-s3-backups.members = [ cfg.user ];
-
       services.restic.backups.slusha = {
-        user = cfg.user;
+        user = "root";
         repository = "s3:https://b9b008414ac92325dff304821d2a0a2c.eu.r2.cloudflarestorage.com/bots-backups";
         passwordFile = config.age.secrets.resticBackupsPassword.path;
         environmentFile = config.age.secrets.resticS3Keys.path;
