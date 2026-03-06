@@ -330,17 +330,10 @@ in
     group = "slusha";
     file = ./secrets/slushaEnv;
   };
-  age.secrets.slushaConfig = {
-    owner = "slusha";
-    group = "slusha";
-    mode = "0644";
-    file = ./secrets/slushaConfig.js;
-  };
   cumserver.slusha = {
     enable = true;
     image = "localhost/slusha:latest";
     environmentFile = config.age.secrets.slushaEnv.path;
-    configFile = config.age.secrets.slushaConfig.path;
   };
 
   nixpkgs.config.allowUnfreePredicate =
