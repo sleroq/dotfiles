@@ -2,13 +2,13 @@
   config,
   pkgs,
   lib,
+  secrets,
   ...
 }:
 let
   cfg = config.cumserver.bore;
 in
 {
-  # TODO: Add some sort of auth
   options.cumserver.bore = {
     enable = lib.mkEnableOption "Bore server";
 
@@ -49,6 +49,10 @@ in
         assertion = config.services.caddy.enable;
         message = "Caddy has to be enabled for Bore server to work";
       }
+      {
+        assertion = secrets ? boreSecret && secrets.boreSecret != "";
+        message = "secrets.boreSecret must be set for Bore server authentication";
+      }
     ];
 
     systemd.services.bore-server = {
@@ -62,7 +66,7 @@ in
         Group = "bore";
         Restart = "always";
         RestartSec = "5";
-        ExecStart = "${pkgs.bore-cli}/bin/bore server --min-port ${toString cfg.minPort} --max-port ${toString cfg.maxPort} --bind-addr ${cfg.bindAddr}";
+        ExecStart = "${pkgs.bore-cli}/bin/bore server --secret ${secrets.boreSecret} --min-port ${toString cfg.minPort} --max-port ${toString cfg.maxPort} --bind-addr ${cfg.bindAddr}";
 
         # Security hardening
         NoNewPrivileges = true;
