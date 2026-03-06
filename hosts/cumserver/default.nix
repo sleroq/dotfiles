@@ -93,7 +93,7 @@ in
   cumserver.matterbridge.enable = true;
   cumserver.mailserver.enable = true;
   cumserver.radicale.enable = true;
-  cumserver.bore.enable = false;
+  cumserver.bore.enable = true;
   cumserver.podman.enable = true;
 
 

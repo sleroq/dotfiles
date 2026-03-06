@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   cfg = config.cumserver.bore;
 in
@@ -6,34 +11,34 @@ in
   # TODO: Add some sort of auth
   options.cumserver.bore = {
     enable = lib.mkEnableOption "Bore server";
-    
+
     minPort = lib.mkOption {
       type = lib.types.int;
       default = 8002;
       description = "Minimum port for bore server";
     };
-    
+
     maxPort = lib.mkOption {
       type = lib.types.int;
-      default = 8008;
+      default = 8010;
       description = "Maximum port for bore server";
     };
-    
+
     domain = lib.mkOption {
       type = lib.types.str;
       default = "bore.cum.army";
       description = "Domain for bore server reverse proxy";
     };
-    
+
     bindAddr = lib.mkOption {
       type = lib.types.str;
       default = "0.0.0.0";
       description = "IP address for bore server to bind to";
     };
-    
+
     proxyPort = lib.mkOption {
       type = lib.types.int;
-      default = 8008;
+      default = 8010;
       description = "Port to forward from Caddy reverse proxy to bore server";
     };
   };
@@ -50,7 +55,7 @@ in
       description = "Bore TCP tunnel server";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
-      
+
       serviceConfig = {
         Type = "simple";
         User = "bore";
@@ -58,7 +63,7 @@ in
         Restart = "always";
         RestartSec = "5";
         ExecStart = "${pkgs.bore-cli}/bin/bore server --min-port ${toString cfg.minPort} --max-port ${toString cfg.maxPort} --bind-addr ${cfg.bindAddr}";
-        
+
         # Security hardening
         NoNewPrivileges = true;
         PrivateTmp = true;
@@ -67,7 +72,11 @@ in
         ProtectKernelTunables = true;
         ProtectKernelModules = true;
         ProtectControlGroups = true;
-        RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" ];
+        RestrictAddressFamilies = [
+          "AF_UNIX"
+          "AF_INET"
+          "AF_INET6"
+        ];
         RestrictNamespaces = true;
         LockPersonality = true;
         MemoryDenyWriteExecute = true;
@@ -77,7 +86,7 @@ in
       };
     };
 
-    users.groups.bore = {};
+    users.groups.bore = { };
 
     users.users.bore = {
       isSystemUser = true;
@@ -97,10 +106,16 @@ in
     };
 
     networking.firewall = {
-      allowedTCPPorts = [ 7835 cfg.proxyPort ];
+      allowedTCPPorts = [
+        7835
+        cfg.proxyPort
+      ];
       allowedTCPPortRanges = [
-        { from = cfg.minPort; to = cfg.maxPort; }
+        {
+          from = cfg.minPort;
+          to = cfg.maxPort;
+        }
       ];
     };
   };
-} 
+}
