@@ -6,6 +6,18 @@ in
   options.cumserver.slusha = {
     enable = lib.mkEnableOption "Slusha telegram bot (OCI container)";
 
+    domain = lib.mkOption {
+      type = lib.types.str;
+      default = "slusha.cum.army";
+      description = "Domain name for Slusha web app";
+    };
+
+    webPort = lib.mkOption {
+      type = lib.types.port;
+      default = 18080;
+      description = "Host loopback port used for Slusha web app reverse proxy";
+    };
+
     backup.enable = lib.mkEnableOption "backups" // { default = true; };
 
     image = lib.mkOption {
@@ -52,6 +64,10 @@ in
           assertion = config.virtualisation.oci-containers.backend != null;
           message = "OCI containers backend must be configured for Slusha to work";
         }
+        {
+          assertion = config.services.caddy.enable;
+          message = "Slusha requires Caddy to be enabled for reverse proxy. Set services.caddy.enable = true";
+        }
       ];
 
       users.users.${cfg.user} = {
@@ -76,6 +92,10 @@ in
         autoStart = true;
         pull = "newer";
 
+        ports = [
+          "127.0.0.1:${toString cfg.webPort}:8080"
+        ];
+
         environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
 
         volumes = [
@@ -83,6 +103,13 @@ in
           "${cfg.dataDir}/tmp:/home/nonroot/app/tmp:U"
           "${cfg.dataDir}/log:/home/nonroot/app/log:U"
         ] ++ lib.optional (cfg.configFile != null) "${cfg.configFile}:/home/nonroot/app/slusha.config.js:ro";
+      };
+
+      services.caddy.virtualHosts.${cfg.domain} = {
+        extraConfig = ''
+          reverse_proxy 127.0.0.1:${toString cfg.webPort}
+          encode zstd gzip
+        '';
       };
     })
 
