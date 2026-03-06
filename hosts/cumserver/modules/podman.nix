@@ -7,6 +7,8 @@ in
 
   config = lib.mkIf cfg.enable {
     virtualisation = {
+      containers.registries.insecure = [ "localhost:5000" ];
+
       podman = {
         enable = true;
         dockerCompat = true;
