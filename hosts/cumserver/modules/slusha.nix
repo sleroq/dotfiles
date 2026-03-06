@@ -17,7 +17,7 @@ in
     dataDir = lib.mkOption {
       type = lib.types.str;
       default = "/var/lib/slusha";
-      description = "Persistent data directory for Slusha (for tmp, log, slusha.sqlite)";
+      description = "Persistent data directory for Slusha (for tmp, log, data with sqlite files)";
     };
 
     environmentFile = lib.mkOption {
@@ -68,7 +68,7 @@ in
         "d ${cfg.dataDir} 0750 ${cfg.user} ${cfg.group} -"
         "d ${cfg.dataDir}/tmp 0750 ${cfg.user} ${cfg.group} -"
         "d ${cfg.dataDir}/log 0750 ${cfg.user} ${cfg.group} -"
-        "f ${cfg.dataDir}/slusha.sqlite 0640 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.dataDir}/data 0750 ${cfg.user} ${cfg.group} -"
       ];
 
       virtualisation.oci-containers.containers.slusha = {
@@ -79,7 +79,7 @@ in
         environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
 
         volumes = [
-          "${cfg.dataDir}/slusha.sqlite:/home/nonroot/app/slusha.sqlite:U"
+          "${cfg.dataDir}/data:/home/nonroot/app/data:U"
           "${cfg.dataDir}/tmp:/home/nonroot/app/tmp:U"
           "${cfg.dataDir}/log:/home/nonroot/app/log:U"
         ] ++ lib.optional (cfg.configFile != null) "${cfg.configFile}:/home/nonroot/app/slusha.config.js:ro";
