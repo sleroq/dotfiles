@@ -96,6 +96,11 @@ in
   cumserver.bore.enable = true;
   cumserver.podman.enable = true;
 
+  services.dockerRegistry = {
+    enable = true;
+    enableDelete = true;
+  };
+
 
   cumserver.tuwunel.enable = true;
 
@@ -332,7 +337,7 @@ in
   };
   cumserver.slusha = {
     enable = true;
-    image = "localhost/slusha:latest";
+    image = "localhost:5000/slusha:latest";
     environmentFile = config.age.secrets.slushaEnv.path;
   };
 

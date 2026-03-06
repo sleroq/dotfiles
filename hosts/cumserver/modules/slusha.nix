@@ -22,7 +22,7 @@ in
 
     image = lib.mkOption {
       type = lib.types.str;
-      default = "localhost/slusha:latest";
+      default = "localhost:5000/slusha:latest";
       description = "Container image to use for Slusha";
     };
 
