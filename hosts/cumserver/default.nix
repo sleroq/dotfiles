@@ -99,6 +99,7 @@ in
   services.dockerRegistry = {
     enable = true;
     enableDelete = true;
+    enableGarbageCollect = true;
   };
 
 
