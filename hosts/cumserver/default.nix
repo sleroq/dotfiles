@@ -133,7 +133,7 @@ in
     domain = "time.cum.army";
   };
 
-  cumserver.traggo.enable = false;
+  cumserver.traggo.enable = true;
 
   age.secrets.grafanaPassword = {
     owner = "grafana";
