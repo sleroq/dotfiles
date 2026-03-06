@@ -93,7 +93,7 @@ in
         environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
 
         volumes = [
-          "${cfg.cataDir}/data:/home/nonroot/app/data:U"
+          "${cfg.dataDir}/data:/home/nonroot/app/data:U"
           "${cfg.dataDir}/tmp:/home/nonroot/app/tmp:U"
           "${cfg.dataDir}/log:/home/nonroot/app/log:U"
         ];
