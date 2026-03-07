@@ -149,6 +149,10 @@ in
                     }
                 ];
             }
+            {
+                job_name = "fabric";
+                static_configs = [{ targets = [ "127.0.0.1:25585" ]; }];
+            }
         ] ++ lib.optionals (config.cumserver.frp.enable or false) [
           {
             job_name = "frps";
