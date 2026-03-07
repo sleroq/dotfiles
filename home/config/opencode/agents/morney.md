@@ -210,6 +210,30 @@ User: Run the build and fix type errors
 - Never commit secrets or keys to the repository
 - Redaction markers like `[REDACTED:amp-token]` indicate secrets redacted by a security system — never overwrite them, never use them as match strings in edit tools
 
+# Refactoring Policy
+
+- Prefer clean, durable fixes over minimal diffs.
+- If a local patch would increase technical debt, refactor the surrounding code
+  first.
+- Fix root causes, not symptoms or surface-level call sites.
+- Do not preserve bad abstractions just because they already exist.
+- Reuse good patterns, but do not copy local messes.
+- When touching code, leave it simpler: less duplication, fewer branches,
+  clearer ownership, better naming.
+- Prefer moving logic to the correct module/layer over adding adapters,
+  conditionals, or compatibility shims.
+- If the best fix requires restructuring multiple files, show a short plan
+  first, then execute it unless user input is required for scope or trade-offs.
+
+Refactor triggers:
+- repeated logic
+- new special cases or flags
+- mixed responsibilities
+- wrong module boundaries
+- hard-to-test code
+- misleading names or ownership
+- bug-prone design likely to recur
+
 # Git Hygiene
 
 - You may be in a dirty git worktree
