@@ -77,7 +77,7 @@
             "uid": "Prometheus1"
           },
           "exemplar": true,
-          "expr": "sum(minecraft_players_online{instance=~\"$instance\",job=~\"$job\"})",
+          "expr": "sum(minecraft_players_online{job=\"fabric\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -151,7 +151,7 @@
             "uid": "Prometheus1"
           },
           "exemplar": true,
-          "expr": "minecraft_mspt{type=\"mean\",instance=~\"$instance\",job=~\"$job\"}",
+          "expr": "minecraft_mspt{type=\"mean\",job=\"fabric\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -225,7 +225,7 @@
             "uid": "Prometheus1"
           },
           "exemplar": true,
-          "expr": "minecraft_tps{instance=~\"$instance\",job=~\"$job\"}",
+          "expr": "minecraft_tps{job=\"fabric\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -295,7 +295,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "avg_over_time(jvm_memory_bytes_used{instance=~\"$instance\",job=~\"$job\",area=\"heap\"}[2m])",
+          "expr": "avg_over_time(jvm_memory_bytes_used{job=\"fabric\",area=\"heap\"}[2m])",
           "format": "time_series",
           "interval": "",
           "legendFormat": "__auto",
@@ -363,7 +363,7 @@
             "uid": "Prometheus1"
           },
           "exemplar": true,
-          "expr": "sum(minecraft_entities{instance=~\"$instance\",job=~\"$job\"})",
+          "expr": "sum(minecraft_entities{job=\"fabric\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -464,7 +464,7 @@
             "uid": "Prometheus1"
           },
           "exemplar": true,
-          "expr": "sum(minecraft_players_online{instance=~\"$instance\",job=~\"$job\"}) by (world)",
+          "expr": "sum(minecraft_players_online{job=\"fabric\"}) by (world)",
           "interval": "",
           "legendFormat": "Players in {{world}}",
           "refId": "A"
@@ -564,7 +564,7 @@
             "uid": "Prometheus1"
           },
           "exemplar": true,
-          "expr": "minecraft_tps{instance=~\"$instance\",job=~\"$job\"}",
+          "expr": "minecraft_tps{job=\"fabric\"}",
           "interval": "",
           "legendFormat": "TPS",
           "refId": "A"
@@ -668,7 +668,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "minecraft_mspt{type!=\"max\",instance=~\"$instance\",job=~\"$job\"}",
+          "expr": "minecraft_mspt{type!=\"max\",job=\"fabric\"}",
           "interval": "",
           "legendFormat": "{{type}} MSPT",
           "range": true,
@@ -741,7 +741,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sort_desc(sum(minecraft_entities{instance=~\"$instance\",job=~\"$job\"}) by (type))",
+          "expr": "sort_desc(sum(minecraft_entities{job=\"fabric\"}) by (type))",
           "instant": true,
           "interval": "",
           "legendFormat": "{{type}}",
@@ -841,7 +841,7 @@
             "uid": "Prometheus1"
           },
           "exemplar": true,
-          "expr": "sum(minecraft_entities{instance=~\"$instance\",job=~\"$job\"}) by (group)",
+          "expr": "sum(minecraft_entities{job=\"fabric\"}) by (group)",
           "interval": "",
           "legendFormat": "{{group}}",
           "refId": "A"
@@ -939,7 +939,7 @@
             "uid": "Prometheus1"
           },
           "exemplar": true,
-          "expr": "sum(minecraft_entities{instance=~\"$instance\",job=~\"$job\"}) by (world)",
+          "expr": "sum(minecraft_entities{job=\"fabric\"}) by (world)",
           "interval": "",
           "legendFormat": "Entities in {{world}}",
           "refId": "A"
@@ -1035,7 +1035,7 @@
             "uid": "Prometheus1"
           },
           "editorMode": "code",
-          "expr": "rate(process_cpu_seconds_total{instance=~\"$instance\",job=~\"$job\"}[10m])",
+          "expr": "rate(process_cpu_seconds_total{job=\"fabric\"}[10m])",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1144,7 +1144,7 @@
             "uid": "Prometheus1"
           },
           "exemplar": true,
-          "expr": "sum(minecraft_loaded_chunks{instance=~\"$instance\",job=~\"$job\"}) by (world)",
+          "expr": "sum(minecraft_loaded_chunks{job=\"fabric\"}) by (world)",
           "interval": "",
           "legendFormat": "Loaded chunks in {{world}}",
           "refId": "A"
@@ -1242,7 +1242,7 @@
             "uid": "Prometheus1"
           },
           "editorMode": "code",
-          "expr": "rate({__name__=~\"jvm_gc_collection_seconds_sum\",instance=~\"$instance\",job=~\"$job\"}[10m])",
+          "expr": "rate({__name__=~\"jvm_gc_collection_seconds_sum\",job=\"fabric\"}[10m])",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1253,7 +1253,7 @@
             "uid": "Prometheus1"
           },
           "editorMode": "code",
-          "expr": "rate({__name__=~\"jvm_gc_collection_seconds_count\",instance=~\"$instance\",job=~\"$job\"}[10m])",
+          "expr": "rate({__name__=~\"jvm_gc_collection_seconds_count\",job=\"fabric\"}[10m])",
           "hide": true,
           "instant": false,
           "legendFormat": "__auto",
@@ -1359,7 +1359,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "rate({__name__=\"jvm_memory_pool_bytes_used\",instance=~\"$instance\",job=~\"$job\"}[10m])",
+          "expr": "rate({__name__=\"jvm_memory_pool_bytes_used\",job=\"fabric\"}[10m])",
           "interval": "",
           "legendFormat": "{{pool}}",
           "range": true,
@@ -1458,7 +1458,7 @@
             "uid": "Prometheus1"
           },
           "editorMode": "code",
-          "expr": "sum(jvm_threads_state{instance=~\"$instance\",job=~\"$job\"}) by (state)",
+          "expr": "sum(jvm_threads_state{job=\"fabric\"}) by (state)",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -1472,7 +1472,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "process_virtual_memory_bytes{instance=~\"$instance\",job=~\"$job\"}",
+          "expr": "process_virtual_memory_bytes{job=\"fabric\"}",
           "hide": true,
           "instant": false,
           "legendFormat": "__auto",
@@ -1570,7 +1570,7 @@
             "uid": "Prometheus1"
           },
           "editorMode": "code",
-          "expr": "{__name__=~\"jvm_threads_(current|daemon|peak|deadlocked|deadlocked_monitor)\",instance=~\"$instance\",job=~\"$job\"}",
+          "expr": "{__name__=~\"jvm_threads_(current|daemon|peak|deadlocked|deadlocked_monitor)\",job=\"fabric\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1594,50 +1594,7 @@
   "schemaVersion": 42,
   "tags": [],
   "templating": {
-    "list": [
-      {
-        "current": {
-          "text": [
-            "All"
-          ],
-          "value": [
-            "$__all"
-          ]
-        },
-        "datasource": "Prometheus1",
-        "definition": "query_result(up{job=~\"$job\"})",
-        "description": "",
-        "includeAll": true,
-        "multi": true,
-        "name": "instance",
-        "options": [],
-        "query": {
-          "query": "query_result(up{job=~\"$job\"})",
-          "refId": "StandardVariableQuery"
-        },
-        "refresh": 1,
-        "regex": "/.*instance=\"([^\"]+).*/",
-        "type": "query"
-      },
-      {
-        "current": {
-          "text": "fabric",
-          "value": "fabric"
-        },
-        "datasource": "Prometheus1",
-        "definition": "query_result(minecraft_entities)",
-        "includeAll": false,
-        "name": "job",
-        "options": [],
-        "query": {
-          "query": "query_result(minecraft_entities)",
-          "refId": "StandardVariableQuery"
-        },
-        "refresh": 1,
-        "regex": "/.*job=\"([^\"]+)/",
-        "type": "query"
-      }
-    ]
+    "list": []
   },
   "time": {
     "from": "now-3h",
