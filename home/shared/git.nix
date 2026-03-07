@@ -50,6 +50,7 @@
     ignores = [
       ".gitlab.nvim"
       ".aider*"
+      ".DS_Store"
     ];
     includes = [
       {
