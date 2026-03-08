@@ -163,6 +163,12 @@ in
             job_name = "restic";
             static_configs = [{ targets = [ "127.0.0.1:${toString config.cumserver.restic.port}" ]; }];
           }
+        ] ++ lib.optionals (config.cumserver.slusha.enable or false) [
+          {
+            job_name = "slusha";
+            metrics_path = "/metrics";
+            static_configs = [{ targets = [ "127.0.0.1:${toString config.cumserver.slusha.webPort}" ]; }];
+          }
         ] ++ (map (node: {
             job_name = "node-${lib.strings.toLower node.name}";
             static_configs = [{
