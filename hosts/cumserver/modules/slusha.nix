@@ -53,31 +53,31 @@ in
         }
       ];
 
-      # Distroless nonroot image uses uid/gid 65532
+      # add node_modules dir for runtime npm cache
       systemd.tmpfiles.rules = [
         "d ${cfg.dataDir} 0750 65532 65532 -"
         "d ${cfg.dataDir}/tmp 0750 65532 65532 -"
         "d ${cfg.dataDir}/log 0750 65532 65532 -"
         "d ${cfg.dataDir}/data 0750 65532 65532 -"
+        "d ${cfg.dataDir}/node_modules 0750 65532 65532 -"
       ];
-
       virtualisation.oci-containers.containers.slusha = {
         inherit (cfg) image;
         autoStart = true;
         pull = "newer";
-
         ports = [
           "127.0.0.1:${toString cfg.webPort}:8080"
         ];
-
         environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
-
         user = "65532:65532";
-
+        environment = {
+          DENO_DIR = "/app/tmp/deno";
+        };
         volumes = [
-          "${cfg.dataDir}/data:/home/nonroot/app/data"
-          "${cfg.dataDir}/tmp:/home/nonroot/app/tmp"
-          "${cfg.dataDir}/log:/home/nonroot/app/log"
+          "${cfg.dataDir}/data:/app/data"
+          "${cfg.dataDir}/tmp:/app/tmp"
+          "${cfg.dataDir}/log:/app/log"
+          "${cfg.dataDir}/node_modules:/app/node_modules"
         ];
       };
 
