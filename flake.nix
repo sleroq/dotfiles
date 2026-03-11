@@ -47,7 +47,7 @@
     vicinae.url = "git+https://github.com/vicinaehq/vicinae?ref=refs/tags/v0.20.1"; # Lock version here to hit gh actions cache
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     zig.url = "github:mitchellh/zig-overlay";
-    zls.url = "github:zigtools/zls?rev=45b855f7ec3dccea3c9a95df0b68e27dab842ae4";
+    zls.url = "github:zigtools/zls";
     zed-interplanetary.url = "github:zed-industries/zed/nightly"; # Lock to hit the cache
     zed-international.url = "github:zed-industries/zed/nightly";
 
