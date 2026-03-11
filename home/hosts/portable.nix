@@ -78,6 +78,8 @@ in
         amp-cli
         scrcpy
         typst
+        inputs'.zig.packages.master
+        inputs'.zls.packages.default
       ];
     };
   };
