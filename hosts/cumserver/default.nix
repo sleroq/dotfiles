@@ -321,19 +321,17 @@ in
   #   environmentFile = config.age.secrets.zefxiEnv.path;
   # };
 
-  # age.secrets.sieveEnv = {
-  #   owner = "sieve";
-  #   group = "sieve";
-  #   file = ./secrets/sieveEnv;
-  # };
-  # services.sieve = {
-  #   enable = false;
-  #   environmentFile = config.age.secrets.sieveEnv.path;
-  # };
+  age.secrets.sieveEnv = {
+    owner = "sieve";
+    group = "sieve";
+    file = ./secrets/sieveEnv;
+  };
+  services.sieve = {
+    enable = true;
+    environmentFile = config.age.secrets.sieveEnv.path;
+  };
 
   age.secrets.slushaEnv = {
-    owner = "slusha";
-    group = "slusha";
     file = ./secrets/slushaEnv;
   };
   cumserver.slusha = {
