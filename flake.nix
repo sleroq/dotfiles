@@ -22,12 +22,8 @@
     caelestia_shell-interplanetary.url = "github:caelestia-dots/shell";
     caelestia_shell-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
 
-    caelestia_shell-international.url = "github:caelestia-dots/shell";
-    caelestia_shell-international.inputs.nixpkgs.follows = "nixpkgs-international";
-
     # Per-host nixpkgs pins
     nixpkgs-interplanetary.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
-    nixpkgs-international.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-cumserver.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-portable.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
 
@@ -38,9 +34,6 @@
     home-manager-interplanetary.url = "github:nix-community/home-manager";
     home-manager-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
 
-    home-manager-international.url = "github:nix-community/home-manager";
-    home-manager-international.inputs.nixpkgs.follows = "nixpkgs-international";
-
     # HM-related inputs used by home modules
     nix-gaming.url = "github:fufexan/nix-gaming";
 
@@ -49,7 +42,6 @@
     zig.url = "github:mitchellh/zig-overlay";
     zls.url = "github:zigtools/zls";
     zed-interplanetary.url = "github:zed-industries/zed/nightly"; # Lock to hit the cache
-    zed-international.url = "github:zed-industries/zed/nightly";
 
     scrcpyPkgs.url = "github:nixos/nixpkgs/77a0bdd";
     nixpkgs-master.url = "github:nixos/nixpkgs/master";
@@ -147,24 +139,6 @@
                   ];
                 }
                 { home-manager.users.${username}.imports = [ ./home/hosts/interplanetary.nix ]; }
-              ];
-            };
-
-            international = withNixpkgsFor "international" {
-              tags = [ "linux-personal" ];
-
-              specialArgs = {
-                inherit username;
-                flakeRoot = "/home/sleroq/develop/other/dotfiles";
-              };
-              modules = [
-                inputs.home-manager-international.nixosModules.home-manager
-                {
-                  home-manager.sharedModules = [
-                    inputs.caelestia_shell-international.homeManagerModules.default
-                  ];
-                }
-                { home-manager.users.${username}.imports = [ ./home/hosts/international.nix ]; }
               ];
             };
 
