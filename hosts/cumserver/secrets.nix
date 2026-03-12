@@ -47,7 +47,6 @@ let
     "secrets/resticS3Keys" = { publicKeys = commonPublicKeys; };
     "secrets/resticPassword" = { publicKeys = commonPublicKeys; };
     "secrets/livekitKeys" = { publicKeys = commonPublicKeys; };
-    "secrets/keycloakPassword" = { publicKeys = commonPublicKeys; };
   };
 
 in

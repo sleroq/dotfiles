@@ -35,7 +35,6 @@ in
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
     ./modules/caddy.nix
-    ./modules/keycloak.nix
     ./modules/matterbridge.nix
     ./modules/mailserver.nix
     ./modules/navidrome.nix
@@ -102,17 +101,9 @@ in
     enableGarbageCollect = true;
   };
 
-
   cumserver.tuwunel.enable = true;
 
   cumserver.frp.enable = true;
-
-  age.secrets.keycloak = {
-    owner = "keycloak";
-    group = "keycloak";
-    file = ./secrets/keycloakPassword;
-  };
-  cumserver.keycloak.enable = true;
 
   age.secrets.livekitKeys = {
     owner = "root";

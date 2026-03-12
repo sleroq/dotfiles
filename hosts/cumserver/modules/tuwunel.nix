@@ -219,24 +219,6 @@ in
               allow_incoming_presence = false;
               allow_outgoing_presence = false;
 
-              identity_provider = [
-                {
-                  brand = "keycloak";
-                  client_id = "tuwunel";
-                  client_secret = secrets.tuwunel.oidcClientSecret;
-                  issuer_url = "https://${config.cumserver.keycloak.domain}/realms/meow";
-                  discovery_url = "https://${config.cumserver.keycloak.domain}/realms/meow/.well-known/openid-configuration";
-                  callback_url = "https://${cfg.domain}/_matrix/client/unstable/login/sso/callback/tuwunel";
-
-                  # optional:
-                  # default = true;
-                  # name = "Company SSO";
-                  # scope = [ "openid" "profile" "email" ];
-                  # userid_claims = [ "sub" ];
-                  # discovery = true;
-                }
-              ];
-
               # Well-known configuration for client discovery and Element Call (MSC4143)
               well_known = {
                 client = "https://${cfg.domain}";
