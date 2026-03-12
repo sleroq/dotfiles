@@ -434,7 +434,30 @@ in
 
   users.users.root.hashedPassword = "$6$vsKWQuT3n7JRBP.s$uI.Pyq.dN/kxLqmGF9Pl/yuVGRp/9Y6sQXVNqAsNm4impBdDgAnazM1VVu9jZ4oHfZRsFCXvZTIwvXWoSF76x.";
 
-  nix.settings.auto-optimise-store = true;
+  nix.settings = {
+    auto-optimise-store = true;
+    max-jobs = 1;
+    cores = 0;
+  };
+
+  # Fixes for low memory situations:
+  zramSwap = {
+    enable = true;
+    algorithm = "lz4"; # Bad compression but fast
+  };
+  systemd.oomd.enableUserSlices = true; # take action on user-space process hierarchies
+
+  # nix = {
+  #    daemonIOSchedClass = lib.mkDefault "idle";
+  #    daemonCPUSchedPolicy = lib.mkDefault "idle";
+  #  };
+  #  # put the service in top-level slice
+  #  # so that it's lower than system and user slice overall
+  #  # instead of only being lower in system slice
+  #  systemd.services.nix-daemon.serviceConfig.Slice = "-.slice";
+  #  # always use the daemon, even executed  with root
+  #  environment.variables.NIX_REMOTE = "daemon";
+
   nix.gc = {
     automatic = true;
     dates = "daily";
