@@ -8,16 +8,14 @@ Single unified flake for NixOS + Home Manager across laptop, desktop, and server
 ├── flake.nix                     # top-level flake for NixOS + HM
 ├── home/                         # Home Manager
 │   ├── config/                   # configs linked into $XDG_CONFIG_HOME
-│   ├── hosts/                    # per-host settings
-│   │   ├── international.nix     # laptop
-│   │   └── interplanetary.nix    # desktop
+│   ├── hosts/                    # per-host settings
+│   │   └── interplanetary.nix    # desktop
 │   ├── modules/                  # modules: programs, editors, wms, etc
 │   ├── secrets/                  # secrets
 │   └── shared/                   # shared settings
 ├── hosts/                        # NixOS hosts
-│   ├── international/            # laptop
-│   ├── interplanetary/           # desktop
-│   └── cumserver/                # server (NixOS + services)
+│   ├── interplanetary/           # desktop
+│   └── cumserver/                # server (NixOS + services)
 ├── modules/                      # reusable NixOS modules (shared across non-server hosts)
 ├── shared/                       # shared NixOS config + secrets for non-servers
 │   ├── default.nix
@@ -50,7 +48,7 @@ Example usage in modules:
 #+BEGIN_SRC nix
 { lib, pkgs, inputs', ... }:
 {
-  # Host-aware: picks inputs.zed-interplanetary on "interplanetary" host, inputs.zed-international on "international" host
+  # Host-aware: picks inputs.zed-interplanetary on "interplanetary" host
   environment.systemPackages = [
     # shorter access thanks to inputs'
     inputs'.zed.packages.default
@@ -68,12 +66,10 @@ These helpers are also passed into Home Manager via =extraSpecialArgs=, so HM mo
 2. Setup secrets mentioned in =home/secrets.nix=, =shared/secrets.nix=, and host-specific =hosts/*/secrets.nix=
 3. Switch NixOS (from repo root):
    - =sudo nixos-rebuild switch --flake .#interplanetary=
-   - =sudo nixos-rebuild switch --flake .#international=
    - =sudo nixos-rebuild switch --flake .#cumserver=
 4. Home Manager is managed via the NixOS module and rebuilt with the system. No separate HM flake or aliases.
 5. Per-host nixpkgs pins can be updated independently:
    - =nix flake lock --update-input nixpkgs-interplanetary=
-   - =nix flake lock --update-input nixpkgs-international=
    - =nix flake lock --update-input nixpkgs-cumserver=
 
 ** How to understand Nix?
