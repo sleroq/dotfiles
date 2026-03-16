@@ -2495,11 +2495,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773323842,
-        "narHash": "sha256-pmmisCaFS5JLkV4fIPTRVHsziJN/kjIoYWVdzLkTXS4=",
+        "lastModified": 1773411827,
+        "narHash": "sha256-dI+7KLqW3YdSVZ2vGkr6rRqSEykXHWOkKEMTtg+evVs=",
         "ref": "refs/heads/main",
-        "rev": "fd59cd30e17150b8ae83160d0a6d7a3e603b5368",
-        "revCount": 112,
+        "rev": "625abca27f9147f66e4b11837489b88de5051413",
+        "revCount": 114,
         "type": "git",
         "url": "ssh://git@github.com/sleroq/sieve"
       },
