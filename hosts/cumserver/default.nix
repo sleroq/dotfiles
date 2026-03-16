@@ -171,13 +171,15 @@ in
 
   cumserver.navidrome = {
     enable = true;
+    metrics = {
+      enable = true;
+      path = "/metrics_itslocalanyway";
+    };
     filebrowser.enable = true;
     feishin.enable = true;
   };
 
   age.secrets.ziplineEnv = {
-    owner = "zipline";
-    group = "zipline";
     file = ./secrets/ziplineEnv;
   };
 
