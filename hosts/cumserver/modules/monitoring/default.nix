@@ -1,6 +1,7 @@
 { config, lib, ... }:
 let
   cfg = config.cumserver.monitoring;
+  navidromeCfg = config.cumserver.navidrome;
 in
 {
   options.cumserver.monitoring = {
@@ -168,6 +169,12 @@ in
             job_name = "slusha";
             metrics_path = "/metrics";
             static_configs = [{ targets = [ "127.0.0.1:${toString config.cumserver.slusha.webPort}" ]; }];
+          }
+        ] ++ lib.optionals (navidromeCfg.enable && navidromeCfg.metrics.enable) [
+          {
+            job_name = "navidrome";
+            metrics_path = navidromeCfg.metrics.path;
+            static_configs = [{ targets = [ "127.0.0.1:${toString config.services.navidrome.settings.Port}" ]; }];
           }
         ] ++ (map (node: {
             job_name = "node-${lib.strings.toLower node.name}";

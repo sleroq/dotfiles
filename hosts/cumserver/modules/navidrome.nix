@@ -19,6 +19,16 @@ in
       description = "Path to music files";
     };
 
+    metrics = {
+      enable = lib.mkEnableOption "Navidrome Prometheus metrics";
+
+      path = lib.mkOption {
+        type = lib.types.str;
+        default = "/metrics";
+        description = "Path for the Navidrome metrics endpoint";
+      };
+    };
+
     filebrowser = {
       enable = lib.mkEnableOption "FileBrowser web file manager";
       
@@ -119,6 +129,10 @@ in
           SessionTimeout = "24h";
           BaseURL = "https://${cfg.domain}";
           EnableSharing = true;
+          Prometheus = {
+            Enabled = cfg.metrics.enable;
+            MetricsPath = cfg.metrics.path;
+          };
         };
       };
 
