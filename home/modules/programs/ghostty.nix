@@ -11,6 +11,7 @@
       theme = "dark:Rose Pine,light:Rose Pine Dawn";
       font-size = 18;
       cursor-style = "block";
+      shell-integration-features = "ssh-terminfo,ssh-env";
 
       keybind = [
         "alt+w=toggle_window_decorations"
