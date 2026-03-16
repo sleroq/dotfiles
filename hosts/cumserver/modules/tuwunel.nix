@@ -170,6 +170,7 @@ in
               allow_public_room_directory_without_auth = false;
               lockdown_public_room_directory = false;
               allow_device_name_federation = false;
+              default_room_version = 12;
               url_preview_domain_contains_allowlist = [ ];
               url_preview_domain_explicit_allowlist = [
                 "x.com"
@@ -341,11 +342,12 @@ in
                       "unredacted.org"
                     ];
                     spaces = [
-                      "!FwtFmFqM4bwuaWtRKB:sleroq.link"
+                      "!xPWsQQHAsLQiJzm1JJPqynB-gAq4ycN6cY3GvkjQSas:sleroq.link"
                       "!brXHJeAtqliwNGqHQx:lossy.network"
                       "#science-space:matrix.org"
                       "#community:matrix.org"
                       "#cinny-space:matrix.org"
+                      "!_G-Utf3nOR3_6J3sbvycpRkssI6qlK8pnuBF7OXpJYA:sleroq.link"
                     ];
                     rooms = [
                       "#cinny:matrix.org"
