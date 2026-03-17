@@ -119,6 +119,8 @@ in
       bun
       pnpm
 
+      zstd # For compressing stuff
+
       pre-commit # Some repos use this (e.g. anytype)
     ];
   };
