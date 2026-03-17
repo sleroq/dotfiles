@@ -170,7 +170,7 @@ in
               allow_public_room_directory_without_auth = false;
               lockdown_public_room_directory = false;
               allow_device_name_federation = false;
-              default_room_version = 12;
+              default_room_version = "12";
               url_preview_domain_contains_allowlist = [ ];
               url_preview_domain_explicit_allowlist = [
                 "x.com"
