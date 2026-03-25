@@ -29,7 +29,7 @@ in
       };
     };
 
-    networking.firewall.allowedTCPPorts = [ 7000 27015 ];
-    networking.firewall.allowedUDPPorts = [ 27015 ];
+    networking.firewall.allowedTCPPorts = [ 7000 27015 28801 ];
+    networking.firewall.allowedUDPPorts = [ 27015 28802 ];
   };
 }
