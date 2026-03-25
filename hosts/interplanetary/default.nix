@@ -1,5 +1,10 @@
-{ config, pkgs, self, username, ... }:
-
+{ config, pkgs, self, username, lib, ... }:
+let
+  tailscaleStateDir = "/boot/tailscale-initrd";
+  initrdTailscaleState = "${tailscaleStateDir}/tailscaled.state";
+  initrdSshHostKey = "/boot/initrd-ssh/ssh_host_ed25519_key";
+  tailscaleCfg = config.services.tailscale;
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -27,11 +32,92 @@
     # Enable "Silent Boot"
     consoleLogLevel = 0;
     initrd = {
-      systemd.enable = true;
+      availableKernelModules = lib.mkAfter [
+        "r8169"
+        "tun"
+        "nft_chain_nat"
+      ];
+      network = {
+        enable = true;
+        ssh = {
+          enable = true;
+          hostKeys = [ initrdSshHostKey ];
+          authorizedKeys = config.users.users.${username}.openssh.authorizedKeys.keys;
+          ignoreEmptyHostKeys = true;
+        };
+      };
       verbose = false;
       luks.devices."luks-16e9a143-3440-4844-9742-9fb6f3a2f679" = {
         device = "/dev/disk/by-uuid/16e9a143-3440-4844-9742-9fb6f3a2f679";
         allowDiscards = true;
+      };
+      systemd = {
+        enable = true;
+        users.root.shell = "${pkgs.bashInteractive}/bin/bash";
+        packages = [ tailscaleCfg.package ];
+        storePaths = [ pkgs.bashInteractive ];
+        extraBin = {
+          ping = "${pkgs.iputils}/bin/ping";
+        };
+        mounts = [
+          {
+            what = "/dev/disk/by-uuid/AF7D-6D7E";
+            where = "/boot";
+            type = "vfat";
+            options = "fmask=0077,dmask=0077";
+            wantedBy = [ "initrd.target" ];
+            before = [ "initrd.target" ];
+            unitConfig.DefaultDependencies = false;
+          }
+        ];
+        network = {
+          enable = true;
+          wait-online = {
+            anyInterface = true;
+            timeout = 20;
+          };
+          networks = {
+            "10-enp16s0" = {
+              matchConfig.Name = "enp16s0";
+              networkConfig.DHCP = "ipv4";
+              linkConfig.RequiredForOnline = "routable";
+            };
+            "50-tailscale" = {
+              matchConfig.Name = tailscaleCfg.interfaceName;
+              linkConfig = {
+                Unmanaged = true;
+                ActivationPolicy = "manual";
+              };
+            };
+          };
+        };
+        services = {
+          systemd-networkd-wait-online.requiredBy = [ "network-online.target" ];
+          tailscaled = {
+            unitConfig.DefaultDependencies = false;
+            wantedBy = [ "initrd.target" ];
+            wants = [ "network-online.target" ];
+            requires = [ "boot.mount" ];
+            after = [
+              "boot.mount"
+              "network-online.target"
+            ];
+            path = [
+              pkgs.iptables
+              pkgs.iproute2
+              tailscaleCfg.package
+            ];
+            serviceConfig = {
+              # Keep initrd Tailscale disabled until a separate node state exists on /boot.
+              ExecStart = ''${tailscaleCfg.package}/bin/tailscaled --state=${lib.escapeShellArg initrdTailscaleState} --socket=/run/tailscale/tailscaled.sock --port=${toString tailscaleCfg.port} --tun ${lib.escapeShellArg tailscaleCfg.interfaceName}'';
+              Restart = "on-failure";
+              RuntimeDirectory = "tailscale";
+              RuntimeDirectoryMode = "0755";
+              Type = "notify";
+            };
+            unitConfig.ConditionPathExists = initrdTailscaleState;
+          };
+        };
       };
     };
     kernelParams = [
@@ -107,6 +193,28 @@
     settings = {
       PasswordAuthentication = false;
     };
+  };
+
+  systemd.tmpfiles.rules = [
+    "d /boot/initrd-ssh 0700 root root -"
+    "d ${tailscaleStateDir} 0700 root root -"
+  ];
+
+  systemd.services.initrd-ssh-host-key = {
+    description = "Generate initrd SSH host key";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "boot.mount" ];
+    # The first switch creates the key on /boot; rebuild once more so it is embedded into initrd.
+    unitConfig.ConditionPathExists = "|!${initrdSshHostKey}";
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    path = [ pkgs.openssh ];
+    script = ''
+      install -d -m 0700 /boot/initrd-ssh
+      ssh-keygen -q -t ed25519 -N "" -f ${lib.escapeShellArg initrdSshHostKey}
+    '';
   };
 
   age.secrets = {
