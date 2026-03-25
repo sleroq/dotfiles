@@ -47,8 +47,8 @@ in
         };
       };
       verbose = false;
-      luks.devices."luks-16e9a143-3440-4844-9742-9fb6f3a2f679" = {
-        device = "/dev/disk/by-uuid/16e9a143-3440-4844-9742-9fb6f3a2f679";
+      luks.devices."luks-972627b2-2690-4d15-be64-d03f0aa85255" = {
+        device = "/dev/disk/by-uuid/972627b2-2690-4d15-be64-d03f0aa85255";
         allowDiscards = true;
       };
       systemd = {
