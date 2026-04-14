@@ -44,7 +44,7 @@ in
       # :lang web
       html-tidy
       jsbeautifier
-      nodePackages_latest.stylelint
+      stylelint
       sass
       # :lang org & export with pandoc
       pandoc
