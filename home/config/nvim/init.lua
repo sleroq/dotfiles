@@ -22,6 +22,7 @@ vim.cmd.packadd("nohlsearch")
 vim.cmd.packadd("cfilter")
 vim.o.grepprg = "rg --vimgrep --hidden --glob '!.git/*' --glob '!node_modules/*'"
 vim.opt.shell = "bash"
+vim.opt.conceallevel = 2 -- for markdown shit
 
 -- experimental stuff
 vim.o.path = "**"         -- for the find command, maybe helps with completion as well
@@ -107,6 +108,8 @@ vim.pack.add({
     { src = "https://github.com/kdheepak/monochrome.nvim" },
     { src = "https://github.com/vague2k/vague.nvim" },
     { src = "https://github.com/rose-pine/neovim" },
+
+    { src = "https://github.com/epwalsh/obsidian.nvim" },
 })
 
 require("faster").setup()
@@ -329,6 +332,15 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     callback = function()
         vim.bo.filetype = "sh"
     end,
+})
+
+require("obsidian").setup({
+    workspaces = {
+        {
+          name = "vault",
+          path = "~/Sync/shared-org",
+        },
+    },
 })
 
 -- require("vague").setup({ transparent = true })
