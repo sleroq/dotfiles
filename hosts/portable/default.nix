@@ -1,7 +1,10 @@
- { flakeRoot, pkgs, ... }:
+ { flakeRoot, pkgs, config, ... }:
 
 {
-  imports = [ ./aerospace.nix ];
+  imports = [
+    ./aerospace.nix
+    ../../modules/sing-box.nix
+  ];
 
   system = {
     stateVersion = 6;
@@ -27,6 +30,20 @@
   };
 
   documentation.enable = false;
+
+  age.identityPaths = [ "/var/lib/agenix-key.txt" ];
+  age.secrets.sing-box-outbounds = {
+    file = ../../shared/secrets/sing-box-outbounds.jsonc;
+    mode = "0644";
+  };
+
+  sleroq.sing-box = {
+    enable = true;
+    outboundsFile = config.age.secrets.sing-box-outbounds.path;
+    settings = {
+      # log.level = "warn";
+    };
+  };
 
   # Tailscale? https://github.com/nix-darwin/nix-darwin/blob/b8c7ac030211f18bd1f41eae0b815571853db7a2/modules/services/tailscale.nix
   system.primaryUser = "sleroq";

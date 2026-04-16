@@ -1,75 +1,110 @@
 {
   config,
   lib,
+  options,
   pkgs,
   ...
 }:
 let
   cfg = config.sleroq.sing-box;
   settingsFormat = pkgs.formats.json { };
+  hasSystemd = lib.hasAttrByPath [ "systemd" "services" ] options;
+  hasLaunchd = lib.hasAttrByPath [ "launchd" "daemons" ] options;
 
-  sing-box-beta = pkgs.sing-box.overrideAttrs (oldAttrs: rec {
-    version = "1.12.11";
-    src = pkgs.fetchFromGitHub {
-      owner = "SagerNet";
-      repo = "sing-box";
-      tag = "v${version}";
-      hash = "sha256-K28Lf5WOd0RNpk7nRettrJLc5WrGgqki5Dj4zxfmZ+4=";
-    };
-    vendorHash = "sha256-+p2esP5sKNSPJ2ig9R58PflsMPlrGv+MJCwX0ESMmbc=";
-    tags = [
-      "with_quic"
-      "with_dhcp"
-      "with_wireguard"
-      "with_utls"
-      "with_acme"
-      "with_clash_api"
-      "with_gvisor"
-    ];
-  });
+  directDomains = [
+    ".ru"
+    ".local"
+    ".frg"
+    ".frankrg.com"
+  ];
+
+  tunInbound = {
+    type = "tun";
+    tag = "tun-in";
+    address = [ "172.19.0.1/30" ];
+    auto_route = true;
+    strict_route = true;
+    stack = "system";
+  };
 
   defaultSettings = {
     log = {
       level = "info";
       timestamp = true;
     };
+
     dns = {
       servers = [
         {
-          tag = "google";
           type = "tls";
-          server = "8.8.8.8";
+          tag = "remote-dns";
+          server = "1.1.1.1";
+          server_port = 853;
+        }
+        {
+          type = "local";
+          tag = "local-dns";
         }
       ];
+
+      rules = [
+        {
+          domain_suffix = directDomains;
+          server = "local-dns";
+          strategy = "ipv4_only";
+        }
+      ];
+
+      strategy = "ipv4_only";
+      final = "remote-dns";
     };
+
+    inbounds = [ tunInbound ];
+
     route = {
-      default_domain_resolver = "google";
       rules = [
         {
           action = "sniff";
         }
         {
+          ip_version = 6;
+          action = "reject";
+        }
+        {
+          network = [ "udp" ];
+          port = [ 443 ];
+          action = "reject";
+        }
+        {
+          network = [ "udp" ];
+          action = "route";
+          outbound = "direct";
+        }
+        {
           protocol = "dns";
           action = "hijack-dns";
         }
+        {
+          ip_is_private = true;
+          action = "route";
+          outbound = "direct";
+        }
+        {
+          domain_suffix = directDomains;
+          action = "route";
+          outbound = "direct";
+        }
       ];
+
+      final = "proxy";
       auto_detect_interface = true;
+      default_domain_resolver = "local-dns";
     };
-    inbounds = [
-      {
-        type = "mixed";
-        tag = "mixed-in";
-        listen = "127.0.0.1";
-        listen_port = 2080;
-        sniff = true;
-        sniff_override_destination = true;
-      }
-    ];
+
     experimental = {
       cache_file = {
         enabled = true;
-        path = "clash.db";
-        store_rdrc = true;
+        path = "${workingDirectory}/clash.db";
       };
       clash_api = {
         default_mode = "Enhanced";
@@ -77,6 +112,28 @@ let
     };
   };
 
+  finalSettings = lib.recursiveUpdate defaultSettings cfg.settings;
+
+  configTemplate = settingsFormat.generate "sing-box-config.json" (
+    removeAttrs finalSettings [ "outbounds" ]
+  );
+
+  configPath = "/etc/sing-box/config.json";
+  workingDirectory = "/var/lib/sing-box";
+  logPath = "/var/log/sing-box.log";
+
+  serviceRunner = pkgs.writeShellScript "sing-box-run" ''
+    set -eu
+
+    mkdir -p "/etc/sing-box" "${workingDirectory}" "$(dirname "${logPath}")"
+
+    ${pkgs.jq}/bin/jq \
+      --rawfile outbounds "${cfg.outboundsFile}" \
+      '.outbounds = ($outbounds | fromjson)' \
+      "${configTemplate}" > "${configPath}"
+
+    exec ${cfg.package}/bin/sing-box run -c "${configPath}"
+  '';
 in
 {
   options.sleroq.sing-box = {
@@ -84,94 +141,88 @@ in
 
     package = lib.mkOption {
       type = lib.types.package;
-      default = sing-box-beta;
+      default = pkgs.sing-box;
       description = "The sing-box package to use.";
+    };
+
+    outboundsFile = lib.mkOption {
+      type = lib.types.str;
+      example = "/run/agenix/sing-box-outbounds.json";
+      description = "Path to a JSON file containing the sing-box outbounds array.";
     };
 
     settings = lib.mkOption {
       type = lib.types.submodule {
         freeformType = settingsFormat.type;
       };
-      default = {};
+      default = { };
       description = ''
         The sing-box configuration, see https://sing-box.sagernet.org/configuration/ for documentation.
 
         These settings will be merged with sensible defaults. You can override any default setting
         by specifying it here.
 
-        Options containing secret data should be set to an attribute set
-        containing the attribute `_secret` - a string pointing to a file
-        containing the value the option should be set to.
-
         Example:
         ```nix
-        settings = {
-          log.level = "debug";
-          outbounds = { _secret = "/path/to/secret/outbounds.json"; quote = false; };
-        };
+        outboundsFile = config.age.secrets.sing-box-outbounds.path;
+        settings.log.level = "debug";
         ```
       '';
     };
 
-    useTunMode = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = ''
-        Whether to use TUN mode for transparent proxying.
-        If true, sing-box will run as root and create a TUN interface.
-        If false, will use mixed mode (HTTP/SOCKS proxy).
-      '';
-    };
   };
 
-  config = lib.mkIf cfg.enable {
-    services.sing-box = {
-      enable = true;
-      inherit (cfg) package;
-      settings = lib.mkMerge [
-        defaultSettings
-        
-        cfg.settings
-        
-        (lib.mkIf cfg.useTunMode {
-          inbounds = [
-            {
-              address = [
-                "172.19.0.1/30"
-                "fdfe:dcba:9876::1/126"
-              ];
-              route_address = [
-                "0.0.0.0/1"
-                "128.0.0.0/1"
-                "::/1"
-                "8000::/1"
-              ];
-              type = "tun";
-              auto_route = true;
-              auto_redirect = true;
-              strict_route = true;
-            }
-          ];
-        })
-      ];
-    };
+  config = lib.mkIf cfg.enable (
+    lib.mkMerge [
+      {
+        assertions = [
+          {
+            assertion = cfg.outboundsFile != "";
+            message = "sleroq.sing-box.outboundsFile must be set.";
+          }
+          {
+            assertion = !(cfg.settings ? outbounds);
+            message = "Set sleroq.sing-box.outboundsFile instead of sleroq.sing-box.settings.outbounds.";
+          }
+        ];
 
-    environment.systemPackages = [
-      cfg.package
-    ];
+        environment.systemPackages = [ cfg.package ];
+      }
 
-    systemd.services.sing-box.serviceConfig = lib.mkMerge [
-      (lib.mkIf (!cfg.useTunMode) {
-        DynamicUser = true;
-        User = "sing-box";
-        Group = "sing-box";
+      (lib.optionalAttrs hasSystemd {
+        systemd.services.sing-box = {
+          description = "sing-box";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "network-online.target" ];
+          wants = [ "network-online.target" ];
+          serviceConfig = {
+            ExecStart = "${serviceRunner}";
+            Restart = "on-failure";
+            User = "root";
+            Group = "root";
+            AmbientCapabilities = [
+              "CAP_NET_ADMIN"
+              "CAP_NET_RAW"
+            ];
+            CapabilityBoundingSet = [
+              "CAP_NET_ADMIN"
+              "CAP_NET_RAW"
+            ];
+          };
+        };
       })
-      (lib.mkIf cfg.useTunMode {
-        User = "root";
-        Group = "root";
-        AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
-        CapabilityBoundingSet = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
+
+      (lib.optionalAttrs hasLaunchd {
+        launchd.daemons.sing-box = {
+          serviceConfig = {
+            ProgramArguments = [ "${serviceRunner}" ];
+            RunAtLoad = true;
+            KeepAlive = true;
+            StandardOutPath = logPath;
+            StandardErrorPath = logPath;
+          };
+        };
       })
-    ];
-  };
+    ]
+  );
 }

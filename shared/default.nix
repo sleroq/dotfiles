@@ -229,13 +229,9 @@
 
   sleroq.sing-box = {
     enable = true;
-    useTunMode = false;
+    outboundsFile = config.age.secrets.sing-box-outbounds.path;
     settings = {
       # log.level = "warn";
-      outbounds = {
-        _secret = config.age.secrets.sing-box-outbounds.path;
-        quote = false;
-      };
     };
   };
 
