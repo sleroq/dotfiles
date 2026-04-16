@@ -1,4 +1,12 @@
-{ agenixModule, vicinae, inputs', realConfigs, flakeRoot, self, ... }:
+{
+  agenixModule,
+  vicinae,
+  inputs',
+  realConfigs,
+  flakeRoot,
+  self,
+  ...
+}:
 {
   home-manager = {
     useGlobalPkgs = true;
@@ -24,7 +32,7 @@
     };
   };
 
-  manual.manpages.enable = false;
-  manual.html.enable = false;
-  manual.json.enable = false;
+  # manual.manpages.enable = false;
+  # manual.html.enable = false;
+  # manual.json.enable = false;
 }
