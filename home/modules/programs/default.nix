@@ -1,4 +1,11 @@
-{ pkgs, lib, config, secrets, inputs', ... }:
+{
+  pkgs,
+  lib,
+  config,
+  secrets,
+  inputs',
+  ...
+}:
 
 let
   cfg = config.myHome.programs;
@@ -6,6 +13,7 @@ in
 {
   imports = [
     ./opencode.nix
+    ./pi.nix
   ];
 
   options.myHome.programs = {
@@ -66,7 +74,7 @@ in
 
     extraPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
-      default = [];
+      default = [ ];
       description = "A list of extra packages to install.";
     };
   };
@@ -98,9 +106,7 @@ in
       home.sessionVariables.TERMINAL = "kitty";
     })
     (lib.mkIf cfg.mpv.enable (import ./mpv.nix { inherit pkgs; }))
-    (lib.mkIf cfg.wezterm.enable (
-        import ./wezterm.nix { extraConfig = secrets.wezterm-ssh-domains; }
-    ))
+    (lib.mkIf cfg.wezterm.enable (import ./wezterm.nix { extraConfig = secrets.wezterm-ssh-domains; }))
     (lib.mkIf (cfg.wezterm.enable && cfg.wezterm.default) {
       home.sessionVariables.TERMINAL = "wezterm";
     })
@@ -114,7 +120,7 @@ in
           wlrobs
           obs-backgroundremoval
           obs-pipewire-audio-capture
-          obs-vaapi #optional AMD hardware acceleration
+          obs-vaapi # optional AMD hardware acceleration
           obs-gstreamer
           obs-vkcapture
         ];
@@ -148,6 +154,6 @@ in
       ];
     })
     (lib.mkIf cfg.mangohud.enable (import ./mangohud.nix { }))
-    (lib.mkIf (cfg.extraPackages != []) { home.packages = cfg.extraPackages; })
+    (lib.mkIf (cfg.extraPackages != [ ]) { home.packages = cfg.extraPackages; })
   ];
 }

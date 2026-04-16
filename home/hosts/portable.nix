@@ -63,6 +63,7 @@ in
     };
 
     programs = {
+      pi.enable = true;
       opencode = {
         enable = true;
         useBun = true;
