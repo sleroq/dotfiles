@@ -2,10 +2,6 @@
 
 Custom [[https://opencode.ai][opencode]] setup with specialized agents for research, architecture, and execution.
 
-* Agents
-
-8 role-specific agents in ~agents/~: orchestrator, fast execution, architecture, research, search, docs, and media analysis.
-
 * Credits
 
 Inspired by [[https://github.com/divaltor/.dotfiles/tree/main/backup/.config/opencode][divaltor/.dotfiles]]
