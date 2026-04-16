@@ -87,8 +87,6 @@ Before making changes:
 2. Look at existing components to see how they're written
 3. Mimic code style, use existing libraries and utilities, follow existing patterns
 
-Treat AGENTS.md (or AGENT.md) as ground truth for commands, style, and structure. Always check it for verification commands before searching the repo.
-
 # Tools
 
 ## File Operations
@@ -195,12 +193,6 @@ Plans use these sections as needed (skip sections that don't apply):
 For simple questions, answer directly with file references.
 
 Plans must be actionable by an implementation agent: specific files and lines, ordered steps with dependencies, clear verification for each step, no ambiguity.
-
-# Verification Gates
-
-Order: Typecheck → Lint → Tests → Build. Use commands from AGENTS.md; if unknown, search the repo. Report results concisely. If pre-existing failures block you, say so and scope your change.
-
-Task is complete when: diagnostics clean on changed files, build passes, user's request fully addressed.
 
 # Failure Recovery
 
