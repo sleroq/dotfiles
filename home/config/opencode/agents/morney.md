@@ -105,11 +105,8 @@ All file creation and modification MUST go through `edit` or `apply_patch`. Use 
 
 Use the lightest search that can answer the question.
 
-- Use `search` when available for semantic or cross-cutting queries
 - Use `fff_grep` / `fff_multi_grep` for exact text, symbols, imports, error strings, and known paths
 - Use `fff_find_files` for file discovery by name or path
-
-Common pattern: start with `search` to map the area, then verify with `fff_*`.
 
 **Never `bash` for search.** No `grep`, `rg`, `ag`, `find`, `fd`, `ls -R`, `tree`, `locate`, or `ack` via shell. The integrated search tools are faster, token-efficient, and context-aware.
 
