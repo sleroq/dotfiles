@@ -16,13 +16,13 @@ in
 
     postgresImage = lib.mkOption {
       type = lib.types.str;
-      default = "postgres:17.6";
+      default = "postgres:17.9";
       description = "Docker image to use for Remnawave PostgreSQL";
     };
 
     redisImage = lib.mkOption {
       type = lib.types.str;
-      default = "valkey/valkey:8.1-alpine";
+      default = "valkey/valkey:9.0.3-alpine";
       description = "Docker image to use for Remnawave Redis/Valkey";
     };
 
@@ -58,7 +58,7 @@ in
 
     extraOptions = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "--network=host" ];
+      default = [ ];
       description = "Additional options to pass to Remnawave containers";
     };
 
@@ -67,7 +67,7 @@ in
 
       image = lib.mkOption {
         type = lib.types.str;
-        default = "remnawave/subscription-page:latest";
+        default = "remnawave/subscription-page:7.1.8";
         description = "Docker image to use for Remnawave subscription page";
       };
 
@@ -149,6 +149,10 @@ in
             APP_PORT = toString cfg.port;
             METRICS_PORT = toString cfg.metricsPort;
           };
+          ports = [
+            "127.0.0.1:${toString cfg.port}:${toString cfg.port}"
+            "127.0.0.1:${toString cfg.metricsPort}:${toString cfg.metricsPort}"
+          ];
           extraOptions = cfg.extraOptions;
         };
       } // lib.optionalAttrs cfg.subscriptionPage.enable {
@@ -159,8 +163,11 @@ in
           environmentFiles = lib.optional (cfg.subscriptionPage.environmentFile != null) cfg.subscriptionPage.environmentFile;
           environment = {
             APP_PORT = toString cfg.subscriptionPage.port;
-            REMNAWAVE_PANEL_URL = "http://127.0.0.1:${toString cfg.port}";
+            REMNAWAVE_PANEL_URL = "http://remnawave:${toString cfg.port}";
           };
+          ports = [
+            "127.0.0.1:${toString cfg.subscriptionPage.port}:${toString cfg.subscriptionPage.port}"
+          ];
           extraOptions = cfg.extraOptions;
         };
       };
@@ -181,7 +188,11 @@ in
             }
           '';
         };
-      } // lib.optionalAttrs (cfg.subscriptionPage.enable && cfg.subscriptionPage.domain != null) {
+      } // lib.optionalAttrs (
+        cfg.subscriptionPage.enable
+        && cfg.subscriptionPage.domain != null
+        && !(config.cumserver.marzban.enable && cfg.subscriptionPage.domain == config.cumserver.marzban.domain)
+      ) {
         ${cfg.subscriptionPage.domain} = {
           extraConfig = ''
             reverse_proxy 127.0.0.1:${toString cfg.subscriptionPage.port}

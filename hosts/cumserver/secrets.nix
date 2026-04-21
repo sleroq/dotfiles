@@ -47,6 +47,8 @@ let
     "secrets/resticS3Keys" = { publicKeys = commonPublicKeys; };
     "secrets/resticPassword" = { publicKeys = commonPublicKeys; };
     "secrets/livekitKeys" = { publicKeys = commonPublicKeys; };
+    "secrets/remnawaveSubscriptionPageEnv" = { publicKeys = commonPublicKeys; };
+    "secrets/remnawaveEnv" = { publicKeys = commonPublicKeys; };
   };
 
 in

@@ -125,6 +125,22 @@ in
     metricsEnvironmentFile = config.age.secrets.marzbanMetricsEnv.path;
   };
 
+  age.secrets.remnawaveEnv.file = ./secrets/remnawaveEnv;
+  age.secrets.remnawaveSubscriptionPageEnv.file = ./secrets/remnawaveSubscriptionPageEnv;
+
+  cumserver.remnawave = {
+    enable = false;
+    domain = "proxy.cum.army";
+    port = 3300;
+    metricsPort = 3301;
+    environmentFile = config.age.secrets.remnawaveEnv.path;
+    subscriptionPage = {
+      enable = false;
+      domain = "uwu.sleroq.link";
+      environmentFile = config.age.secrets.remnawaveSubscriptionPageEnv.path;
+    };
+  };
+
   cumserver.manictime = {
     enable = false;
     domain = "time.cum.army";

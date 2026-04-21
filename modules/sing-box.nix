@@ -20,11 +20,9 @@ let
 
   tunInbound = {
     type = "tun";
-    tag = "tun-in";
-    address = [ "172.19.0.1/30" ];
+    address = [ "198.18.0.1/30" ];
     auto_route = true;
-    strict_route = true;
-    stack = "system";
+    route_exclude_address = cfg.routeExcludeAddresses;
   };
 
   defaultSettings = {
@@ -149,6 +147,19 @@ in
       type = lib.types.str;
       example = "/run/agenix/sing-box-outbounds.json";
       description = "Path to a JSON file containing the sing-box outbounds array.";
+    };
+
+    routeExcludeAddresses = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [
+        "10.130.1.0/24"
+        "10.130.100.0/24"
+      ];
+      description = ''
+        Destination CIDRs excluded from sing-box TUN auto-routing.
+        Use this for LAN or VPN-managed subnets that should stay under the system routing table.
+      '';
     };
 
     settings = lib.mkOption {

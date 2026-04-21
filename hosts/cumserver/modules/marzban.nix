@@ -94,7 +94,24 @@ in
 
       services.caddy.virtualHosts.${cfg.domain} = {
         extraConfig = ''
+          ${lib.optionalString (
+            config.cumserver.remnawave.subscriptionPage.enable
+            && config.cumserver.remnawave.subscriptionPage.domain == cfg.domain
+          ) ''
+          @legacy_sub path /sub /sub/* /assets/* /favicon* /site.webmanifest /manifest.webmanifest /apple-touch-icon* /android-chrome* /mstile-*
+          handle @legacy_sub {
+            reverse_proxy 127.0.0.1:${toString config.cumserver.remnawave.subscriptionPage.port}
+          }
+
+          handle {
+          ''}
           reverse_proxy 127.0.0.1:${toString cfg.port}
+          ${lib.optionalString (
+            config.cumserver.remnawave.subscriptionPage.enable
+            && config.cumserver.remnawave.subscriptionPage.domain == cfg.domain
+          ) ''
+          }
+          ''}
           
           header {
             X-Content-Type-Options nosniff

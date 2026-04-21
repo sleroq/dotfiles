@@ -40,6 +40,12 @@
   sleroq.sing-box = {
     enable = true;
     outboundsFile = config.age.secrets.sing-box-outbounds.path;
+    routeExcludeAddresses = [
+      "10.0.0.0/8"
+      "172.16.0.0/12"
+      "192.168.0.0/16"
+      "83.69.209.222/32"
+    ];
     settings = {
       # log.level = "warn";
     };
