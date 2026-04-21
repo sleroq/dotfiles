@@ -1,7 +1,7 @@
 ---
 description: "External research agent for documentation, examples, and best practices."
 mode: subagent
-model: opencode/kimi-k2.5
+model: opencode/kimi-k2.6
 color: "#355C63"
 permission:
   edit: deny

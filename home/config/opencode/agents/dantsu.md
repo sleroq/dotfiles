@@ -1,8 +1,7 @@
 ---
 description: 'Contextual code search for exact and semantic queries. Answers "Where is X?", "Which file has Y?", "Find the code that does Z".'
 mode: subagent
-model: openai/gpt-5.4-mini
-variant: medium
+model: opencode/kimi-k2.6
 color: "#eb6f92"
 temperature: 0.1
 permission:
@@ -36,15 +35,14 @@ Start with 2-4 high-signal tool calls in parallel when there are genuinely diffe
 Use the lightest search that fits:
 
 - Use `fff_grep`, `fff_multi_grep`, and `fff_find_files` when you know the exact text, symbol, import, path, or filename
-- Use `telescope` when you need local workspace behavior-level discovery, semantic lookup, or feature mapping across multiple modules. Do not call `colgrep` through `bash` for this
-- Scope `telescope` to the most likely directories first. Use path filters and `excludeDir` to skip tests, docs, examples, and generated output unless the user explicitly wants them
+- For behavior-level discovery across multiple modules, chain a few targeted `fff_*` searches using adjacent symbols, imports, filenames, and error strings until the implementation path is clear
 - Use `read` only after you narrow to the relevant files
 
-Common pattern inside the current workspace: use `telescope` to map an area, then `fff_*` to verify exact files and symbols. If you already know the exact symbol or string, start with `fff_*` directly.
+Common pattern inside the current workspace: start with the narrowest likely `fff_*` query, then expand to related symbols or callers until you can name the canonical implementation. If you already know the exact symbol or string, start with `fff_*` directly.
 
-Never use built-in `grep` or `glob`. Use `fff_grep`, `fff_multi_grep`, `fff_find_files`, and `telescope` instead.
+Never use built-in `grep` or `glob`. Use `fff_grep`, `fff_multi_grep`, and `fff_find_files` instead.
 
-Never use `bash` for workspace search. No direct `colgrep`, `grep`, `rg`, `ag`, `find`, `fd`, `ls -R`, or similar shell-based search when `telescope` or `fff_*` can answer the question.
+Never use `bash` for workspace search. No direct `grep`, `rg`, `ag`, `find`, `fd`, `ls -R`, or similar shell-based search when `fff_*` can answer the question.
 
 Search until you have confident coverage. **Stop when**:
 
