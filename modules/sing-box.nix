@@ -14,6 +14,7 @@ let
   directDomains = [
     ".ru"
     ".local"
+    ".nelocal"
     ".frg"
     ".frankrg.com"
   ];
