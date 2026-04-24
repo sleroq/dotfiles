@@ -35,7 +35,10 @@ in
   };
 
   # TODO: Move to the system config?
-  home.sessionVariables.NH_DARWIN_FLAKE = opts.flakeRoot;
+  home.sessionVariables = {
+    NH_DARWIN_FLAKE = opts.flakeRoot;
+    DOCKER_DEFAULT_PLATFORM = "linux/amd64";
+  };
 
   age.secrets.ssh-config = {
     file = ../secrets/ssh-config;
