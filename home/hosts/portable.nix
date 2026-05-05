@@ -54,9 +54,11 @@ in
       zed = {
         enable = true;
         package = null;
+      };
+      neovim = {
+        enable = true;
         default = true;
       };
-      neovim.enable = true;
     };
 
     development = {
