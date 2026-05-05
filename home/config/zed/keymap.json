@@ -6,28 +6,58 @@
 // To see the default key bindings run `zed: open default keymap`
 // from the command palette.
 [
-  {
-    "context": "Workspace",
-    "bindings": {
-      "cmd-shift-a": "tab_switcher::ToggleAll",
+    {
+        "context": "Workspace",
+        "bindings": {
+            "cmd-shift-a": "tab_switcher::ToggleAll",
+        },
     },
-  },
-  {
-    "context": "Editor",
-    "bindings": {
-      "cmd-shift-e": "project_panel::ToggleFocus",
+    {
+        "context": "Editor",
+        "bindings": {
+            "cmd-shift-e": "project_panel::ToggleFocus",
+        },
     },
-  },
-  {
-    "context": "Workspace || Editor",
-    "bindings": {
-      "cmd-shift-g": "git_panel::ToggleFocus",
+    {
+        "context": "Workspace || Editor",
+        "bindings": {
+            "cmd-shift-g": "git_panel::ToggleFocus",
+        },
     },
-  },
-  {
-    "context": "Editor && edit_prediction",
-    "bindings": {
-      "ctrl-l": "editor::AcceptEditPrediction",
+    {
+        "context": "Editor && edit_prediction",
+        "bindings": {
+            "ctrl-l": "editor::AcceptEditPrediction",
+        },
     },
-  },
+    {
+        "context": "Workspace",
+        "unbind": {
+            "cmd-shift-s": "workspace::SaveAs",
+        },
+    },
+    {
+        "context": "Workspace",
+        "unbind": {
+            "cmd-s": "workspace::Save",
+        },
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "cmd-shift-s": "editor::ViewBookmarks",
+        },
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "cmd-s": "editor::ToggleBookmark",
+        },
+    },
+    {
+        "context": "(vim_mode == helix_normal || vim_mode == helix_select || vim_mode == normal || vim_mode == select) && !menu",
+        "bindings": {
+            "g w": "vim::HelixJumpToWord"
+        }
+    }
 ]
