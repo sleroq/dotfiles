@@ -57,7 +57,8 @@
     {
         "context": "(vim_mode == helix_normal || vim_mode == helix_select || vim_mode == normal || vim_mode == select) && !menu",
         "bindings": {
-            "g w": "vim::HelixJumpToWord"
+            "g w": "vim::HelixJumpToWord",
+            "s": "vim::HelixJumpToWord"
         }
     }
 ]
