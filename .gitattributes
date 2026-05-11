@@ -3,6 +3,7 @@
 /home/secrets/*.nix filter=git-crypt diff=git-crypt
 /home/config/zed/settings.json filter=git-crypt diff=git-crypt
 /home/config/pi/agent/auth.json filter=git-crypt diff=git-crypt
+/home/config/pi/agent/models.json filter=git-crypt diff=git-crypt
 /home/config/opencode/* filter=git-crypt diff=git-crypt
 /home/config/opencode/README.org !filter !diff
 /.gitattributes !filter !diff
