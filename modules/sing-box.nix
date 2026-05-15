@@ -12,6 +12,7 @@ let
   hasLaunchd = lib.hasAttrByPath [ "launchd" "daemons" ] options;
 
   directDomains = [
+    "cum.army"
     ".рф"
     ".ru"
     ".local"
