@@ -19,6 +19,20 @@ let
     ".nelocal"
     ".frg"
     ".frankrg.com"
+    ".steampowered.com"
+    ".steamcommunity.com"
+    ".steamstatic.com"
+    ".steamcontent.com"
+    ".steamserver.net"
+    ".steamusercontent.com"
+    ".steam-chat.com"
+    ".valvesoftware.com"
+  ];
+
+  directProcesses = [
+    "steam"
+    "steam_osx"
+    "steamwebhelper"
   ];
 
   tunInbound = {
