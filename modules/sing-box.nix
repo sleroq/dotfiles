@@ -82,25 +82,30 @@ let
           action = "sniff";
         }
         {
-          ip_version = 6;
-          action = "reject";
-        }
-        {
-          network = [ "udp" ];
-          port = [ 443 ];
-          action = "reject";
-        }
-        {
-          network = [ "udp" ];
-          action = "route";
-          outbound = "direct";
-        }
-        {
           protocol = "dns";
           action = "hijack-dns";
         }
         {
+          ip_version = 6;
+          action = "reject";
+        }
+        # {
+        #   network = [ "udp" ];
+        #   port = [ 443 ];
+        #   action = "reject";
+        # }
+        # {
+        #   network = [ "udp" ];
+        #   action = "route";
+        #   outbound = "proxy";
+        # }
+        {
           ip_is_private = true;
+          action = "route";
+          outbound = "direct";
+        }
+        {
+          process_name = directProcesses;
           action = "route";
           outbound = "direct";
         }
