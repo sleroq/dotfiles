@@ -76,6 +76,7 @@ in
       # mpv.enable = true; # waiting for fix
       ghostty.enable = true;
       extraPackages = with pkgs; [
+        nerd-fonts.jetbrains-mono
         inputs'.agenix.packages.default
         ffmpeg
         wget
