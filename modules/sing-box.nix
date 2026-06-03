@@ -27,6 +27,7 @@ let
     ".steamusercontent.com"
     ".steam-chat.com"
     ".valvesoftware.com"
+    ".energotransbank.com"
   ];
 
   directProcesses = [
