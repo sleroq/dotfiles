@@ -9,6 +9,7 @@
 }:
 
 let
+  curlCaBundle = "/etc/ssl/certs/curl-ca-bundle.crt";
   darwin-aliases = {
     nix-switch = "nh darwin switch --hostname portable";
   };
@@ -25,6 +26,11 @@ in
         ;
       enableSshAuthSocket = false;
       extraAliases = darwin-aliases;
+      systemVars = {
+        CURL_CA_BUNDLE = curlCaBundle;
+        SSL_CERT_FILE = curlCaBundle;
+        NH_OS_FLAKE = opts.flakeRoot;
+      };
     })
   ];
 

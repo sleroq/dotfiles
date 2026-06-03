@@ -3,6 +3,7 @@
   config,
   aliases,
   vars,
+  systemVars,
   ...
 }:
 
@@ -82,7 +83,7 @@ in
   shellAliases = aliases;
   environmentVariables = vars;
   extraEnv = lib.mkBefore ''
-    ${exportToNuEnv config.home.sessionVariables}
+    ${exportToNuEnv (systemVars // config.home.sessionVariables)}
   '';
   extraConfig = lib.mkMerge [
     (lib.mkBefore ''

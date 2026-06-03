@@ -1,4 +1,9 @@
- { flakeRoot, pkgs, config, ... }:
+{ flakeRoot, pkgs, config, ... }:
+
+let
+  curlCaBundle = "/etc/ssl/certs/curl-ca-bundle.crt";
+  frgCert = "/Users/sleroq/develop/frg/cert.crt";
+in
 
 {
   imports = [
@@ -22,7 +27,15 @@
     nh
     git-crypt # Required to build this nix repo...
   ];
-  environment.variables.NH_OS_FLAKE = flakeRoot;
+  environment.variables = {
+    NH_OS_FLAKE = flakeRoot;
+    CURL_CA_BUNDLE = curlCaBundle;
+  };
+
+  system.activationScripts.extraActivation.text = ''
+    install -d -m 0755 /etc/ssl/certs
+    cat ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt ${frgCert} > ${curlCaBundle}
+  '';
 
   system.defaults.NSGlobalDomain =  {
     NSWindowShouldDragOnGesture = true;
