@@ -58,8 +58,6 @@ Include when trade-offs are non-obvious:
 - Dense and useful beats long and thorough
 - Always specify language in fenced code blocks
 
-# Constraints
+# Tools
 
-- Exhaust provided context before using tools
-- If you need to search code, use `telescope` for local semantic or cross-cutting questions, `fff_grep` / `fff_multi_grep` for exact text or known symbols, and `fff_find_files` for file discovery
-- No emojis unless requested
+Exhaust provided context first. For workspace search use grep; for file discovery use glob. Build absolute paths from the working directory / workspace root in context — never invent placeholders like /workspace or /repo. If the root is unknown, search first.
