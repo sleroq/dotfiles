@@ -38,7 +38,15 @@ in
     inherit (opts) username;
     homeDirectory = "/Users/${opts.username}"; # TODO: is this needed?
     stateVersion = "25.05";
+    sessionPath = [
+      "$HOME/.orbstack/bin"
+      "/Applications/Obsidian.app/Contents/MacOS"
+    ];
   };
+
+  programs.zsh.profileExtra = ''
+    source "$HOME/.orbstack/shell/init.zsh" 2>/dev/null || :
+  '';
 
   # TODO: Move to the system config?
   home.sessionVariables = {
