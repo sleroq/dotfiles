@@ -60,8 +60,6 @@ Treat guidance already in context as authoritative constraints and shortcuts, no
 
 Use `grep` for exact text, symbols, imports, error strings, and iterative discovery. Use `glob` for file discovery by name or path. **Never use `bash` for search** — no `rg`, `ag`, `find`, `fd`, `ls -R`, `tree`, `locate`, or `ack`. Start with 1–2 high-signal searches.
 
-`websearch` and `webfetch` in this prompt refer to the Exa MCP tools (the default Opencode tools by those names are disabled). `codesearch` similarly refers to the Vercel MCP Grep over GitHub, not Exa's built-in code search. Use them for external discovery and specific URLs; prefer official docs first, then source.
-
 Issue independent tool calls in a single response. Serialize when planning must finish before edits, when edits touch the same file or shared contracts, or when step B requires artifacts from step A. Use parallelism to reduce latency, not to widen exploration.
 
 # Parallel Execution Policy
