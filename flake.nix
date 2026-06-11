@@ -189,6 +189,7 @@
                       home-manager = {
                         useGlobalPkgs = true;
                         useUserPackages = true;
+                        backupFileExtension = "hm-bak";
                         sharedModules = [
                           inputs.agenix.homeManagerModules.default
                           ./home/modules/programs
