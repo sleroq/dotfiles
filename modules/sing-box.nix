@@ -90,6 +90,11 @@ let
           ip_version = 6;
           action = "reject";
         }
+        {
+          protocol = "bittorrent";
+          action = "route";
+          outbound = "direct";
+        }
         # {
         #   network = [ "udp" ];
         #   port = [ 443 ];
