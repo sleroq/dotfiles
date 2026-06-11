@@ -8,8 +8,6 @@ permission:
     webfetch: deny
     codesearch: deny
     doom_loop: deny
-    grep: deny
-    glob: deny
     question: allow
     task:
         "*": deny

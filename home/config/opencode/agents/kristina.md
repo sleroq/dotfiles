@@ -10,9 +10,6 @@ permission:
   webfetch: deny
   codesearch: deny
   doom_loop: deny
-  grep: deny
-  grep_*: deny
-  glob: deny
   parallel-ai_*: deny
 ---
 

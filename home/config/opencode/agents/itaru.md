@@ -12,8 +12,6 @@ permission:
   webfetch: deny
   codesearch: deny
   doom_loop: deny
-  grep: deny
-  glob: deny
 ---
 
 You are external research agent. Find documentation, examples, and best practices for libraries and APIs.
