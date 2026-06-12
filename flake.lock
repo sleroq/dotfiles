@@ -1201,6 +1201,27 @@
         "type": "github"
       }
     },
+    "home-manager-cumserver": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-cumserver"
+        ]
+      },
+      "locked": {
+        "lastModified": 1772218752,
+        "narHash": "sha256-G8nArvOTZXU8DRvrzAdz3Elcj6kA/vMtvY9mrGLATtA=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "f3a30376bb9eb2f6f61816be7d6ed954b6d2a3b9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "f3a30376bb9eb2f6f61816be7d6ed954b6d2a3b9",
+        "type": "github"
+      }
+    },
     "home-manager-interplanetary": {
       "inputs": {
         "nixpkgs": [
@@ -2370,6 +2391,7 @@
         "easy-hosts": "easy-hosts",
         "emacs-overlay": "emacs-overlay",
         "flake-parts": "flake-parts_2",
+        "home-manager-cumserver": "home-manager-cumserver",
         "home-manager-interplanetary": "home-manager-interplanetary",
         "home-manager-portable": "home-manager-portable",
         "hy3": "hy3",
