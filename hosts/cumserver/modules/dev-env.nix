@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.cumserver.dev-env;
 in
@@ -28,9 +33,8 @@ in
       shell = pkgs.bashInteractive;
       linger = true;
 
-      openssh.authorizedKeys.keys = [
-          config.users.users.root.openssh.authorizedKeys.keys
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAdlcjFtISF+IZ8I6+G48VcpsaCbTNpdzX7TfX+MIrPe"
+      openssh.authorizedKeys.keys = config.users.users.root.openssh.authorizedKeys.keys ++ [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAdlcjFtISF+IZ8I6+G48VcpsaCbTNpdzX7TfX+MIrPe"
       ];
 
       subUidRanges = [
