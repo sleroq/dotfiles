@@ -1,13 +1,12 @@
 {
-  "lastChangelogVersion": "0.77.0",
+  "lastChangelogVersion": "0.79.0",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.5",
   "defaultThinkingLevel": "low",
   "enabledModels": [
-    "ollama/Qwen3.5",
-    "opencode/kimi-k2.5",
+    "opencode/kimi-k2.6",
     "openai-codex/gpt-5.5",
-    "FrankAI/Qwen3.5"
+    "FrankAI/FrankAI"
   ],
   "packages": [
     "npm:pi-subdir-context"

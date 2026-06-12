@@ -104,6 +104,7 @@ in
       nil # Another nix language server? (zed needs it)
       package-version-server # JSON language server
       lua-language-server
+      nginx-language-server
 
       # python39
       # python39Packages.pip

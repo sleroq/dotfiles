@@ -28,6 +28,7 @@ let
     ".steam-chat.com"
     ".valvesoftware.com"
     ".energotransbank.com"
+    ".nixos.org"
   ];
 
   directProcesses = [
