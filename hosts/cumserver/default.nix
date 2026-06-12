@@ -35,6 +35,7 @@ in
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
     ./modules/caddy.nix
+    ./modules/dev-env.nix
     ./modules/matterbridge.nix
     ./modules/mailserver.nix
     ./modules/navidrome.nix
@@ -79,6 +80,12 @@ in
     enable = true;
     settings = {
       PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      X11Forwarding = false;
+      AllowUsers = [
+        "root"
+        config.cumserver.dev-env.user
+      ];
     };
   };
 
@@ -89,6 +96,7 @@ in
   '';
 
   cumserver.caddy.enable = true;
+  cumserver.dev-env.enable = true;
   cumserver.matterbridge.enable = true;
   cumserver.mailserver.enable = true;
   cumserver.radicale.enable = true;

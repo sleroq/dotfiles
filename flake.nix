@@ -34,6 +34,9 @@
     home-manager-interplanetary.url = "github:nix-community/home-manager";
     home-manager-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
 
+    home-manager-cumserver.url = "github:nix-community/home-manager/f3a30376bb9eb2f6f61816be7d6ed954b6d2a3b9";
+    home-manager-cumserver.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+
     # HM-related inputs used by home modules
     nix-gaming.url = "github:fufexan/nix-gaming";
 
@@ -101,6 +104,19 @@
       flake.overlays = import ./overlays/default.nix {
         inherit self nixpkgs;
         inherit (inputs) scrcpyPkgs nixpkgs-master;
+      };
+
+      flake.homeConfigurations."dev@cumserver" = inputs.home-manager-cumserver.lib.homeManagerConfiguration {
+        pkgs = import inputs.nixpkgs-cumserver {
+          system = "x86_64-linux";
+          overlays = [ self.overlays.default ];
+        };
+
+        modules = [ ./home/hosts/cumserver-dev.nix ];
+
+        extraSpecialArgs = {
+          inherit self;
+        };
       };
 
       # FIXME: This is a bit overengineered
