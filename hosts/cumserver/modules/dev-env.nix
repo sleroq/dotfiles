@@ -28,7 +28,10 @@ in
       shell = pkgs.bashInteractive;
       linger = true;
 
-      openssh.authorizedKeys.keys = config.users.users.root.openssh.authorizedKeys.keys;
+      openssh.authorizedKeys.keys = [
+          config.users.users.root.openssh.authorizedKeys.keys
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAdlcjFtISF+IZ8I6+G48VcpsaCbTNpdzX7TfX+MIrPe"
+      ];
 
       subUidRanges = [
         {
