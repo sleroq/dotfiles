@@ -33,6 +33,7 @@ in
       shell = pkgs.bashInteractive;
       linger = true;
 
+      # FIXME: do not default to all authorizedKeys of the root
       openssh.authorizedKeys.keys = config.users.users.root.openssh.authorizedKeys.keys ++ [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAdlcjFtISF+IZ8I6+G48VcpsaCbTNpdzX7TfX+MIrPe"
       ];
@@ -50,21 +51,6 @@ in
         }
       ];
     };
-
-    services.openssh.settings = {
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-      X11Forwarding = false;
-      AllowUsers = [
-        "root"
-        cfg.user
-      ];
-    };
-
-    environment.systemPackages = with pkgs; [
-      podman
-      podman-compose
-    ];
 
     systemd.tmpfiles.rules = [
       "d ${cfg.workspaceDirectory} 0750 ${cfg.user} users - -"
