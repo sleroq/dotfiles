@@ -26,6 +26,7 @@ in
   environment.systemPackages = with pkgs; [
     nh
     git-crypt # Required to build this nix repo...
+    sshfs
   ];
   environment.variables = {
     NH_OS_FLAKE = flakeRoot;
