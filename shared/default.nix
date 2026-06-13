@@ -230,9 +230,7 @@
   sleroq.sing-box = {
     enable = true;
     outboundsFile = config.age.secrets.sing-box-outbounds.path;
-    settings = {
-      # log.level = "warn";
-    };
+    logLevel = "warn";
   };
 
   programs.firefox = {

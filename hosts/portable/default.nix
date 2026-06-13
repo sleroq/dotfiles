@@ -59,9 +59,7 @@ in
       "192.168.0.0/16"
       "83.69.209.222/32"
     ];
-    settings = {
-      # log.level = "warn";
-    };
+    logLevel = "warn";
   };
 
   # Tailscale? https://github.com/nix-darwin/nix-darwin/blob/b8c7ac030211f18bd1f41eae0b815571853db7a2/modules/services/tailscale.nix
