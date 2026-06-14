@@ -4,7 +4,7 @@
   "defaultModel": "gpt-5.5",
   "defaultThinkingLevel": "low",
   "enabledModels": [
-    "opencode/kimi-k2.6",
+    "opencode-go/kimi-k2.7-code",
     "openai-codex/gpt-5.5",
     "FrankAI/FrankAI"
   ],
