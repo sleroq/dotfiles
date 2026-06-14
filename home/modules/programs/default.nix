@@ -4,6 +4,7 @@
   config,
   secrets,
   inputs',
+  opts,
   ...
 }:
 
@@ -155,5 +156,13 @@ in
     })
     (lib.mkIf cfg.mangohud.enable (import ./mangohud.nix { }))
     (lib.mkIf (cfg.extraPackages != [ ]) { home.packages = cfg.extraPackages; })
+    {
+      home.activation.agentSkillsConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        mkdir -p $HOME/.agents
+
+        $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+            ${opts.realConfigs}/agents/skills $HOME/.agents/skills
+      '';
+    }
   ];
 }
