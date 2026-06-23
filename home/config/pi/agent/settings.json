@@ -1,15 +1,12 @@
 {
-  "lastChangelogVersion": "0.79.0",
-  "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.5",
+  "lastChangelogVersion": "0.79.10",
   "defaultThinkingLevel": "low",
-  "enabledModels": [
-    "opencode-go/kimi-k2.7-code",
-    "openai-codex/gpt-5.5",
-    "FrankAI/FrankAI"
-  ],
   "packages": [
-    "npm:pi-subdir-context"
+    "npm:pi-subdir-context",
+    "npm:pi-mcp-adapter"
   ],
-  "hideThinkingBlock": false
+  "hideThinkingBlock": false,
+  "theme": "dark",
+  "defaultProvider": "FrankAI",
+  "defaultModel": "FrankAI"
 }
