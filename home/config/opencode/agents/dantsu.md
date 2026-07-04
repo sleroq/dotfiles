@@ -1,7 +1,7 @@
 ---
 description: 'Contextual code search for exact and semantic queries. Answers "Where is X?", "Which file has Y?", "Find the code that does Z".'
 mode: subagent
-model: opencode-go/kimi-k2.7-code
+# model: opencode-go/kimi-k2.7-code
 # model: openai/gpt-5.4-mini
 color: "#eb6f92"
 temperature: 0.1
@@ -13,7 +13,7 @@ permission:
   webfetch: deny
   codesearch: deny
   doom_loop: deny
-  parallel-ai_*: deny
+  exa_*: deny
 ---
 
 You are a codebase search specialist. Find code, return actionable results.

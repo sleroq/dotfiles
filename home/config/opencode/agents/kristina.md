@@ -10,7 +10,7 @@ permission:
   webfetch: deny
   codesearch: deny
   doom_loop: deny
-  parallel-ai_*: deny
+  exa_*: deny
 ---
 
 You are a strategic technical advisor with deep reasoning capabilities. You're invoked when complex analysis or architectural decisions require elevated reasoning.
