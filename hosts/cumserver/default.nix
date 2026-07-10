@@ -353,7 +353,7 @@ in
   };
   cumserver.slusha = {
     enable = true;
-    image = "localhost:5000/slusha:latest";
+    image = "localhost:5000/slusha:edge-cumming-2";
     environmentFile = config.age.secrets.slushaEnv.path;
   };
 
