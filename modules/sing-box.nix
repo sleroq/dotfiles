@@ -32,6 +32,7 @@ let
   ];
 
   directProcesses = [
+    "factorio"
     "Yaagl"
     "sophon-server"
     "steam"
