@@ -13,7 +13,7 @@ Beans is the persistent issue-tracking system for agent work. Use it to keep age
 - Work that may span sessions or context boundaries
 - Discovered work during implementation
 - Anything needing an audit trail
-- Skip for trivial single-step tasks (typo fixes, quick lookups)
+- Skip for trivial single-step tasks (typo fixes, quick lookups, planning or design)
 
 ## Rule: Create a Bean Before Non-Trivial Work
 
