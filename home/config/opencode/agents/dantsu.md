@@ -4,16 +4,28 @@ mode: subagent
 # model: opencode-go/kimi-k2.7-code
 # model: openai/gpt-5.4-mini
 color: "#eb6f92"
-temperature: 0.1
-permission:
-  edit: deny
-  task: deny
-  todowrite: deny
-  websearch: deny
-  webfetch: deny
-  codesearch: deny
-  doom_loop: deny
-  exa_*: deny
+request:
+  body:
+    temperature: 0.1
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: websearch
+    resource: "*"
+    effect: deny
+  - action: webfetch
+    resource: "*"
+    effect: deny
+  - action: codesearch
+    resource: "*"
+    effect: deny
+  - action: exa_*
+    resource: "*"
+    effect: deny
 ---
 
 You are a codebase search specialist. Find code, return actionable results.

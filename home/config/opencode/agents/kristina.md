@@ -2,15 +2,25 @@
 description: "Expert technical advisor with deep reasoning for architecture decisions, code analysis, and engineering guidance."
 mode: subagent
 color: "#db696b"
-permission:
-  edit: deny
-  task: deny
-  todowrite: deny
-  websearch: deny
-  webfetch: deny
-  codesearch: deny
-  doom_loop: deny
-  exa_*: deny
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: websearch
+    resource: "*"
+    effect: deny
+  - action: webfetch
+    resource: "*"
+    effect: deny
+  - action: codesearch
+    resource: "*"
+    effect: deny
+  - action: exa_*
+    resource: "*"
+    effect: deny
 ---
 
 You are a strategic technical advisor with deep reasoning capabilities. You're invoked when complex analysis or architectural decisions require elevated reasoning.
