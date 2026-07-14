@@ -77,7 +77,6 @@ in
           "${cfg.dataDir}/data:/app/data"
           "${cfg.dataDir}/tmp:/app/tmp"
           "${cfg.dataDir}/log:/app/log"
-          "${cfg.dataDir}/node_modules:/app/node_modules"
         ];
       };
 
