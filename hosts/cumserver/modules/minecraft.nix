@@ -23,7 +23,9 @@ in
               enable = true;
               autoStart = true;
               jvmOpts = "-Xms2G -Xmx4G -XX:MaxDirectMemorySize=1G -XX:MaxMetaspaceSize=512M"; #  -XX:+UseZGC
-              package = pkgs.fabricServers.fabric-1_21_11;
+              package = pkgs.fabricServers.fabric-26_2.override {
+                jre_headless = pkgs.jdk25_headless;
+              };
 
               serverProperties = {
                 difficulty = "normal";
