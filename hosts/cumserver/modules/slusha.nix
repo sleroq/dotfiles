@@ -59,7 +59,6 @@ in
         "d ${cfg.dataDir}/tmp 0750 65532 65532 -"
         "d ${cfg.dataDir}/log 0750 65532 65532 -"
         "d ${cfg.dataDir}/data 0750 65532 65532 -"
-        "d ${cfg.dataDir}/node_modules 0750 65532 65532 -"
       ];
       virtualisation.oci-containers.containers.slusha = {
         inherit (cfg) image;
