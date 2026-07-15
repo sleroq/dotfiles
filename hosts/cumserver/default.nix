@@ -92,7 +92,7 @@ in
   services.qemuGuest.enable = true;
 
   services.journald.extraConfig = ''
-    SystemMaxUse=500M
+    SystemMaxUse=100M
   '';
 
   cumserver.caddy.enable = true;
