@@ -83,10 +83,7 @@ in
 
     programs = {
       pi.enable = true;
-      opencode = {
-        enable = true;
-        useBun = true;
-      };
+      opencode.enable = true;
       # mpv.enable = true; # waiting for fix
       ghostty.enable = true;
       extraPackages = with pkgs; [
