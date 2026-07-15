@@ -118,10 +118,10 @@ in
       };
       prometheus = {
         enable = true;
-        # keep data for 90 days
-        extraFlags = [ 
-          "--storage.tsdb.retention.time=90d"
-          "--web.enable-remote-write-receiver"
+        # Keep enough history for troubleshooting without filling the root disk.
+        extraFlags = [
+          "--storage.tsdb.retention.time=14d"
+          "--storage.tsdb.retention.size=4GB"
         ];
         scrapeConfigs = [
             {
@@ -311,7 +311,7 @@ in
               provisioned_write_throughput = 0;
             };
             retention_deletes_enabled = true;
-            retention_period = "720h"; # 30 days
+            retention_period = "168h"; # 7 days
           };
         };
       };
@@ -341,74 +341,6 @@ in
       // Get hostname for labeling
       local.file "hostname" {
         filename = "/proc/sys/kernel/hostname"
-      }
-
-      // Discover local node_exporter target
-      discovery.relabel "integrations_node_exporter" {
-        targets = [{
-          __address__ = "localhost:9100",
-        }]
-
-        rule {
-          source_labels = ["__address__"]
-          target_label = "instance"
-          replacement = "${cfg.localNodeName}"
-        }
-
-        rule {
-          target_label = "job"
-          replacement = "node"
-        }
-      }
-
-      // Scrape local node_exporter metrics
-      prometheus.scrape "integrations_node_exporter" {
-        targets = discovery.relabel.integrations_node_exporter.output
-        forward_to = [prometheus.remote_write.prometheus.receiver]
-        scrape_interval = "15s"
-      }
-
-      ${lib.concatMapStringsSep "\n" (node: ''
-      // Discover remote node_exporter target: ${node.name}
-      discovery.relabel "integrations_node_exporter_${node.name}" {
-        targets = [{
-          __address__ = "${node.address}",
-        }]
-
-        rule {
-          source_labels = ["__address__"]
-          target_label = "instance"
-          replacement = "${node.name}"
-        }
-
-        rule {
-          target_label = "job"
-          replacement = "node"
-        }
-      }
-
-      // Scrape remote node_exporter metrics: ${node.name}
-      prometheus.scrape "integrations_node_exporter_${node.name}" {
-        targets = discovery.relabel.integrations_node_exporter_${node.name}.output
-        forward_to = [prometheus.remote_write.prometheus.receiver]
-        scrape_interval = "30s"
-        basic_auth {
-          username = "${node.username}"
-          password_file = "${node.passwordPath}"
-        }
-        ${lib.optionalString node.enableTLS ''
-        tls_config {
-          insecure_skip_verify = ${if node.tlsInsecure then "true" else "false"}
-        }
-        ''}
-      }
-      '') cfg.remoteNodes}
-
-      // Send metrics to Prometheus
-      prometheus.remote_write "prometheus" {
-        endpoint {
-          url = "http://localhost:${toString config.services.prometheus.port}/api/v1/write"
-        }
       }
 
       // Relabeling rules for systemd journal logs
