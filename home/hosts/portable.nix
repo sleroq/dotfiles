@@ -82,6 +82,7 @@ in
     };
 
     programs = {
+      hammerspoon.enable = true;
       pi.enable = true;
       opencode.enable = true;
       # mpv.enable = true; # waiting for fix
