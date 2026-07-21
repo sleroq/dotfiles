@@ -3,6 +3,7 @@
   services.dbus.enable = true;
   environment.systemPackages = with pkgs; [
     dbus
+    brightnessctl
   ];
 
   xdg.portal = {
@@ -11,8 +12,6 @@
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 
-  # Brightness cli tool
-  programs.light.enable = true; # TODO: make it laptop only?
   programs.xwayland.enable = true;
 
   programs.sway.enable = true;

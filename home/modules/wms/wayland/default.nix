@@ -54,7 +54,7 @@ in
         slurp
 
         waypaper
-        swww
+        awww
       ];
 
       # TODO: Do not enable on desktop

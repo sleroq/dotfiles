@@ -99,7 +99,7 @@
 
     coredump = {
       enable = true;
-      extraConfig = "ExternalSizeMax=${toString (8 * 1024 * 1024 * 1024)}";
+      settings.Coredump.ExternalSizeMax = toString (8 * 1024 * 1024 * 1024);
     };
   };
 

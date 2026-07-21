@@ -1,4 +1,4 @@
-{ pkgs, lib, ... } :
+{ pkgs, lib, config, ... } :
 let
   catppuccinAccent = "Blue";
   catppuccinFlavor = "Macchiato";
@@ -34,6 +34,7 @@ in {
     enable = true;
     theme.name = "Orchis-Dark";
     theme.package = pkgs.orchis-theme;
+    gtk4.theme = config.gtk.theme;
     iconTheme.name = "Tela";
     iconTheme.package = pkgs.tela-icon-theme;
     # cursorTheme.name = "Vimix-cursors";
@@ -54,6 +55,7 @@ in {
     pointerCursor = 
       let 
         getFrom = url: hash: name: {
+            enable = true;
             gtk.enable = true;
             x11.enable = true;
             hyprcursor.enable = true;

@@ -39,8 +39,11 @@ in
 {
   programs.eww = {
     enable = true;
-    configDir = self + /home/config/eww/bar;
+    yuckConfig = builtins.readFile (self + /home/config/eww/bar/eww.yuck);
+    scssConfig = builtins.readFile (self + /home/config/eww/bar/eww.scss);
   };
+
+  xdg.configFile."eww/scripts".source = self + /home/config/eww/bar/scripts;
 
   fonts.fontconfig.enable = true;
   home.packages = with pkgs; [

@@ -1,5 +1,16 @@
 { pkgs, inputs', ... }:
 
+let
+  bottles = pkgs.bottles.override {
+    bottles-unwrapped = pkgs.bottles-unwrapped.override {
+      python3Packages = pkgs.python3Packages.overrideScope (_final: prev: {
+        patool = prev.patool.overridePythonAttrs (_old: {
+          doCheck = false;
+        });
+      });
+    };
+  };
+in
 {
   myHome = {
     wms = {
@@ -25,6 +36,7 @@
     };
 
     programs = {
+      pi.enable = true;
       kitty.enable = true;
       obs.enable = true;
       chromium = {
