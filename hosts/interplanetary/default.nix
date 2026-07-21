@@ -217,6 +217,7 @@ in
     '';
   };
 
+  age.identityPaths = [ "/var/lib/agenix-key.txt" ];
   age.secrets = {
     webdav-cert = {
       file = "${self}/shared/secrets/webdav-cert.pem";
