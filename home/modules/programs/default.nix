@@ -13,6 +13,7 @@ let
 in
 {
   imports = [
+    ./hammerspoon.nix
     ./opencode.nix
     ./pi.nix
   ];
