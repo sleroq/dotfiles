@@ -93,6 +93,8 @@ let
     address = [ "198.18.0.1/30" ];
     auto_route = true;
     route_exclude_address = cfg.routeExcludeAddresses;
+  } // lib.optionalAttrs hasSystemd {
+    auto_redirect = true;
   };
 
   defaultSettings = {
@@ -105,10 +107,11 @@ let
     dns = {
       servers = [
         {
-          type = "tls";
+          type = "https";
           tag = "remote-dns";
           server = "1.1.1.1";
-          server_port = 853;
+          server_port = 443;
+          tls.server_name = "cloudflare-dns.com";
         }
         {
           type = "local";
@@ -134,7 +137,7 @@ let
       rules = routeRules;
       final = "proxy";
       auto_detect_interface = true;
-      default_domain_resolver = "local-dns";
+      default_domain_resolver = "remote-dns";
     };
 
     experimental = {
@@ -293,12 +296,16 @@ in
             Group = "root";
             StateDirectory = "sing-box";
             AmbientCapabilities = [
+              "CAP_DAC_READ_SEARCH"
               "CAP_NET_ADMIN"
               "CAP_NET_RAW"
+              "CAP_SYS_PTRACE"
             ];
             CapabilityBoundingSet = [
+              "CAP_DAC_READ_SEARCH"
               "CAP_NET_ADMIN"
               "CAP_NET_RAW"
+              "CAP_SYS_PTRACE"
             ];
           };
         };
