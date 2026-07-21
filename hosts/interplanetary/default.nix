@@ -246,6 +246,24 @@ in
   };
   sleroq.virtualisation.enable = true;
 
+
+  age.secrets.sing-box-outbounds = {
+    file = ../../shared/secrets/sing-box-outbounds.jsonc;
+    mode = "0644";
+  };
+
+  sleroq.sing-box = {
+    enable = true;
+    outboundsFile = config.age.secrets.sing-box-outbounds.path;
+    routeExcludeAddresses = [
+      "10.0.0.0/8"
+      "172.16.0.0/12"
+      "192.168.0.0/16"
+      "83.69.209.222/32"
+    ];
+    logLevel = "warn";
+  };
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
