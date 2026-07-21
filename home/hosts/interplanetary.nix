@@ -8,7 +8,7 @@
         hyprland = {
           extraConfig = ''
             # See https://wiki.hyprland.org/Configuring/Monitors/
-            monitor = DP-2, 2560x1440@180.00, auto, 1
+            monitor = DP-1, 2560x1440@180.00, auto, 1
           '';
           gamemode = false;
         };
