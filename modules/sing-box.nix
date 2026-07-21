@@ -291,6 +291,7 @@ in
             Restart = "on-failure";
             User = "root";
             Group = "root";
+            StateDirectory = "sing-box";
             AmbientCapabilities = [
               "CAP_NET_ADMIN"
               "CAP_NET_RAW"
