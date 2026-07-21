@@ -6,7 +6,6 @@
     package = inputs'.neovim-nightly-overlay.packages.default;
     withRuby = false;
     withPython3 = false;
-    sideloadInitLua = true;
   };
 
   home.activation.neovim = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
