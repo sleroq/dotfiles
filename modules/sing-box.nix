@@ -11,6 +11,7 @@ let
   hasSystemd = lib.hasAttrByPath [ "systemd" "services" ] options;
   hasLaunchd = lib.hasAttrByPath [ "launchd" "daemons" ] options;
   supportsDnsCache = lib.versionAtLeast cfg.package.version "1.14.0";
+  directBypassMark = "0x5342";
 
   routeRules = [
     {
@@ -41,10 +42,6 @@ let
 
   tunInbound = {
     type = "tun";
-    # The default mixed stack uses the Linux system stack for TCP. This host's
-    # firewall drops that TUN-side TCP before sing-box can accept it, while the
-    # gVisor stack handles both TCP and UDP in userspace.
-    stack = "gvisor";
     address = [
       "198.18.0.1/30"
       "fdfe:dcba:9876::1/126"
@@ -52,6 +49,11 @@ let
     auto_route = true;
     route_exclude_address = cfg.routeExcludeAddresses;
   } // lib.optionalAttrs hasSystemd {
+    # The default mixed stack uses the Linux system stack for TCP. This host's
+    # firewall drops that TUN-side TCP before sing-box can accept it, while the
+    # gVisor stack handles both TCP and UDP in userspace. Keep this Linux-only;
+    # Darwin does not use the policy-routing workaround below.
+    stack = "gvisor";
     # On sing-box 1.13.14, the nftables/strict policy-routing path can write
     # UDP replies back to tun0 without delivering them to the originating
     # socket (upstream issue #3560). Use plain auto_route until it is fixed.
@@ -144,6 +146,20 @@ let
   configPath = "${workingDirectory}/config.json";
   logPath = "/var/log/sing-box.log";
 
+  directRuleSetup = pkgs.writeShellScript "sing-box-direct-rule-setup" ''
+    ${pkgs.iproute2}/bin/ip rule del priority 8999 fwmark ${directBypassMark} lookup main 2>/dev/null || true
+    ${pkgs.iproute2}/bin/ip rule add priority 8999 fwmark ${directBypassMark} lookup main
+  '';
+
+  directRuleCleanup = pkgs.writeShellScript "sing-box-direct-rule-cleanup" ''
+    ${pkgs.iproute2}/bin/ip rule del priority 8999 fwmark ${directBypassMark} lookup main 2>/dev/null || true
+  '';
+
+  installOutbounds = if hasSystemd then
+    ''.outbounds = (($outbounds | fromjson) | map(if .type == "direct" then . + { routing_mark: 21314 } else . end))''
+  else
+    ''.outbounds = ($outbounds | fromjson)'';
+
   serviceRunner = pkgs.writeShellScript "sing-box-run" ''
     set -eu
     umask 077
@@ -154,7 +170,7 @@ let
 
     ${pkgs.jq}/bin/jq \
       --rawfile outbounds "${cfg.outboundsFile}" \
-      '.outbounds = ($outbounds | fromjson)' \
+      '${installOutbounds}' \
       "${configTemplate}" > "$temporaryConfig"
 
     ${cfg.package}/bin/sing-box check -c "$temporaryConfig"
@@ -293,7 +309,9 @@ in
           after = [ "network-online.target" ];
           wants = [ "network-online.target" ];
           serviceConfig = {
+            ExecStartPre = directRuleSetup;
             ExecStart = "${serviceRunner}";
+            ExecStopPost = directRuleCleanup;
             Restart = "on-failure";
             User = "root";
             Group = "root";
