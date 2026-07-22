@@ -11,6 +11,7 @@ let
   hasSystemd = lib.hasAttrByPath [ "systemd" "services" ] options;
   hasLaunchd = lib.hasAttrByPath [ "launchd" "daemons" ] options;
   supportsDnsCache = lib.versionAtLeast cfg.package.version "1.14.0";
+  bootstrapBypassMark = "0x5342";
 
   routeRules = [
     {
@@ -71,13 +72,17 @@ let
         # DNS hijacking, which would loop a UDP/TCP bootstrap resolver.
         # This bootstrap is the only normal-DNS exception; direct-domain and
         # direct-process rules deliberately use local-dns.
-        {
+        ({
           type = "https";
           tag = "bootstrap-dns";
           server = "1.1.1.1";
           server_port = 443;
           tls.server_name = "cloudflare-dns.com";
-        }
+        } // lib.optionalAttrs hasSystemd {
+          # auto_route otherwise captures this internal dial before sing-box
+          # can resolve the proxy endpoint hostname.
+          routing_mark = 21314;
+        })
         {
           type = "https";
           tag = "remote-dns";
@@ -142,6 +147,15 @@ let
   workingDirectory = "/var/lib/sing-box";
   configPath = "${workingDirectory}/config.json";
   logPath = "/var/log/sing-box.log";
+
+  bootstrapRuleSetup = pkgs.writeShellScript "sing-box-bootstrap-rule-setup" ''
+    ${pkgs.iproute2}/bin/ip rule del priority 8999 fwmark ${bootstrapBypassMark} lookup main 2>/dev/null || true
+    ${pkgs.iproute2}/bin/ip rule add priority 8999 fwmark ${bootstrapBypassMark} lookup main
+  '';
+
+  bootstrapRuleCleanup = pkgs.writeShellScript "sing-box-bootstrap-rule-cleanup" ''
+    ${pkgs.iproute2}/bin/ip rule del priority 8999 fwmark ${bootstrapBypassMark} lookup main 2>/dev/null || true
+  '';
 
   serviceRunner = pkgs.writeShellScript "sing-box-run" ''
     set -eu
@@ -292,7 +306,9 @@ in
           after = [ "network-online.target" ];
           wants = [ "network-online.target" ];
           serviceConfig = {
+            ExecStartPre = bootstrapRuleSetup;
             ExecStart = "${serviceRunner}";
+            ExecStopPost = bootstrapRuleCleanup;
             Restart = "on-failure";
             User = "root";
             Group = "root";
