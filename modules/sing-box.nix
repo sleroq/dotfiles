@@ -65,15 +65,18 @@ let
     dns = {
       servers = [
         # Proxy endpoint hostnames are resolved through this IP-address-based
-        # resolver. UDP DNS uses its own direct dialer by default; sing-box
+        # resolver. Direct DoH uses its own direct dialer by default; sing-box
         # rejects detouring it through an otherwise empty direct outbound.
+        # Port 443 is required here because auto_route reserves port 53 for
+        # DNS hijacking, which would loop a UDP/TCP bootstrap resolver.
         # This bootstrap is the only normal-DNS exception; direct-domain and
         # direct-process rules deliberately use local-dns.
         {
-          type = "udp";
+          type = "https";
           tag = "bootstrap-dns";
           server = "1.1.1.1";
-          server_port = 53;
+          server_port = 443;
+          tls.server_name = "cloudflare-dns.com";
         }
         {
           type = "https";
