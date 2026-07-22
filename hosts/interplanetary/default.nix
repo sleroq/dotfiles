@@ -248,6 +248,9 @@ in
   sleroq.virtualisation.enable = true;
 
 
+  # UDP responses (including Discord/STUN) are lost through sing-box's
+  # nftables auto-redirect path on this host. Regular TUN auto-routing works.
+  sleroq.sing-box.enableAutoRedirect = false;
   sleroq.sing-box.routeExcludeAddresses = [
     "10.0.0.0/8"
     "172.16.0.0/12"

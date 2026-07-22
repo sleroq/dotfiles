@@ -94,7 +94,7 @@ let
     auto_route = true;
     route_exclude_address = cfg.routeExcludeAddresses;
   } // lib.optionalAttrs hasSystemd {
-    auto_redirect = true;
+    auto_redirect = cfg.enableAutoRedirect;
   };
 
   defaultSettings = {
@@ -225,6 +225,15 @@ in
       default = false;
       description = ''
         Enable sing-box persistent DNS cache. Requires sing-box 1.14.0 or newer.
+      '';
+    };
+
+    enableAutoRedirect = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Enable sing-box's nftables-based TUN auto redirect on systemd systems.
+        Disable this when UDP responses are lost by the auto redirect path.
       '';
     };
 
