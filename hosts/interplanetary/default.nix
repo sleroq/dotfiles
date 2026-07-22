@@ -248,8 +248,11 @@ in
   sleroq.virtualisation.enable = true;
   sleroq.sing-box.routeExcludeAddresses = [
     # OS route bypasses for the direct DNS bootstrap endpoint and LAN/VPN
-    # address space. Application DNS still uses proxied DoH.
+    # address space. The current proxy endpoint also needs an OS route bypass
+    # with plain auto_route; auto_detect_interface does not prevent its outer
+    # connection from re-entering tun0 on this host.
     "1.1.1.1/32"
+    "45.144.51.81/32" # node1.yamarkov.ru, selected proxy endpoint.
     "10.0.0.0/8"
     "172.16.0.0/12"
     "192.168.0.0/16"

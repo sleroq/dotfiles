@@ -83,6 +83,7 @@ in
     # are unnecessary because route.auto_detect_interface prevents loops.
     routeExcludeAddresses = [
       "1.1.1.1/32" # Direct DNS bootstrap for proxy endpoint hostnames.
+      "45.144.51.81/32" # node1.yamarkov.ru, selected proxy endpoint.
       "10.0.0.0/8"
       "172.16.0.0/12"
       "192.168.0.0/16"
