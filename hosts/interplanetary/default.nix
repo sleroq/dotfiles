@@ -255,7 +255,22 @@ in
     "10.0.0.0/8"
     "172.16.0.0/12"
     "192.168.0.0/16"
+    # DNS and proxy endpoints must bypass the TUN to avoid routing loops when
+    # auto-redirect is disabled.
+    "1.1.1.1/32"
+    "2.27.105.61/32"
+    "45.144.51.68/32"
+    "45.144.51.81/32" # node1.yamarkov.ru
+    "64.188.69.19/32"
+    "82.47.62.41/32"
+    "82.148.30.232/32"
     "83.69.209.222/32"
+    "84.201.153.80/32"
+    "144.31.182.232/32"
+    "151.245.163.226/32"
+    "158.160.196.149/32"
+    "158.160.198.80/32"
+    "188.68.218.54/32"
   ];
 
   # This value determines the NixOS release from which the default
