@@ -48,7 +48,10 @@ let
     auto_route = true;
     route_exclude_address = cfg.routeExcludeAddresses;
   } // lib.optionalAttrs hasSystemd {
-    auto_redirect = true;
+    # sing-box 1.13 auto_redirect loses UDP replies on Linux even when the
+    # selected outbound is direct (upstream issue #3560). auto_route still
+    # captures TCP and UDP through the TUN without the broken nftables path.
+    auto_redirect = false;
     strict_route = true;
   };
 
