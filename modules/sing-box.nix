@@ -62,14 +62,15 @@ let
     dns = {
       servers = [
         # Proxy endpoint hostnames are resolved through this IP-address-based
-        # resolver. This direct bootstrap is the only normal-DNS exception;
-        # direct-domain and direct-process rules deliberately use local-dns.
+        # resolver. UDP DNS uses its own direct dialer by default; sing-box
+        # rejects detouring it through an otherwise empty direct outbound.
+        # This bootstrap is the only normal-DNS exception; direct-domain and
+        # direct-process rules deliberately use local-dns.
         {
           type = "udp";
           tag = "bootstrap-dns";
           server = "1.1.1.1";
           server_port = 53;
-          detour = "direct";
         }
         {
           type = "https";
