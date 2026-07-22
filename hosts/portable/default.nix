@@ -79,7 +79,7 @@ in
       "steamwebhelper"
     ];
     # OS route bypasses for private LAN/VPN destinations, link-local IPv6,
-    # and local multicast/broadcast. Public proxy endpoint /32 workarounds
+    # and link-local/multicast traffic. Public proxy endpoint /32 workarounds
     # are unnecessary because route.auto_detect_interface prevents loops.
     routeExcludeAddresses = [
       "10.0.0.0/8"
@@ -87,10 +87,8 @@ in
       "192.168.0.0/16"
       "100.64.0.0/10"
       "224.0.0.0/4"
-      "255.255.255.255/32"
       "fc00::/7"
       "fe80::/10"
-      "ff00::/8"
     ];
     logLevel = "warn";
   };

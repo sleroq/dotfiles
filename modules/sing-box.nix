@@ -232,6 +232,8 @@ in
       description = ''
         Destination CIDRs excluded from sing-box TUN auto-routing.
         Use this for LAN or VPN-managed subnets that should stay under the system routing table.
+        On sing-box 1.13, do not include ranges ending at the address-family maximum (such as
+        255.255.255.255/32 or ff00::/8); sing-tun cannot encode them in an auto-redirect nftables interval set.
       '';
     };
 
