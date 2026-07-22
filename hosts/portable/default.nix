@@ -82,6 +82,7 @@ in
     # and link-local/multicast traffic. Public proxy endpoint /32 workarounds
     # are unnecessary because route.auto_detect_interface prevents loops.
     routeExcludeAddresses = [
+      "1.1.1.1/32" # Direct DNS bootstrap for proxy endpoint hostnames.
       "10.0.0.0/8"
       "172.16.0.0/12"
       "192.168.0.0/16"

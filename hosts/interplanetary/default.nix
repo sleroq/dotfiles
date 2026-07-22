@@ -247,7 +247,9 @@ in
   };
   sleroq.virtualisation.enable = true;
   sleroq.sing-box.routeExcludeAddresses = [
-    # OS route bypasses for LAN and VPN-managed address space.
+    # OS route bypasses for the direct DNS bootstrap endpoint and LAN/VPN
+    # address space. Application DNS still uses proxied DoH.
+    "1.1.1.1/32"
     "10.0.0.0/8"
     "172.16.0.0/12"
     "192.168.0.0/16"

@@ -48,8 +48,11 @@ let
     auto_route = true;
     route_exclude_address = cfg.routeExcludeAddresses;
   } // lib.optionalAttrs hasSystemd {
-    auto_redirect = true;
-    strict_route = true;
+    # On sing-box 1.13.14, the nftables/strict policy-routing path can write
+    # UDP replies back to tun0 without delivering them to the originating
+    # socket (upstream issue #3560). Use plain auto_route until it is fixed.
+    auto_redirect = false;
+    strict_route = false;
   };
 
   defaultSettings = {
