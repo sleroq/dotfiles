@@ -253,10 +253,8 @@ in
     "192.168.0.0/16"
     "100.64.0.0/10" # Tailscale CGNAT range.
     "224.0.0.0/4" # Local IPv4 multicast.
-    "255.255.255.255/32" # Limited broadcast.
     "fc00::/7" # Private IPv6 LAN/VPN space.
     "fe80::/10" # IPv6 link-local traffic.
-    "ff00::/8" # IPv6 multicast.
   ];
 
   # This value determines the NixOS release from which the default
