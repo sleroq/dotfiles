@@ -224,12 +224,39 @@
 
   age.secrets.sing-box-outbounds = {
     file = ./secrets/sing-box-outbounds.jsonc;
-    mode = "0644";
+    mode = "0600";
   };
 
   sleroq.sing-box = {
     enable = true;
     outboundsFile = config.age.secrets.sing-box-outbounds.path;
+    directDomains = [
+      "рф"
+      "ru"
+      "local"
+      "nelocal"
+      "frg"
+      "frankrg.com"
+      "steampowered.com"
+      "steamcommunity.com"
+      "steamstatic.com"
+      "steamcontent.com"
+      "steamserver.net"
+      "steamusercontent.com"
+      "steam-chat.com"
+      "valvesoftware.com"
+      "energotransbank.com"
+      "nixos.org"
+    ];
+    # Process matching is exact. Wine is intentionally not listed because
+    # excluding wine/wineserver would bypass the proxy for every Wine app.
+    directProcessNames = [
+      "factorio"
+      "Yaagl"
+      "sophon-server"
+      "steam"
+      "steamwebhelper"
+    ];
     logLevel = "warn";
   };
 

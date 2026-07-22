@@ -12,73 +12,18 @@ let
   hasLaunchd = lib.hasAttrByPath [ "launchd" "daemons" ] options;
   supportsDnsCache = lib.versionAtLeast cfg.package.version "1.14.0";
 
-  directDomains = [
-    ".рф"
-    ".ru"
-    ".local"
-    ".nelocal"
-    ".frg"
-    ".frankrg.com"
-    ".steampowered.com"
-    ".steamcommunity.com"
-    ".steamstatic.com"
-    ".steamcontent.com"
-    ".steamserver.net"
-    ".steamusercontent.com"
-    ".steam-chat.com"
-    ".valvesoftware.com"
-    ".energotransbank.com"
-    ".nixos.org"
-  ];
-
-  directProcesses = [
-    "factorio"
-    "Yaagl"
-    "sophon-server"
-    "steam"
-    "steam_osx"
-    "steamwebhelper"
-    "wine"
-    "wineserver"
-  ];
-
   routeRules = [
     {
       action = "sniff";
     }
     {
-      protocol = "dns";
+      type = "logical";
+      mode = "or";
+      rules = [
+        { protocol = "dns"; }
+        { port = 53; }
+      ];
       action = "hijack-dns";
-    }
-    {
-      ip_version = 6;
-      action = "reject";
-    }
-    {
-      network = "udp";
-      process_name = [ "Discord" ];
-      action = "route";
-      outbound = "proxy";
-    }
-    {
-      protocol = "bittorrent";
-      action = "route";
-      outbound = "direct";
-    }
-    # {
-    #   network = [ "udp" ];
-    #   port = [ 443 ];
-    #   action = "reject";
-    # }
-    # {
-    #   network = [ "udp" ];
-    #   action = "route";
-    #   outbound = "proxy";
-    # }
-    {
-      ip_is_private = true;
-      action = "route";
-      outbound = "direct";
     }
   ] ++ [
     {
@@ -88,7 +33,7 @@ let
     }
   ] ++ [
     {
-      domain_suffix = directDomains;
+      domain_suffix = cfg.directDomains;
       action = "route";
       outbound = "direct";
     }
@@ -96,12 +41,15 @@ let
 
   tunInbound = {
     type = "tun";
-    address = [ "198.18.0.1/30" ];
+    address = [
+      "198.18.0.1/30"
+      "fdfe:dcba:9876::1/126"
+    ];
     auto_route = true;
-    endpoint_independent_nat = true;
     route_exclude_address = cfg.routeExcludeAddresses;
   } // lib.optionalAttrs hasSystemd {
     auto_redirect = true;
+    strict_route = true;
   };
 
   defaultSettings = {
@@ -113,12 +61,23 @@ let
 
     dns = {
       servers = [
+        # Proxy endpoint hostnames are resolved through this IP-address-based
+        # resolver. This direct bootstrap is the only normal-DNS exception;
+        # direct-domain and direct-process rules deliberately use local-dns.
+        {
+          type = "udp";
+          tag = "bootstrap-dns";
+          server = "1.1.1.1";
+          server_port = 53;
+          detour = "direct";
+        }
         {
           type = "https";
           tag = "remote-dns";
           server = "1.1.1.1";
           server_port = 443;
           tls.server_name = "cloudflare-dns.com";
+          detour = "proxy";
         }
         {
           type = "local";
@@ -128,7 +87,14 @@ let
 
       rules = [
         {
-          domain_suffix = directDomains;
+          process_name = cfg.directProcessNames;
+          action = "route";
+          server = "local-dns";
+          strategy = "ipv4_only";
+        }
+        {
+          domain_suffix = cfg.directDomains;
+          action = "route";
           server = "local-dns";
           strategy = "ipv4_only";
         }
@@ -144,18 +110,18 @@ let
       rules = routeRules;
       final = "proxy";
       auto_detect_interface = true;
-      default_domain_resolver = "remote-dns";
+      default_domain_resolver = "bootstrap-dns";
     };
 
+    # Runtime selector switching is intentionally disabled: the encrypted
+    # selector's default remains the stable "proxy" target, with no exposed
+    # Clash controller. The cache is retained only for sing-box state/cache.
     experimental = {
       cache_file = {
         enabled = true;
         path = "${workingDirectory}/clash.db";
       } // lib.optionalAttrs cfg.enablePersistentDnsCache {
         store_dns = true;
-      };
-      clash_api = {
-        default_mode = "Enhanced";
       };
     };
   };
@@ -166,19 +132,26 @@ let
     removeAttrs finalSettings [ "outbounds" ]
   );
 
-  configPath = "/etc/sing-box/config.json";
   workingDirectory = "/var/lib/sing-box";
+  configPath = "${workingDirectory}/config.json";
   logPath = "/var/log/sing-box.log";
 
   serviceRunner = pkgs.writeShellScript "sing-box-run" ''
     set -eu
+    umask 077
 
-    mkdir -p "/etc/sing-box" "${workingDirectory}" "$(dirname "${logPath}")"
+    mkdir -p "${workingDirectory}" "$(dirname "${logPath}")"
+    temporaryConfig="$(${pkgs.coreutils}/bin/mktemp "${workingDirectory}/config.json.tmp.XXXXXX")"
+    trap '${pkgs.coreutils}/bin/rm -f "$temporaryConfig"' EXIT
 
     ${pkgs.jq}/bin/jq \
       --rawfile outbounds "${cfg.outboundsFile}" \
       '.outbounds = ($outbounds | fromjson)' \
-      "${configTemplate}" > "${configPath}"
+      "${configTemplate}" > "$temporaryConfig"
+
+    ${cfg.package}/bin/sing-box check -c "$temporaryConfig"
+    ${pkgs.coreutils}/bin/mv -f "$temporaryConfig" "${configPath}"
+    trap - EXIT
 
     exec ${cfg.package}/bin/sing-box run -c "${configPath}"
   '';
@@ -223,8 +196,21 @@ in
 
     directProcessNames = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = directProcesses;
-      description = "Process names routed directly when process routing is enabled.";
+      default = [ ];
+      description = ''
+        Exact, platform-dependent process names whose TCP, UDP, and DNS are routed directly.
+        Avoid broad launchers such as wine and wineserver unless every application they run should bypass the proxy.
+      '';
+    };
+
+    directDomains = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [ "example.com" ];
+      description = ''
+        Domain suffixes whose DNS and connections are routed directly. A suffix without a leading dot
+        matches both its apex and subdomains on current sing-box versions.
+      '';
     };
 
     enablePersistentDnsCache = lib.mkOption {

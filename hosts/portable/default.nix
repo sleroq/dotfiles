@@ -48,17 +48,49 @@ in
   age.identityPaths = [ "/var/lib/agenix-key.txt" ];
   age.secrets.sing-box-outbounds = {
     file = ../../shared/secrets/sing-box-outbounds.jsonc;
-    mode = "0644";
+    mode = "0600";
   };
 
   sleroq.sing-box = {
     enable = true;
     outboundsFile = config.age.secrets.sing-box-outbounds.path;
+    directDomains = [
+      "рф"
+      "ru"
+      "local"
+      "nelocal"
+      "frg"
+      "frankrg.com"
+      "steampowered.com"
+      "steamcommunity.com"
+      "steamstatic.com"
+      "steamcontent.com"
+      "steamserver.net"
+      "steamusercontent.com"
+      "steam-chat.com"
+      "valvesoftware.com"
+      "energotransbank.com"
+      "nixos.org"
+    ];
+    # Process matching is exact and platform-dependent.
+    directProcessNames = [
+      "steam"
+      "steam_osx"
+      "steamwebhelper"
+    ];
+    # OS route bypasses for private LAN/VPN destinations, link-local IPv6,
+    # and local multicast/broadcast. Public proxy endpoint /32 workarounds
+    # are unnecessary because route.auto_detect_interface prevents loops.
     routeExcludeAddresses = [
       "10.0.0.0/8"
       "172.16.0.0/12"
       "192.168.0.0/16"
-      "83.69.209.222/32"
+      "100.64.0.0/10"
+      "224.0.0.0/4"
+      "255.255.255.255/32"
+      "fc00::/7"
+      "fe80::/10"
+      "ff00::/8"
     ];
     logLevel = "warn";
   };

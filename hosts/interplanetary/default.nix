@@ -247,10 +247,16 @@ in
   };
   sleroq.virtualisation.enable = true;
   sleroq.sing-box.routeExcludeAddresses = [
+    # OS route bypasses for LAN and VPN-managed address space.
     "10.0.0.0/8"
     "172.16.0.0/12"
     "192.168.0.0/16"
-    "83.69.209.222/32"
+    "100.64.0.0/10" # Tailscale CGNAT range.
+    "224.0.0.0/4" # Local IPv4 multicast.
+    "255.255.255.255/32" # Limited broadcast.
+    "fc00::/7" # Private IPv6 LAN/VPN space.
+    "fe80::/10" # IPv6 link-local traffic.
+    "ff00::/8" # IPv6 multicast.
   ];
 
   # This value determines the NixOS release from which the default
