@@ -5,19 +5,19 @@ let
     #!/bin/bash
     export XDG_CURRENT_DESKTOP=sway
     flameshot gui -r > /tmp/screenshot.png
-    
+
     # Check if screenshot was taken (file exists and is not empty)
     if [ ! -s /tmp/screenshot.png ]; then
       echo "Screenshot cancelled or failed"
       exit 1
     fi
-    
+
     # Show uploading notification
     notify-send "Screenshot" "Uploading screenshot..." --icon=camera-photo
-    
+
     # Read auth token from agenix secret
     AUTH_TOKEN=$(cat ${config.age.secrets.flameshot-auth-token.path})
-    
+
     # Upload to sharing service
     response=$(curl -H "authorization: $AUTH_TOKEN" \
       -H "x-zipline-folder: cmd49r9980003sp9r18zs5zaq" \
@@ -25,7 +25,7 @@ let
       -F file=@/tmp/screenshot.png \
       -H 'content-type: multipart/form-data' \
       --silent)
-    
+
     if [ $? -eq 0 ]; then
       # Extract URL and copy to clipboard
       url=$(echo "$response" | jq -r '.files[0].url')
@@ -43,7 +43,7 @@ let
       notify-send "Screenshot" "Failed to upload screenshot" --icon=dialog-error
       exit 1
     fi
-    
+
     # Clean up
     rm -f /tmp/screenshot.png
   '';
@@ -73,7 +73,6 @@ in
       saveLastRegion=true
       savePath=/home/sleroq/Pictures/Screenshots
       showStartupLaunchMessage=false
-      disabledGrimWarning=true
     '';
   };
 }
