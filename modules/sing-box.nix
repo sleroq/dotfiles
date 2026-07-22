@@ -55,6 +55,12 @@ let
       action = "reject";
     }
     {
+      network = "udp";
+      process_name = [ "Discord" ];
+      action = "route";
+      outbound = "proxy";
+    }
+    {
       protocol = "bittorrent";
       action = "route";
       outbound = "direct";
@@ -92,9 +98,10 @@ let
     type = "tun";
     address = [ "198.18.0.1/30" ];
     auto_route = true;
+    endpoint_independent_nat = true;
     route_exclude_address = cfg.routeExcludeAddresses;
   } // lib.optionalAttrs hasSystemd {
-    auto_redirect = cfg.enableAutoRedirect;
+    auto_redirect = true;
   };
 
   defaultSettings = {
@@ -225,15 +232,6 @@ in
       default = false;
       description = ''
         Enable sing-box persistent DNS cache. Requires sing-box 1.14.0 or newer.
-      '';
-    };
-
-    enableAutoRedirect = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = ''
-        Enable sing-box's nftables-based TUN auto redirect on systemd systems.
-        Disable this when UDP responses are lost by the auto redirect path.
       '';
     };
 
