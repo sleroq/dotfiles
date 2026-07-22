@@ -78,9 +78,8 @@ in
       "steam_osx"
       "steamwebhelper"
     ];
-    # OS route bypasses for private LAN/VPN destinations, link-local IPv6,
-    # and link-local/multicast traffic. Public proxy endpoint /32 workarounds
-    # are unnecessary because route.auto_detect_interface prevents loops.
+    # OS route bypasses for bootstrap/proxy endpoints, private LAN/VPN
+    # destinations, link-local IPv6, and multicast traffic.
     routeExcludeAddresses = [
       "1.1.1.1/32" # Direct DNS bootstrap for proxy endpoint hostnames.
       "45.144.51.81/32" # node1.yamarkov.ru, selected proxy endpoint.

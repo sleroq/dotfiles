@@ -246,6 +246,10 @@ in
     };
   };
   sleroq.virtualisation.enable = true;
+  # Direct sing-box outbounds intentionally return through the physical
+  # interface while the unmarked default route points at tun0. Strict reverse
+  # path filtering drops those replies before they reach the marked socket.
+  networking.firewall.checkReversePath = "loose";
   sleroq.sing-box.routeExcludeAddresses = [
     # OS route bypasses for the direct DNS bootstrap endpoint and LAN/VPN
     # address space. The current proxy endpoint also needs an OS route bypass
