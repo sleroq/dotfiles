@@ -41,6 +41,10 @@ let
 
   tunInbound = {
     type = "tun";
+    # The default mixed stack uses the Linux system stack for TCP. This host's
+    # firewall drops that TUN-side TCP before sing-box can accept it, while the
+    # gVisor stack handles both TCP and UDP in userspace.
+    stack = "gvisor";
     address = [
       "198.18.0.1/30"
       "fdfe:dcba:9876::1/126"
