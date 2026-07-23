@@ -193,14 +193,15 @@ in
     ];
   };
 
+  # TODO: Move to another host
   cumserver.navidrome = {
-    enable = true;
+    enable = false;
     metrics = {
       enable = true;
       path = "/metrics_itslocalanyway";
     };
-    filebrowser.enable = true;
-    feishin.enable = true;
+    filebrowser.enable = false;
+    feishin.enable = false;
   };
 
   age.secrets.ziplineEnv = {
@@ -353,7 +354,7 @@ in
   };
   cumserver.slusha = {
     enable = true;
-    image = "localhost:5000/slusha:edge-cumming-2";
+    image = "localhost:5000/slusha:edge-cumming-beta";
     environmentFile = config.age.secrets.slushaEnv.path;
   };
 
