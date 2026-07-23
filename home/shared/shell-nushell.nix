@@ -108,7 +108,7 @@ in
 
       let existing_nix_paths = ($nix_paths | where { |p| $p | path exists })
 
-      $env.PATH = ($env.PATH | split row (char esep) | where { |p| $p not-in $existing_nix_paths } | append $existing_nix_paths)
+      $env.PATH = ($existing_nix_paths | append ($env.PATH | split row (char esep) | where { |p| $p not-in $existing_nix_paths }))
     '')
   ];
   settings = {

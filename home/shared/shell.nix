@@ -24,9 +24,14 @@ in
     ../modules/programs/starship.nix
     ../modules/programs/btop.nix
   ];
-  home.sessionVariables = if enableSshAuthSocket then {
-    SSH_AUTH_SOCK = "/run/user/1000/ssh-agent";
-  } else {};
+  home = {
+    # Do not rely on the PATH inherited from macOS applications or terminal
+    # launchers: they can put /usr/bin before the Home Manager profile.
+    sessionPath = [ "${config.home.profileDirectory}/bin" ];
+    sessionVariables = if enableSshAuthSocket then {
+      SSH_AUTH_SOCK = "/run/user/1000/ssh-agent";
+    } else { };
+  };
 
   programs = {
     bash = {
