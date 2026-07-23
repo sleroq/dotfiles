@@ -13,6 +13,13 @@ in
 
   hardware.amdgpu.initrd.enable = true;
 
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+  };
+
+  services.blueman.enable = true;
+
   # Bootloader.
   boot = {
     kernelPackages = pkgs.linuxKernel.packages.linux_zen;

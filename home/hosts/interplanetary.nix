@@ -12,6 +12,8 @@ let
   };
 in
 {
+  age.identityPaths = [ "/var/lib/agenix-key.txt" ];
+
   myHome = {
     wms = {
       wayland = {
@@ -66,7 +68,7 @@ in
     settings = {
       bar.status = {
         showBattery = false;
-        showBluetooth = false;
+        showBluetooth = true;
         showNetwork = false;
       };
     };
