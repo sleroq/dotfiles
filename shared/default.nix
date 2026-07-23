@@ -246,7 +246,6 @@
       "steam-chat.com"
       "valvesoftware.com"
       "energotransbank.com"
-      "nixos.org"
     ];
     # Process matching is exact. Wine is intentionally not listed because
     # excluding wine/wineserver would bypass the proxy for every Wine app.
