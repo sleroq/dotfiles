@@ -1,7 +1,7 @@
 {
   appimageTools,
-  version ? "0.5.7.1",
-  hash ? "sha256-AiLuEQhJoyPo1pTmAWvnXMj5pdA/CBO6JvZZVG71W7M="
+  version ? "0.14.8.2",
+  hash ? "sha256-7Kde6Crsr6LdKnfER+6yE7JkU6+10xXtJ1GQEHhBtqg="
 }:
 
 let
