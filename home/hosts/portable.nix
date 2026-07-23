@@ -59,6 +59,11 @@ in
     path = "${config.home.homeDirectory}/.ssh/config";
   };
 
+  # Allow the interplanetary host to SSH into this machine.
+  home.file.".ssh/authorized_keys".text = ''
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSh54pu9bAH8DFBKPtswFJzevCft+gHZStJQ0trYGoj sleroq@cum.army
+  '';
+
   # Fix for https://github.com/ryantm/agenix/issues/308
   launchd.agents."activate-agenix".config.KeepAlive = lib.mkForce { SuccessfulExit = false; };
 
