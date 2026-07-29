@@ -1,4 +1,5 @@
 {
+  config,
   modulesPath,
   pkgs,
   ...
@@ -20,13 +21,7 @@
   networking = {
     hostName = "div";
     useDHCP = true;
-    firewall = {
-      enable = true;
-      allowedTCPPorts = [
-        80
-        443
-      ];
-    };
+    firewall.enable = true;
   };
 
   swapDevices = [
@@ -62,7 +57,6 @@
   };
 
   services.qemuGuest.enable = true;
-  services.caddy.enable = true;
 
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK72BBTnP5Os5ZQfS1BuigNzWMqNFl7lgUH4CJq1bl9P cantundo@pm.me"
@@ -70,14 +64,19 @@
 
   services.navidrome = {
     enable = true;
-    domain = "music.cum.army";
+    cloudflared.tokenFile = config.age.secrets.cloudflaredToken.path;
     metrics = {
       enable = true;
       path = "/metrics_itslocalanyway";
     };
-    filebrowser.enable = false;
-    feishin.enable = false;
   };
+
+  age.secrets.cloudflaredToken = {
+    file = ../../shared/secrets/cloudflared.key;
+  };
+  systemd.services.cloudflared-navidrome.restartTriggers = [
+    config.age.secrets.cloudflaredToken.file
+  ];
 
   environment.systemPackages = with pkgs; [
     curl

@@ -38,7 +38,6 @@ in
     ./modules/dev-env.nix
     ./modules/matterbridge.nix
     ./modules/mailserver.nix
-    ../../modules/navidrome.nix
     ./modules/zipline.nix
     ./modules/radicale.nix
     ./modules/monitoring
