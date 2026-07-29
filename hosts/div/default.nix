@@ -82,8 +82,16 @@
   age.secrets.cloudflaredToken = {
     file = ../../shared/secrets/cloudflared.key;
   };
+  age.secrets.navidromeEnv = {
+    owner = "navidrome";
+    group = "navidrome";
+    file = ./secrets/navidromeEnv;
+  };
   systemd.services.cloudflared-navidrome.restartTriggers = [
     config.age.secrets.cloudflaredToken.file
+  ];
+  systemd.services.navidrome.restartTriggers = [
+    config.age.secrets.navidromeEnv.file
   ];
 
   environment.systemPackages = with pkgs; [
