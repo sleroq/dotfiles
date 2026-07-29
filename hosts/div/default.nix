@@ -97,7 +97,8 @@
   environment.systemPackages = with pkgs; [
     curl
     git
-    htop
+    btop
+    dust
     python3
     tmux
     vim
