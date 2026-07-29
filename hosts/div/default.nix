@@ -79,7 +79,7 @@
   ];
 
   services.navidrome = {
-    enable = false;
+    enable = true;
     listenAddress = "0.0.0.0";
     cloudflared.tokenFile = config.age.secrets.cloudflaredToken.path;
     environmentFile = config.age.secrets.navidromeEnv.path;
