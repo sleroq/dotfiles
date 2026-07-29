@@ -226,15 +226,34 @@ in
         backup.enable = true;
       };
 
-      # testing = {
-      #   domain = "test-web.cum.army";
-      #   port = 8081;
-      #   udpPort = 8081;
-      #   redisPort = 6380;
-      #   redisDb = 1;
-      #   stateDirectory = "broadcast-box-testing";
-      #   backup.enable = false;
-      # };
+      testing = {
+        domain = "test-web.cum.army";
+        port = 8083;
+        udpPort = 8081;
+        redisPort = 6380;
+        redisDb = 1;
+        stateDirectory = "broadcast-box-testing";
+        backup.enable = false;
+        package = pkgs.broadcast-box.override {
+          version = "bb-data-v1-2026-07-29";
+          owner = "Azarattum";
+          rev = "42571dc0185d6ced7292e5029e54c3e680f69a0c";
+          hash = "sha256-j06pwh/hMOEdqTim4C+RwdcBIybKA3LWFnn8hXQ7wyc=";
+          vendorHash = "sha256-7BBYB2YJJ0f5Su7KXC0z8hff8kN8vY11k3kRo12m1W8=";
+          frontendLock = ../../packages/broadcast-box-bb-data-v1-package-lock.json;
+          frontendNpmDepsHash = "sha256-slz9+a/MoYbl6bmA+hKX+4rP1pb+8PnXJAc4JJ9vU3A=";
+        };
+      };
+
+      development = {
+        domain = "dev-web.cum.army";
+        port = 8082;
+        udpPort = 8082;
+        redisPort = 6381;
+        redisDb = 2;
+        stateDirectory = "broadcast-box-development";
+        backup.enable = false;
+      };
     };
   };
 

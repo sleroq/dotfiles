@@ -1,5 +1,4 @@
 {
-  inputs',
   pkgs,
   config,
   lib,
@@ -38,7 +37,8 @@ let
     ];
   };
 
-  mkServiceEnvironment = name: instance:
+  mkServiceEnvironment =
+    name: instance:
     let
       defaultSettings = {
         REDIS_URL = "redis://localhost:${toString instance.redisPort}/${toString instance.redisDb}";
@@ -59,7 +59,8 @@ let
       HTTP_ADDRESS = "127.0.0.1:${toString instance.port}";
     };
 
-  mkService = name: instance:
+  mkService =
+    name: instance:
     let
       serviceName = "broadcast-box-${name}";
       redisService = "redis-broadcast-box-${name}.service";
@@ -79,7 +80,7 @@ let
       environment = mkServiceEnvironment name instance;
 
       serviceConfig = {
-        ExecStart = lib.getExe pkgs.broadcast-box;
+        ExecStart = lib.getExe instance.package;
         Restart = "always";
         RestartSec = "10s";
 
@@ -151,14 +152,9 @@ let
           reverse_proxy 127.0.0.1:${toString instance.port}
         }
 
-        # Everything else serves the static frontend from web-cum-army
+        # Everything else serves the frontend built from this instance's source.
         handle {
-          root * ${
-            inputs'.web-cum-army.packages.default.override {
-              siteTitle = if name == "production" then "Broadcast Box" else "Broadcast Box (${name})";
-              apiPath = "https://${instance.domain}/api";
-            }
-          }
+          root * ${instance.package}/share/web
 
           @index {
             file
@@ -228,6 +224,12 @@ in
               port = lib.mkOption {
                 type = lib.types.port;
                 description = "Internal port for Broadcast Box HTTP server";
+              };
+
+              package = lib.mkOption {
+                type = lib.types.package;
+                default = pkgs.broadcast-box;
+                description = "Broadcast Box package used by this instance";
               };
 
               udpPort = lib.mkOption {
@@ -307,19 +309,27 @@ in
         }
       ];
 
-      services.redis.servers = lib.mapAttrs' (name: instance: lib.nameValuePair "broadcast-box-${name}" (mkRedisServer name instance)) enabledInstances;
+      services.redis.servers = lib.mapAttrs' (
+        name: instance: lib.nameValuePair "broadcast-box-${name}" (mkRedisServer name instance)
+      ) enabledInstances;
 
-      systemd.services = lib.mapAttrs' (name: instance: lib.nameValuePair "broadcast-box-${name}" (mkService name instance)) enabledInstances;
+      systemd.services = lib.mapAttrs' (
+        name: instance: lib.nameValuePair "broadcast-box-${name}" (mkService name instance)
+      ) enabledInstances;
 
       networking.firewall = {
         allowedUDPPorts = map (instance: instance.udpPort) instanceList;
       };
 
-      services.caddy.virtualHosts = lib.mapAttrs' (name: instance: lib.nameValuePair instance.domain (mkCaddyVirtualHost name instance)) enabledInstances;
+      services.caddy.virtualHosts = lib.mapAttrs' (
+        name: instance: lib.nameValuePair instance.domain (mkCaddyVirtualHost name instance)
+      ) enabledInstances;
     })
 
     (lib.mkIf cfg.enable {
-      services.restic.backups = lib.mapAttrs' (name: instance: lib.nameValuePair "broadcast-box-redis-${name}" (mkBackup name instance)) backupInstances;
+      services.restic.backups = lib.mapAttrs' (
+        name: instance: lib.nameValuePair "broadcast-box-redis-${name}" (mkBackup name instance)
+      ) backupInstances;
     })
   ];
 }
