@@ -237,8 +237,9 @@ in
         package = pkgs.broadcast-box.override {
           version = "bb-data-v1-2026-07-29";
           owner = "Azarattum";
-          rev = "42571dc0185d6ced7292e5029e54c3e680f69a0c";
-          hash = "sha256-j06pwh/hMOEdqTim4C+RwdcBIybKA3LWFnn8hXQ7wyc=";
+          repo = "BroadcastBox";
+          rev = "fd348c444158e3661687a6161ead21f400063737";
+          hash = "sha256-DI/YJ8KktkgMV7UkVMOUiT7YTUrGPUHWY6/IyzoK2iE=";
           vendorHash = "sha256-7BBYB2YJJ0f5Su7KXC0z8hff8kN8vY11k3kRo12m1W8=";
           frontendLock = ../../packages/broadcast-box-bb-data-v1-package-lock.json;
           frontendNpmDepsHash = "sha256-slz9+a/MoYbl6bmA+hKX+4rP1pb+8PnXJAc4JJ9vU3A=";

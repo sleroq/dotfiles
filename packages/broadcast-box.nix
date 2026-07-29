@@ -5,6 +5,7 @@
   buildNpmPackage,
   version ? "unstable-2026-07-29",
   owner ? "Glimesh",
+  repo ? "broadcast-box",
   rev ? "03dcbfa724fba2b6b577c644dd0c3d76422269ac",
   hash ? "sha256-AXW2xu3N+Uevg/Gc/ZI3UUnvgt4wcJkiY6MZDGdx6AY=",
   vendorHash ? "sha256-NQoDxuuYsIvUGf2W+bShEhgCrWrliz45c8+v48tHKp0=",
@@ -13,8 +14,12 @@
 }:
 let
   src = fetchFromGitHub {
-    inherit owner rev hash;
-    repo = "broadcast-box";
+    inherit
+      owner
+      repo
+      rev
+      hash
+      ;
   };
 
   frontend = buildNpmPackage {
@@ -56,7 +61,7 @@ buildGoModule {
 
   meta = with lib; {
     description = "WebRTC broadcast server";
-    homepage = "https://github.com/${owner}/broadcast-box";
+    homepage = "https://github.com/${owner}/${repo}";
     license = licenses.mit;
     mainProgram = "broadcast-box";
   };
