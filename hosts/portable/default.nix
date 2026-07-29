@@ -73,7 +73,11 @@ in
       "steam-chat.com"
       "valvesoftware.com"
       "energotransbank.com"
-      "nixos.org"
+      "zoom.us"
+      "teams.microsoft.com"
+      "teams.live.com"
+      "skype.com"
+      "skype.net"
     ];
     # Process matching is exact and platform-dependent.
     directProcessNames = [
