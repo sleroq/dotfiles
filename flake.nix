@@ -25,6 +25,7 @@
     # Per-host nixpkgs pins
     nixpkgs-interplanetary.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-cumserver.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
+    nixpkgs-div.url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-26.05&rev=b3fe9581c9061c749abef42b6d4ee7b7c05c33fa&shallow=1";
     nixpkgs-portable.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
 
     # Interplanetary flakes
@@ -179,6 +180,15 @@
                 inputs.sieve.nixosModules.sieve
                 inputs.nixos-facter-modules.nixosModules.facter
                 inputs.nix-minecraft.nixosModules.minecraft-servers
+              ];
+            };
+
+            div = withNixpkgsFor "div" {
+              arch = "x86_64";
+              tags = [ "server" ];
+
+              modules = [
+                inputs.disko.nixosModules.disko
               ];
             };
 

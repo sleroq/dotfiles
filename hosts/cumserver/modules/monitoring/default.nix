@@ -1,7 +1,7 @@
 { config, lib, ... }:
 let
   cfg = config.cumserver.monitoring;
-  navidromeCfg = config.cumserver.navidrome;
+  navidromeCfg = config.services.navidrome;
 in
 {
   options.cumserver.monitoring = {

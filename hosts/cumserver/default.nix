@@ -38,7 +38,7 @@ in
     ./modules/dev-env.nix
     ./modules/matterbridge.nix
     ./modules/mailserver.nix
-    ./modules/navidrome.nix
+    ../../modules/navidrome.nix
     ./modules/zipline.nix
     ./modules/radicale.nix
     ./modules/monitoring
@@ -191,17 +191,6 @@ in
         tlsInsecure = true;
       }
     ];
-  };
-
-  # TODO: Move to another host
-  cumserver.navidrome = {
-    enable = false;
-    metrics = {
-      enable = true;
-      path = "/metrics_itslocalanyway";
-    };
-    filebrowser.enable = false;
-    feishin.enable = false;
   };
 
   age.secrets.ziplineEnv = {

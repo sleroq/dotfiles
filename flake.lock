@@ -1927,6 +1927,24 @@
         "url": "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz"
       }
     },
+    "nixpkgs-div": {
+      "locked": {
+        "lastModified": 1784707089,
+        "narHash": "sha256-2V/6imsUgB7mPZlHY54oeVBRDoZbPKnvzwkAHUSSufk=",
+        "ref": "nixos-26.05",
+        "rev": "b3fe9581c9061c749abef42b6d4ee7b7c05c33fa",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs.git"
+      },
+      "original": {
+        "ref": "nixos-26.05",
+        "rev": "b3fe9581c9061c749abef42b6d4ee7b7c05c33fa",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs.git"
+      }
+    },
     "nixpkgs-interplanetary": {
       "locked": {
         "lastModified": 1784555310,
@@ -2388,6 +2406,7 @@
         "nixos-facter-modules": "nixos-facter-modules",
         "nixpkgs": "nixpkgs_10",
         "nixpkgs-cumserver": "nixpkgs-cumserver",
+        "nixpkgs-div": "nixpkgs-div",
         "nixpkgs-interplanetary": "nixpkgs-interplanetary",
         "nixpkgs-master": "nixpkgs-master",
         "nixpkgs-portable": "nixpkgs-portable",
