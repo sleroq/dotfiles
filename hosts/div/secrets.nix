@@ -4,11 +4,19 @@ let
   div = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKqaD8lUj2IoSXbd+ZngR3w+7rKxS7DU/3CPo4jd9SE9 root@shared";
 in
 {
-  "secrets/navidromeEnv" = {
-    publicKeys = [
-      sleroq
-      portable
-      div
-    ];
-  };
+  "secrets/navidromeEnv".publicKeys = [
+    sleroq
+    portable
+    div
+  ];
+  "secrets/tuwunelRegistrationToken".publicKeys = [
+    sleroq
+    portable
+    div
+  ];
+  "secrets/tuwunelTurnSecret".publicKeys = [
+    sleroq
+    portable
+    div
+  ];
 }

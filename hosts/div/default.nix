@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   modulesPath,
   pkgs,
   ...
@@ -10,6 +11,7 @@
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
     ../../modules/navidrome.nix
+    ../../modules/tuwunel.nix
   ];
 
   boot.loader.systemd-boot = {
@@ -22,7 +24,14 @@
   networking = {
     hostName = "div";
     useDHCP = true;
-    firewall.enable = true;
+    firewall = {
+      enable = true;
+      interfaces.tailscale0.allowedTCPPorts = [
+        4533
+        8008
+        9100
+      ];
+    };
   };
 
   swapDevices = [
@@ -80,6 +89,20 @@
     };
   };
 
+  services.matrix-tuwunel = {
+    enable = true;
+    # Keep the current server version for the data migration. Upgrade only
+    # after the migrated database has been verified on div.
+    package = inputs.nixpkgs-cumserver.legacyPackages.x86_64-linux.matrix-tuwunel;
+    listenAddress = "0.0.0.0";
+    registrationTokenFile = config.age.secrets.tuwunelRegistrationToken.path;
+    turn = {
+      enable = true;
+      secretFile = config.age.secrets.tuwunelTurnSecret.path;
+    };
+    elementCallUrl = "https://call.cum.army";
+  };
+
   services.prometheus.exporters.node = {
     enable = true;
     listenAddress = "0.0.0.0";
@@ -98,11 +121,21 @@
     group = "navidrome";
     file = ./secrets/navidromeEnv;
   };
+  age.secrets.tuwunelRegistrationToken = {
+    file = ./secrets/tuwunelRegistrationToken;
+  };
+  age.secrets.tuwunelTurnSecret = {
+    file = ./secrets/tuwunelTurnSecret;
+  };
   systemd.services.cloudflared-navidrome.restartTriggers = [
     config.age.secrets.cloudflaredToken.file
   ];
   systemd.services.navidrome.restartTriggers = [
     config.age.secrets.navidromeEnv.file
+  ];
+  systemd.services.tuwunel.restartTriggers = [
+    config.age.secrets.tuwunelRegistrationToken.file
+    config.age.secrets.tuwunelTurnSecret.file
   ];
 
   environment.systemPackages = with pkgs; [

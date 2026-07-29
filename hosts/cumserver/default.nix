@@ -108,7 +108,10 @@ in
     enableGarbageCollect = true;
   };
 
-  cumserver.tuwunel.enable = true;
+  cumserver.tuwunel = {
+    enable = true;
+    backend = "div:8008";
+  };
 
   cumserver.frp.enable = true;
 

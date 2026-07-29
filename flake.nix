@@ -187,6 +187,10 @@
               arch = "x86_64";
               tags = [ "server" ];
 
+              specialArgs = {
+                inherit inputs;
+              };
+
               modules = [
                 inputs.disko.nixosModules.disko
               ];
