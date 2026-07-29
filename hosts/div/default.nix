@@ -17,6 +17,7 @@
     configurationLimit = 10;
   };
   boot.loader.efi.canTouchEfiVariables = false;
+  boot.tmp.cleanOnBoot = true;
 
   networking = {
     hostName = "div";
@@ -36,10 +37,16 @@
     openFirewall = true;
     settings = {
       AuthorizedKeysFile = ".ssh/authorized_keys /etc/ssh/authorized_keys.d/%u";
+      KbdInteractiveAuthentication = false;
       PasswordAuthentication = false;
       PermitRootLogin = "prohibit-password";
+      X11Forwarding = false;
     };
   };
+
+  services.journald.extraConfig = ''
+    SystemMaxUse=500M
+  '';
 
   services.avahi = {
     enable = true;
@@ -65,6 +72,7 @@
   services.navidrome = {
     enable = true;
     cloudflared.tokenFile = config.age.secrets.cloudflaredToken.path;
+    environmentFile = config.age.secrets.navidromeEnv.path;
     metrics = {
       enable = true;
       path = "/metrics_itslocalanyway";
@@ -93,7 +101,19 @@
       "flakes"
     ];
     optimise.automatic = true;
+
+    gc = {
+      automatic = true;
+      dates = "daily";
+      options = "--delete-older-than 7d";
+    };
   };
+
+  zramSwap = {
+    enable = true;
+    algorithm = "lz4";
+  };
+  systemd.oomd.enableUserSlices = true;
 
   system.stateVersion = "26.05";
 }
