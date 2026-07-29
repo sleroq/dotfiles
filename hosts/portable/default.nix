@@ -53,6 +53,9 @@ in
 
   sleroq.sing-box = {
     enable = true;
+    # The current proxy has no working IPv6 egress. Advertising an IPv6 TUN
+    # makes libcurl/Nix prefer AAAA records and repeatedly hit that broken path.
+    enableIPv6 = false;
     outboundsFile = config.age.secrets.sing-box-outbounds.path;
     directDomains = [
       "рф"
@@ -90,6 +93,7 @@ in
       "224.0.0.0/4"
       "fc00::/7"
       "fe80::/10"
+      "31.172.71.180/32"
     ];
     logLevel = "warn";
   };

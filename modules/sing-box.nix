@@ -42,10 +42,7 @@ let
 
   tunInbound = {
     type = "tun";
-    address = [
-      "198.18.0.1/30"
-      "fdfe:dcba:9876::1/126"
-    ];
+    address = [ "198.18.0.1/30" ] ++ lib.optional cfg.enableIPv6 "fdfe:dcba:9876::1/126";
     auto_route = true;
     route_exclude_address = cfg.routeExcludeAddresses;
   } // lib.optionalAttrs hasSystemd {
@@ -242,6 +239,16 @@ in
       default = false;
       description = ''
         Enable sing-box persistent DNS cache. Requires sing-box 1.14.0 or newer.
+      '';
+    };
+
+    enableIPv6 = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Route IPv6 traffic through the TUN. Disable this when the selected proxy
+        cannot reach IPv6 destinations; otherwise the TUN makes IPv6 appear
+        usable and applications may prefer it over working IPv4 connections.
       '';
     };
 
