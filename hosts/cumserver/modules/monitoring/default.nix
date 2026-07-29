@@ -14,6 +14,23 @@ in
       default = config.networking.hostName;
       description = "Display name for the local monitoring node";
     };
+    navidrome = {
+      address = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Address of a remote Navidrome metrics endpoint (host:port)";
+      };
+      metricsPath = lib.mkOption {
+        type = lib.types.str;
+        default = "/metrics";
+        description = "Path of the remote Navidrome metrics endpoint";
+      };
+      nodeName = lib.mkOption {
+        type = lib.types.str;
+        default = "Navidrome";
+        description = "Display name for the remote Navidrome instance";
+      };
+    };
     remoteNodes = lib.mkOption {
       type = lib.types.listOf (lib.types.submodule {
         options = {
@@ -31,7 +48,8 @@ in
             description = "Username for basic auth";
           };
           passwordPath = lib.mkOption {
-            type = lib.types.path;
+            type = lib.types.nullOr lib.types.path;
+            default = null;
             description = "Path to the password file for basic auth";
           };
           enableTLS = lib.mkOption {
@@ -169,6 +187,15 @@ in
             metrics_path = "/metrics";
             static_configs = [{ targets = [ "127.0.0.1:${toString config.cumserver.slusha.webPort}" ]; }];
           }
+        ] ++ lib.optionals (cfg.navidrome.address != null) [
+          {
+            job_name = "navidrome";
+            metrics_path = cfg.navidrome.metricsPath;
+            static_configs = [{
+              targets = [ cfg.navidrome.address ];
+              labels.instance = cfg.navidrome.nodeName;
+            }];
+          }
         ] ++ (map (node: {
             job_name = "node-${lib.strings.toLower node.name}";
             static_configs = [{
@@ -178,7 +205,7 @@ in
                     node_type = "remote";
                 };
             }];
-            basic_auth = {
+            basic_auth = lib.mkIf (node.passwordPath != null) {
                 inherit (node) username;
                 password_file = toString node.passwordPath;
             };

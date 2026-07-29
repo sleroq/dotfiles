@@ -16,6 +16,12 @@ in
       description = "Path to music files";
     };
 
+    listenAddress = lib.mkOption {
+      type = lib.types.str;
+      default = "127.0.0.1";
+      description = "Address on which Navidrome listens";
+    };
+
     metrics = {
       enable = lib.mkEnableOption "Navidrome Prometheus metrics";
 
@@ -40,7 +46,7 @@ in
     services.navidrome = {
       openFirewall = false;
       settings = {
-        Address = "127.0.0.1";
+        Address = cfg.listenAddress;
         Port = 4533;
         MusicFolder = cfg.musicFolder;
         DataFolder = "/var/lib/navidrome/data";

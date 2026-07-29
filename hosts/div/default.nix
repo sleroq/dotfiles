@@ -70,13 +70,24 @@
   ];
 
   services.navidrome = {
-    enable = true;
+    enable = false;
+    listenAddress = "0.0.0.0";
     cloudflared.tokenFile = config.age.secrets.cloudflaredToken.path;
     environmentFile = config.age.secrets.navidromeEnv.path;
     metrics = {
       enable = true;
       path = "/metrics_itslocalanyway";
     };
+  };
+
+  services.prometheus.exporters.node = {
+    enable = true;
+    listenAddress = "0.0.0.0";
+    openFirewall = false;
+    enabledCollectors = [
+      "systemd"
+      "processes"
+    ];
   };
 
   age.secrets.cloudflaredToken = {

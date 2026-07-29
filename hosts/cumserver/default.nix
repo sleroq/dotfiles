@@ -174,6 +174,11 @@ in
     enable = true;
     grafanaPasswordPath = config.age.secrets.grafanaPassword.path;
     localNodeName = "Germany";
+    navidrome = {
+      address = "div:4533";
+      metricsPath = "/metrics_itslocalanyway";
+      nodeName = "Div";
+    };
     remoteNodes = [
       {
         name = "Poland";
@@ -188,6 +193,10 @@ in
         passwordPath = config.age.secrets.nodeExporter3Password.path;
         enableTLS = true;
         tlsInsecure = true;
+      }
+      {
+        name = "Div";
+        address = "div:9100";
       }
     ];
   };
