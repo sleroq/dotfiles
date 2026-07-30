@@ -1,6 +1,5 @@
 {
   config,
-  inputs,
   lib,
   modulesPath,
   pkgs,
@@ -166,9 +165,6 @@
     enableGarbageCollect = true;
   };
 
-  # Enable during the final cutover, after the last offline rsync from
-  # cumserver has completed. Keeping it disabled makes registry and data
-  # staging safe: it cannot start from an incomplete SQLite snapshot.
   sleroq.slusha = {
     enable = true;
     image = "div.capybara-menkent.ts.net:5000/slusha:edge-cumming-beta";
@@ -177,10 +173,7 @@
   };
 
   services.matrix-tuwunel = {
-    enable = false;
-    # Keep the current server version for the data migration. Upgrade only
-    # after the migrated database has been verified on div.
-    package = inputs.nixpkgs-cumserver.legacyPackages.x86_64-linux.matrix-tuwunel;
+    enable = true;
     listenAddress = "0.0.0.0";
     registrationTokenFile = config.age.secrets.tuwunelRegistrationToken.path;
     turn = {
