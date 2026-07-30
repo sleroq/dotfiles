@@ -10,6 +10,7 @@
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
+    ../../modules/cloudflared.nix
     ../../modules/navidrome.nix
     ../../modules/tuwunel.nix
   ];
@@ -70,18 +71,32 @@
   services.tailscale = {
     enable = true;
     openFirewall = true;
+    extraSetFlags = [ "--hostname=div" ];
   };
 
   services.qemuGuest.enable = true;
+
+  sleroq.cloudflared = {
+    enable = true;
+    protocol = "http2";
+    tunnels.music = {
+      id = "fcb39dde-46c0-4819-972c-49867b813bcc";
+      credentialsFile = config.age.secrets.cloudflaredDivCredentials.path;
+      restartTriggers = [ config.age.secrets.cloudflaredDivCredentials.file ];
+    };
+  };
 
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK72BBTnP5Os5ZQfS1BuigNzWMqNFl7lgUH4CJq1bl9P cantundo@pm.me"
   ];
 
-  services.navidrome = {
+  sleroq.navidrome = {
     enable = true;
     listenAddress = "0.0.0.0";
-    cloudflared.tokenFile = config.age.secrets.cloudflaredToken.path;
+    cloudflared = {
+      tunnel = "music";
+      hostname = "music.cum.army";
+    };
     environmentFile = config.age.secrets.navidromeEnv.path;
     metrics = {
       enable = true;
@@ -90,7 +105,7 @@
   };
 
   services.matrix-tuwunel = {
-    enable = true;
+    enable = false;
     # Keep the current server version for the data migration. Upgrade only
     # after the migrated database has been verified on div.
     package = inputs.nixpkgs-cumserver.legacyPackages.x86_64-linux.matrix-tuwunel;
@@ -113,8 +128,8 @@
     ];
   };
 
-  age.secrets.cloudflaredToken = {
-    file = ../../shared/secrets/cloudflared.key;
+  age.secrets.cloudflaredDivCredentials = {
+    file = ../../shared/secrets/cloudflared-div.json;
   };
   age.secrets.navidromeEnv = {
     owner = "navidrome";
@@ -127,9 +142,6 @@
   age.secrets.tuwunelTurnSecret = {
     file = ./secrets/tuwunelTurnSecret;
   };
-  systemd.services.cloudflared-navidrome.restartTriggers = [
-    config.age.secrets.cloudflaredToken.file
-  ];
   systemd.services.navidrome.restartTriggers = [
     config.age.secrets.navidromeEnv.file
   ];

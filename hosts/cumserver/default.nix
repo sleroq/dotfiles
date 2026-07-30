@@ -178,7 +178,7 @@ in
     grafanaPasswordPath = config.age.secrets.grafanaPassword.path;
     localNodeName = "Germany";
     navidrome = {
-      address = "div:4533";
+      address = "div.capybara-menkent.ts.net:4533";
       metricsPath = "/metrics_itslocalanyway";
       nodeName = "Div";
     };
@@ -199,7 +199,7 @@ in
       }
       {
         name = "Div";
-        address = "div:9100";
+        address = "div.capybara-menkent.ts.net:9100";
       }
     ];
   };

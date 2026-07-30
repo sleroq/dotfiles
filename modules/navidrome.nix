@@ -1,15 +1,16 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
 let
-  cfg = config.services.navidrome;
+  cfg = config.sleroq.navidrome;
 in
 {
-  options.services.navidrome = {
+  options.sleroq.navidrome = {
+    enable = lib.mkEnableOption "Navidrome with the Cloudflare tunnel";
+
     musicFolder = lib.mkOption {
       type = lib.types.path;
       default = "/var/lib/navidrome/music";
@@ -22,6 +23,11 @@ in
       description = "Address on which Navidrome listens";
     };
 
+    environmentFile = lib.mkOption {
+      type = lib.types.path;
+      description = "File containing Navidrome environment variables";
+    };
+
     metrics = {
       enable = lib.mkEnableOption "Navidrome Prometheus metrics";
 
@@ -32,9 +38,16 @@ in
       };
     };
 
-    cloudflared.tokenFile = lib.mkOption {
-      type = lib.types.path;
-      description = "File containing the token for a remotely managed Cloudflare Tunnel";
+    cloudflared = {
+      tunnel = lib.mkOption {
+        type = lib.types.str;
+        description = "Name of the locally managed Cloudflare Tunnel that routes to Navidrome.";
+      };
+
+      hostname = lib.mkOption {
+        type = lib.types.str;
+        description = "Public hostname for Navidrome.";
+      };
     };
   };
 
@@ -44,7 +57,9 @@ in
     ];
 
     services.navidrome = {
+      enable = true;
       openFirewall = false;
+      inherit (cfg) environmentFile;
       settings = {
         Address = cfg.listenAddress;
         Port = 4533;
@@ -62,19 +77,6 @@ in
       };
     };
 
-    systemd.services.cloudflared-navidrome = {
-      description = "Cloudflare Tunnel for Navidrome";
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
-      wantedBy = [ "multi-user.target" ];
-
-      serviceConfig = {
-        ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --token-file %d/token";
-        LoadCredential = "token:${cfg.cloudflared.tokenFile}";
-        DynamicUser = true;
-        Restart = "on-failure";
-        RestartSec = "5s";
-      };
-    };
+    sleroq.cloudflared.tunnels.${cfg.cloudflared.tunnel}.routes.${cfg.cloudflared.hostname} = "http://127.0.0.1:4533";
   };
 }
