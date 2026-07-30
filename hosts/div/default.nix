@@ -11,7 +11,10 @@
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
     ../../modules/cloudflared.nix
+    ../../modules/feishin.nix
     ../../modules/navidrome.nix
+    ../../modules/sftpgo.nix
+    ../../modules/slusha.nix
     ../../modules/tuwunel.nix
   ];
 
