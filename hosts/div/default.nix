@@ -1,6 +1,7 @@
 {
   config,
   inputs,
+  lib,
   modulesPath,
   pkgs,
   ...
@@ -31,9 +32,11 @@
     firewall = {
       enable = true;
       interfaces.tailscale0.allowedTCPPorts = [
-        4533
-        8008
-        9100
+        4533 # Navidrome music server
+        5000 # Private container registry
+        8008 # Matrix Tuwunel server
+        9100 # Prometheus node exporter metrics
+        9882 # Prometheus Podman exporter metrics
       ];
     };
   };
@@ -107,6 +110,72 @@
     };
   };
 
+  sleroq.feishin = {
+    enable = true;
+    # The Web Audio processing path can be silent even when the browser has
+    # successfully fetched the stream. Use the native media element instead.
+    webAudio = false;
+    cloudflared = {
+      tunnel = "music";
+      hostname = "feishin.cum.army";
+    };
+  };
+
+  sleroq.sftpgo = {
+    enable = true;
+    musicFolder = config.sleroq.navidrome.musicFolder;
+    adminEnvironmentFile = config.age.secrets.sftpgoAdminEnv.path;
+    usersFile = config.age.secrets.sftpgoUsers.path;
+    cloudflared = {
+      tunnel = "music";
+      hostname = "music-files.cum.army";
+    };
+  };
+
+  virtualisation = {
+    containers.registries.insecure = [ "div.capybara-menkent.ts.net:5000" ];
+    podman = {
+      enable = true;
+      dockerCompat = true;
+      defaultNetwork.settings.dns_enabled = true;
+      autoPrune.enable = true;
+    };
+    oci-containers.backend = "podman";
+    oci-containers.containers.prometheus-podman-exporter = {
+      image = "quay.io/navidys/prometheus-podman-exporter:v1.21.0";
+      autoStart = true;
+      ports = [ "0.0.0.0:9882:9882" ];
+      volumes = [
+        "/run/podman/podman.sock:/run/podman/podman.sock:ro"
+      ];
+      environment = {
+        CONTAINER_HOST = "unix:///run/podman/podman.sock";
+      };
+      extraOptions = [
+        "--security-opt=label=disable"
+        "--user=root"
+      ];
+      cmd = [ "--collector.enable-all" ];
+    };
+  };
+
+  services.dockerRegistry = {
+    enable = true;
+    listenAddress = "0.0.0.0";
+    enableDelete = true;
+    enableGarbageCollect = true;
+  };
+
+  # Enable during the final cutover, after the last offline rsync from
+  # cumserver has completed. Keeping it disabled makes registry and data
+  # staging safe: it cannot start from an incomplete SQLite snapshot.
+  sleroq.slusha = {
+    enable = true;
+    image = "div.capybara-menkent.ts.net:5000/slusha:edge-cumming-beta";
+    environmentFile = config.age.secrets.slushaEnv.path;
+    cloudflared.tunnel = "music";
+  };
+
   services.matrix-tuwunel = {
     enable = false;
     # Keep the current server version for the data migration. Upgrade only
@@ -139,6 +208,17 @@
     group = "navidrome";
     file = ./secrets/navidromeEnv;
   };
+  age.secrets.sftpgoAdminEnv = {
+    owner = "navidrome";
+    group = "navidrome";
+    file = ./secrets/sftpgoAdminEnv;
+  };
+  age.secrets.sftpgoUsers = {
+    owner = "navidrome";
+    group = "navidrome";
+    file = ./secrets/sftpgoUsers;
+  };
+  age.secrets.slushaEnv.file = ../cumserver/secrets/slushaEnv;
   age.secrets.tuwunelRegistrationToken = {
     file = ./secrets/tuwunelRegistrationToken;
   };
@@ -162,6 +242,8 @@
     tmux
     vim
   ];
+
+  nixpkgs.config.allowUnfreePredicate = pkg: lib.getName pkg == "sftpgo";
 
   nix = {
     settings.experimental-features = [

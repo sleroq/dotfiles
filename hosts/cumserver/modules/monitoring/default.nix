@@ -42,6 +42,11 @@ in
             type = lib.types.str;
             description = "Address of the remote node (IP:PORT)";
           };
+          podmanAddress = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = "Address of the remote Podman exporter (host:port)";
+          };
           username = lib.mkOption {
             type = lib.types.str;
             default = "prometheus";
@@ -224,7 +229,23 @@ in
                     replacement = "\${1}";
                 }
             ];
-        }) cfg.remoteNodes);
+        }) cfg.remoteNodes) ++ (map (node: {
+          job_name = "podman-${lib.strings.toLower node.name}";
+          static_configs = [{
+            targets = [ node.podmanAddress ];
+            labels = {
+              node_name = node.name;
+              node_type = "remote";
+            };
+          }];
+          relabel_configs = [
+            {
+              source_labels = [ "node_name" ];
+              target_label = "instance";
+              replacement = "\${1}";
+            }
+          ];
+        }) (lib.filter (node: node.podmanAddress != null) cfg.remoteNodes));
         exporters = {
             node = {
                 enable = true;

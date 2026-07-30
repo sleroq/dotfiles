@@ -200,6 +200,7 @@ in
       {
         name = "Div";
         address = "div.capybara-menkent.ts.net:9100";
+        podmanAddress = "div.capybara-menkent.ts.net:9882";
       }
     ];
   };

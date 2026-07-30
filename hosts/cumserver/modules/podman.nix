@@ -26,7 +26,7 @@ in
 
         containers = {
           prometheus-podman-exporter = lib.mkIf config.cumserver.monitoring.enable {
-            image = "quay.io/navidys/prometheus-podman-exporter:v1.18.1";
+            image = "quay.io/navidys/prometheus-podman-exporter:v1.21.0";
             autoStart = true;
             ports = [ "127.0.0.1:9882:9882" ];
             volumes = [
@@ -54,8 +54,20 @@ in
     services.prometheus.scrapeConfigs = lib.mkIf config.cumserver.monitoring.enable [
       {
         job_name = "podman";
-        static_configs = [{ targets = [ "127.0.0.1:9882" ]; }];
-       }
+        static_configs = [{
+          targets = [ "127.0.0.1:9882" ];
+          labels = {
+            node_name = config.cumserver.monitoring.localNodeName;
+            node_type = "local";
+          };
+        }];
+        relabel_configs = [
+          {
+            target_label = "instance";
+            replacement = config.cumserver.monitoring.localNodeName;
+          }
+        ];
+      }
     ];
   };
 } 
