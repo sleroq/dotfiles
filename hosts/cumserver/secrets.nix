@@ -2,6 +2,7 @@ let
   sleroq = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK72BBTnP5Os5ZQfS1BuigNzWMqNFl7lgUH4CJq1bl9P cantundo@pm.me";
   portable = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSh54pu9bAH8DFBKPtswFJzevCft+gHZStJQ0trYGoj sleroq@cum.army";
   cumserver = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGNy4lHOvczy/vR4hf+uk6ciJGpkw5mqu3oC+9hTDbqf";
+  div = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKqaD8lUj2IoSXbd+ZngR3w+7rKxS7DU/3CPo4jd9SE9 root@shared";
   commonPublicKeys = [ sleroq portable cumserver ];
 
   numberOfMailPasswords = 6;
@@ -34,7 +35,7 @@ let
     "secrets/kopokaEnv" = { publicKeys = commonPublicKeys; };
     "secrets/reactorEnv" = { publicKeys = commonPublicKeys; };
     "secrets/sieveEnv" = { publicKeys = commonPublicKeys; };
-    "secrets/slushaEnv" = { publicKeys = commonPublicKeys; };
+    "secrets/slushaEnv" = { publicKeys = commonPublicKeys ++ [ div ]; };
     "secrets/spoilerImagesEnv" = { publicKeys = commonPublicKeys; };
     "secrets/zefxiEnv" = { publicKeys = commonPublicKeys; };
     "secrets/marzbanMetricsEnv" = { publicKeys = commonPublicKeys; };

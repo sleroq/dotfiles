@@ -373,7 +373,7 @@ in
     file = ./secrets/slushaEnv;
   };
   cumserver.slusha = {
-    enable = true;
+    enable = false;
     image = "localhost:5000/slusha:edge-cumming-beta";
     environmentFile = config.age.secrets.slushaEnv.path;
   };
