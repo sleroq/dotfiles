@@ -14,6 +14,5 @@ in
   "secrets/work-vpn/cert.crt" = { publicKeys = commonPublicKeys; };
   "secrets/work-vpn/private.key" = { publicKeys = commonPublicKeys; };
   "secrets/work-vpn/tls_auth.key" = { publicKeys = commonPublicKeys; };
-  "secrets/cloudflared.key" = { publicKeys = commonPublicKeys ++ [ div ]; };
   "secrets/cloudflared-div.json" = { publicKeys = commonPublicKeys ++ [ div ]; };
 }
