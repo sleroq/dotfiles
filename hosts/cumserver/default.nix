@@ -235,14 +235,13 @@ in
         stateDirectory = "broadcast-box-testing";
         backup.enable = false;
         package = pkgs.broadcast-box.override {
-          version = "bb-data-v1-2026-07-29";
+          version = "bb-data-v1-2026-07-30";
           owner = "Azarattum";
           repo = "BroadcastBox";
-          rev = "fd348c444158e3661687a6161ead21f400063737";
-          hash = "sha256-DI/YJ8KktkgMV7UkVMOUiT7YTUrGPUHWY6/IyzoK2iE=";
+          rev = "2de2aa97c6295a4d6e09a5fafac285ee243dd464";
+          hash = "sha256-kA0JmZZzifwX8gq73wwdVL1zHInLZMfHYxN1CRkMzpY=";
           vendorHash = "sha256-7BBYB2YJJ0f5Su7KXC0z8hff8kN8vY11k3kRo12m1W8=";
-          frontendLock = ../../packages/broadcast-box-bb-data-v1-package-lock.json;
-          frontendNpmDepsHash = "sha256-slz9+a/MoYbl6bmA+hKX+4rP1pb+8PnXJAc4JJ9vU3A=";
+          frontendNpmDepsHash = "sha256-fPvAgEsUuC+qEuRMi7jV+HOH+ibjxNnqI6m/NNnnVAM=";
         };
       };
 
