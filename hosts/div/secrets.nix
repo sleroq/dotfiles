@@ -9,6 +9,16 @@ in
     portable
     div
   ];
+  "secrets/sftpgoAdminEnv".publicKeys = [
+    sleroq
+    portable
+    div
+  ];
+  "secrets/sftpgoUsers".publicKeys = [
+    sleroq
+    portable
+    div
+  ];
   "secrets/tuwunelRegistrationToken".publicKeys = [
     sleroq
     portable
