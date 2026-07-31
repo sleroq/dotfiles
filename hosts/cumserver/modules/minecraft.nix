@@ -45,6 +45,34 @@ in
                 rcon-port = 25576;
               };
             };
+
+            cum-creative = {
+              enable = true;
+              autoStart = true;
+              jvmOpts = "-Xmx2G -XX:MaxDirectMemorySize=1G -XX:MaxMetaspaceSize=512M"; #  -XX:+UseZGC
+              package = pkgs.fabricServers.fabric-26_2.override {
+                jre_headless = pkgs.jdk25_headless;
+              };
+
+              serverProperties = {
+                difficulty = "normal";
+                level-seed = -1694756061639681260;
+                player-idle-timeout = 0;
+                spawn-protection = 0;
+                server-port = 25567;
+                motd = "<3";
+                online-mode = false;
+                max-players = 10;
+                white-list = true;
+                enable-status = true;
+                hide-online-players = true;
+                allow-flight = true;
+                sync-chunk-writes = false;
+                enable-rcon = true;
+                rcon-password = "localbackup";
+                rcon-port = 25576;
+              };
+            };
           })
 
           (lib.mkIf cfg.forever-chu.enable {
