@@ -150,7 +150,7 @@ in
           url_preview_domain_explicit_denylist = [ ];
           url_preview_max_spider_size = 384000;
           url_preview_check_root_domain = false;
-          allow_profile_lookup_federation_requests = true;
+          allow_inbound_profile_lookup_federation_requests = true;
 
           turn_uris = lib.optionals cfg.turn.enable [
             "turns:${cfg.turn.domain}:5349?transport=tcp"
@@ -160,18 +160,28 @@ in
           log = "info";
           new_user_displayname_suffix = "";
 
-          cache_capacity_modifier = 1.2;
-          db_cache_capacity_mb = 64.0;
-          db_write_buffer_capacity_mb = 24.0;
-          dns_cache_entries = 4096;
+          # Keep federation and database maintenance from saturating this host.
+          # sender_timeout also controls request duration, so increasing it to
+          # force hourly retries would leave federation requests stalled longer.
+          sender_retry_grace = 0;
+          fetch_fanout_max_width = 1;
+          rocksdb_parallelism_threads = 2;
+          rocksdb_compaction_prio_idle = true;
+
           stream_width_scale = 0.5;
-          stream_amplification = 256;
-          stream_width_default = 16;
-          db_pool_workers = 8;
+          # cache_capacity_modifier = 1.2;
+          # db_cache_capacity_mb = 64.0;
+          # db_write_buffer_capacity_mb = 24.0;
+          # dns_cache_entries = 4096;
+          # stream_width_scale = 0.5;
+          # stream_amplification = 256;
+          # stream_width_default = 16;
+          # db_pool_workers = 8;
 
           allow_local_presence = true;
-          allow_incoming_presence = false;
-          allow_outgoing_presence = false;
+          allow_incoming_presence = true;
+          allow_outgoing_presence = true;
+          presence_timeout_remote_users = false;
 
           well_known = {
             client = "https://${cfg.domain}";
