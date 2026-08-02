@@ -169,14 +169,10 @@ in
           rocksdb_compaction_prio_idle = true;
 
           stream_width_scale = 0.5;
-          # cache_capacity_modifier = 1.2;
-          # db_cache_capacity_mb = 64.0;
-          # db_write_buffer_capacity_mb = 24.0;
-          # dns_cache_entries = 4096;
-          # stream_width_scale = 0.5;
+          stream_width_default = 16;
+          db_pool_workers = 8;
+          db_cache_capacity_mb = 1024.0;
           # stream_amplification = 256;
-          # stream_width_default = 16;
-          # db_pool_workers = 8;
 
           allow_local_presence = true;
           allow_incoming_presence = true;
