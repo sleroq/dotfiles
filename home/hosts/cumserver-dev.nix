@@ -22,10 +22,13 @@
       tmux
       tree
       wget
+      helix
     ];
 
     sessionVariables = {
-      EDITOR = "nvim";
+      EDITOR = "hx";
+      COLORTERM = "truecolor";
+      TERM = "xterm-256color";
     };
   };
 
@@ -45,6 +48,10 @@
     git = {
       enable = true;
       settings = {
+        user = {
+          name = "santakameow";
+          email = "sakanai@cum.army";
+        };
         init.defaultBranch = "main";
         pull.rebase = true;
       };
@@ -54,7 +61,7 @@
 
     neovim = {
       enable = true;
-      defaultEditor = true;
+      # defaultEditor = true;
     };
 
     ssh = {
