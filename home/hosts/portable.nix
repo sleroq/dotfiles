@@ -99,7 +99,6 @@ in
         wget
         dust
         ollama
-        amp-cli
         scrcpy
         typst
         inputs'.zig.packages.master
