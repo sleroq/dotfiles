@@ -182,14 +182,19 @@ def test_fast(proxy: str, streams: int) -> dict[str, Any]:
         return {"ok": False, "error": str(error)}
 
 
-def speedtest_server(proxy: str) -> tuple[str, str]:
+def speedtest_server(proxy: str) -> tuple[str, str, dict[str, Any]]:
     payload = json.loads(curl_text(proxy, "https://www.speedtest.net/api/js/servers?engine=js&limit=10&https_functional=true"))
     if not payload:
         raise RuntimeError("Speedtest.net returned no servers")
-    server = payload[0]
-    base = server["url"].rsplit("/", 1)[0]
-    label = f"{server.get('name', '?')}, {server.get('country', '?')} ({server.get('sponsor', '?')})"
-    return base, label
+    failures = []
+    for server in payload:
+        base = server["url"].rsplit("/", 1)[0]
+        probe = curl(proxy, f"{base}/latency.txt", timeout=20)
+        if probe.get("ok"):
+            label = f"{server.get('name', '?')}, {server.get('country', '?')} ({server.get('sponsor', '?')})"
+            return base, label, probe
+        failures.append(str(probe.get("http") or probe.get("error") or "unknown error"))
+    raise RuntimeError(f"none of the {len(payload)} nearest Speedtest.net servers worked ({', '.join(failures)})")
 
 
 def test_speedtest(proxy: str, payload: Path) -> dict[str, Any]:
@@ -199,8 +204,8 @@ def test_speedtest(proxy: str, payload: Path) -> dict[str, Any]:
     a SOCKS proxy without changing system routes.
     """
     try:
-        base, label = speedtest_server(proxy)
-        latency = [curl(proxy, f"{base}/latency.txt?x={index}", timeout=20) for index in range(3)]
+        base, label, probe = speedtest_server(proxy)
+        latency = [probe] + [curl(proxy, f"{base}/latency.txt?x={index}", timeout=20) for index in range(2)]
         downloads = [curl(proxy, f"{base}/random4000x4000.jpg?x={index}", timeout=90) for index in range(3)]
         upload = curl(proxy, f"{base}/upload.php", method="POST", upload=payload, timeout=90)
         return {
