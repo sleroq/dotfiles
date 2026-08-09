@@ -1,8 +1,30 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.services.matrix-tuwunel;
   credentialDirectory = "/run/credentials/tuwunel.service";
+  tuwunelVersion = "1.8.3";
+  tuwunelSrc = pkgs.fetchFromGitHub {
+    owner = "matrix-construct";
+    repo = "tuwunel";
+    tag = "v${tuwunelVersion}";
+    hash = "sha256-Csq8eHV2r28POX+Ce1lZ0ybIw5Wt3ABUbWg2W8p2lOw=";
+  };
+  tuwunelPackage = pkgs.matrix-tuwunel.overrideAttrs (
+    _final: _old: {
+      version = tuwunelVersion;
+      src = tuwunelSrc;
+      cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+        src = tuwunelSrc;
+        hash = "sha256-mShVBCwd8cwF7K1ILf1gn7ImaxwF73KP2YiDiAJV0f0=";
+      };
+    }
+  );
 in
 {
   options.services.matrix-tuwunel = {
@@ -75,6 +97,7 @@ in
     ];
 
     services.matrix-tuwunel = {
+      package = tuwunelPackage;
       stateDirectory = "matrix-conduit";
 
       # https://matrix-construct.github.io/tuwunel/configuration/examples.html
@@ -119,6 +142,8 @@ in
           allow_guests_auto_join_rooms = false;
           allow_registration = true;
           registration_token_file = "${credentialDirectory}/registration-token";
+          oidc_native_auth = true;
+          rendezvous_enabled = true;
           allow_federation = true;
           allow_public_room_directory_over_federation = false;
           allow_public_room_directory_without_auth = false;
