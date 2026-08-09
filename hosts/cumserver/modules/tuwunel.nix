@@ -232,6 +232,14 @@ in
           handle /_matrix/* {
             reverse_proxy ${cfg.backend}
           }
+
+          handle /_tuwunel/* {
+            reverse_proxy ${cfg.backend}
+          }
+
+          handle /.well-known/openid-configuration {
+            reverse_proxy ${cfg.backend}
+          }
         '';
       };
 
