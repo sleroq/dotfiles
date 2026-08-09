@@ -43,6 +43,7 @@ in
         
         settings = {
           CORE_PORT = cfg.port;
+          CORE_TEMP_DIRECTORY = "/var/lib/zipline/tmp";
         };
         
         database.createLocally = true;
