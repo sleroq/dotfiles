@@ -56,6 +56,7 @@ in
     ./modules/minecraft.nix
     ./modules/frp.nix
     ./modules/restic.nix
+    ../../modules/syncplay.nix
     bayan
     kopoka
     spoiler-images
@@ -112,6 +113,8 @@ in
     enable = true;
     backend = "div:8008";
   };
+
+  cumserver.syncplay.enable = true;
 
   cumserver.frp.enable = true;
 
