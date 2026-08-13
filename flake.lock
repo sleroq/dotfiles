@@ -1839,11 +1839,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1749158379,
-        "narHash": "sha256-u3M4dmEMGotYhhDfm37ZXmJHvGEIIC1USVd+3XjyC3w=",
+        "lastModified": 1786660212,
+        "narHash": "sha256-zRt6dRRcTskI/HEdH0WAoS/4A9lttlH6IOnI9GBzsoo=",
         "owner": "sleroq",
         "repo": "reactor",
-        "rev": "47bbb21fa7ff75ac7935b83ececa8d619cc993e5",
+        "rev": "a9de6585932fc8b9d20393252c161942a3146037",
         "type": "github"
       },
       "original": {
