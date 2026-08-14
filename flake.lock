@@ -690,18 +690,17 @@
           "mailserver",
           "flake-compat"
         ],
-        "gitignore": "gitignore_2",
         "nixpkgs": [
           "mailserver",
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1769939035,
-        "narHash": "sha256-Fok2AmefgVA0+eprw2NDwqKkPGEI5wvR+twiZagBvrg=",
+        "lastModified": 1784288435,
+        "narHash": "sha256-ReRHaLgr/uVqdD8afFSn+myXIfpHeOhP0yYe0TJqAA8=",
         "owner": "cachix",
         "repo": "git-hooks.nix",
-        "rev": "a8ca480175326551d6c4121498316261cbb5b260",
+        "rev": "43b3c1ab9d40fb1dbb008f451988a91e375825e9",
         "type": "github"
       },
       "original": {
@@ -766,28 +765,6 @@
         "nixpkgs": [
           "hyprland",
           "pre-commit-hooks",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1709087332,
-        "narHash": "sha256-HG2cCnktfHsKV0s4XW83gU3F57gaTljL9KNSuG6bnQs=",
-        "owner": "hercules-ci",
-        "repo": "gitignore.nix",
-        "rev": "637db329424fd7e46cf4185293b9cc8c88c95394",
-        "type": "github"
-      },
-      "original": {
-        "owner": "hercules-ci",
-        "repo": "gitignore.nix",
-        "type": "github"
-      }
-    },
-    "gitignore_2": {
-      "inputs": {
-        "nixpkgs": [
-          "mailserver",
-          "git-hooks",
           "nixpkgs"
         ]
       },
@@ -1234,11 +1211,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1749148779,
-        "narHash": "sha256-wts3CUSdvMZGOwoZZi0dpbr+llRp4J+sxYvZLYaCZLM=",
+        "lastModified": 1786660808,
+        "narHash": "sha256-LWSZmP5iXw9NVb5CQDXFps8GeqijdHQVu1vsRb2Uv3Q=",
         "ref": "refs/heads/main",
-        "rev": "b874e097d18ea1cf70a4f5889a0875a46f367ad3",
-        "revCount": 10,
+        "rev": "273e6cc1a71a8f04a31924b29cb41b66c49bf037",
+        "revCount": 11,
         "type": "git",
         "url": "ssh://git@github.com/sleroq/kopoka"
       },
@@ -1272,11 +1249,11 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1770659507,
-        "narHash": "sha256-RVZno9CypFN3eHxfULKN1K7mb/Cq0HkznnWqnshxpWY=",
-        "ref": "refs/heads/master",
-        "rev": "781e833633ebc0873d251772a74e4400a73f5d78",
-        "revCount": 863,
+        "lastModified": 1786567397,
+        "narHash": "sha256-H713vbgy+n1asVNn/0kBwbFgroNgC1dnx8pEMKcFdgk=",
+        "ref": "refs/heads/main",
+        "rev": "e668474df221aeef1ebd374d0364aa07f1d4f827",
+        "revCount": 1074,
         "type": "git",
         "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/"
       },
@@ -1453,11 +1430,11 @@
     },
     "nixpkgs-cumserver": {
       "locked": {
-        "lastModified": 1771423170,
-        "narHash": "sha256-V/p5M4cAMbu/MJBDn5YABy5QJgCFpsgrnXVVc2Uo5+k=",
-        "rev": "bcc4a9d9533c033d806a46b37dc444f9b0da49dd",
+        "lastModified": 1786534138,
+        "narHash": "sha256-Cwffw7dPM56d8spt4/queFQ1cKg69D9qrsp+wfwKvfo=",
+        "rev": "044bfe75bfe4c7bbe043dc17b5e42ea823b84a09",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.05pre948338.bcc4a9d9533c/nixexprs.tar.xz"
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1052792.044bfe75bfe4/nixexprs.tar.xz"
       },
       "original": {
         "type": "tarball",
@@ -1725,11 +1702,11 @@
     },
     "nixpkgs_6": {
       "locked": {
-        "lastModified": 1770650459,
-        "narHash": "sha256-hGeOnueXorzwDD1V9ldZr+y+zad4SNyqMnQsa/mIlvI=",
+        "lastModified": 1786548149,
+        "narHash": "sha256-pBv1JbhCqqMcF5ciyLi8D9nzVyw4Gv2sk/tcGF4mBHA=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "fff0554c67696d76a0cdd9cfe14403fbdbf1f378",
+        "rev": "5df1f9ae934fe1bffbd3867a1ae2870ab22302ed",
         "type": "github"
       },
       "original": {
@@ -1839,11 +1816,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786660212,
-        "narHash": "sha256-zRt6dRRcTskI/HEdH0WAoS/4A9lttlH6IOnI9GBzsoo=",
+        "lastModified": 1786734802,
+        "narHash": "sha256-bRZeVFWeYT+EKJbg4d5SLSZLfUhSFvUssVmVnmhrTCE=",
         "owner": "sleroq",
         "repo": "reactor",
-        "rev": "a9de6585932fc8b9d20393252c161942a3146037",
+        "rev": "67bfb8f8256f2592d5ca8f65c1fc9b1b3dd094c9",
         "type": "github"
       },
       "original": {
