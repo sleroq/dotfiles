@@ -47,7 +47,7 @@ in
             };
 
             cum-creative = {
-              enable = true;
+              enable = false;
               autoStart = true;
               jvmOpts = "-Xmx2G -XX:MaxDirectMemorySize=1G -XX:MaxMetaspaceSize=512M"; #  -XX:+UseZGC
               package = pkgs.fabricServers.fabric-26_2.override {
