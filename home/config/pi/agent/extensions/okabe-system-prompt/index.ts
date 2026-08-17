@@ -12,6 +12,12 @@ function loadPrompt(): string {
 
 export default function okabeSystemPromptExtension(pi: ExtensionAPI) {
   pi.on("before_agent_start", async (event) => {
+    // pi-subagents marks every spawned child process. Those agents supply
+    // their own role-specific prompts from ~/.pi/agent/agents.
+    if (process.env.PI_SUBAGENT_CHILD === "1") {
+      return;
+    }
+
     const prompt = loadPrompt();
 
     if (!prompt) {
