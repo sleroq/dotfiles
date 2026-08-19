@@ -14,3 +14,5 @@ golangci-lint run --enable=modernize
 ```
 
 Run it from the Go module or repository root so that its project configuration is applied. Report any lint failures honestly.
+
+Follow the DDD principles described [here](references/DDD.md)
