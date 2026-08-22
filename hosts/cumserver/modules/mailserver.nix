@@ -99,13 +99,13 @@ in {
       mailserver = {
         inherit fqdn;
         enable = true;
-        stateVersion = 3;
+        stateVersion = 5;
         domains = [ "cum.army" ];
         messageSizeLimit = 52428800; # 50MB
         enableManageSieve = true;
 
         # nix-shell -p mkpasswd --run 'mkpasswd -sm bcrypt'
-        loginAccounts = generatedLoginAccounts;
+        accounts = generatedLoginAccounts;
 
         x509.certificateFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.crt";
         x509.privateKeyFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.key";

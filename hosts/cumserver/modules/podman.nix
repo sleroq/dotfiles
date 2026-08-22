@@ -7,7 +7,12 @@ in
 
   config = lib.mkIf cfg.enable {
     virtualisation = {
-      containers.registries.insecure = [ "localhost:5000" ];
+      containers.registries.settings.registry = [
+        {
+          location = "localhost:5000";
+          insecure = true;
+        }
+      ];
 
       podman = {
         enable = true;
