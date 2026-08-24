@@ -8,9 +8,9 @@
     url = "https://github.com/sleroq/cumban";
     name = "div-cumban";
     tokenFile = config.age.secrets.githubRunnerCumbanToken.path;
-    tokenType = "access";
+    tokenType = "registration";
     replace = true;
-    ephemeral = true;
+    ephemeral = false;
     extraLabels = [
       "div"
       "cumban-profile"
