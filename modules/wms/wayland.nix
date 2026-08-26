@@ -22,8 +22,4 @@
     package = inputs'.hyprland.packages.hyprland;
     # portalPackage = inputs'.hyprland.packages.xdg-desktop-portal-hyprland;
   };
-
-  # The pinned Hyprland predates its fix for dropping CAP_SYS_NICE. Without
-  # this, the NixOS wrapper leaks the capability to child apps and bwrap exits.
-  security.wrappers.Hyprland.capabilities = lib.mkForce "";
 }

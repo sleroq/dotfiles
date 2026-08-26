@@ -2,6 +2,7 @@
 
 with lib;
 let
+  hy3Plugin = "${inputs'.hy3.packages.hy3}/lib/libhy3.so";
   hyprlandScripts = {
     followMouseToggle = pkgs.writeShellScriptBin "hypr-follow-mouse-toggle" ''
       #!/usr/bin/env sh
@@ -28,7 +29,7 @@ let
               keyword animations:enabled 0;\
               keyword decoration:shadow:enabled 0;\
               keyword decoration:blur:enabled 0;\
-              keyword misc:vfr 0;\
+              keyword debug:vfr 0;\
               keyword general:border_size 1;\
               keyword decoration:rounding 0"
           exit
@@ -37,7 +38,7 @@ let
               keyword animations:enabled 1;\
               keyword decoration:shadow:enabled 1;\
               keyword decoration:blur:enabled 1;\
-              keyword misc:vfr 1;\
+              keyword debug:vfr 1;\
               keyword general:border_size 2;\
               keyword decoration:rounding 1"
           exit
@@ -53,19 +54,26 @@ mkMerge [
     home.activation.hyprland = hm.dag.entryAfter [ "writeBoundary" ] ''
       mkdir -p $HOME/.config/hypr
 
+      $DRY_RUN_CMD rm -f \
+          $HOME/.config/hypr/hyprland.conf \
+          $HOME/.config/hypr/extra-config.conf
+
       $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
           ${opts.realConfigs}/hypr/* $HOME/.config/hypr/
     '';
 
-
-    home.file."${config.xdg.configHome}/hypr/extra-config.conf" = {
+    home.file."${config.xdg.configHome}/hypr/extra-config.lua" = {
       text = mkMerge [
-        "plugin = ${inputs'.hy3.packages.hy3}/lib/libhy3.so"
+        ''
+          hl.plugin.load(${builtins.toJSON hy3Plugin})
+        ''
         (mkIf config.myHome.wms.wayland.hyprland.gamemode ''
-          exec = hypr-gamemode
+          hl.on("hyprland.start", function()
+              hl.exec_cmd("hypr-gamemode")
+          end)
         '')
         (mkIf (config.myHome.gaming.osu.enable && config.myHome.gaming.osu.enableTearing) ''
-          windowrule = match:class ^(osu!)$, immediate on
+          hl.window_rule({ match = { class = "^(osu!)$" }, immediate = true })
         '')
         config.myHome.wms.wayland.hyprland.extraConfig
       ];
