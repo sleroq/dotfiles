@@ -10,6 +10,7 @@
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
+    ./github-runner.nix
     ../../modules/cloudflared.nix
     ../../modules/feishin.nix
     ../../modules/navidrome.nix

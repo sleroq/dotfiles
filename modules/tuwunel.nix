@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   ...
@@ -8,23 +9,6 @@
 let
   cfg = config.services.matrix-tuwunel;
   credentialDirectory = "/run/credentials/tuwunel.service";
-  tuwunelVersion = "1.8.3";
-  tuwunelSrc = pkgs.fetchFromGitHub {
-    owner = "matrix-construct";
-    repo = "tuwunel";
-    tag = "v${tuwunelVersion}";
-    hash = "sha256-Csq8eHV2r28POX+Ce1lZ0ybIw5Wt3ABUbWg2W8p2lOw=";
-  };
-  tuwunelPackage = pkgs.matrix-tuwunel.overrideAttrs (
-    _final: _old: {
-      version = tuwunelVersion;
-      src = tuwunelSrc;
-      cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
-        src = tuwunelSrc;
-        hash = "sha256-mShVBCwd8cwF7K1ILf1gn7ImaxwF73KP2YiDiAJV0f0=";
-      };
-    }
-  );
 in
 {
   options.services.matrix-tuwunel = {
@@ -97,7 +81,7 @@ in
     ];
 
     services.matrix-tuwunel = {
-      package = tuwunelPackage;
+      package = inputs.tuwunel.packages.${pkgs.system}.default;
       stateDirectory = "matrix-conduit";
 
       # https://matrix-construct.github.io/tuwunel/configuration/examples.html
@@ -152,13 +136,24 @@ in
           default_room_version = "12";
           url_preview_domain_contains_allowlist = [ ];
           url_preview_domain_explicit_allowlist = [
+            "discord.com"
             "x.com"
             "fixupx.com"
             "twitterfx.com"
+            "instagram.com"
+            "ddinstagram.com"
+            "reddit.com"
+            "safereddit.com"
+            "telegram.org"
             "t.me"
             "youtube.com"
             "github.com"
             "reddit.com"
+            "news.ycombinator.com"
+            "chatgpt.com"
+            "nixos.org"
+            "solidjs.com"
+            "react.dev"
             "pkg.go.dev"
             "go.dev"
             "matrix.org"
@@ -170,6 +165,9 @@ in
             "www.linux.org.ru"
             "www.opennet.ru"
             "habr.com"
+            "cum.army"
+            "web.cum.army"
+            "share.cum.army"
           ];
           url_preview_url_contains_allowlist = [ ];
           url_preview_domain_explicit_denylist = [ ];

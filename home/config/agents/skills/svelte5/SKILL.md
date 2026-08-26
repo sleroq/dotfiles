@@ -1,80 +1,47 @@
 ---
 name: svelte5-best-practices
-description: "Svelte 5 runes, snippets and modern best practices for TypeScript and component development. Use when writing, reviewing, or refactoring Svelte 5 components. Triggers on: Svelte components, runes ($state, $derived, $effect, $props, $bindable, $inspect), snippets ({#snippet}, {@render}), event handling, form actions, Svelte 4 to Svelte 5 migration, store to rune migration, slots to snippets migration, TypeScript props typing, generic components, SSR state isolation, performance optimization, or component testing."
+description: "Use for non-obvious Svelte 5 reactivity, prop ownership, effect lifecycle, SSR, snippets, keyed lists, attachments, or experimental async-Svelte pitfalls."
 license: MIT
 metadata:
   author: ejirocodes
-  version: '1.0.0'
+  version: '2.0.0'
 ---
 
-# Svelte 5 Best Practices
+# Svelte 5: non-obvious rules
 
-## Quick Reference
+Consult the linked current Svelte docs when behaviour is version-sensitive. Do not restate basic rune syntax.
 
-| Topic | When to Use | Reference |
-|-------|-------------|-----------|
-| **Runes** | $state, $derived, $effect, $props, $bindable, $inspect | [runes.md](references/runes.md) |
-| **Snippets** | Replacing slots, {#snippet}, {@render} | [snippets.md](references/snippets.md) |
-| **Events** | onclick handlers, callback props, context API | [events.md](references/events.md) |
-| **TypeScript** | Props typing, generic components | [typescript.md](references/typescript.md) |
-| **Migration** | Svelte 4 to 5, stores to runes | [migration.md](references/migration.md) |
-| **Performance** | Universal reactivity, avoiding over-reactivity, streaming | [performance.md](references/performance.md) |
+## Reactivity and ownership
 
-## Essential Patterns
+- `$state` objects and arrays are deeply reactive proxies. Use `$state.raw` for large API-shaped values that are replaced, not mutated; raw state must be reassigned rather than mutated. Use `$state.snapshot(value)` before giving proxy state to an API that expects a plain value.
+- `$derived` tracks only values synchronously read by its expression. Keep it side-effect free. It is lazy (push-pull), and only propagates when its result changes by identity. Use `$derived.by` for multi-statement derivations, not `$derived(() => ...)`.
+- Derived values may be temporarily reassigned for optimistic UI (Svelte 5.25+); the next source change replaces the override. Do not create a second state variable just to mirror a derivation.
+- Treat props as changing and derive values from them. Never mutate a prop. A child mutating a parent-owned state proxy produces an ownership warning; use a callback prop, or deliberately expose the prop with `$bindable` when shared mutation is the component contract.
+- `$bindable` is opt-in and should be rare. A bound prop with a `$bindable(fallback)` fallback must receive a non-`undefined` value from its parent.
 
-### Reactive State
+## Effects are DOM/external-system boundaries
 
-```svelte
-<script>
-  let count = $state(0);           // Reactive state
-  let doubled = $derived(count * 2); // Computed value
-</script>
-```
+- Prefer `$derived` for state calculations, event handlers for user actions, `{@attach ...}` for element integration, `$inspect` for debugging, and `createSubscriber` for external subscriptions. `$effect` is the remaining escape hatch.
+- Effects run after DOM updates, never during SSR, and clean up before re-running and on unmount. Do not add `if (browser)` inside one.
+- Dependencies are values read synchronously in the effect, including through synchronous function calls. Reads after `await`, timers, or other async callbacks are **not** tracked. Use `untrack` only to intentionally exclude a synchronous read.
+- Avoid reading and writing the same state in an effect: it commonly creates loops. If unavoidable, `untrack` the read that must not subscribe. Use `$effect.pre` only when code must run before the DOM update; use `tick()` from there to observe the updated DOM.
+- Effects cannot be created after an `await` or in an event handler. `$effect.root` is a manual-lifecycle escape hatch, not a routine solution.
 
-### Component Props
+## Component and template traps
 
-```svelte
-<script>
-  let { name, count = 0 } = $props();
-  let { value = $bindable() } = $props(); // Two-way binding
-</script>
-```
+- Prefer keyed `{#each}` for changing lists. Keys must be stable, unique identities — never indexes — or DOM/component state will be associated with the wrong item.
+- Snippets declared at component top level may be passed as props; snippets that do not capture component state can be exported from a module script. A snippet is lexical: do not expect it to see the receiving component's scope.
+- `bind:this` is `undefined` until mount. Read it only in an event handler or effect, never during component initialisation.
+- In runes mode, use callback props for component events. If forwarding a DOM handler, preserve the caller's handler rather than overwriting it.
 
-### Snippets (replacing slots)
+## SSR and async Svelte
 
-```svelte
-<script>
-  let { children, header } = $props();
-</script>
+- Do not put request/user-specific mutable state in module scope. On the server it is shared across requests; create it per component/request or pass it through context.
+- `$effect` does not run on the server. Server-required computations belong in render/load/server code or a side-effect-free `$derived`, not an effect.
+- Direct `await` in components and `$derived` requires Svelte 5.36+ with `compilerOptions.experimental.async: true`; it remains experimental. Do not introduce it without confirming the project has enabled it. Tracking after an `await` applies only to the derived expression itself, not async functions it calls.
 
-{@render header?.()}
-{@render children()}
-```
+## Primary sources
 
-### Event Handlers
-
-```svelte
-<!-- Svelte 5: use onclick, not on:click -->
-<button onclick={() => count++}>Click</button>
-```
-
-### Callback Props (replacing createEventDispatcher)
-
-```svelte
-<script>
-  let { onclick } = $props();
-</script>
-
-<button onclick={() => onclick?.({ data })}>Click</button>
-```
-
-## Common Mistakes
-
-1. **Using `let` without `$state`** - Variables are not reactive without `$state()`
-2. **Using `$effect` for derived values** - Use `$derived` instead
-3. **Using `on:click` syntax** - Use `onclick` in Svelte 5
-4. **Using `createEventDispatcher`** - Use callback props instead
-5. **Using `<slot>`** - Use snippets with `{@render}`
-6. **Forgetting `$bindable()`** - Required for `bind:` to work
-7. **Setting module-level state in SSR** - Causes cross-request leaks
-8. **Sequential awaits in load functions** - Use `Promise.all` for parallel requests
+- [Best practices](https://svelte.dev/docs/svelte/best-practices)
+- [$state](https://svelte.dev/docs/svelte/$state), [$derived](https://svelte.dev/docs/svelte/$derived), [$effect](https://svelte.dev/docs/svelte/$effect), [$props](https://svelte.dev/docs/svelte/$props), and [$bindable](https://svelte.dev/docs/svelte/$bindable)
+- [Svelte 5 migration guide](https://svelte.dev/docs/svelte/v5-migration-guide)

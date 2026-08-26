@@ -78,6 +78,7 @@ in
       "teams.live.com"
       "skype.com"
       "skype.net"
+      "cardlink.link"
     ];
     # Process matching is exact and platform-dependent.
     directProcessNames = [

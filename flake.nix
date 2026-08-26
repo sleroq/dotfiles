@@ -4,6 +4,7 @@
   inputs = {
     # these should not be used for any system and just for building. but I'm not verifying that anywhere
     nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
+    tuwunel.url = "github:matrix-construct/tuwunel/v1.9.0";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 

@@ -1,12 +1,22 @@
 {
-  "lastChangelogVersion": "0.79.10",
+  "lastChangelogVersion": "0.84.2",
   "defaultThinkingLevel": "low",
   "packages": [
     "npm:pi-subdir-context",
-    "npm:pi-mcp-adapter"
+    "npm:pi-mcp-adapter",
+    "npm:pi-subagents"
   ],
+  "subagents": {
+    "disableBuiltins": true
+  },
   "hideThinkingBlock": false,
   "theme": "dark",
   "defaultProvider": "FrankAI",
-  "defaultModel": "FrankAI"
+  "defaultModel": "FrankAgent",
+  "enabledModels": [
+    "FrankAI/FrankAI",
+    "FrankAI/FrankAgent",
+    "openai-codex/gpt-5.6-terra",
+    "openai-codex/gpt-5.6-sol"
+  ]
 }
