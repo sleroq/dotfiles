@@ -142,7 +142,12 @@ telescope.setup({
             prompt_position = "top",
             preview_cutoff = 40,
         }
-    }
+    },
+    extensions = {
+        frecency = {
+            db_safe_mode = false,
+        },
+    },
 })
 telescope.load_extension("frecency")
 telescope.load_extension("ui-select")
