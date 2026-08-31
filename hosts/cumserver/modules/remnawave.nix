@@ -10,19 +10,19 @@ in
 
     image = lib.mkOption {
       type = lib.types.str;
-      default = "remnawave/backend:2";
+      default = "remnawave/backend:3.3.2";
       description = "Docker image to use for Remnawave backend";
     };
 
     postgresImage = lib.mkOption {
       type = lib.types.str;
-      default = "postgres:17.9";
+      default = "postgres:18.4";
       description = "Docker image to use for Remnawave PostgreSQL";
     };
 
     redisImage = lib.mkOption {
       type = lib.types.str;
-      default = "valkey/valkey:9.0.3-alpine";
+      default = "valkey/valkey:9-alpine";
       description = "Docker image to use for Remnawave Redis/Valkey";
     };
 
@@ -56,6 +56,18 @@ in
       description = "Environment file containing Remnawave backend and PostgreSQL variables";
     };
 
+    metricsUsername = lib.mkOption {
+      type = lib.types.str;
+      default = "admin";
+      description = "Username for the Remnawave metrics endpoint";
+    };
+
+    metricsPasswordFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = "File containing the Remnawave metrics password";
+    };
+
     extraOptions = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
@@ -67,7 +79,7 @@ in
 
       image = lib.mkOption {
         type = lib.types.str;
-        default = "remnawave/subscription-page:7.1.8";
+        default = "remnawave/subscription-page:8.0.0";
         description = "Docker image to use for Remnawave subscription page";
       };
 
@@ -110,6 +122,10 @@ in
           assertion = cfg.subscriptionPage.enable || cfg.subscriptionPage.domain == null;
           message = "cumserver.remnawave.subscriptionPage.domain requires cumserver.remnawave.subscriptionPage.enable = true";
         }
+        {
+          assertion = !config.cumserver.monitoring.enable || cfg.metricsPasswordFile != null;
+          message = "cumserver.remnawave.metricsPasswordFile must be set when monitoring is enabled";
+        }
       ];
 
       virtualisation.oci-containers.containers = {
@@ -117,9 +133,10 @@ in
           autoStart = true;
           image = cfg.postgresImage;
           environmentFiles = [ cfg.environmentFile ];
-          extraOptions = cfg.extraOptions;
+          environment.TZ = "UTC";
+          extraOptions = cfg.extraOptions ++ [ "--shm-size=512m" ];
           volumes = [
-            "${cfg.dataDir}/postgres:/var/lib/postgresql/data"
+            "${cfg.dataDir}/postgres:/var/lib/postgresql"
           ];
         };
 
@@ -136,8 +153,15 @@ in
             "noeviction"
             "--loglevel"
             "warning"
+            "--unixsocket"
+            "/var/run/valkey/valkey.sock"
+            "--unixsocketperm"
+            "777"
+            "--port"
+            "0"
           ];
           extraOptions = cfg.extraOptions;
+          volumes = [ "remnawave-valkey-socket:/var/run/valkey" ];
         };
 
         remnawave = {
@@ -154,6 +178,7 @@ in
             "127.0.0.1:${toString cfg.metricsPort}:${toString cfg.metricsPort}"
           ];
           extraOptions = cfg.extraOptions;
+          volumes = [ "remnawave-valkey-socket:/var/run/valkey" ];
         };
       } // lib.optionalAttrs cfg.subscriptionPage.enable {
         remnawave-subscription-page = {
@@ -210,6 +235,30 @@ in
       systemd.tmpfiles.rules = [
         "d ${cfg.dataDir} 0755 root root -"
         "d ${cfg.dataDir}/postgres 0755 root root -"
+      ];
+
+      services.prometheus.scrapeConfigs = lib.mkIf config.cumserver.monitoring.enable [
+        {
+          job_name = "remnawave";
+          metrics_path = "/metrics";
+          basic_auth = {
+            username = cfg.metricsUsername;
+            password_file = cfg.metricsPasswordFile;
+          };
+          static_configs = [{
+            targets = [ "127.0.0.1:${toString cfg.metricsPort}" ];
+            labels = {
+              node_name = config.cumserver.monitoring.localNodeName;
+              node_type = "local";
+            };
+          }];
+          relabel_configs = [
+            {
+              target_label = "instance";
+              replacement = config.cumserver.monitoring.localNodeName;
+            }
+          ];
+        }
       ];
     })
 
