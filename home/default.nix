@@ -17,6 +17,7 @@
       ./modules/editors
       ./modules/gaming.nix
       ./modules/development.nix
+      ./modules/ast-grep.nix
       ./shared
       agenixModule
       vicinae

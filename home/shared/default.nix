@@ -110,6 +110,8 @@
     development = {
       enable = true;
     };
+
+    astGrep.enable = lib.mkDefault true;
   };
 
   xsession.enable = true;
