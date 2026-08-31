@@ -67,8 +67,14 @@
     web-cum-army.url = "github:sleroq/web.cum.army";
     web-cum-army.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
-    reactor.url = "github:sleroq/reactor";
+    # reactor.url = "github:sleroq/reactor";
+    reactor.url = "path:///Users/sleroq/develop/reactor";
     reactor.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+
+    music-link = {
+      url = "path:/Users/sleroq/develop/music-link";
+      inputs.nixpkgs.follows = "nixpkgs-div";
+    };
 
     sieve.url = "git+ssh://git@github.com/sleroq/sieve";
     sieve.inputs.nixpkgs.follows = "nixpkgs-cumserver";
