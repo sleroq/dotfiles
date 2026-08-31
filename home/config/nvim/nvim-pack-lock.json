@@ -21,11 +21,11 @@
       "src": "https://github.com/jaredgorski/fogbell.vim"
     },
     "gitlab.nvim": {
-      "rev": "e29909c",
+      "rev": "f01ccbdaef7e8460af72c75be65f5f359928a0b4",
       "src": "https://github.com/harrisoncramer/gitlab.nvim"
     },
     "gitsigns.nvim": {
-      "rev": "20ad441",
+      "rev": "5be654f2232c10ddcad19c1607a67b6b4b78fc29",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
     },
     "guess-indent.nvim": {
@@ -33,11 +33,11 @@
       "src": "https://github.com/NMAC427/guess-indent.nvim"
     },
     "komau.vim": {
-      "rev": "c525eebc9a46e889144216dc3a965783abaccf98",
+      "rev": "52c193bb912b782ebe3c348e38e81f15458b500d",
       "src": "https://github.com/ntk148v/komau.vim"
     },
     "lualine.nvim": {
-      "rev": "3946f01",
+      "rev": "221ce6b2d999187044529f49da6554a92f740a96",
       "src": "https://github.com/nvim-lualine/lualine.nvim"
     },
     "marks.nvim": {
@@ -49,19 +49,19 @@
       "src": "https://github.com/kdheepak/monochrome.nvim"
     },
     "neogit": {
-      "rev": "524ae32f",
+      "rev": "5adc81b26232954cd7a90f158aa7844c18fc3165",
       "src": "https://github.com/NeogitOrg/neogit"
     },
     "neovim": {
-      "rev": "eb3ff49",
+      "rev": "ff483051a47e27d84bdef47703538df1ed9f4a47",
       "src": "https://github.com/rose-pine/neovim"
     },
     "nui.nvim": {
-      "rev": "de74099",
+      "rev": "10fc361835c856ba4233ef5ea135b919bf3dce97",
       "src": "https://github.com/MunifTanjim/nui.nvim"
     },
     "nvim-lspconfig": {
-      "rev": "52a8932",
+      "rev": "3928e638fdedf195b23ae5a18f024afa487982bc",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-neoclip.lua": {
@@ -69,12 +69,12 @@
       "src": "https://github.com/AckslD/nvim-neoclip.lua"
     },
     "nvim-treesitter": {
-      "rev": "8fecb462",
+      "rev": "8b98b4470eb326f1c7b50dae79f8c963568e5720",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
     "nvim-web-devicons": {
-      "rev": "b8221e4",
+      "rev": "2ae6958df7ced50baac5035cec0c15799eedfbf7",
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
     },
     "obsidian.nvim": {
@@ -82,19 +82,19 @@
       "src": "https://github.com/epwalsh/obsidian.nvim"
     },
     "oil.nvim": {
-      "rev": "7e1cd77",
+      "rev": "b73018b75affd13fa38e2fc94ef753b465f770d7",
       "src": "https://github.com/stevearc/oil.nvim"
     },
     "opencode.nvim": {
-      "rev": "b51972a",
+      "rev": "2ddeebd3212596b51bf078e6ff52862655b80419",
       "src": "https://github.com/NickvanDyke/opencode.nvim"
     },
     "plenary.nvim": {
-      "rev": "b9fd522",
+      "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
       "src": "https://github.com/nvim-lua/plenary.nvim"
     },
     "snacks.nvim": {
-      "rev": "987b2cf",
+      "rev": "882c996cf28183f4d63640de0b4c02ec886d01f2",
       "src": "https://github.com/folke/snacks.nvim"
     },
     "supermaven-nvim": {
@@ -102,7 +102,7 @@
       "src": "https://github.com/supermaven-inc/supermaven-nvim"
     },
     "telescope-frecency.nvim": {
-      "rev": "463e356",
+      "rev": "5479d8a269e30479280c59e44f805396127653e6",
       "src": "https://github.com/nvim-telescope/telescope-frecency.nvim"
     },
     "telescope-ui-select.nvim": {
@@ -110,16 +110,16 @@
       "src": "https://github.com/nvim-telescope/telescope-ui-select.nvim"
     },
     "telescope.nvim": {
-      "rev": "b4da76b",
+      "rev": "40aedd8a68c78a656a10a8d62d80c54af59420fb",
       "src": "https://github.com/nvim-telescope/telescope.nvim",
       "version": "'master'"
     },
     "undotree": {
-      "rev": "0f1c981",
+      "rev": "6fa6b57cda8459e1e4b2ca34df702f55242f4e4d",
       "src": "https://github.com/mbbill/undotree"
     },
     "vague.nvim": {
-      "rev": "ac4ecda",
+      "rev": "f9060fdaf7b20f68575d6f8214da6f1cf0c72825",
       "src": "https://github.com/vague2k/vague.nvim"
     },
     "vim-prisma": {
@@ -127,11 +127,11 @@
       "src": "https://github.com/prisma/vim-prisma"
     },
     "which-key.nvim": {
-      "rev": "b4177e3",
+      "rev": "3aab2147e74890957785941f0c1ad87d0a44c15a",
       "src": "https://github.com/folke/which-key.nvim"
     },
     "zen-mode.nvim": {
-      "rev": "438a59c",
+      "rev": "8564ce6d29ec7554eb9df578efa882d33b3c23a7",
       "src": "https://github.com/folke/zen-mode.nvim"
     }
   }
