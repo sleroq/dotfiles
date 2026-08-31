@@ -17,6 +17,7 @@ in
 {
   imports = [
     ../shared/git.nix
+    ../modules/ast-grep.nix
     (import ../shared/shell.nix {
       inherit
         pkgs
@@ -68,6 +69,8 @@ in
   launchd.agents."activate-agenix".config.KeepAlive = lib.mkForce { SuccessfulExit = false; };
 
   myHome = {
+    astGrep.enable = true;
+
     editors = {
       # vscode.enable = true;
       zed = {
