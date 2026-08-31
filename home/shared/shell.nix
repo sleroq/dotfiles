@@ -108,7 +108,6 @@ in
   home.packages = with pkgs; [
     bat
     eza
-    fasd
     fd
     fzf
     jq
