@@ -3,6 +3,7 @@ description: 'Contextual code search for exact and semantic queries. Answers "Wh
 mode: subagent
 # model: opencode-go/kimi-k2.7-code
 # model: openai/gpt-5.4-mini
+model: openai/gpt-5.6-luna#medium
 color: "#eb6f92"
 request:
   body:

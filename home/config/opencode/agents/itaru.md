@@ -2,7 +2,7 @@
 description: "External research agent for documentation, examples, and best practices."
 mode: subagent
 # model: opencode-go/kimi-k2.7-code
-# model: openai/gpt-5.4-mini
+model: openai/gpt-5.6-luna#medium
 color: "#355C63"
 permissions:
   - action: edit
