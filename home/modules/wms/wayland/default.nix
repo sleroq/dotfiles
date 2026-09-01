@@ -11,7 +11,7 @@ in
       extraConfig = lib.mkOption {
         type = lib.types.lines;
         default = "";
-        description = "Extra configuration to append to Hyprland config";
+        description = "Extra Lua configuration loaded before the main Hyprland config";
       };
       gamemode = lib.mkOption {
         type = lib.types.bool;
