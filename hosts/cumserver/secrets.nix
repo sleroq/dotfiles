@@ -49,6 +49,7 @@ let
     "secrets/livekitKeys" = { publicKeys = commonPublicKeys; };
     "secrets/remnawaveSubscriptionPageEnv" = { publicKeys = commonPublicKeys; };
     "secrets/remnawaveEnv" = { publicKeys = commonPublicKeys; };
+    "secrets/remnawaveMetricsPassword" = { publicKeys = commonPublicKeys; };
   };
 
 in

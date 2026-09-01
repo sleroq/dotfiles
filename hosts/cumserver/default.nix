@@ -139,17 +139,24 @@ in
   };
 
   age.secrets.remnawaveEnv.file = ./secrets/remnawaveEnv;
+  age.secrets.remnawaveMetricsPassword = {
+    owner = "prometheus";
+    group = "prometheus";
+    file = ./secrets/remnawaveMetricsPassword;
+  };
   age.secrets.remnawaveSubscriptionPageEnv.file = ./secrets/remnawaveSubscriptionPageEnv;
 
   cumserver.remnawave = {
-    enable = false;
+    enable = true;
     domain = "proxy.cum.army";
     port = 3300;
     metricsPort = 3301;
+    metricsUsername = "remnawave";
     environmentFile = config.age.secrets.remnawaveEnv.path;
+    metricsPasswordFile = config.age.secrets.remnawaveMetricsPassword.path;
     subscriptionPage = {
       enable = false;
-      domain = "uwu.sleroq.link";
+      domain = null;
       environmentFile = config.age.secrets.remnawaveSubscriptionPageEnv.path;
     };
   };

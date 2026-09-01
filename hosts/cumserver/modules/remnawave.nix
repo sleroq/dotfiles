@@ -10,19 +10,19 @@ in
 
     image = lib.mkOption {
       type = lib.types.str;
-      default = "remnawave/backend:3.3.2";
+      default = "docker.io/remnawave/backend:3.3.2";
       description = "Docker image to use for Remnawave backend";
     };
 
     postgresImage = lib.mkOption {
       type = lib.types.str;
-      default = "postgres:18.4";
+      default = "docker.io/library/postgres:17.9";
       description = "Docker image to use for Remnawave PostgreSQL";
     };
 
     redisImage = lib.mkOption {
       type = lib.types.str;
-      default = "valkey/valkey:9-alpine";
+      default = "docker.io/valkey/valkey:9.0.3-alpine";
       description = "Docker image to use for Remnawave Redis/Valkey";
     };
 
@@ -79,7 +79,7 @@ in
 
       image = lib.mkOption {
         type = lib.types.str;
-        default = "remnawave/subscription-page:8.0.0";
+        default = "docker.io/remnawave/subscription-page:8.0.0";
         description = "Docker image to use for Remnawave subscription page";
       };
 
