@@ -3,6 +3,7 @@
   scrcpyPkgs,
   nixpkgs-master,
   nixpkgs,
+  rust-overlay,
 }:
 let
   inherit (nixpkgs.lib) composeManyExtensions;
@@ -39,6 +40,7 @@ rec {
   };
 
   default = composeManyExtensions [
+    rust-overlay.overlays.default
     scrcpy
     code-cursor
     # opencode

@@ -35,7 +35,6 @@
     vscode-langservers-extracted
 
     nodejs
-    cargo
     shellcheck
     stylua
     tree-sitter

@@ -451,7 +451,7 @@
           "cachix",
           "nixpkgs"
         ],
-        "rust-overlay": "rust-overlay_2"
+        "rust-overlay": "rust-overlay_3"
       },
       "locked": {
         "lastModified": 1785176754,
@@ -2443,6 +2443,7 @@
         "nixpkgs-master": "nixpkgs-master",
         "nixpkgs-portable": "nixpkgs-portable",
         "reactor": "reactor",
+        "rust-overlay": "rust-overlay_2",
         "scrcpyPkgs": "scrcpyPkgs",
         "sieve": "sieve",
         "sleroq-link": "sleroq-link",
@@ -2496,6 +2497,26 @@
     "rust-overlay_2": {
       "inputs": {
         "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1788332415,
+        "narHash": "sha256-BTFrmyh0oaVDsvA9NNw0YpbbeppTwU0t70iVx672Ew8=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "860d7c835ab91bfc8972b67092f5f2db8e9390a0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "rust-overlay_3": {
+      "inputs": {
+        "nixpkgs": [
           "tuwunel",
           "cachix",
           "devenv",
@@ -2516,7 +2537,7 @@
         "type": "github"
       }
     },
-    "rust-overlay_3": {
+    "rust-overlay_4": {
       "inputs": {
         "nixpkgs": [
           "zed-interplanetary",
@@ -2967,7 +2988,7 @@
         "crane": "crane_3",
         "flake-parts": "flake-parts_7",
         "nixpkgs": "nixpkgs_15",
-        "rust-overlay": "rust-overlay_3"
+        "rust-overlay": "rust-overlay_4"
       },
       "locked": {
         "lastModified": 1788280130,

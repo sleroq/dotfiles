@@ -4,6 +4,9 @@ let
   cfg = config.myHome.development;
   brewEnabled = cfg.enableBrew;
   darwinMagicShit = cfg.darwinMagicShit;
+  rustToolchain = pkgs.rust-bin.stable.latest.default.override {
+    targets = [ "wasm32-wasip2" ];
+  };
 in
 {
   options.myHome.development = {
@@ -95,8 +98,7 @@ in
       typescript
       typescript-language-server
       gopls
-      cargo
-      rustc
+      rustToolchain
       # godot_4
       marksman
       hadolint
