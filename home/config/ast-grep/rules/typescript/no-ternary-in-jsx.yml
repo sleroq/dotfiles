@@ -1,0 +1,12 @@
+id: no-ternary-in-jsx
+language: Jsx
+message: Ternary expressions are allowed only inside JSX expression containers.
+severity: error
+files:
+  - develop/**
+rule:
+  all:
+    - kind: ternary_expression
+    - not:
+        inside:
+          kind: jsx_expression

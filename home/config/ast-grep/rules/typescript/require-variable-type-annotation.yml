@@ -1,0 +1,23 @@
+id: require-variable-type-annotation
+language: TypeScript
+message: Declare a type annotation for every local variable.
+severity: warning
+files:
+  - develop/**
+rule:
+  all:
+    - kind: variable_declarator
+    - has:
+        field: name
+        any:
+          - kind: identifier
+          - kind: object_pattern
+          - kind: array_pattern
+    - not:
+        has:
+          field: type
+          kind: type_annotation
+    - not:
+        has:
+          field: value
+          pattern: $A

@@ -1,0 +1,17 @@
+id: no-multiple-statements-in-catch
+language: TypeScript
+message: Catch blocks must contain only one direct statement.
+severity: warning
+files:
+  - develop/**
+rule:
+  all:
+    - kind: catch_clause
+    - has:
+        field: body
+        has:
+          nthChild:
+            position: 2
+            ofRule:
+              not:
+                kind: comment

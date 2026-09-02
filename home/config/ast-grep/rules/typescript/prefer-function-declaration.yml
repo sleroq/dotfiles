@@ -1,0 +1,17 @@
+id: prefer-function-declaration
+language: TypeScript
+message: Prefer a function declaration for a named function. Keep an arrow function only when it needs lexical this.
+severity: warning
+files:
+  - develop/**
+rule:
+  all:
+    - kind: variable_declarator
+    - has:
+        field: value
+        kind: arrow_function
+    - not:
+        has:
+          field: value
+          kind: this
+          stopBy: end

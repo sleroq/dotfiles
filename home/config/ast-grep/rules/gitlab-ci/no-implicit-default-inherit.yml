@@ -1,0 +1,17 @@
+id: no-implicit-default-inherit
+language: Yaml
+message: Explicitly list the default properties this job inherits instead of inheriting all defaults.
+severity: error
+files:
+    - develop/**/.gitlab-ci.yml
+    - develop/**/.gitlab-ci.yaml
+rule:
+    any:
+        - pattern: 'inherit: true'
+        - all:
+              - kind: block_mapping_pair
+              - has:
+                    field: key
+                    regex: '^inherit$'
+              - has:
+                    regex: 'default\s*:\s*true'

@@ -1,0 +1,30 @@
+id: require-go-ci-cache
+language: Yaml
+message: Cache .go/pkg/mod and .cache/go-build with a go.sum cache key for Go build jobs.
+severity: warning
+files:
+  - develop/**/.gitlab-ci.yml
+  - develop/**/.gitlab-ci.yaml
+rule:
+  all:
+    - kind: stream
+    - has:
+        stopBy: end
+        all:
+          - any:
+              - kind: string_scalar
+              - kind: block_scalar
+          - regex: '(?m)(^|[;&|]|\n)[[:space:]]*(?:[[:alnum:]_]+=[^[:space:]]+[[:space:]]+)*go(?:[[:space:]]+-[^[:space:]]+)*[[:space:]]+(?:build|test|vet|generate|install)(?:[[:space:]]|$)'
+          - inside:
+              stopBy: end
+              pattern: |-
+                script: $COMMAND
+    - not:
+        has:
+          stopBy: end
+          all:
+            - regex: '(?:^|/|[\x27\x22])(?:\.go/pkg/mod|\.cache/go-build)/?[\x27\x22]?$'
+            - inside:
+                stopBy: end
+                pattern: |-
+                  cache: $$$CACHE

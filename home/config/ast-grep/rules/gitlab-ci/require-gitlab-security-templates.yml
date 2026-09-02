@@ -1,0 +1,19 @@
+id: require-gitlab-security-templates
+language: Yaml
+message: Include GitLab's SAST and Secret Detection security templates.
+severity: warning
+files:
+  - develop/**/.gitlab-ci.yml
+  - develop/**/.gitlab-ci.yaml
+rule:
+  all:
+    - kind: stream
+    - any:
+        - not:
+            has:
+              stopBy: end
+              regex: template:\s+['"]?(Security|Jobs)/SAST(\.latest)?\.gitlab-ci\.yml['"]?
+        - not:
+            has:
+              stopBy: end
+              regex: template:\s+['"]?(Security|Jobs)/Secret-Detection(\.latest)?\.gitlab-ci\.yml['"]?

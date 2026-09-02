@@ -1,0 +1,32 @@
+id: no-unpinned-ci-image
+language: Yaml
+message: Pin CI images to a version tag or digest; do not use untagged images or :latest.
+severity: error
+files:
+    - develop/**/.gitlab-ci.yml
+    - develop/**/.gitlab-ci.yaml
+rule:
+    any:
+        - pattern: 'image: $IMG'
+        - all:
+              - pattern: 'name: $VAL'
+              - inside:
+                    stopBy: end
+                    pattern: 'image: $IMG2'
+constraints:
+    IMG:
+        all:
+            - not:
+                regex: '\$'
+            - not:
+                regex: 'name:'
+            - any:
+                - regex: '^[\x27\x22]?(?:[^/@\x27\x22]+/)*[^/:@\x27\x22]+[\x27\x22]?$'
+                - regex: '(^|/)[^/]*:latest[\x27\x22]?$'
+    VAL:
+        all:
+            - not:
+                regex: '\$'
+            - any:
+                - regex: '^[\x27\x22]?(?:[^/@\x27\x22]+/)*[^/:@\x27\x22]+[\x27\x22]?$'
+                - regex: '(^|/)[^/]*:latest[\x27\x22]?$'

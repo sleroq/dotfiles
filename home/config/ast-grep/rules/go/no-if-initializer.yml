@@ -1,0 +1,15 @@
+id: no-if-initializer
+language: Go
+message: Declare variables before an if condition. Keep an inline initializer only when its scope is required.
+severity: error
+files:
+  - develop/**/*.go
+rule:
+  all:
+    - kind: if_statement
+    - has:
+        field: initializer
+        pattern: $VAR := $VALUE
+    - has:
+        field: condition
+        pattern: $VAR != $CHECK
