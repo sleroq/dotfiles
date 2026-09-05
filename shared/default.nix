@@ -254,6 +254,7 @@
       "sophon-server"
       "steam"
       "steamwebhelper"
+      "java"
     ];
     logLevel = "warn";
   };
