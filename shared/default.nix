@@ -181,6 +181,8 @@
     # SayoDevice O3C v1 keyboard bootloader mode (for firmware updates)
     SUBSYSTEM=="usb", ATTRS{idVendor}=="8089", ATTRS{idProduct}=="0005", ATTRS{serial}=="00CDAB10239BBC788B39E339E300", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
     KERNEL=="hidraw*", ATTRS{idVendor}=="8089", ATTRS{idProduct}=="0005", ATTRS{serial}=="00CDAB10239BBC788B39E339E300", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+
+    ATTRS{idVendor}=="4653", ATTRS{idProduct}=="0001", ENV{ID_INPUT_JOYSTICK}=""
  '';
 
   # Allow plugdev access to ANNE PRO 2
