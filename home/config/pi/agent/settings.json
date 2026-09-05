@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.84.2",
+  "lastChangelogVersion": "0.84.4",
   "defaultThinkingLevel": "low",
   "packages": [
     "npm:pi-subdir-context",
