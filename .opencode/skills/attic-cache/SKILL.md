@@ -1,6 +1,7 @@
 ---
 name: attic-cache-integration
 description: Integrate a cloned Nix project with the self-hosted Attic cache on cumserver.
+disable-model-invocation: true
 ---
 
 # Attic cache integration
