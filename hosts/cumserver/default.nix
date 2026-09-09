@@ -35,6 +35,7 @@ in
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
     ./modules/caddy.nix
+    ./modules/attic.nix
     ./modules/dev-env.nix
     ./modules/matterbridge.nix
     ./modules/mailserver.nix
@@ -97,6 +98,7 @@ in
   '';
 
   cumserver.caddy.enable = true;
+  cumserver.attic.enable = true;
   cumserver.dev-env.enable = true;
   cumserver.matterbridge.enable = true;
   cumserver.mailserver.enable = true;

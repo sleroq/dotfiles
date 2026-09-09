@@ -53,6 +53,9 @@ let
     "secrets/reactorEnv" = {
       publicKeys = commonPublicKeys;
     };
+    "secrets/atticServerToken" = {
+      publicKeys = commonPublicKeys;
+    };
     "secrets/sieveEnv" = {
       publicKeys = commonPublicKeys;
     };
