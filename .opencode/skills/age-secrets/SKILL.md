@@ -9,7 +9,7 @@ Use `agenix`; do not hand-edit ciphertext or expose plaintext in chat, logs, she
 
 ## Workflow
 
-1. Work from the directory containing the applicable `secrets.nix` (for example, `cd hosts/cumserver`). Paths passed to `agenix` must match keys such as `secrets/marzbanMetricsEnv` in that file.
+1. Work from the directory containing the applicable `secrets.nix` (for example, `cd hosts/cumserver`). Paths passed to `agenix` must match keys such as `secrets/remnawaveEnv` in that file.
 2. Use the explicit local identity when needed: `-i "$HOME/.ssh/id_ed25519"`.
 3. Read without displaying values:
    ```sh

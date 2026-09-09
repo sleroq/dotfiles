@@ -47,7 +47,6 @@ in
     ./modules/oven-media-engine.nix
     ./modules/tuwunel.nix
     ./modules/element-call.nix
-    ./modules/marzban.nix
     ./modules/remnawave.nix
     ./modules/remnawave-div-relay.nix
     ./modules/manictime.nix
@@ -140,16 +139,6 @@ in
     livekitKeyFile = config.age.secrets.livekitKeys.path;
   };
 
-  age.secrets.marzbanMetricsEnv = {
-    owner = "root";
-    group = "root";
-    file = ./secrets/marzbanMetricsEnv;
-  };
-  cumserver.marzban = {
-    enable = false;
-    metricsEnvironmentFile = config.age.secrets.marzbanMetricsEnv.path;
-  };
-
   age.secrets.remnawaveEnv.file = ./secrets/remnawaveEnv;
   age.secrets.remnawaveMetricsPassword = {
     owner = "prometheus";
@@ -221,7 +210,7 @@ in
     remoteNodes = [
       {
         name = "Poland";
-        address = "${secrets.marzbanNode1IP}:9100";
+        address = "${secrets.polandNodeIP}:9100";
         passwordPath = config.age.secrets.nodeExporter1Password.path;
         enableTLS = true;
         tlsInsecure = true;

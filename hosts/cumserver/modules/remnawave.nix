@@ -212,7 +212,7 @@ in
       environmentFile = lib.mkOption {
         type = lib.types.nullOr lib.types.path;
         default = null;
-        description = "Optional env file for subscription page (legacy Marzban compatibility variables)";
+        description = "Optional environment file for the subscription page";
       };
     };
 
@@ -391,29 +391,20 @@ in
           '';
         };
       }
-      //
-        lib.optionalAttrs
-          (
-            cfg.subscriptionPage.enable
-            && cfg.subscriptionPage.domain != null
-            && !(
-              config.cumserver.marzban.enable && cfg.subscriptionPage.domain == config.cumserver.marzban.domain
-            )
-          )
-          {
-            ${cfg.subscriptionPage.domain} = {
-              extraConfig = ''
-                reverse_proxy 127.0.0.1:${toString cfg.subscriptionPage.port}
-                encode zstd gzip
+      // lib.optionalAttrs (cfg.subscriptionPage.enable && cfg.subscriptionPage.domain != null) {
+        ${cfg.subscriptionPage.domain} = {
+          extraConfig = ''
+            reverse_proxy 127.0.0.1:${toString cfg.subscriptionPage.port}
+            encode zstd gzip
 
-                header {
-                  X-Content-Type-Options nosniff
-                  X-Frame-Options SAMEORIGIN
-                  X-XSS-Protection "1; mode=block"
-                }
-              '';
-            };
-          };
+            header {
+              X-Content-Type-Options nosniff
+              X-Frame-Options SAMEORIGIN
+              X-XSS-Protection "1; mode=block"
+            }
+          '';
+        };
+      };
 
       systemd.tmpfiles.rules = [
         "d ${cfg.dataDir} 0755 root root -"
