@@ -1,0 +1,17 @@
+id: require-gitlab-interruptible
+valid:
+  - |-
+    default:
+      interruptible: true
+    build:
+      stage: build
+      script: make build
+  - |-
+    deploy:
+      stage: deploy
+      script: make deploy
+invalid:
+  - |-
+    test:
+      stage: test
+      script: make test

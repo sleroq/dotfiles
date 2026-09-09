@@ -1,0 +1,22 @@
+id: restrict-gitlab-retry
+language: Yaml
+message: Retry only once and only for runner_system_failure.
+severity: error
+files:
+  - develop/**/.gitlab-ci.yml
+  - develop/**/.gitlab-ci.yaml
+rule:
+  all:
+    - kind: block_mapping_pair
+    - has:
+        field: key
+        regex: '^retry$'
+    - not:
+        has:
+          field: value
+          has:
+            all:
+              - has:
+                  pattern: 'max: 1'
+              - has:
+                  pattern: 'when: runner_system_failure'

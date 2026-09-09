@@ -1,6 +1,6 @@
 id: no-ternary-in-tsx
 language: Tsx
-message: Ternary expressions are allowed only inside JSX expression containers.
+message: Ternary expressions are allowed only inside template expression containers.
 severity: error
 files:
   - develop/**

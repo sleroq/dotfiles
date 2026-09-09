@@ -1,0 +1,32 @@
+id: require-gitlab-interruptible
+language: Yaml
+message: Set default.interruptible to true so workflow auto-cancellation can stop stale build, test, and lint jobs.
+severity: warning
+files:
+  - develop/**/.gitlab-ci.yml
+  - develop/**/.gitlab-ci.yaml
+rule:
+  all:
+    - kind: document
+    - has:
+        stopBy: end
+        any:
+          - pattern: 'stage: test'
+          - pattern: 'stage: build'
+          - pattern: 'stage: lint'
+          - all:
+              - pattern: 'stages: $$$'
+              - has:
+                  stopBy: end
+                  any:
+                    - pattern: '- test'
+                    - pattern: '- build'
+                    - pattern: '- lint'
+    - not:
+        has:
+          stopBy: end
+          all:
+            - pattern: 'default: $$$'
+            - has:
+                stopBy: end
+                pattern: 'interruptible: true'

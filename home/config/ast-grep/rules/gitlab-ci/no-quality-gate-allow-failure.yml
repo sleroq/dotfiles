@@ -1,0 +1,19 @@
+id: no-quality-gate-allow-failure
+language: Yaml
+message: Do not allow test, lint, or security jobs to fail without failing the pipeline.
+severity: error
+files:
+  - develop/**/.gitlab-ci.yml
+  - develop/**/.gitlab-ci.yaml
+rule:
+  all:
+    - pattern: 'allow_failure: true'
+    - inside:
+        stopBy: end
+        all:
+          - kind: block_mapping
+          - has:
+              any:
+                - pattern: 'stage: test'
+                - pattern: 'stage: lint'
+                - pattern: 'stage: security'

@@ -1,0 +1,33 @@
+id: restrict-gitlab-retry
+snapshots:
+  ? |-
+    test:
+      retry:
+        max: 1
+        when: script_failure
+      script: go test ./...
+  : labels:
+    - source: |-
+        retry:
+            max: 1
+            when: script_failure
+      style: primary
+      start: 8
+      end: 50
+    - source: retry
+      style: secondary
+      start: 8
+      end: 13
+  ? |-
+    test:
+      retry: 2
+      script: go test ./...
+  : labels:
+    - source: 'retry: 2'
+      style: primary
+      start: 8
+      end: 16
+    - source: retry
+      style: secondary
+      start: 8
+      end: 13

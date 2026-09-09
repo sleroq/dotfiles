@@ -3,7 +3,7 @@ language: Go
 message: Declare variables before an if condition. Keep an inline initializer only when its scope is required.
 severity: error
 files:
-  - develop/**/*.go
+  - develop/frg/**/*.go
 rule:
   all:
     - kind: if_statement

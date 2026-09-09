@@ -1,0 +1,11 @@
+id: prefer-context-over-map-err
+language: Rust
+severity: error
+message: Discarding the original error with map_err loses the source chain. Use .context(...) instead to preserve it (or .with_context for lazy/format messages).
+rule:
+  any:
+    - pattern: $EXPR.map_err(|_| anyhow::anyhow!($MSG))
+    - pattern: $EXPR.map_err(|_| anyhow!($MSG))
+    - pattern: $EXPR.map_err(|_| { anyhow::anyhow!($MSG) })
+    - pattern: $EXPR.map_err(|_| { anyhow!($MSG) })
+fix: $EXPR.context($MSG)
