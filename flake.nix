@@ -73,7 +73,6 @@
     web-cum-army.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     reactor.url = "github:sleroq/reactor";
-    reactor.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     music-link = {
       url = "path:/Users/sleroq/develop/music-link";
@@ -125,21 +124,28 @@
 
       flake.overlays = import ./overlays/default.nix {
         inherit self nixpkgs;
-        inherit (inputs) scrcpyPkgs nixpkgs-master rust-overlay sb;
+        inherit (inputs)
+          scrcpyPkgs
+          nixpkgs-master
+          rust-overlay
+          sb
+          ;
       };
 
-      flake.homeConfigurations."dev@cumserver" = inputs.home-manager-cumserver.lib.homeManagerConfiguration {
-        pkgs = import inputs.nixpkgs-cumserver {
-          system = "x86_64-linux";
-          overlays = [ self.overlays.default ];
-        };
+      flake.homeConfigurations."dev@cumserver" =
+        inputs.home-manager-cumserver.lib.homeManagerConfiguration
+          {
+            pkgs = import inputs.nixpkgs-cumserver {
+              system = "x86_64-linux";
+              overlays = [ self.overlays.default ];
+            };
 
-        modules = [ ./home/hosts/cumserver-dev.nix ];
+            modules = [ ./home/hosts/cumserver-dev.nix ];
 
-        extraSpecialArgs = {
-          inherit self;
-        };
-      };
+            extraSpecialArgs = {
+              inherit self;
+            };
+          };
 
       # FIXME: This is a bit overengineered
       easy-hosts =
