@@ -58,6 +58,7 @@ in
     ./modules/frp.nix
     ./modules/restic.nix
     ./modules/trusttunnel.nix
+    ../../modules/attic-cache.nix
     ../../modules/syncplay.nix
     bayan
     kopoka

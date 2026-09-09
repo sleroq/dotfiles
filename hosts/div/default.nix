@@ -12,6 +12,7 @@
     ./disk-config.nix
     ./github-runner.nix
     ./remnanode.nix
+    ../../modules/attic-cache.nix
     ../../modules/cloudflared.nix
     ../../modules/feishin.nix
     ../../modules/navidrome.nix

@@ -51,9 +51,5 @@ in
       reverse_proxy 127.0.0.1:${toString cfg.port}
     '';
 
-    nix.settings = {
-      extra-substituters = [ "https://${cfg.domain}/reactor" ];
-      extra-trusted-public-keys = [ "reactor:6zTPyqXJya+MKMFxKL/KvobYqjD2Bh/tvPS9FM+pNlo=" ];
-    };
   };
 }

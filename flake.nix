@@ -76,14 +76,12 @@
 
     music-link = {
       url = "path:/Users/sleroq/develop/music-link";
-      inputs.nixpkgs.follows = "nixpkgs-div";
     };
 
     sieve.url = "git+ssh://git@github.com/sleroq/sieve";
     sieve.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     bayan.url = "github:sleroq/bayan";
-    bayan.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     kopoka.url = "git+ssh://git@github.com/sleroq/kopoka";
     kopoka.inputs.nixpkgs.follows = "nixpkgs-cumserver";
