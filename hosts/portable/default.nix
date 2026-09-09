@@ -1,4 +1,9 @@
-{ flakeRoot, pkgs, config, ... }:
+{
+  flakeRoot,
+  pkgs,
+  config,
+  ...
+}:
 
 let
   curlCaBundle = "/etc/ssl/certs/curl-ca-bundle.crt";
@@ -33,12 +38,23 @@ in
     CURL_CA_BUNDLE = curlCaBundle;
   };
 
+  launchd.daemons."limit-maxfiles".serviceConfig = {
+    ProgramArguments = [
+      "/bin/launchctl"
+      "limit"
+      "maxfiles"
+      "65536"
+      "unlimited"
+    ];
+    RunAtLoad = true;
+  };
+
   system.activationScripts.extraActivation.text = ''
     install -d -m 0755 /etc/ssl/certs
     cat ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt ${frgCert} > ${curlCaBundle}
   '';
 
-  system.defaults.NSGlobalDomain =  {
+  system.defaults.NSGlobalDomain = {
     NSWindowShouldDragOnGesture = true;
     NSAutomaticWindowAnimationsEnabled = false; # Disable windows opening animations
   };
