@@ -5,6 +5,7 @@ let
   brewEnabled = cfg.enableBrew;
   darwinMagicShit = cfg.darwinMagicShit;
   rustToolchain = pkgs.rust-bin.stable.latest.default.override {
+    extensions = [ "rust-src" ];
     targets = [ "wasm32-wasip2" ];
   };
 in
