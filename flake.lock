@@ -2385,13 +2385,17 @@
         ]
       },
       "locked": {
-        "narHash": "sha256-Xovp91xES+HytvgWWwh2a14N3EqK9v4tpep2J1ty+hA=",
-        "path": "/Users/sleroq/develop/reactor",
-        "type": "path"
+        "lastModified": 1788986829,
+        "narHash": "sha256-KzAAufuIBzd/X+SPQ85y8ACe1ArE/yxHCaZZyYuP5Io=",
+        "owner": "sleroq",
+        "repo": "reactor",
+        "rev": "f0d4b0754d8613503bbe145cb2d6562404e1cb53",
+        "type": "github"
       },
       "original": {
-        "path": "/Users/sleroq/develop/reactor",
-        "type": "path"
+        "owner": "sleroq",
+        "repo": "reactor",
+        "type": "github"
       }
     },
     "rocksdb": {
