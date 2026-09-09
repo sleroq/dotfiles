@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Attic cache integration
 
-Use this only when given an absolute path to a cloned project. It is stored outside OpenCode's skill directories intentionally; do not register or copy it into `.opencode/skills` or `home/config/agents/skills`.
+Use this only when given an absolute path to a cloned project. It is stored outside OpenCode's skill directories intentionally; do not register or copy it anywhere
 
 ## Existing infrastructure
 
