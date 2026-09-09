@@ -3,7 +3,7 @@ language: Tsx
 message: Ternary expressions are allowed only inside template expression containers.
 severity: error
 files:
-  - develop/**
+  - develop/frg/**
 rule:
   all:
     - kind: ternary_expression

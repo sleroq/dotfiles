@@ -3,7 +3,7 @@ language: Jsx
 message: Ternary expressions are allowed only inside JSX expression containers.
 severity: error
 files:
-  - develop/**
+  - develop/frg/**
 rule:
   all:
     - kind: ternary_expression
