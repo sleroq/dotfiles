@@ -1,6 +1,118 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.cumserver.remnawave;
+
+  remnawaveCertSync = pkgs.writeShellApplication {
+    name = "remnawave-cert-sync";
+    runtimeInputs = with pkgs; [
+      coreutils
+      curl
+      gnugrep
+      gnutar
+      jq
+      openssh
+      openssl
+    ];
+    text = ''
+      set -euo pipefail
+      umask 077
+
+      workdir=$(mktemp -d "$RUNTIME_DIRECTORY/work.XXXXXX")
+      trap 'rm -rf "$workdir"' EXIT
+
+      printf '%s\n' '45.144.51.68 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPmGGuGeW5CmB44ephJVAsEwHqZzj6DS12VCnzGNgYVUSvt4StxDroJ/ishVC/PWXFapJ5iVW2wp8TV3jiBFPE4=' > "$workdir/known_hosts"
+      ssh \
+        -i ${config.age.secrets.remnawaveWarsawCertSyncKey.path} \
+        -o BatchMode=yes \
+        -o HostKeyAlgorithms=ecdsa-sha2-nistp256 \
+        -o IdentitiesOnly=yes \
+        -o UserKnownHostsFile="$workdir/known_hosts" \
+        klj@45.144.51.68 > "$workdir/warsaw.tar"
+      tar -xf "$workdir/warsaw.tar" -C "$workdir"
+
+      printf 'header = "Authorization: Bearer %s"\n' "$(cat ${config.age.secrets.remnawaveToken.path})" > "$workdir/curl.conf"
+      curl --fail --silent --show-error --config "$workdir/curl.conf" \
+        https://${cfg.domain}/api/config-profiles > "$workdir/profiles.json"
+      curl --fail --silent --show-error --config "$workdir/curl.conf" \
+        https://${cfg.domain}/api/nodes > "$workdir/nodes.json"
+
+      sync_profile() {
+        profile_name=$1
+        inbound_tag=$2
+        node_name=$3
+        certificate=$4
+        key=$5
+        listen_port=''${6:-}
+
+        jq --arg profile "$profile_name" --arg tag "$inbound_tag" -r '
+          .response.configProfiles[] | select(.name == $profile) |
+          .config.inbounds[] | select(.tag == $tag) |
+          .streamSettings.tlsSettings.certificates[0].certificate |
+          if type == "array" then join("\n") else . end
+        ' "$workdir/profiles.json" > "$workdir/current.crt"
+
+        current_fingerprint=$(openssl x509 -in "$workdir/current.crt" -noout -fingerprint -sha256)
+        next_fingerprint=$(openssl x509 -in "$certificate" -noout -fingerprint -sha256)
+        current_port=$(jq --arg profile "$profile_name" --arg tag "$inbound_tag" -r '
+          .response.configProfiles[] | select(.name == $profile) |
+          .config.inbounds[] | select(.tag == $tag) | .port
+        ' "$workdir/profiles.json")
+        if [ "$current_fingerprint" = "$next_fingerprint" ] \
+          && { [ -z "$listen_port" ] || [ "$current_port" = "$listen_port" ]; }; then
+          return
+        fi
+
+        jq \
+          --arg profile "$profile_name" \
+          --arg tag "$inbound_tag" \
+          --argjson port "''${listen_port:-null}" \
+          --rawfile certificate "$certificate" \
+          --rawfile key "$key" '
+          .response.configProfiles[] | select(.name == $profile) |
+          .config.inbounds |= map(
+            if .tag == $tag then
+              (if $port == null then . else .port = $port end) |
+              .streamSettings.tlsSettings.certificates = [{
+                certificate: ($certificate | split("\n") | map(select(length > 0))),
+                key: ($key | split("\n") | map(select(length > 0)))
+              }]
+            else . end
+          ) |
+          {uuid, name, config}
+        ' "$workdir/profiles.json" > "$workdir/profile-update.json"
+
+        curl --fail --silent --show-error --config "$workdir/curl.conf" \
+          --request PATCH \
+          --header 'Content-Type: application/json' \
+          --data-binary "@$workdir/profile-update.json" \
+          https://${cfg.domain}/api/config-profiles/ > /dev/null
+
+        node_uuid=$(jq --arg node "$node_name" -r '.response[] | select(.name == $node) | .uuid' "$workdir/nodes.json")
+        printf '%s\n' '{"forceRestart":true}' > "$workdir/restart.json"
+        curl --fail --silent --show-error --config "$workdir/curl.conf" \
+          --request POST \
+          --header 'Content-Type: application/json' \
+          --data-binary "@$workdir/restart.json" \
+          "https://${cfg.domain}/api/nodes/$node_uuid/actions/restart" > /dev/null
+      }
+
+      caddy_certs=/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory
+      sync_profile 'Remnawave Cumserver' HYSTERIA2_CUMSERVER Cumserver \
+        "$caddy_certs/edge.cum.army/edge.cum.army.crt" \
+        "$caddy_certs/edge.cum.army/edge.cum.army.key" \
+        ${toString cfg.node.clientUdpPort}
+      sync_profile div-private DIV_HYSTERIA2 div \
+        "$caddy_certs/div.cum.army/div.cum.army.crt" \
+        "$caddy_certs/div.cum.army/div.cum.army.key"
+      sync_profile 'Remnawave Warsaw' HYSTERIA2_WARSAW Warsaw \
+        "$workdir/fullchain.pem" "$workdir/privkey.pem"
+    '';
+  };
 in
 {
   options.cumserver.remnawave = {
@@ -118,16 +230,6 @@ in
         description = "Environment file containing NODE_PORT and SECRET_KEY";
       };
 
-      tlsCertificateFile = lib.mkOption {
-        type = lib.types.path;
-        description = "TLS certificate sent by the panel to nodes for Hysteria2";
-      };
-
-      tlsPrivateKeyFile = lib.mkOption {
-        type = lib.types.path;
-        description = "TLS private key sent by the panel to nodes for Hysteria2";
-      };
-
       managementPort = lib.mkOption {
         type = lib.types.port;
         default = 62053;
@@ -236,13 +338,7 @@ in
             "127.0.0.1:${toString cfg.metricsPort}:${toString cfg.metricsPort}"
           ];
           extraOptions = cfg.extraOptions;
-          volumes = [
-            "remnawave-valkey-socket:/var/run/valkey"
-          ]
-          ++ lib.optionals cfg.node.enable [
-            "${cfg.node.tlsCertificateFile}:/var/lib/remnawave/configs/xray/ssl/node.crt:ro"
-            "${cfg.node.tlsPrivateKeyFile}:/var/lib/remnawave/configs/xray/ssl/node.key:ro"
-          ];
+          volumes = [ "remnawave-valkey-socket:/var/run/valkey" ];
         };
       }
       // lib.optionalAttrs cfg.subscriptionPage.enable {
@@ -346,7 +442,6 @@ in
             {
               targets = [ "127.0.0.1:${toString cfg.metricsPort}" ];
               labels = {
-                node_name = config.cumserver.monitoring.localNodeName;
                 node_type = "local";
               };
             }
@@ -378,6 +473,33 @@ in
           OnCalendar = "04:35";
           Persistent = true;
           RandomizedDelaySec = "1h";
+        };
+      };
+    })
+
+    (lib.mkIf (cfg.enable && cfg.node.enable) {
+      systemd.services.remnawave-cert-sync = {
+        description = "Refresh Remnawave Hysteria2 certificates";
+        after = [
+          "network-online.target"
+          "remnawave.service"
+        ];
+        wants = [ "network-online.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${remnawaveCertSync}/bin/remnawave-cert-sync";
+          RuntimeDirectory = "remnawave-cert-sync";
+          RuntimeDirectoryMode = "0700";
+        };
+      };
+
+      systemd.timers.remnawave-cert-sync = {
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "*-*-* 05,17:15:00";
+          Persistent = true;
+          RandomizedDelaySec = "15m";
+          Unit = "remnawave-cert-sync.service";
         };
       };
     })

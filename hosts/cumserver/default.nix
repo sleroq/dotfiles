@@ -49,6 +49,7 @@ in
     ./modules/element-call.nix
     ./modules/marzban.nix
     ./modules/remnawave.nix
+    ./modules/remnawave-div-relay.nix
     ./modules/manictime.nix
     ./modules/traggo.nix
     ./modules/slusha.nix
@@ -56,6 +57,7 @@ in
     ./modules/minecraft.nix
     ./modules/frp.nix
     ./modules/restic.nix
+    ./modules/trusttunnel.nix
     ../../modules/syncplay.nix
     bayan
     kopoka
@@ -103,6 +105,16 @@ in
   cumserver.bore.enable = true;
   cumserver.podman.enable = true;
 
+  age.secrets.trusttunnelCredentials = {
+    owner = "trusttunnel";
+    group = "trusttunnel";
+    file = ./secrets/trusttunnelCredentials;
+  };
+  cumserver.trusttunnel = {
+    enable = true;
+    credentialsFile = config.age.secrets.trusttunnelCredentials.path;
+  };
+
   services.dockerRegistry = {
     enable = true;
     enableDelete = true;
@@ -146,8 +158,11 @@ in
   };
   age.secrets.remnawaveSubscriptionPageEnv.file = ./secrets/remnawaveSubscriptionPageEnv;
   age.secrets.remnawaveNodeEnv.file = ./secrets/remnawaveNodeEnv;
-  age.secrets.remnawaveNodeTlsCert.file = ./secrets/remnawaveNodeTlsCert;
-  age.secrets.remnawaveNodeTlsKey.file = ./secrets/remnawaveNodeTlsKey;
+  age.secrets.remnawaveToken.file = ./secrets/remnawaveToken;
+  age.secrets.remnawaveWarsawCertSyncKey = {
+    file = ./secrets/remnawaveWarsawCertSyncKey;
+    mode = "0400";
+  };
 
   cumserver.remnawave = {
     enable = true;
@@ -165,11 +180,12 @@ in
     node = {
       enable = true;
       clientTcpPort = 2080;
+      clientUdpPort = 8444;
       environmentFile = config.age.secrets.remnawaveNodeEnv.path;
-      tlsCertificateFile = config.age.secrets.remnawaveNodeTlsCert.path;
-      tlsPrivateKeyFile = config.age.secrets.remnawaveNodeTlsKey.path;
     };
   };
+
+  cumserver.remnawaveDivRelay.enable = true;
 
   cumserver.manictime = {
     enable = false;

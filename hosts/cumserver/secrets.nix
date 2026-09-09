@@ -38,6 +38,9 @@ let
     "secrets/cf-privkey.pem" = {
       publicKeys = commonPublicKeys;
     };
+    "secrets/trusttunnelCredentials" = {
+      publicKeys = commonPublicKeys;
+    };
     "secrets/grafanaPassword" = {
       publicKeys = commonPublicKeys;
     };
@@ -101,10 +104,10 @@ let
     "secrets/remnawaveNodeEnv" = {
       publicKeys = commonPublicKeys;
     };
-    "secrets/remnawaveNodeTlsCert" = {
+    "secrets/remnawaveToken" = {
       publicKeys = commonPublicKeys;
     };
-    "secrets/remnawaveNodeTlsKey" = {
+    "secrets/remnawaveWarsawCertSyncKey" = {
       publicKeys = commonPublicKeys;
     };
   };
