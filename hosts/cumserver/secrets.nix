@@ -3,54 +3,111 @@ let
   portable = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSh54pu9bAH8DFBKPtswFJzevCft+gHZStJQ0trYGoj sleroq@cum.army";
   cumserver = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGNy4lHOvczy/vR4hf+uk6ciJGpkw5mqu3oC+9hTDbqf";
   div = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKqaD8lUj2IoSXbd+ZngR3w+7rKxS7DU/3CPo4jd9SE9 root@shared";
-  commonPublicKeys = [ sleroq portable cumserver ];
+  commonPublicKeys = [
+    sleroq
+    portable
+    cumserver
+  ];
 
   numberOfMailPasswords = 6;
   mailSecretBasePath = "secrets/mail/";
   passwordNamePrefix = "password";
 
-  mailPasswordNumbers = builtins.genList
-    (index: index + 1)
-    numberOfMailPasswords;
+  mailPasswordNumbers = builtins.genList (index: index + 1) numberOfMailPasswords;
 
-  passwordFilePaths = map
-    (n: "${mailSecretBasePath}${passwordNamePrefix}${toString n}")
-    mailPasswordNumbers;
+  passwordFilePaths = map (
+    n: "${mailSecretBasePath}${passwordNamePrefix}${toString n}"
+  ) mailPasswordNumbers;
 
   generatedPasswordEntries = builtins.listToAttrs (
-    map
-      (filePath: {
-        name = filePath;
-        value = { publicKeys = commonPublicKeys; };
-      })
-      passwordFilePaths
+    map (filePath: {
+      name = filePath;
+      value = {
+        publicKeys = commonPublicKeys;
+      };
+    }) passwordFilePaths
   );
 
   staticEntries = {
-    "secrets/matterbridge.toml" = { publicKeys = commonPublicKeys; };
-    "secrets/cf-fullchain.pem" = { publicKeys = commonPublicKeys; };
-    "secrets/cf-privkey.pem" = { publicKeys = commonPublicKeys; };
-    "secrets/grafanaPassword" = { publicKeys = commonPublicKeys; };
-    "secrets/bayanEnv" = { publicKeys = commonPublicKeys; };
-    "secrets/kopokaEnv" = { publicKeys = commonPublicKeys; };
-    "secrets/reactorEnv" = { publicKeys = commonPublicKeys; };
-    "secrets/sieveEnv" = { publicKeys = commonPublicKeys; };
-    "secrets/slushaEnv" = { publicKeys = commonPublicKeys ++ [ div ]; };
-    "secrets/spoilerImagesEnv" = { publicKeys = commonPublicKeys; };
-    "secrets/zefxiEnv" = { publicKeys = commonPublicKeys; };
-    "secrets/marzbanMetricsEnv" = { publicKeys = commonPublicKeys; };
-    "secrets/nodeExporter1Password" = { publicKeys = commonPublicKeys; };
-    "secrets/nodeExporter3Password" = { publicKeys = commonPublicKeys; };
-    "secrets/ziplineEnv" = { publicKeys = commonPublicKeys; };
-    "secrets/resticMinecraftPassword" = { publicKeys = commonPublicKeys; };
-    "secrets/resticMailPassword" = { publicKeys = commonPublicKeys; };
-    "secrets/resticS3Keys" = { publicKeys = commonPublicKeys; };
-    "secrets/resticPassword" = { publicKeys = commonPublicKeys; };
-    "secrets/livekitKeys" = { publicKeys = commonPublicKeys; };
-    "secrets/remnawaveSubscriptionPageEnv" = { publicKeys = commonPublicKeys; };
-    "secrets/remnawaveEnv" = { publicKeys = commonPublicKeys; };
-    "secrets/remnawaveMetricsPassword" = { publicKeys = commonPublicKeys; };
+    "secrets/matterbridge.toml" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/cf-fullchain.pem" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/cf-privkey.pem" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/grafanaPassword" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/bayanEnv" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/kopokaEnv" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/reactorEnv" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/sieveEnv" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/slushaEnv" = {
+      publicKeys = commonPublicKeys ++ [ div ];
+    };
+    "secrets/spoilerImagesEnv" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/zefxiEnv" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/marzbanMetricsEnv" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/nodeExporter1Password" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/nodeExporter3Password" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/ziplineEnv" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/resticMinecraftPassword" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/resticMailPassword" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/resticS3Keys" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/resticPassword" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/livekitKeys" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/remnawaveSubscriptionPageEnv" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/remnawaveEnv" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/remnawaveMetricsPassword" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/remnawaveNodeEnv" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/remnawaveNodeTlsCert" = {
+      publicKeys = commonPublicKeys;
+    };
+    "secrets/remnawaveNodeTlsKey" = {
+      publicKeys = commonPublicKeys;
+    };
   };
 
 in
-  staticEntries // generatedPasswordEntries
+staticEntries // generatedPasswordEntries

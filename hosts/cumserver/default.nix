@@ -134,7 +134,7 @@ in
     file = ./secrets/marzbanMetricsEnv;
   };
   cumserver.marzban = {
-    enable = true;
+    enable = false;
     metricsEnvironmentFile = config.age.secrets.marzbanMetricsEnv.path;
   };
 
@@ -145,6 +145,9 @@ in
     file = ./secrets/remnawaveMetricsPassword;
   };
   age.secrets.remnawaveSubscriptionPageEnv.file = ./secrets/remnawaveSubscriptionPageEnv;
+  age.secrets.remnawaveNodeEnv.file = ./secrets/remnawaveNodeEnv;
+  age.secrets.remnawaveNodeTlsCert.file = ./secrets/remnawaveNodeTlsCert;
+  age.secrets.remnawaveNodeTlsKey.file = ./secrets/remnawaveNodeTlsKey;
 
   cumserver.remnawave = {
     enable = true;
@@ -155,9 +158,16 @@ in
     environmentFile = config.age.secrets.remnawaveEnv.path;
     metricsPasswordFile = config.age.secrets.remnawaveMetricsPassword.path;
     subscriptionPage = {
-      enable = false;
-      domain = null;
+      enable = true;
+      domain = "uwu.sleroq.link";
       environmentFile = config.age.secrets.remnawaveSubscriptionPageEnv.path;
+    };
+    node = {
+      enable = true;
+      clientTcpPort = 2080;
+      environmentFile = config.age.secrets.remnawaveNodeEnv.path;
+      tlsCertificateFile = config.age.secrets.remnawaveNodeTlsCert.path;
+      tlsPrivateKeyFile = config.age.secrets.remnawaveNodeTlsKey.path;
     };
   };
 

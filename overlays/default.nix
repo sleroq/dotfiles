@@ -39,11 +39,16 @@ rec {
     broadcast-box = final.callPackage ../packages/broadcast-box.nix { };
   };
 
+  sing-box-subscribe-cli = final: prev: {
+    sing-box-subscribe-cli = final.callPackage ../packages/sing-box-subscribe-cli.nix { };
+  };
+
   default = composeManyExtensions [
     rust-overlay.overlays.default
     scrcpy
     code-cursor
     # opencode
     broadcast-box
+    sing-box-subscribe-cli
   ];
 }

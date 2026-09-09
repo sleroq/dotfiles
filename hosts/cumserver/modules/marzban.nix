@@ -6,7 +6,9 @@ in
   options.cumserver.marzban = {
     enable = lib.mkEnableOption "Marzban proxy management panel";
 
-    backup.enable = lib.mkEnableOption "backups" // { default = true; };
+    backup.enable = lib.mkEnableOption "backups" // {
+      default = true;
+    };
 
     image = lib.mkOption {
       type = lib.types.str;
@@ -82,7 +84,8 @@ in
             "${cfg.dataDir}:/var/lib/marzban"
           ];
         };
-      } // lib.optionalAttrs (config.cumserver.monitoring.enable && cfg.metricsEnvironmentFile != null) {
+      }
+      // lib.optionalAttrs (config.cumserver.monitoring.enable && cfg.metricsEnvironmentFile != null) {
         marzban-exporter = {
           autoStart = true;
           image = "kutovoys/marzban-exporter:v0.2.3";
@@ -94,25 +97,35 @@ in
 
       services.caddy.virtualHosts.${cfg.domain} = {
         extraConfig = ''
-          ${lib.optionalString (
-            config.cumserver.remnawave.subscriptionPage.enable
-            && config.cumserver.remnawave.subscriptionPage.domain == cfg.domain
-          ) ''
-          @legacy_sub path /sub /sub/* /assets/* /favicon* /site.webmanifest /manifest.webmanifest /apple-touch-icon* /android-chrome* /mstile-*
-          handle @legacy_sub {
-            reverse_proxy 127.0.0.1:${toString config.cumserver.remnawave.subscriptionPage.port}
+          ${lib.optionalString
+            (
+              config.cumserver.remnawave.subscriptionPage.enable
+              && config.cumserver.remnawave.subscriptionPage.domain == cfg.domain
+            )
+            ''
+                @legacy_sub path /sub /sub/* /assets/* /favicon* /site.webmanifest /manifest.webmanifest /apple-touch-icon* /android-chrome* /mstile-*
+                handle @legacy_sub {
+              reverse_proxy 127.0.0.1:${toString config.cumserver.remnawave.subscriptionPage.port} {
+                header_up X-Forwarded-For {remote_host}
+                header_up X-Forwarded-Proto https
+                header_up X-Forwarded-Host {host}
+              }
+                }
+
+                handle {
+            ''
+          }
+          reverse_proxy 127.0.0.1:${toString cfg.port}
+          ${lib.optionalString
+            (
+              config.cumserver.remnawave.subscriptionPage.enable
+              && config.cumserver.remnawave.subscriptionPage.domain == cfg.domain
+            )
+            ''
+              }
+            ''
           }
 
-          handle {
-          ''}
-          reverse_proxy 127.0.0.1:${toString cfg.port}
-          ${lib.optionalString (
-            config.cumserver.remnawave.subscriptionPage.enable
-            && config.cumserver.remnawave.subscriptionPage.domain == cfg.domain
-          ) ''
-          }
-          ''}
-          
           header {
             X-Content-Type-Options nosniff
             X-Frame-Options SAMEORIGIN
@@ -121,7 +134,7 @@ in
             X-Forwarded-For {remote_addr}
             X-Forwarded-Host {host}
           }
-          
+
           encode zstd gzip
         '';
       };
@@ -135,13 +148,15 @@ in
         8081 # vmess
       ];
 
-      services.prometheus.scrapeConfigs = lib.mkIf (config.cumserver.monitoring.enable && cfg.metricsEnvironmentFile != null) [
-        {
-          job_name = "marzban";
-          static_configs = [{ targets = [ "127.0.0.1:9091" ]; }];
-          scrape_interval = "30s";
-        }
-      ];
+      services.prometheus.scrapeConfigs =
+        lib.mkIf (config.cumserver.monitoring.enable && cfg.metricsEnvironmentFile != null)
+          [
+            {
+              job_name = "marzban";
+              static_configs = [ { targets = [ "127.0.0.1:9091" ]; } ];
+              scrape_interval = "30s";
+            }
+          ];
     })
 
     (lib.mkIf (cfg.enable && cfg.backup.enable) {

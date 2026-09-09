@@ -8,7 +8,7 @@ in
 {
   imports = [
     ./aerospace.nix
-    ../../modules/sing-box.nix
+    ../../shared/sing-box.nix
   ];
 
   system = {
@@ -46,33 +46,11 @@ in
   documentation.enable = false;
 
   age.identityPaths = [ "/var/lib/agenix-key.txt" ];
-  age.secrets.sing-box-outbounds = {
-    file = ../../shared/secrets/sing-box-outbounds.jsonc;
-    mode = "0600";
-  };
-
   sleroq.sing-box = {
-    enable = true;
     # The current proxy has no working IPv6 egress. Advertising an IPv6 TUN
     # makes libcurl/Nix prefer AAAA records and repeatedly hit that broken path.
     enableIPv6 = false;
-    outboundsFile = config.age.secrets.sing-box-outbounds.path;
     directDomains = [
-      "рф"
-      "ru"
-      "local"
-      "nelocal"
-      "frg"
-      "frankrg.com"
-      "steampowered.com"
-      "steamcommunity.com"
-      "steamstatic.com"
-      "steamcontent.com"
-      "steamserver.net"
-      "steamusercontent.com"
-      "steam-chat.com"
-      "valvesoftware.com"
-      "energotransbank.com"
       "zoom.us"
       "teams.microsoft.com"
       "teams.live.com"
@@ -82,9 +60,7 @@ in
     ];
     # Process matching is exact and platform-dependent.
     directProcessNames = [
-      "steam"
       "steam_osx"
-      "steamwebhelper"
     ];
     # OS route bypasses for bootstrap/proxy endpoints, private LAN/VPN
     # destinations, link-local IPv6, and multicast traffic.
@@ -100,7 +76,6 @@ in
       "fe80::/10"
       "31.172.71.180/32"
     ];
-    logLevel = "warn";
   };
 
   # Tailscale? https://github.com/nix-darwin/nix-darwin/blob/b8c7ac030211f18bd1f41eae0b815571853db7a2/modules/services/tailscale.nix
