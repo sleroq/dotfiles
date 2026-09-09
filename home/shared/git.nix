@@ -29,6 +29,7 @@
     pkgs.gnupg
     pkgs.gh
     pkgs.glab
+    pkgs.forgejo-cli
   ];
 
   programs.git = {
