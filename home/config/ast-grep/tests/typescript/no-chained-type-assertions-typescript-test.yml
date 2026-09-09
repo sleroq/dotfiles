@@ -1,0 +1,11 @@
+id: no-chained-type-assertions-typescript
+valid:
+  - |-
+      const value = input as Value;
+  - |-
+      const value = input as const;
+invalid:
+  - |-
+      const value = input as unknown as Value;
+  - |-
+      const value = <Value><unknown>input;

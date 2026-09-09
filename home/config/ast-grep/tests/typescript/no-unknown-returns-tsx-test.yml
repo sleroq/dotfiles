@@ -1,0 +1,11 @@
+id: no-unknown-returns-tsx
+valid:
+  - |-
+      function load(): Payload { return value; }
+  - |-
+      const load = async (): Promise<Payload> => value;
+invalid:
+  - |-
+      function load(): unknown { return value; }
+  - |-
+      const load = async (): Promise<unknown> => value;

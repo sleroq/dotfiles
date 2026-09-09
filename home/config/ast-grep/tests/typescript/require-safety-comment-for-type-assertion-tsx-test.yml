@@ -1,0 +1,12 @@
+id: require-safety-comment-for-type-assertion-tsx
+valid:
+  - |-
+    const value = input as const;
+  - |-
+    // SAFETY: schema validation established this shape.
+    const value = input as Value;
+  - |-
+    const element = <Component value={input} />;
+invalid:
+  - |-
+    const value = input as Value;

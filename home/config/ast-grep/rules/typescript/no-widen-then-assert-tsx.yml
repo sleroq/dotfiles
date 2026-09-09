@@ -1,0 +1,10 @@
+id: no-widen-then-assert-tsx
+language: Tsx
+message: This assertion recreates evidence discarded by an immediately preceding broad assertion. Keep the precise type throughout.
+severity: warning
+files:
+  - develop/**
+rule:
+  all:
+    - kind: as_expression
+    - regex: \bas\s+(?:unknown|any|object)\s*\)?\s+as\s+

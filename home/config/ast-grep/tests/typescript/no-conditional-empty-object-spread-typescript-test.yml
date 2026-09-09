@@ -1,0 +1,11 @@
+id: no-conditional-empty-object-spread-typescript
+valid:
+  - |-
+      const value = { ...details };
+  - |-
+      const value = enabled ? { enabled } : {};
+invalid:
+  - |-
+      const value = { ...(enabled ? { enabled } : {}) };
+  - |-
+      const value = { ...(enabled ? {} : { enabled }) };

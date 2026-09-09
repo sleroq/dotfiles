@@ -1,0 +1,14 @@
+id: no-object-parameters-typescript
+language: TypeScript
+message: Broad object parameters discard the input contract. Accept a named owner type.
+severity: warning
+files:
+  - develop/**
+rule:
+  any:
+    - all:
+        - kind: required_parameter
+        - regex: :[^=]*\bobject\b
+    - all:
+        - kind: optional_parameter
+        - regex: :[^=]*\bobject\b

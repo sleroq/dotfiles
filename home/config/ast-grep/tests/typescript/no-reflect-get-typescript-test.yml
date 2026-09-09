@@ -1,0 +1,9 @@
+id: no-reflect-get-typescript
+valid:
+  - |-
+      reflect.get(value, 'id');
+  - |-
+      Reflect.set(value, 'id', 1);
+invalid:
+  - |-
+      Reflect.get(value, 'id');

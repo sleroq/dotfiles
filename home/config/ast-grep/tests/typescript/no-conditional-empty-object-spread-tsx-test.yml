@@ -1,0 +1,11 @@
+id: no-conditional-empty-object-spread-tsx
+valid:
+  - |-
+      const value = { ...details };
+  - |-
+      const value = enabled ? { enabled } : {};
+invalid:
+  - |-
+      const value = { ...(enabled ? { enabled } : {}) };
+  - |-
+      const value = { ...(enabled ? {} : { enabled }) };

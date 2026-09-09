@@ -1,0 +1,11 @@
+id: no-module-mocking-typescript
+valid:
+  - |-
+      vi.spyOn(service, 'run');
+  - |-
+      mock('./dep');
+invalid:
+  - |-
+      vi.mock('./dep');
+  - |-
+      jest['doMock']('./dep');

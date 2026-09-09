@@ -1,0 +1,36 @@
+id: require-safety-comment-for-type-assertion-tsx
+language: Tsx
+message: This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.
+severity: warning
+files:
+  - develop/**
+utils:
+  safety-comment:
+    all:
+      - kind: comment
+      - regex: \bSAFETY\s*[:]
+  comment-owner:
+    any:
+      - kind: expression_statement
+      - kind: public_field_definition
+      - kind: return_statement
+      - kind: throw_statement
+      - kind: lexical_declaration
+      - kind: variable_declaration
+  has-safety-comment:
+    any:
+      - follows:
+          matches: safety-comment
+      - inside:
+          all:
+            - matches: comment-owner
+            - follows:
+                matches: safety-comment
+          stopBy: end
+rule:
+  all:
+    - kind: as_expression
+    - not:
+        regex: \bas\s+const$
+    - not:
+        matches: has-safety-comment

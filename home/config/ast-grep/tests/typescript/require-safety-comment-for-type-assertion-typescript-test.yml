@@ -1,0 +1,17 @@
+id: require-safety-comment-for-type-assertion-typescript
+valid:
+  - |-
+    const value = input as const;
+  - |-
+    // SAFETY: schema validation established this shape.
+    const value = input as Value;
+  - |-
+    const value = consume(
+      // SAFETY: the boundary guarantees Value.
+      input as Value,
+    );
+invalid:
+  - |-
+    const value = input as Value;
+  - |-
+    const value = <Value>input;

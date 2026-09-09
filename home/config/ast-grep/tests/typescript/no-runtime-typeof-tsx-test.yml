@@ -1,0 +1,9 @@
+id: no-runtime-typeof-tsx
+valid:
+  - |-
+      function isString(value: unknown): value is string { return typeof value === "string"; }
+  - |-
+      const value = Typeof.Tag;
+invalid:
+  - |-
+      if (typeof value === "string") {}
