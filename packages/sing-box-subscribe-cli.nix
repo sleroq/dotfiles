@@ -18,6 +18,10 @@ buildGoModule rec {
 
   ldflags = [ "-X main.version=v${version}" ];
 
+  postInstall = ''
+    mv $out/bin/sing-box-subscribe-cli $out/bin/sing-box-sub
+  '';
+
   meta = {
     description = "Generate sing-box configurations from subscriptions";
     homepage = "https://github.com/rainbend/sing-box-subscribe-cli";

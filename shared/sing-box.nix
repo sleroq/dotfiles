@@ -17,8 +17,14 @@
     subscription = {
       enable = true;
       sources = [
-        { urlFile = config.age.secrets.sing-box-subscription-main.path; }
-        { urlFile = config.age.secrets.sing-box-subscription-cw.path; }
+        {
+          name = "main";
+          urlFile = config.age.secrets.sing-box-subscription-main.path;
+        }
+        {
+          name = "cw";
+          urlFile = config.age.secrets.sing-box-subscription-cw.path;
+        }
       ];
     };
     directDomains = [

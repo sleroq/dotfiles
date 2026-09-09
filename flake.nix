@@ -8,6 +8,9 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
+    sb.url = "git+file:///Users/sleroq/develop/sb";
+    sb.inputs.nixpkgs.follows = "nixpkgs";
+
     easy-hosts.url = "github:tgirlcloud/easy-hosts";
 
     # Common NixOS flakes
@@ -108,9 +111,22 @@
         "aarch64-darwin"
       ];
 
+      perSystem =
+        { pkgs, ... }:
+        {
+          devShells.default = pkgs.mkShell {
+            packages = with pkgs; [
+              age
+              coreutils
+              nixfmt
+              python3
+            ];
+          };
+        };
+
       flake.overlays = import ./overlays/default.nix {
         inherit self nixpkgs;
-        inherit (inputs) scrcpyPkgs nixpkgs-master rust-overlay;
+        inherit (inputs) scrcpyPkgs nixpkgs-master rust-overlay sb;
       };
 
       flake.homeConfigurations."dev@cumserver" = inputs.home-manager-cumserver.lib.homeManagerConfiguration {

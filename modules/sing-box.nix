@@ -17,10 +17,7 @@ let
 
   workingDirectory = "/var/lib/sing-box";
   configPath = "${workingDirectory}/config.json";
-  nodesPath = "${workingDirectory}/subscription-outbounds.json";
-  manifestPath = "${workingDirectory}/subscription.json";
   logPath = "/var/log/sing-box.log";
-  clashApi = "http://${subscription.apiAddress}";
 
   routeRules = [
     { action = "sniff"; }
@@ -33,24 +30,25 @@ let
       ];
       action = "hijack-dns";
     }
-    {
-      process_name = cfg.directProcessNames;
-      action = "route";
-      outbound = "direct";
-    }
-    {
-      domain_suffix = cfg.directDomains;
-      action = "route";
-      outbound = "direct";
-    }
-  ];
+  ]
+  ++ lib.optional (cfg.directProcessNames != [ ]) {
+    process_name = cfg.directProcessNames;
+    action = "route";
+    outbound = "direct";
+  }
+  ++ lib.optional (cfg.directDomains != [ ]) {
+    domain_suffix = cfg.directDomains;
+    action = "route";
+    outbound = "direct";
+  };
 
   tunInbound = {
     type = "tun";
     address = [ "198.18.0.1/30" ] ++ lib.optional cfg.enableIPv6 "fdfe:dcba:9876::1/126";
     auto_route = true;
     route_exclude_address = cfg.routeExcludeAddresses;
-  } // lib.optionalAttrs hasSystemd {
+  }
+  // lib.optionalAttrs hasSystemd {
     # The default mixed stack uses the Linux system stack for TCP. This host's
     # firewall drops that TUN-side TCP before sing-box can accept it, while the
     # gVisor stack handles both TCP and UDP in userspace.
@@ -90,20 +88,19 @@ let
         }
       ];
 
-      rules = [
-        {
+      rules =
+        lib.optional (cfg.directProcessNames != [ ]) {
           process_name = cfg.directProcessNames;
           action = "route";
           server = "local-dns";
           strategy = "ipv4_only";
         }
-        {
+        ++ lib.optional (cfg.directDomains != [ ]) {
           domain_suffix = cfg.directDomains;
           action = "route";
           server = "local-dns";
           strategy = "ipv4_only";
-        }
-      ];
+        };
 
       strategy = "ipv4_only";
       final = "remote-dns";
@@ -122,10 +119,12 @@ let
       cache_file = {
         enabled = true;
         path = "${workingDirectory}/clash.db";
-      } // lib.optionalAttrs cfg.enablePersistentDnsCache {
+      }
+      // lib.optionalAttrs cfg.enablePersistentDnsCache {
         store_dns = true;
       };
-    } // lib.optionalAttrs subscription.enable {
+    }
+    // lib.optionalAttrs subscription.enable {
       clash_api.external_controller = subscription.apiAddress;
     };
   };
@@ -145,263 +144,37 @@ let
     ${pkgs.iproute2}/bin/ip rule del priority 8999 fwmark ${directBypassMark} lookup main 2>/dev/null || true
   '';
 
-  installLegacyOutbounds = if hasSystemd then
-    ''.outbounds = (($outbounds | fromjson) | map(if .type == "direct" then . + { routing_mark: ${toString directBypassMarkDecimal} } else . end))''
-  else
-    ''.outbounds = ($outbounds | fromjson)'';
-
-  legacyRunner = pkgs.writeShellScript "sing-box-run" ''
+  serviceRunner = pkgs.writeShellScript "sing-box-run" ''
     set -eu
     umask 077
-
-    mkdir -p "${workingDirectory}" "$(dirname "${logPath}")"
-    temporaryConfig="$(${pkgs.coreutils}/bin/mktemp "${workingDirectory}/config.json.tmp.XXXXXX")"
-    trap '${pkgs.coreutils}/bin/rm -f "$temporaryConfig"' EXIT
-
-    ${pkgs.jq}/bin/jq \
-      --rawfile outbounds "${cfg.outboundsFile}" \
-      '${installLegacyOutbounds}' \
-      "${configTemplate}" > "$temporaryConfig"
-
-    ${cfg.package}/bin/sing-box check -c "$temporaryConfig"
-    ${pkgs.coreutils}/bin/mv -f "$temporaryConfig" "${configPath}"
-    trap - EXIT
-
+    # The public manifest is readable without sudo; secrets remain mode 0600.
+    ${pkgs.coreutils}/bin/install -d -m 0755 "${workingDirectory}"
+    mkdir -p "$(dirname "${logPath}")"
+    ${cli.sb}/bin/sb prepare
     exec ${cfg.package}/bin/sing-box run -c "${configPath}"
   '';
 
-  extraOutboundsArgument = lib.optionalString (cfg.extraOutboundsFile != null) ''
-    --rawfile extraOutbounds "${cfg.extraOutboundsFile}" \
-  '';
-  extraOutboundsDefault = lib.optionalString (cfg.extraOutboundsFile == null) ''
-    --argjson extraOutbounds '[]' \
-  '';
+  # Sources with default names filled in (src<N>). All downstream logic
+  # uses this so per-source groups and the manifest stay consistent.
+  namedSources = lib.imap0 (
+    index: source:
+    source // { name = if source.name != "" then source.name else "src${toString index}"; }
+  ) subscription.sources;
 
-  buildSubscriptionConfig = pkgs.writeShellScript "sing-box-build-config" ''
-    set -eu
-
-    nodesFile="$1"
-    outputFile="$2"
-
-    ${pkgs.jq}/bin/jq \
-      --rawfile nodes "$nodesFile" \
-      ${extraOutboundsArgument}${extraOutboundsDefault}--slurpfile staticOutbounds "${staticOutbounds}" \
-      --arg urlTestURL "${subscription.testURL}" \
-      --arg urlTestInterval "${subscription.testInterval}" \
-      --argjson urlTestTolerance ${toString subscription.tolerance} \
-      --argjson linux ${if hasSystemd then "true" else "false"} \
-      --argjson routingMark ${toString directBypassMarkDecimal} \
-      '
-        def parsed($value; $name):
-          try ($value | fromjson) catch error("invalid " + $name + " JSON");
-        def require_array($value; $name):
-          if ($value | type) == "array" then $value else error($name + " must contain a JSON array") end;
-
-        (require_array(parsed($nodes; "subscription outbounds"); "subscription outbounds")) as $nodes
-        | (if ($extraOutbounds | type) == "string"
-           then require_array(parsed($extraOutbounds; "extra outbounds"); "extra outbounds")
-           else require_array($extraOutbounds; "extra outbounds")
-           end) as $extra
-        | ($staticOutbounds[0]) as $static
-        | if ($nodes | length) == 0 then error("subscription contains no supported outbounds") else . end
-        | ([$nodes[] | .tag] | if any(. == null or . == "") then error("every subscription outbound must have a tag") else . end) as $nodeTags
-        | ([$extra[], $static[] | .tag] | map(select(. != null))) as $extraTags
-        | ($nodeTags + $extraTags) as $leafTags
-        | if (($leafTags | unique | length) != ($leafTags | length))
-          then error("subscription and extra outbound tags must be unique") else . end
-        | if any($leafTags[]; . == "direct" or . == "auto" or . == "proxy")
-          then error("outbound tags direct, auto, and proxy are reserved") else . end
-        | .outbounds = (
-            $nodes + $extra + $static + [
-              {
-                type: "urltest",
-                tag: "auto",
-                outbounds: $nodeTags,
-                url: $urlTestURL,
-                interval: $urlTestInterval,
-                tolerance: $urlTestTolerance
-              },
-              {
-                type: "selector",
-                tag: "proxy",
-                outbounds: (["auto"] + $nodeTags + $extraTags),
-                default: "auto"
-              },
-              { type: "direct", tag: "direct" }
-            ]
-            | if $linux
-              then map(if .type == "direct" then . + { routing_mark: $routingMark } else . end)
-              else .
-              end
-          )
-      ' "${configTemplate}" > "$outputFile"
-
-    ${cfg.package}/bin/sing-box check -c "$outputFile"
-  '';
-
-  subscriptionRunner = pkgs.writeShellScript "sing-box-run" ''
-    set -eu
-    umask 077
-
-    mkdir -p "${workingDirectory}" "$(dirname "${logPath}")"
-    if [ ! -s "${nodesPath}" ]; then
-      echo "No cached subscription. Run: sudo sb update" >&2
-      exit 1
-    fi
-
-    temporaryConfig="$(${pkgs.coreutils}/bin/mktemp "${workingDirectory}/config.json.tmp.XXXXXX")"
-    trap '${pkgs.coreutils}/bin/rm -f "$temporaryConfig"' EXIT
-    ${buildSubscriptionConfig} "${nodesPath}" "$temporaryConfig"
-    ${pkgs.coreutils}/bin/mv -f "$temporaryConfig" "${configPath}"
-    trap - EXIT
-
-    exec ${cfg.package}/bin/sing-box run -c "${configPath}"
-  '';
-
-  serviceRunner = if subscription.enable then subscriptionRunner else legacyRunner;
-
-  restartService = if hasSystemd then
-    ''${pkgs.systemd}/bin/systemctl restart sing-box.service''
-  else
-    ''/bin/launchctl kickstart -k system/org.nixos.sing-box'';
-
-  updateSubscription = pkgs.writeShellScript "sing-box-update" ''
-    set -eu
-    umask 077
-
-    if [ "$(id -u)" -ne 0 ]; then
-      echo "sb update must run as root (use sudo)" >&2
-      exit 1
-    fi
-
-    mkdir -p "${workingDirectory}"
-    lock="${workingDirectory}/update.lock"
-    if ! mkdir "$lock" 2>/dev/null; then
-      echo "another sing-box update is already running" >&2
-      exit 1
-    fi
-
-    temporaryDirectory="$(${pkgs.coreutils}/bin/mktemp -d "${workingDirectory}/update.tmp.XXXXXX")"
-    trap '${pkgs.coreutils}/bin/rm -rf "$temporaryDirectory"; rmdir "$lock"' EXIT
-
-    ${pkgs.jq}/bin/jq -Rn --rawfile url "${subscription.urlFile}" '
-      ($url | sub("[\\r\\n]+$"; "")) as $url
-      | if ($url == "" or ($url | test("[\\r\\n]")))
-        then error("subscription URL file must contain exactly one URL")
-        else "url = " + ($url | tojson)
-        end
-    ' > "$temporaryDirectory/curl.conf"
-
-    ${pkgs.curl}/bin/curl \
-      --fail \
-      --silent \
-      --show-error \
-      --location \
-      --config "$temporaryDirectory/curl.conf" \
-      --output "$temporaryDirectory/subscription"
-
-    ${subscription.package}/bin/sing-box-sub \
-      "$temporaryDirectory/subscription" \
-      --only-nodes \
-      --prefix "sub-" \
-      --exclude-protocol "${subscription.excludeProtocols}" \
-      --exclude-node-name "${subscription.excludeNodeNames}" \
-      --out "$temporaryDirectory/nodes.json"
-
-    ${buildSubscriptionConfig} "$temporaryDirectory/nodes.json" "$temporaryDirectory/config.json"
-    ${pkgs.jq}/bin/jq \
-      --arg updatedAt "$(${pkgs.coreutils}/bin/date -u +%Y-%m-%dT%H:%M:%SZ)" \
-      '{ updatedAt: $updatedAt, nodes: map({ tag, type, server }) }' \
-      "$temporaryDirectory/nodes.json" > "$temporaryDirectory/manifest.json"
-
-    ${pkgs.coreutils}/bin/install -m 0600 "$temporaryDirectory/nodes.json" "${nodesPath}.new"
-    ${pkgs.coreutils}/bin/install -m 0600 "$temporaryDirectory/manifest.json" "${manifestPath}.new"
-    ${pkgs.coreutils}/bin/install -m 0600 "$temporaryDirectory/config.json" "${configPath}.new"
-    ${pkgs.coreutils}/bin/mv -f "${nodesPath}.new" "${nodesPath}"
-    ${pkgs.coreutils}/bin/mv -f "${manifestPath}.new" "${manifestPath}"
-    ${pkgs.coreutils}/bin/mv -f "${configPath}.new" "${configPath}"
-
-    ${restartService}
-  '';
-
-  sb = pkgs.writeShellApplication {
-    name = "sb";
-    runtimeInputs = [
-      pkgs.coreutils
-      pkgs.curl
-      pkgs.jq
-      cfg.package
-    ];
-    text = ''
-      api=${lib.escapeShellArg clashApi}
-      config=${lib.escapeShellArg configPath}
-      manifest=${lib.escapeShellArg manifestPath}
-
-      usage() {
-        cat <<'EOF'
-Usage: sb update|list|test|use TAG|status|config [--raw]|check
-EOF
-      }
-
-      command="''${1:-}"
-      case "$command" in
-        update)
-          shift
-          if [ "$#" -ne 0 ]; then usage >&2; exit 2; fi
-          exec ${updateSubscription}
-          ;;
-        list)
-          curl --fail --silent --show-error "$api/proxies/proxy" |
-            jq -r '. as $group | .all[] | if . == $group.now then "* " + . else "  " + . end'
-          ;;
-        test)
-          curl --fail --silent --show-error \
-            --get \
-            --data-urlencode "url=${subscription.testURL}" \
-            --data-urlencode "timeout=10000" \
-            "$api/group/auto/delay" |
-            jq -r 'to_entries | sort_by(.value)[] | "\(.value) ms\t\(.key)"'
-          ;;
-        use)
-          if [ "$#" -ne 2 ]; then usage >&2; exit 2; fi
-          jq -cn --arg name "$2" '{name: $name}' |
-            curl --fail --silent --show-error \
-              --request PUT \
-              --header 'Content-Type: application/json' \
-              --data-binary @- \
-              "$api/proxies/proxy"
-          printf 'selected %s\n' "$2"
-          ;;
-        status)
-          if [ -r "$manifest" ]; then
-            jq -r '"last update: " + .updatedAt + "\nnodes: " + (.nodes | length | tostring)' "$manifest"
-          else
-            echo "subscription has not been updated"
-          fi
-          curl --fail --silent --show-error "$api/proxies/proxy" |
-            jq -r '"selected: " + .now'
-          ;;
-        config)
-          if [ "''${2:-}" = "--raw" ]; then
-            if [ "$(id -u)" -ne 0 ]; then echo "sb config --raw requires root" >&2; exit 1; fi
-            jq . "$config"
-          else
-            jq 'walk(if type == "object" then with_entries(if (.key | test("^(password|uuid|private_key|token|auth_str)$")) then .value = "<redacted>" else . end) else . end)' "$config"
-          fi
-          ;;
-        check)
-          exec sing-box check -c "$config"
-          ;;
-        ""|-h|--help|help)
-          usage
-          ;;
-        *)
-          usage >&2
-          exit 2
-          ;;
-      esac
-    '';
+  cli = import ./sing-box-cli.nix {
+    inherit
+      lib
+      pkgs
+      cfg
+      namedSources
+      hasSystemd
+      configTemplate
+      staticOutbounds
+      workingDirectory
+      directBypassMarkDecimal
+      ;
   };
+
 in
 {
   options.sleroq.sing-box = {
@@ -411,6 +184,12 @@ in
       type = lib.types.package;
       default = pkgs.sing-box;
       description = "The sing-box package to use.";
+    };
+
+    cliPackage = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.sb;
+      description = "The sb subscription management CLI package.";
     };
 
     outboundsFile = lib.mkOption {
@@ -448,7 +227,113 @@ in
           urlFile = lib.mkOption {
             type = lib.types.nullOr lib.types.str;
             default = null;
-            description = "Root-only file containing exactly one subscription URL.";
+            description = ''
+              Deprecated single subscription URL file. Use sources instead.
+            '';
+          };
+
+          sources = lib.mkOption {
+            type = lib.types.listOf (
+              lib.types.submodule {
+                options = {
+                  name = lib.mkOption {
+                    type = lib.types.str;
+                    default = "";
+                    description = ''
+                      Short source name. Shown by sb and used for the auto-<name>
+                      group. Defaults to src<N>. Must match [A-Za-z0-9_-]+.
+                    '';
+                  };
+                  urlFile = lib.mkOption {
+                    type = lib.types.str;
+                    description = "Root-only file containing exactly one subscription URL.";
+                  };
+                  prefix = lib.mkOption {
+                    type = lib.types.str;
+                    default = "";
+                    description = "Prefix added to converted outbound tags from this source.";
+                  };
+                  enable = lib.mkOption {
+                    type = lib.types.bool;
+                    default = true;
+                    description = "Whether this subscription participates. CLI overrides persist until reset and take precedence over this default.";
+                  };
+                  autoSelect = lib.mkOption {
+                    type = lib.types.bool;
+                    default = true;
+                    description = "Include this subscription in automatic selection; false leaves nodes manually selectable.";
+                  };
+                  includeTags = lib.mkOption {
+                    type = lib.types.listOf lib.types.str;
+                    default = [ ];
+                    description = "Go regular expressions limiting automatic selection by node tag. Empty means all tags.";
+                  };
+                  excludeTags = lib.mkOption {
+                    type = lib.types.listOf lib.types.str;
+                    default = [ ];
+                    description = "Go regular expressions excluding node tags from automatic selection. Exclusions win.";
+                  };
+                  includeServers = lib.mkOption {
+                    type = lib.types.listOf lib.types.str;
+                    default = [ ];
+                    description = "Go regular expressions limiting automatic selection by server hostname or address.";
+                  };
+                  excludeServers = lib.mkOption {
+                    type = lib.types.listOf lib.types.str;
+                    default = [ ];
+                    description = "Go regular expressions excluding server hostnames or addresses from automatic selection.";
+                  };
+                };
+              }
+            );
+            default = [ ];
+            example = [
+              { urlFile = "/run/agenix/sing-box-subscription-main"; }
+              {
+                urlFile = "/run/agenix/sing-box-subscription-cw";
+                prefix = "cw-";
+              }
+            ];
+            description = ''
+              Subscription sources. Every source is fetched, converted, and
+              merged into one node set. Tag collisions across sources fail the
+              update loudly instead of shadowing nodes.
+            '';
+          };
+
+          stores = lib.mkOption {
+            type = lib.types.listOf (
+              lib.types.submodule {
+                options = {
+                  name = lib.mkOption {
+                    type = lib.types.str;
+                    description = "Unique store name used by sb subscription add --store.";
+                  };
+                  path = lib.mkOption {
+                    type = lib.types.str;
+                    description = "Runtime JSON subscription store path; may reference an agenix file or an editable symlink.";
+                  };
+                  writable = lib.mkOption {
+                    type = lib.types.bool;
+                    default = false;
+                    description = "Whether sb may edit this store. Leave false for Nix/agenix-managed files.";
+                  };
+                };
+              }
+            );
+            default = [
+              {
+                name = "local";
+                path = "${workingDirectory}/subscriptions.json";
+                writable = true;
+              }
+            ];
+            description = ''
+              Additional subscription stores, merged with sources by unique ID.
+              Store files contain {"subscriptions": [{"id": "main", "url_file": "/run/agenix/url"}]}.
+              URLs must stay in runtime files, never in Nix store values.
+              Read-only sources can be enabled/disabled and filtered through private CLI overrides.
+            '';
           };
 
           updateInterval = lib.mkOption {
@@ -559,109 +444,144 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable (lib.mkMerge [
-    {
-      assertions = [
-        {
-          assertion = subscription.enable -> subscription.urlFile != null;
-          message = "sleroq.sing-box.subscription.urlFile must be set when subscription management is enabled.";
-        }
-        {
-          assertion = subscription.enable -> cfg.outboundsFile == null;
-          message = "Use staticOutbounds/extraOutboundsFile instead of outboundsFile with subscription management.";
-        }
-        {
-          assertion = (!subscription.enable) -> cfg.outboundsFile != null;
-          message = "Set sleroq.sing-box.outboundsFile or enable subscription management.";
-        }
-        {
-          assertion = !(cfg.settings ? outbounds);
-          message = "Use staticOutbounds or extraOutboundsFile instead of settings.outbounds.";
-        }
-        {
-          assertion = subscription.enable -> lib.hasPrefix "127.0.0.1:" subscription.apiAddress;
-          message = "The unauthenticated sing-box Clash API must listen on 127.0.0.1.";
-        }
-        {
-          assertion = cfg.enablePersistentDnsCache -> supportsDnsCache;
-          message = "sleroq.sing-box.enablePersistentDnsCache requires sing-box 1.14.0 or newer; current package is ${cfg.package.version}.";
-        }
-      ];
+  config = lib.mkIf cfg.enable (
+    lib.mkMerge [
+      {
+        assertions = [
+          {
+            assertion = subscription.enable -> subscription.urlFile == null;
+            message = "sleroq.sing-box.subscription.urlFile is deprecated; use subscription.sources instead.";
+          }
+          {
+            assertion = subscription.enable -> (subscription.sources != [ ] || subscription.stores != [ ]);
+            message = "Configure subscription.sources or subscription.stores when subscription management is enabled.";
+          }
+          {
+            assertion = subscription.enable -> lib.all (source: source.urlFile != "") namedSources;
+            message = "Every sleroq.sing-box.subscription.sources entry must set urlFile.";
+          }
+          {
+            assertion =
+              subscription.enable
+              -> lib.all (source: builtins.match "[A-Za-z0-9_-]+" source.name != null) namedSources;
+            message = "Every sleroq.sing-box.subscription.sources name must match [A-Za-z0-9_-]+; it is used in group tags and API paths.";
+          }
+          {
+            assertion =
+              subscription.enable
+              -> lib.unique (map (source: source.name) namedSources) == map (source: source.name) namedSources;
+            message = "sleroq.sing-box.subscription.sources names must be unique.";
+          }
+          {
+            assertion = subscription.enable -> cfg.outboundsFile == null;
+            message = "Use staticOutbounds/extraOutboundsFile instead of outboundsFile with subscription management.";
+          }
+          {
+            assertion = (!subscription.enable) -> cfg.outboundsFile != null;
+            message = "Set sleroq.sing-box.outboundsFile or enable subscription management.";
+          }
+          {
+            assertion = !(cfg.settings ? outbounds);
+            message = "Use staticOutbounds or extraOutboundsFile instead of settings.outbounds.";
+          }
+          {
+            assertion = subscription.enable -> lib.hasPrefix "127.0.0.1:" subscription.apiAddress;
+            message = "The unauthenticated sing-box Clash API must listen on 127.0.0.1.";
+          }
+          {
+            assertion =
+              subscription.enable
+              -> (
+                lib.attrByPath [ "experimental" "clash_api" "external_controller" ] null finalSettings
+                == subscription.apiAddress
+              );
+            message = "Set subscription.apiAddress instead of overriding settings.experimental.clash_api.external_controller; sb and sing-box must use the same loopback endpoint.";
+          }
+          {
+            assertion = cfg.enablePersistentDnsCache -> supportsDnsCache;
+            message = "sleroq.sing-box.enablePersistentDnsCache requires sing-box 1.14.0 or newer; current package is ${cfg.package.version}.";
+          }
+        ];
 
-      environment.systemPackages = [ cfg.package ] ++ lib.optional subscription.enable sb;
-    }
+        environment.systemPackages = [
+          cfg.package
+          cli.sb
+        ];
+        environment.etc."sb/config.json".source = cli.settings;
+      }
 
-    (lib.optionalAttrs hasSystemd {
-      systemd.services.sing-box = {
-        description = "sing-box";
-        wantedBy = [ "multi-user.target" ];
-        after = [ "network-online.target" ];
-        wants = [ "network-online.target" ];
-        serviceConfig = {
-          ExecStartPre = directRuleSetup;
-          ExecStart = serviceRunner;
-          ExecStopPost = directRuleCleanup;
-          Restart = "on-failure";
-          User = "root";
-          Group = "root";
-          StateDirectory = "sing-box";
-          AmbientCapabilities = [
-            "CAP_DAC_READ_SEARCH"
-            "CAP_NET_ADMIN"
-            "CAP_NET_RAW"
-            "CAP_SYS_PTRACE"
-          ];
-          CapabilityBoundingSet = [
-            "CAP_DAC_READ_SEARCH"
-            "CAP_NET_ADMIN"
-            "CAP_NET_RAW"
-            "CAP_SYS_PTRACE"
-          ];
+      (lib.optionalAttrs hasSystemd {
+        systemd.services.sing-box = {
+          description = "sing-box";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "network-online.target" ];
+          wants = [ "network-online.target" ];
+          serviceConfig = {
+            ExecStartPre = directRuleSetup;
+            ExecStart = serviceRunner;
+            ExecStopPost = directRuleCleanup;
+            Restart = "on-failure";
+            User = "root";
+            Group = "root";
+            StateDirectory = "sing-box";
+            AmbientCapabilities = [
+              "CAP_DAC_READ_SEARCH"
+              "CAP_NET_ADMIN"
+              "CAP_NET_RAW"
+              "CAP_SYS_PTRACE"
+            ];
+            CapabilityBoundingSet = [
+              "CAP_DAC_READ_SEARCH"
+              "CAP_NET_ADMIN"
+              "CAP_NET_RAW"
+              "CAP_SYS_PTRACE"
+            ];
+          };
         };
-      };
-    })
+      })
 
-    (lib.optionalAttrs hasSystemd {
-      systemd.services.sing-box-update = lib.mkIf subscription.enable {
-        description = "Update sing-box subscription";
-        after = [ "network-online.target" ];
-        wants = [ "network-online.target" ];
-        serviceConfig = {
-          Type = "oneshot";
-          ExecStart = updateSubscription;
+      (lib.optionalAttrs hasSystemd {
+        systemd.services.sing-box-update = lib.mkIf subscription.enable {
+          description = "Update sing-box subscription";
+          after = [ "network-online.target" ];
+          wants = [ "network-online.target" ];
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart = cli.updateSubscription;
+          };
         };
-      };
-      systemd.timers.sing-box-update = lib.mkIf subscription.enable {
-        wantedBy = [ "timers.target" ];
-        timerConfig = {
-          OnBootSec = "5m";
-          OnUnitActiveSec = "${toString subscription.updateInterval}s";
-          Unit = "sing-box-update.service";
+        systemd.timers.sing-box-update = lib.mkIf subscription.enable {
+          wantedBy = [ "timers.target" ];
+          timerConfig = {
+            OnBootSec = "5m";
+            OnUnitActiveSec = "${toString subscription.updateInterval}s";
+            Unit = "sing-box-update.service";
+          };
         };
-      };
-    })
+      })
 
-    (lib.optionalAttrs hasLaunchd {
-      launchd.daemons.sing-box = {
-        serviceConfig = {
-          ProgramArguments = [ "${serviceRunner}" ];
-          RunAtLoad = true;
-          KeepAlive = true;
-          StandardOutPath = logPath;
-          StandardErrorPath = logPath;
+      (lib.optionalAttrs hasLaunchd {
+        launchd.daemons.sing-box = {
+          serviceConfig = {
+            ProgramArguments = [ "${serviceRunner}" ];
+            RunAtLoad = true;
+            KeepAlive = true;
+            StandardOutPath = logPath;
+            StandardErrorPath = logPath;
+          };
         };
-      };
-    })
+      })
 
-    (lib.optionalAttrs hasLaunchd {
-      launchd.daemons.sing-box-update = lib.mkIf subscription.enable {
-        serviceConfig = {
-          ProgramArguments = [ "${updateSubscription}" ];
-          StartInterval = subscription.updateInterval;
-          StandardOutPath = logPath;
-          StandardErrorPath = logPath;
+      (lib.optionalAttrs hasLaunchd {
+        launchd.daemons.sing-box-update = lib.mkIf subscription.enable {
+          serviceConfig = {
+            ProgramArguments = [ "${cli.updateSubscription}" ];
+            StartInterval = subscription.updateInterval;
+            StandardOutPath = logPath;
+            StandardErrorPath = logPath;
+          };
         };
-      };
-    })
-  ]);
+      })
+    ]
+  );
 }

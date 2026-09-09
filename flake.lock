@@ -2385,7 +2385,7 @@
         ]
       },
       "locked": {
-        "narHash": "sha256-7SP2C1HdzMgz3CyGYCGJG3nXEVvkbEiqe6z/HVrUqSk=",
+        "narHash": "sha256-Xovp91xES+HytvgWWwh2a14N3EqK9v4tpep2J1ty+hA=",
         "path": "/Users/sleroq/develop/reactor",
         "type": "path"
       },
@@ -2444,6 +2444,7 @@
         "nixpkgs-portable": "nixpkgs-portable",
         "reactor": "reactor",
         "rust-overlay": "rust-overlay_2",
+        "sb": "sb",
         "scrcpyPkgs": "scrcpyPkgs",
         "sieve": "sieve",
         "sleroq-link": "sleroq-link",
@@ -2556,6 +2557,26 @@
         "owner": "oxalica",
         "repo": "rust-overlay",
         "type": "github"
+      }
+    },
+    "sb": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1788781761,
+        "narHash": "sha256-LlQwyl83sEF5WeGsjBAXNCqKmLeVNStMdp3Iwq98Sn8=",
+        "ref": "refs/heads/master",
+        "rev": "59008b97eea97e800a16c67913fa01996e6a61d1",
+        "revCount": 3,
+        "type": "git",
+        "url": "file:///Users/sleroq/develop/sb"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:///Users/sleroq/develop/sb"
       }
     },
     "scrcpyPkgs": {
