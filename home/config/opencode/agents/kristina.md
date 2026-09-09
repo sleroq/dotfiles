@@ -1,6 +1,7 @@
 ---
 description: "Expert technical advisor with deep reasoning for architecture decisions, code analysis, and engineering guidance."
 mode: subagent
+model: openai/gpt-5.6-terra#high
 color: "#db696b"
 permissions:
   - action: edit

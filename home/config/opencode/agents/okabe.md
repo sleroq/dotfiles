@@ -2,6 +2,7 @@
 description: "Orchestrator agent for parallel execution, delegation, and strategic planning."
 mode: all
 color: "#8994B8"
+model: openai/gpt-5.6-sol#low
 permissions:
     - action: websearch
       resource: "*"
