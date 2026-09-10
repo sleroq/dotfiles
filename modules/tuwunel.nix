@@ -81,7 +81,7 @@ in
     ];
 
     services.matrix-tuwunel = {
-      package = inputs.tuwunel.packages.${pkgs.system}.default;
+      package = inputs.tuwunel.packages.${pkgs.stdenv.hostPlatform.system}.default;
       stateDirectory = "matrix-conduit";
 
       # https://matrix-construct.github.io/tuwunel/configuration/examples.html
