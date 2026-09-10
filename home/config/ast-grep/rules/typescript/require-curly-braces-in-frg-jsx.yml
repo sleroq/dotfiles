@@ -19,8 +19,10 @@ utils:
           - has:
               field: alternative
               all:
-                - not: { kind: statement_block }
-                - not: { kind: if_statement }
+                - not:
+                    has: { kind: statement_block }
+                - not:
+                    has: { kind: if_statement }
       - all:
           - kind: for_statement
           - has:
