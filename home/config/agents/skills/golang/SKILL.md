@@ -7,7 +7,16 @@ description: "Use for any Go/Golang implementation, review, refactor, debugging,
 
 Always use `fmt.Errorf` instead of `errors.Wrap`.
 
-Run the following verification after completing the task with code changes in .go files:
+After completing the task with code changes in `.go` files, first run `gopls check` on all changed files together. Use the changed file path, directory, or all files as appropriate:
+
+```sh
+gopls check ./path/to/file.go
+# Or check the changed directory or all packages:
+gopls check ./path/to/package
+gopls check ./...
+```
+
+Then run the following verification:
 
 ```sh
 golangci-lint run --enable=modernize
