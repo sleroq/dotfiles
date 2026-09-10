@@ -4,6 +4,23 @@ let
   cfg = config.myHome.development;
   brewEnabled = cfg.enableBrew;
   darwinMagicShit = cfg.darwinMagicShit;
+  nix-for-nil = pkgs.writeShellScriptBin "nix-for-nil" ''
+    if [[ "$1" == "flake" && "$2" == "archive" ]]; then
+      arguments=()
+      for argument in "$@"; do
+        if [[ "$argument" == path:* ]]; then
+          path="''${argument#path:}"
+          if ${pkgs.git}/bin/git -C "$path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+            argument="git+file://$path"
+          fi
+        fi
+        arguments+=("$argument")
+      done
+      set -- "''${arguments[@]}"
+    fi
+
+    exec ${pkgs.nix}/bin/nix "$@"
+  '';
   rustToolchain = pkgs.rust-bin.stable.latest.default.override {
     extensions = [ "rust-src" ];
     targets = [ "wasm32-wasip2" ];
@@ -106,6 +123,7 @@ in
 
       nixd # Nix language server
       nil # Another nix language server? (zed needs it)
+      nix-for-nil
       package-version-server # JSON language server
       lua-language-server
       nginx-language-server
