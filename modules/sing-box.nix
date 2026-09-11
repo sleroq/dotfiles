@@ -30,6 +30,11 @@ let
       ];
       action = "hijack-dns";
     }
+    {
+      protocol = "bittorrent";
+      action = "route";
+      outbound = "direct";
+    }
   ]
   ++ lib.optional (cfg.directProcessNames != [ ]) {
     process_name = cfg.directProcessNames;
