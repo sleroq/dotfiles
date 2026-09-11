@@ -1,0 +1,6 @@
+id: no-errors-wrap
+valid:
+  - 'fmt.Errorf("read config: %w", err)'
+  - 'errors.New("read config")'
+invalid:
+  - 'errors.Wrap(err, "read config")'

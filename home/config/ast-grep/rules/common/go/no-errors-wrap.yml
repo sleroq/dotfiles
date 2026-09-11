@@ -1,0 +1,6 @@
+id: no-errors-wrap
+language: Go
+severity: warning
+message: Prefer fmt.Errorf with %w instead of errors.Wrap.
+rule:
+  pattern: errors.Wrap($ERR, $MESSAGE)
