@@ -24,4 +24,6 @@ golangci-lint run --enable=staticcheck,containedctx,modernize
 
 Run it from the Go module or repository root so that its project configuration and default linters are applied. Report any lint failures honestly.
 
-Follow the DDD principles described [here](references/DDD.md)
+Follow the DDD principles described [here](references/DDD.md).
+
+Follow the Go codebase cleanup guidelines described [here](references/go-deslop.md).
