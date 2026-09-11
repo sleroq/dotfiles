@@ -167,7 +167,11 @@ vim.lsp.config["lua_ls"] = {
     }
 }
 
-vim.lsp.enable({ "lua_ls", "nixd", "gopls", "ts_ls" })
+vim.lsp.config["ast_grep"] = {
+    cmd = { "ast-grep", "lsp", "--config", vim.fn.expand("~/sgconfig.yml") },
+}
+
+vim.lsp.enable({ "ast_grep", "lua_ls", "nixd", "gopls", "ts_ls" })
 
 require("oil").setup({
     lsp_file_methods = {
