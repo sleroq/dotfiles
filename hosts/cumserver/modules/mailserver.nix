@@ -1,4 +1,4 @@
-{ config, lib, inputs', secrets, ... }:
+{ config, lib, pkgs, inputs', secrets, ... }:
 
 let
   cfg = config.cumserver.mailserver;
@@ -113,6 +113,10 @@ in {
 
       # Wait for caddy, so certs are ready on first ever boot
       systemd.services.dovecot.after = [ "caddy.service" ];
+
+      services.rspamd.package = pkgs.rspamd.override {
+        pcre2 = pkgs.pcre2.override { withJitSealloc = false; };
+      };
 
       services.caddy.virtualHosts."mail.cum.army" = {
         extraConfig = ''
