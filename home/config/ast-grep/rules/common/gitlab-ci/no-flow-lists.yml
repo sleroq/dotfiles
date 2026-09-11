@@ -1,0 +1,18 @@
+id: no-flow-yaml-lists
+language: Yaml
+message: "Write lists in block style (`key:` then `- item`); only `needs: []` may be empty."
+severity: error
+files:
+  - "**/.gitlab-ci.yml"
+  - "**/.gitlab-ci.yaml"
+rule:
+  all:
+    - kind: flow_sequence
+    - any:
+        - has:
+            kind: flow_node
+        - not:
+            inside:
+              stopBy: end
+              pattern: |-
+                needs: []

@@ -1,0 +1,11 @@
+id: no-error-string-inspection
+language: Go
+severity: warning
+message: Do not inspect error strings; use errors.Is or errors.As for programmatic error handling.
+rule:
+  any:
+    - pattern: strings.Contains($ERR.Error(), $TEXT)
+    - pattern: $ERR.Error() == $TEXT
+    - pattern: $ERR.Error() != $TEXT
+    - pattern: $TEXT == $ERR.Error()
+    - pattern: $TEXT != $ERR.Error()

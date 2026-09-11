@@ -1,0 +1,8 @@
+id: no-unknown-type-aliases-tsx
+language: Tsx
+message: This type alias hides unknown. Keep unknown explicit at the parsing boundary or use the parsed owner type.
+severity: warning
+rule:
+  all:
+    - kind: type_alias_declaration
+    - regex: =\s*\(*\s*unknown\s*\)*\s*;?$

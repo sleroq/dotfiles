@@ -1,0 +1,8 @@
+id: no-contextless-error-wrap
+language: Go
+severity: warning
+message: Add operation-specific context when wrapping an error with fmt.Errorf.
+rule:
+  any:
+    - pattern: 'fmt.Errorf("error: %w", $ERR)'
+    - pattern: 'fmt.Errorf("failed: %w", $ERR)'

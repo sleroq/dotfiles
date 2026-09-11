@@ -1,0 +1,16 @@
+id: no-nil-context-fallback
+valid:
+  - |-
+      if ctx == nil {
+        return errors.New("nil context")
+      }
+  - ctx := context.Background()
+invalid:
+  - |-
+      if ctx == nil {
+        ctx = context.Background()
+      }
+  - |-
+      if nil == ctx {
+        ctx = context.TODO()
+      }

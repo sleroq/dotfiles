@@ -1,0 +1,16 @@
+id: no-redundant-error-return
+language: Go
+severity: warning
+message: Return the call directly instead of unpacking and immediately repacking its result and error.
+rule:
+  all:
+    - pattern: |
+        if $ERR != nil {
+          return nil, $ERR
+        }
+    - follows:
+        pattern: $RESULT, $ERR := $CALL
+        stopBy: neighbor
+    - precedes:
+        pattern: return $RESULT, nil
+        stopBy: neighbor

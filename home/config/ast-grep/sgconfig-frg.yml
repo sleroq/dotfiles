@@ -1,0 +1,3 @@
+ruleDirs:
+  - ../../.config/ast-grep/rules/common
+  - ../../.config/ast-grep/rules/frg

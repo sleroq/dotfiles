@@ -1,8 +1,0 @@
-id: no-ternary-in-typescript
-language: TypeScript
-message: Do not use ternary expressions. Use an if statement instead.
-severity: error
-files:
-  - develop/frg/**
-rule:
-  kind: ternary_expression

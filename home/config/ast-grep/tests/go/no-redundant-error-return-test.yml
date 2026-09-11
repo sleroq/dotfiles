@@ -1,0 +1,23 @@
+id: no-redundant-error-return
+valid:
+  - return call()
+  - |-
+      result, err := call()
+      if err != nil {
+        return nil, fmt.Errorf("call: %w", err)
+      }
+      return result, nil
+  - |-
+      result, err := call()
+      if err != nil {
+        return nil, err
+      }
+      observe(result)
+      return result, nil
+invalid:
+  - |-
+      result, err := call()
+      if err != nil {
+        return nil, err
+      }
+      return result, nil

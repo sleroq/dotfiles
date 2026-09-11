@@ -1,0 +1,7 @@
+id: no-contextless-error-wrap
+valid:
+  - 'fmt.Errorf("read config: %w", err)'
+  - 'fmt.Errorf("failed to connect: %w", err)'
+invalid:
+  - 'fmt.Errorf("error: %w", err)'
+  - 'fmt.Errorf("failed: %w", err)'

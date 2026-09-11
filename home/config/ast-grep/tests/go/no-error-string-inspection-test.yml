@@ -1,0 +1,11 @@
+id: no-error-string-inspection
+valid:
+  - errors.Is(err, io.EOF)
+  - errors.As(err, &target)
+  - log.Print(err.Error())
+invalid:
+  - strings.Contains(err.Error(), "not found")
+  - err.Error() == "not found"
+  - err.Error() != "not found"
+  - '"not found" == err.Error()'
+  - '"not found" != err.Error()'

@@ -1,8 +1,0 @@
-id: no-ternary-in-javascript
-language: JavaScript
-message: Do not use ternary expressions. Use an if statement instead.
-severity: error
-files:
-  - develop/frg/**
-rule:
-  kind: ternary_expression

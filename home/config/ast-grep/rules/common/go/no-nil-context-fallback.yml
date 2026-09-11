@@ -1,0 +1,22 @@
+id: no-nil-context-fallback
+language: Go
+severity: warning
+message: Require callers to provide a context instead of replacing nil with context.Background or context.TODO.
+rule:
+  any:
+    - pattern: |
+        if $CTX == nil {
+          $CTX = context.Background()
+        }
+    - pattern: |
+        if nil == $CTX {
+          $CTX = context.Background()
+        }
+    - pattern: |
+        if $CTX == nil {
+          $CTX = context.TODO()
+        }
+    - pattern: |
+        if nil == $CTX {
+          $CTX = context.TODO()
+        }

@@ -1,0 +1,8 @@
+id: no-conditional-empty-object-spread-tsx
+language: Tsx
+message: Build the object explicitly instead of conditionally spreading an empty object.
+severity: warning
+rule:
+  all:
+    - kind: spread_element
+    - regex: (?:\?\s*\{\s*\}|:\s*\{\s*\})

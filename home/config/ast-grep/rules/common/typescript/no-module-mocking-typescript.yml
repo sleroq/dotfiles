@@ -1,0 +1,8 @@
+id: no-module-mocking-typescript
+language: TypeScript
+message: Replace module mocking with dependency injection through a real interface or faithful test implementation.
+severity: warning
+rule:
+  all:
+    - kind: call_expression
+    - regex: ^(?:vi|jest)\s*(?:\.\s*(?:doMock|mock|unstable_mockModule)|\[\s*["'](?:doMock|mock|unstable_mockModule)["']\s*\])\s*\(
