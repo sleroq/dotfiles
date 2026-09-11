@@ -46,4 +46,3 @@ Use this only when given an absolute path to a cloned project. It is stored outs
 - Evaluate the cumserver configuration, deploy it, and confirm `nix config show substituters` and `trusted-public-keys` contain the new cache.
 - Confirm `curl -f https://cache.cum.army/CACHE/nix-cache-info` and `nix store ping --store https://cache.cum.army/CACHE` succeed.
 - Compare the project's exported package derivation with the package selected by its cumserver service after the project PR is merged and the dotfiles input is updated.
-- Run the repository-root ast-grep scan required by `AGENTS.md`.
