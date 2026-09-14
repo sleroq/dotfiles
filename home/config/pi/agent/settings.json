@@ -9,7 +9,7 @@
   "subagents": {
     "disableBuiltins": true
   },
-  "hideThinkingBlock": true,
+  "hideThinkingBlock": false,
   "theme": "dark",
   "defaultProvider": "FrankAI",
   "defaultModel": "FrankAgent",
