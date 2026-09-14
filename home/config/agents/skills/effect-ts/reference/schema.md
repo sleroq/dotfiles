@@ -101,6 +101,16 @@ Schema.encodeUnknownSync(Value)(value); // boundary serialization
 
 Use synchronous throwing variants only at narrow startup, tooling, or test boundaries where throwing is intentional.
 
+Collection-style constructors take arrays:
+
+```ts
+Schema.Literals(["draft", "published"]);
+Schema.Union([Success, Failure]);
+Schema.Tuple([Schema.String, Schema.Number]);
+```
+
+Define refinements with `Schema.check(Schema.makeFilter(...))`, verifying the exact signatures against the installed beta.
+
 For untrusted JSON strings, use the current Schema JSON-string combinator rather than `JSON.parse` inside `Effect.try`.
 
 ## Unknown values

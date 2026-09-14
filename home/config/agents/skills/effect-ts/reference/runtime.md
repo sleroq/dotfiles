@@ -40,6 +40,8 @@ const value =
 
 Avoid calling global `Effect.runPromise` from inside application modules when an assembled runtime already exists.
 
+Use `Effect.runForkWith(services)` for lower-level runtime execution and `Effect.context()` to access the current context. Prefer `ManagedRuntime` at application boundaries over manually passing runtime values.
+
 ## Callback boundaries
 
 Use `Effect.callback` when an external API completes through callbacks:
@@ -74,6 +76,8 @@ const connection =
 ```
 
 Place background fibers associated with the resource in the same scope with `Effect.forkScoped` or `Effect.forkIn(scope)`. The scope should own both the resource and its background work.
+
+Use `Scope.provide` to provide a scope. Although v4 keeps suspended fibers alive, use the platform's `runMain` at process entry points for signal handling, exit codes, and unhandled-error reporting.
 
 ## Entry points
 

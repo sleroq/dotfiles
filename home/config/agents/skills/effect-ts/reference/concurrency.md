@@ -47,6 +47,18 @@ yield * Deferred.await(ready);
 
 Use `Deferred.makeUnsafe` only when a synchronous constructor is required by synchronous state setup. “Unsafe” means construction is outside the normal Effect operation, not that the value has different scope semantics.
 
+In v4, `Ref`, `Deferred`, and `Fiber` are no longer Effect subtypes. Read or await them explicitly:
+
+```ts
+yield * Ref.get(ref);
+yield * Deferred.await(ready);
+yield * Fiber.join(fiber);
+```
+
+When an API requires an `Effect` rather than a general `Yieldable`, convert with `.asEffect()`.
+
+For fiber-local state, use `Context.Reference` and `References`. Apply scoped reference changes with `Effect.provideService`.
+
 ## FiberSet and FiberMap
 
 `FiberSet.run` and `FiberMap.run` return Effects; execute them:

@@ -11,10 +11,10 @@ Use this skill for portable Effect v4 TypeScript code.
 
 1. Follow the nearest project instructions and local conventions.
 2. Check the installed Effect version before choosing APIs.
-3. Verify unfamiliar APIs in the matching Effect source and official documentation. Do not rely on v2/v3 examples or memory.
+3. Verify unfamiliar APIs in the matching Effect source and official documentation. Do not rely on memory.
 4. Prefer the newest established, tested local pattern when project guidance conflicts, and call out material conflicts.
 
-Effect v4 APIs may move while prereleases evolve. Generic HTTP modules live under `effect/unstable/http` and `effect/unstable/httpapi` in current v4 builds. Add a platform package only when its runtime or platform-specific services are required.
+Effect v4 APIs may move while prereleases evolve. Treat `effect/unstable/*` as version-specific: these modules may break in minor releases, so verify them against the exact installed version. Generic HTTP modules live under `effect/unstable/http` and `effect/unstable/httpapi`. Add a platform package only when its runtime or platform-specific services are required, and keep ecosystem packages on the same v4 beta version as `effect`.
 
 ## Imports and modules
 
@@ -65,6 +65,7 @@ export const UserRepositoryLayer = Layer.effect(
 - Use `Effect.fnUntraced` for reusable internal workflows that do not need spans.
 - Use the service constructor's `of(...)` helper when available to validate implementations.
 - Preserve local service naming and key conventions rather than imposing one universal style.
+- Use `Context.Service`, prefer `yield* Service`, and expose the service's default implementation as `.layer` when one exists.
 
 ## Layers
 
@@ -165,6 +166,7 @@ See [reference/runtime.md](reference/runtime.md).
 - Prefer semaphore permit combinators over manual acquisition and release.
 - Distinguish permanent caching, TTL caching, and explicitly invalidatable caching.
 - Use `Effect.callback` for callback completion and cancellation cleanup.
+- Values such as `Ref`, `Deferred`, and `Fiber` are not Effects in v4. Use `Ref.get(ref)`, `Deferred.await(deferred)`, and `Fiber.join(fiber)` rather than yielding the value itself.
 
 See [reference/concurrency.md](reference/concurrency.md).
 
@@ -202,6 +204,7 @@ See [reference/testing.md](reference/testing.md).
 - Avoid `any`, non-null assertions, unchecked casts, and broad hidden provisioning.
 - Do not swallow failures into `null`; reserve optional values for valid absence.
 - Use Effect-aware filesystem, process, HTTP, path, clock, and configuration services when already inside Effect code.
+- Use `Effect.catch` for all typed failures and `Effect.catchFilter` for filtered recovery.
 
 ## References
 
