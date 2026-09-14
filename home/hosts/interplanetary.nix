@@ -33,8 +33,8 @@ in
       };
     };
     editors = {
-      datagrip.enable = true;
-      zed.enable = true;
+      datagrip.enable = false;
+      zed.enable = false;
     };
     gaming = {
       etterna.enable = true;
