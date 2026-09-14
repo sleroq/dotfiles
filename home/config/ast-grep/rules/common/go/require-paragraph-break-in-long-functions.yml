@@ -1,7 +1,7 @@
 id: require-paragraph-break-in-long-functions
 language: Go
 severity: warning
-message: Separate related steps with blank lines in large functions.
+message: Separate coherent operations into meaningful paragraphs; keep each operation with its error handling and do not add arbitrary blank lines.
 rule:
   all:
     - any:

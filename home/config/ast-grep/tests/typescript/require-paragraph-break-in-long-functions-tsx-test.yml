@@ -1,0 +1,154 @@
+id: require-paragraph-break-in-long-functions-tsx
+valid:
+  - |-
+      function shortPipeline() {
+        step01();
+        step02();
+      }
+  - |-
+      function largeLiteral() {
+        return [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+        ];
+      }
+  - |-
+      const processArticle = async (
+        client: Client,
+        article: Article,
+        parsed: ParsedArticle,
+      ): Promise<Result> => {
+        const attachments = await client.buildAttachments(
+          article.url,
+          parsed.attachments,
+          false,
+        );
+        if (!attachments.ok) {
+          return attachments.error;
+        }
+
+        const classifications = await client.classifyAttachments(
+          article.url,
+          attachments.value,
+          parsed.failedImages,
+        );
+        if (!classifications.ok) {
+          return classifications.error;
+        }
+
+        const report = await client.buildReport(
+          article,
+          parsed,
+          classifications.value,
+        );
+        if (!report.ok) {
+          return report.error;
+        }
+
+        const saved = await client.saveReport(
+          article.url,
+          report.value,
+          attachments.value,
+        );
+        if (!saved.ok) {
+          return saved.error;
+        }
+
+        const published = await client.publishReport(
+          article.url,
+          saved.value,
+          classifications.value,
+        );
+        if (!published.ok) {
+          return published.error;
+        }
+
+        return published.value;
+      };
+invalid:
+  - |-
+      const processArticle = async (
+        client: Client,
+        article: Article,
+        parsed: ParsedArticle,
+      ): Promise<Result> => {
+        const attachments = await client.buildAttachments(
+          article.url,
+          parsed.attachments,
+          false,
+        );
+        if (!attachments.ok) {
+          return attachments.error;
+        }
+        const classifications = await client.classifyAttachments(
+          article.url,
+          attachments.value,
+          parsed.failedImages,
+        );
+        if (!classifications.ok) {
+          return classifications.error;
+        }
+        const report = await client.buildReport(
+          article,
+          parsed,
+          classifications.value,
+        );
+        if (!report.ok) {
+          return report.error;
+        }
+        const saved = await client.saveReport(
+          article.url,
+          report.value,
+          attachments.value,
+        );
+        if (!saved.ok) {
+          return saved.error;
+        }
+        const published = await client.publishReport(
+          article.url,
+          saved.value,
+          classifications.value,
+        );
+        if (!published.ok) {
+          return published.error;
+        }
+        return published.value;
+      };

@@ -1,0 +1,148 @@
+id: require-paragraph-break-in-long-functions-javascript
+snapshots:
+  ? |-
+    async function processArticle(client, article, parsed) {
+      const attachments = await client.buildAttachments(
+        article.url,
+        parsed.attachments,
+        false,
+      );
+      if (!attachments.ok) {
+        return attachments.error;
+      }
+      const classifications = await client.classifyAttachments(
+        article.url,
+        attachments.value,
+        parsed.failedImages,
+      );
+      if (!classifications.ok) {
+        return classifications.error;
+      }
+      const report = await client.buildReport(
+        article,
+        parsed,
+        classifications.value,
+      );
+      if (!report.ok) {
+        return report.error;
+      }
+      const saved = await client.saveReport(
+        article.url,
+        report.value,
+        attachments.value,
+      );
+      if (!saved.ok) {
+        return saved.error;
+      }
+      const published = await client.publishReport(
+        article.url,
+        saved.value,
+        classifications.value,
+      );
+      if (!published.ok) {
+        return published.error;
+      }
+      return published.value;
+    }
+  : labels:
+    - source: |-
+        async function processArticle(client, article, parsed) {
+          const attachments = await client.buildAttachments(
+            article.url,
+            parsed.attachments,
+            false,
+          );
+          if (!attachments.ok) {
+            return attachments.error;
+          }
+          const classifications = await client.classifyAttachments(
+            article.url,
+            attachments.value,
+            parsed.failedImages,
+          );
+          if (!classifications.ok) {
+            return classifications.error;
+          }
+          const report = await client.buildReport(
+            article,
+            parsed,
+            classifications.value,
+          );
+          if (!report.ok) {
+            return report.error;
+          }
+          const saved = await client.saveReport(
+            article.url,
+            report.value,
+            attachments.value,
+          );
+          if (!saved.ok) {
+            return saved.error;
+          }
+          const published = await client.publishReport(
+            article.url,
+            saved.value,
+            classifications.value,
+          );
+          if (!published.ok) {
+            return published.error;
+          }
+          return published.value;
+        }
+      style: primary
+      start: 0
+      end: 919
+    - source: |-
+        if (!attachments.ok) {
+            return attachments.error;
+          }
+      style: secondary
+      start: 169
+      end: 225
+    - source: |-
+        {
+          const attachments = await client.buildAttachments(
+            article.url,
+            parsed.attachments,
+            false,
+          );
+          if (!attachments.ok) {
+            return attachments.error;
+          }
+          const classifications = await client.classifyAttachments(
+            article.url,
+            attachments.value,
+            parsed.failedImages,
+          );
+          if (!classifications.ok) {
+            return classifications.error;
+          }
+          const report = await client.buildReport(
+            article,
+            parsed,
+            classifications.value,
+          );
+          if (!report.ok) {
+            return report.error;
+          }
+          const saved = await client.saveReport(
+            article.url,
+            report.value,
+            attachments.value,
+          );
+          if (!saved.ok) {
+            return saved.error;
+          }
+          const published = await client.publishReport(
+            article.url,
+            saved.value,
+            classifications.value,
+          );
+          if (!published.ok) {
+            return published.error;
+          }
+          return published.value;
+        }
+      style: secondary
+      start: 55
+      end: 919

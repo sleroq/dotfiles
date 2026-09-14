@@ -1,0 +1,156 @@
+id: require-paragraph-break-in-long-functions-tsx
+snapshots:
+  ? |-
+    const processArticle = async (
+      client: Client,
+      article: Article,
+      parsed: ParsedArticle,
+    ): Promise<Result> => {
+      const attachments = await client.buildAttachments(
+        article.url,
+        parsed.attachments,
+        false,
+      );
+      if (!attachments.ok) {
+        return attachments.error;
+      }
+      const classifications = await client.classifyAttachments(
+        article.url,
+        attachments.value,
+        parsed.failedImages,
+      );
+      if (!classifications.ok) {
+        return classifications.error;
+      }
+      const report = await client.buildReport(
+        article,
+        parsed,
+        classifications.value,
+      );
+      if (!report.ok) {
+        return report.error;
+      }
+      const saved = await client.saveReport(
+        article.url,
+        report.value,
+        attachments.value,
+      );
+      if (!saved.ok) {
+        return saved.error;
+      }
+      const published = await client.publishReport(
+        article.url,
+        saved.value,
+        classifications.value,
+      );
+      if (!published.ok) {
+        return published.error;
+      }
+      return published.value;
+    };
+  : labels:
+    - source: |-
+        async (
+          client: Client,
+          article: Article,
+          parsed: ParsedArticle,
+        ): Promise<Result> => {
+          const attachments = await client.buildAttachments(
+            article.url,
+            parsed.attachments,
+            false,
+          );
+          if (!attachments.ok) {
+            return attachments.error;
+          }
+          const classifications = await client.classifyAttachments(
+            article.url,
+            attachments.value,
+            parsed.failedImages,
+          );
+          if (!classifications.ok) {
+            return classifications.error;
+          }
+          const report = await client.buildReport(
+            article,
+            parsed,
+            classifications.value,
+          );
+          if (!report.ok) {
+            return report.error;
+          }
+          const saved = await client.saveReport(
+            article.url,
+            report.value,
+            attachments.value,
+          );
+          if (!saved.ok) {
+            return saved.error;
+          }
+          const published = await client.publishReport(
+            article.url,
+            saved.value,
+            classifications.value,
+          );
+          if (!published.ok) {
+            return published.error;
+          }
+          return published.value;
+        }
+      style: primary
+      start: 23
+      end: 980
+    - source: |-
+        if (!attachments.ok) {
+            return attachments.error;
+          }
+      style: secondary
+      start: 230
+      end: 286
+    - source: |-
+        {
+          const attachments = await client.buildAttachments(
+            article.url,
+            parsed.attachments,
+            false,
+          );
+          if (!attachments.ok) {
+            return attachments.error;
+          }
+          const classifications = await client.classifyAttachments(
+            article.url,
+            attachments.value,
+            parsed.failedImages,
+          );
+          if (!classifications.ok) {
+            return classifications.error;
+          }
+          const report = await client.buildReport(
+            article,
+            parsed,
+            classifications.value,
+          );
+          if (!report.ok) {
+            return report.error;
+          }
+          const saved = await client.saveReport(
+            article.url,
+            report.value,
+            attachments.value,
+          );
+          if (!saved.ok) {
+            return saved.error;
+          }
+          const published = await client.publishReport(
+            article.url,
+            saved.value,
+            classifications.value,
+          );
+          if (!published.ok) {
+            return published.error;
+          }
+          return published.value;
+        }
+      style: secondary
+      start: 116
+      end: 980

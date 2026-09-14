@@ -51,90 +51,106 @@ valid:
         }
       }
   - |-
-      func groupedPipeline() {
-        step01()
-        step02()
-        step03()
-        step04()
-        step05()
-        step06()
-        step07()
-        step08()
-        step09()
-        step10()
-        step11()
-        step12()
-        step13()
-        step14()
-        step15()
-        step16()
-        step17()
-        step18()
-        step19()
-        step20()
+      func (c *Client) processArticle(ctx context.Context, article Article, parsed ParsedArticle) error {
+        attachments, failedImages, err := c.buildAttachments(
+          ctx,
+          article.URL,
+          parsed.Attachments,
+          false,
+        )
+        if err != nil {
+          return err
+        }
 
-        step21()
-        step22()
-        step23()
-        step24()
-        step25()
-        step26()
-        step27()
-        step28()
-        step29()
-        step30()
-        step31()
-        step32()
-        step33()
-        step34()
-        step35()
-        step36()
-        step37()
-        step38()
-        step39()
-        step40()
+        classifications, err := c.classifyAttachments(
+          ctx,
+          article.URL,
+          attachments,
+          failedImages,
+        )
+        if err != nil {
+          return err
+        }
+
+        report, err := c.buildReport(
+          ctx,
+          article,
+          parsed,
+          classifications,
+        )
+        if err != nil {
+          return err
+        }
+
+        saved, err := c.saveReport(
+          ctx,
+          article.URL,
+          report,
+          attachments,
+        )
+        if err != nil {
+          return err
+        }
+
+        err = c.publishReport(
+          ctx,
+          article.URL,
+          saved,
+          classifications,
+        )
+        if err != nil {
+          return err
+        }
+
+        return nil
       }
 invalid:
   - |-
-      func (s *Service) densePipeline() {
-        step01()
-        step02()
-        step03()
-        step04()
-        step05()
-        step06()
-        step07()
-        step08()
-        step09()
-        step10()
-        step11()
-        step12()
-        step13()
-        step14()
-        step15()
-        step16()
-        step17()
-        step18()
-        step19()
-        step20()
-        step21()
-        step22()
-        step23()
-        step24()
-        step25()
-        step26()
-        step27()
-        step28()
-        step29()
-        step30()
-        step31()
-        step32()
-        step33()
-        step34()
-        step35()
-        step36()
-        step37()
-        step38()
-        step39()
-        step40()
+      func (c *Client) processArticle(ctx context.Context, article Article, parsed ParsedArticle) error {
+        attachments, failedImages, err := c.buildAttachments(
+          ctx,
+          article.URL,
+          parsed.Attachments,
+          false,
+        )
+        if err != nil {
+          return err
+        }
+        classifications, err := c.classifyAttachments(
+          ctx,
+          article.URL,
+          attachments,
+          failedImages,
+        )
+        if err != nil {
+          return err
+        }
+        report, err := c.buildReport(
+          ctx,
+          article,
+          parsed,
+          classifications,
+        )
+        if err != nil {
+          return err
+        }
+        saved, err := c.saveReport(
+          ctx,
+          article.URL,
+          report,
+          attachments,
+        )
+        if err != nil {
+          return err
+        }
+        err = c.publishReport(
+          ctx,
+          article.URL,
+          saved,
+          classifications,
+        )
+        if err != nil {
+          return err
+        }
+        return nil
       }
