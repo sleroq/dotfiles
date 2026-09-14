@@ -1,0 +1,71 @@
+id: require-paragraph-break-in-long-functions
+language: Go
+severity: warning
+message: Separate related steps with blank lines in large functions.
+rule:
+  all:
+    - any:
+        - kind: function_declaration
+        - kind: method_declaration
+    - has:
+        field: body
+        stopBy: neighbor
+        all:
+          - kind: block
+          - regex: '(?s)^(?:[^\n]*\n){40,}[^\n]*$'
+          - not:
+              regex: '(?s)^.*\n[ \t]*\n.*$'
+          - has:
+              stopBy: end
+              all:
+                - any:
+                    - kind: expression_statement
+                    - kind: send_statement
+                    - kind: inc_statement
+                    - kind: assignment_statement
+                    - kind: short_var_declaration
+                    - kind: empty_statement
+                    - kind: go_statement
+                    - kind: defer_statement
+                    - kind: return_statement
+                    - kind: break_statement
+                    - kind: continue_statement
+                    - kind: goto_statement
+                    - kind: fallthrough_statement
+                    - kind: block
+                    - kind: if_statement
+                    - kind: expression_switch_statement
+                    - kind: type_switch_statement
+                    - kind: select_statement
+                    - kind: for_statement
+                    - kind: var_declaration
+                    - kind: const_declaration
+                    - kind: type_declaration
+                    - kind: labeled_statement
+                - nthChild:
+                    position: 2
+                    ofRule:
+                      any:
+                        - kind: expression_statement
+                        - kind: send_statement
+                        - kind: inc_statement
+                        - kind: assignment_statement
+                        - kind: short_var_declaration
+                        - kind: empty_statement
+                        - kind: go_statement
+                        - kind: defer_statement
+                        - kind: return_statement
+                        - kind: break_statement
+                        - kind: continue_statement
+                        - kind: goto_statement
+                        - kind: fallthrough_statement
+                        - kind: block
+                        - kind: if_statement
+                        - kind: expression_switch_statement
+                        - kind: type_switch_statement
+                        - kind: select_statement
+                        - kind: for_statement
+                        - kind: var_declaration
+                        - kind: const_declaration
+                        - kind: type_declaration
+                        - kind: labeled_statement

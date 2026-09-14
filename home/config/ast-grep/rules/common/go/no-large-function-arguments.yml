@@ -1,0 +1,19 @@
+id: no-large-function-arguments
+language: Go
+severity: warning
+message: Extract anonymous functions longer than five lines when passed with at least two other arguments.
+rule:
+  all:
+    - kind: func_literal
+    - inside:
+        all:
+          - kind: argument_list
+          - has:
+              all:
+                - regex: '(?s).+'
+                - nthChild:
+                    position: 3
+                    ofRule:
+                      regex: '(?s).+'
+        stopBy: neighbor
+    - regex: '(?s)^[^\n]*(?:\n[^\n]*){5,}$'

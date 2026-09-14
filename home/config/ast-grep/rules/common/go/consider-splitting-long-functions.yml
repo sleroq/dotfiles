@@ -1,0 +1,15 @@
+id: consider-splitting-long-functions
+language: Go
+severity: warning
+message: This function may combine too many responsibilities; consider extracting coherent operations.
+rule:
+  all:
+    - any:
+        - kind: function_declaration
+        - kind: method_declaration
+    - has:
+        field: body
+        stopBy: neighbor
+        all:
+          - kind: block
+          - regex: '(?s)^(?:[^\n]*\n){100,}[^\n]*$'

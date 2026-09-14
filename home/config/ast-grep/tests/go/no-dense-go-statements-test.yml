@@ -1,15 +1,15 @@
 id: no-dense-go-statements
 valid:
-  - automatic := aipipeline.NewAutomaticService(db, config)
-  - 'return runBotClient(groupCtx, telegram.botRuntime, config, telegram.account, investNewsWatcherDB, lg.Named("bot"))'
+  - processor := service.NewProcessor(store, options)
+  - 'return executeTask(ctx, runtime.worker, options, runtime.credentials, primaryStore, log.Named("worker"))'
   - |-
-      automatic := aipipeline.NewAutomaticService(
-        db,
-        sheetStore,
-        ai,
-        automaticConfig,
-        logger.Named("automatic"),
+      processor := service.NewProcessor(
+        store,
+        cache,
+        client,
+        processorOptions,
+        logger.Named("processor"),
       )
 invalid:
-  - automatic := aipipeline.NewAutomaticService(db, sheetStore, ai, automaticConfig, logger.Named("automatic-with-an-excessively-long-name"))
-  - 'return runUserClient(groupCtx, telegram.userRuntime, config, telegram.account, investNewsWatcherDB, imageProcessingDisabledSources, authorExtractor, lg.Named("user"))'
+  - processor := service.NewProcessor(store, cache, client, processorOptions, logger.Named("processor-with-an-intentionally-long-name"))
+  - 'return executeTask(requestContext, runtime.worker, options, runtime.credentials, primaryStore, disabledInputs, metadataParser, log.Named("worker"))'

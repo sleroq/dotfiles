@@ -1,0 +1,50 @@
+id: no-large-function-arguments
+valid:
+  - 'run(func() error { return nil })'
+  - |-
+      run(func() error {
+        prepare()
+        process()
+        return nil
+      })
+  - |-
+      callback := func() error {
+        prepare()
+        process()
+        finalize()
+        return nil
+      }
+      run(callback)
+  - |-
+      run(func() error {
+        prepare()
+        process()
+        finalize()
+        observe()
+        return nil
+      })
+  - |-
+      run(ctx, func(event RunnerEvent) {
+        message := manualProgressMessage(event)
+        progress(ManualRunProgress{
+          Stage: event.Stage,
+          Message: message,
+        })
+      })
+invalid:
+  - |-
+      run(ctx, inputs, func() error {
+        prepare()
+        process()
+        finalize()
+        observe()
+        return nil
+      })
+  - |-
+      run(ctx, inputs, func(event RunnerEvent) {
+        message := manualProgressMessage(event)
+        progress(ManualRunProgress{
+          Stage: event.Stage,
+          Message: message,
+        })
+      }, logger)
