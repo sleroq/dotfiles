@@ -1,0 +1,35 @@
+id: no-complex-struct-arguments
+valid:
+  - 'consume(Point{X: 1, Y: 2, Z: 3})'
+  - |-
+      consume(Point{
+        X: 1,
+        Y: 2,
+        Z: 3,
+        W: 4,
+      })
+  - |-
+      point := Point{
+        X: 1,
+        Y: 2,
+        Z: 3,
+        W: 4,
+      }
+      consume(point)
+  - |-
+      consume([]string{
+        "first",
+        "second",
+      })
+  - |-
+      consume(map[string]int{
+        "first": 1,
+        "second": 2,
+      })
+invalid:
+  - 'consume(context.Background(), Point{X: 1, Y: 2, Z: 3, W: 4})'
+  - |-
+      consume(context.Background(), model.Point{
+        X: 1,
+        Y: 2,
+      }, logger)

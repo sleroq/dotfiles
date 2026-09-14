@@ -1,0 +1,14 @@
+id: no-dense-go-statements
+language: Go
+severity: warning
+message: Split long statements across lines or into named setup steps.
+rule:
+  all:
+    - any:
+        - kind: short_var_declaration
+        - kind: assignment_statement
+        - kind: expression_statement
+        - kind: return_statement
+        - kind: go_statement
+        - kind: defer_statement
+    - regex: '^[^\n]{120,}$'

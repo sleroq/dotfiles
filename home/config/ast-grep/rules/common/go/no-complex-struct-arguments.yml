@@ -1,0 +1,46 @@
+id: no-complex-struct-arguments
+language: Go
+severity: warning
+message: Extract multiline structs and structs with more than three fields when mixed with other arguments.
+rule:
+  all:
+    - kind: composite_literal
+    - has:
+        field: type
+        stopBy: neighbor
+        any:
+          - kind: type_identifier
+          - kind: qualified_type
+    - inside:
+        kind: argument_list
+        stopBy: neighbor
+    - not:
+        all:
+          - nthChild:
+              position: 1
+              ofRule:
+                regex: '(?s).+'
+          - nthChild:
+              position: 1
+              reverse: true
+              ofRule:
+                regex: '(?s).+'
+    - has:
+        field: body
+        kind: literal_value
+        stopBy: neighbor
+        has:
+          kind: keyed_element
+    - any:
+        - regex: '(?s)^.*\n.*$'
+        - has:
+            field: body
+            kind: literal_value
+            stopBy: neighbor
+            has:
+              all:
+                - kind: keyed_element
+                - nthChild:
+                    position: 4
+                    ofRule:
+                      kind: keyed_element

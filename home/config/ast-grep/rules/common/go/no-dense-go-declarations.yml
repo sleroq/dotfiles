@@ -1,8 +1,0 @@
-id: no-dense-go-declarations
-language: Go
-severity: warning
-message: Split long declarations into named setup steps.
-rule:
-  all:
-    - kind: short_var_declaration
-    - regex: '^[^\n]{120,}$'
