@@ -103,7 +103,7 @@
       imports = [ inputs.easy-hosts.flakeModule ];
 
       systems = [
-        "x86_64-nixos"
+        "x86_64-linux"
         "aarch64-darwin"
       ];
 
