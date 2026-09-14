@@ -1,0 +1,13 @@
+id: no-dense-go-declarations
+valid:
+  - automatic := aipipeline.NewAutomaticService(db, config)
+  - |-
+      automatic := aipipeline.NewAutomaticService(
+        db,
+        sheetStore,
+        ai,
+        automaticConfig,
+        logger.Named("automatic"),
+      )
+invalid:
+  - automatic := aipipeline.NewAutomaticService(db, sheetStore, ai, automaticConfig, logger.Named("automatic-with-an-excessively-long-name"))
