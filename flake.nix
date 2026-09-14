@@ -8,7 +8,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
-    sb.url = "git+file:///Users/sleroq/develop/sb";
+    sb.url = "github:sleroq/proxy-helper";
     sb.inputs.nixpkgs.follows = "nixpkgs";
 
     easy-hosts.url = "github:tgirlcloud/easy-hosts";
