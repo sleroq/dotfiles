@@ -1,0 +1,20 @@
+id: no-unknown-parameters-typescript
+language: TypeScript
+message: This parameter leaves input unparsed. Accept a named domain type and parse external input at its boundary.
+severity: warning
+files:
+  - develop/**
+rule:
+  any:
+    - all:
+        - kind: required_parameter
+        - regex: :\s*unknown\s*$
+        - not:
+            regex: |-
+              ^(?:\.\.\.)?cause\??\s*:
+    - all:
+        - kind: optional_parameter
+        - regex: :\s*unknown\s*$
+        - not:
+            regex: |-
+              ^cause\??\s*:

@@ -1,0 +1,11 @@
+id: no-unsafe-dictionary-type-tsx
+valid:
+  - |-
+      type Values = Record<string, Payload>;
+  - |-
+      type Values = { [key: string]: Payload };
+invalid:
+  - |-
+      type Values = Record<string, unknown>;
+  - |-
+      type Values = { [key: string]: any };

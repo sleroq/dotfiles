@@ -1,0 +1,44 @@
+id: no-quality-gate-allow-failure
+snapshots:
+  ? |-
+    lint:
+      stage: lint
+      script: npm run lint
+      allow_failure: true
+  : labels:
+    - source: 'allow_failure: true'
+      style: primary
+      start: 45
+      end: 64
+    - source: 'stage: lint'
+      style: secondary
+      start: 8
+      end: 19
+    - source: |-
+        stage: lint
+          script: npm run lint
+          allow_failure: true
+      style: secondary
+      start: 8
+      end: 64
+  ? |-
+    sast:
+      stage: test
+      script: run-sast
+      allow_failure: true
+  : labels:
+    - source: 'allow_failure: true'
+      style: primary
+      start: 41
+      end: 60
+    - source: 'stage: test'
+      style: secondary
+      start: 8
+      end: 19
+    - source: |-
+        stage: test
+          script: run-sast
+          allow_failure: true
+      style: secondary
+      start: 8
+      end: 60

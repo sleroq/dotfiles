@@ -1,0 +1,14 @@
+id: no-yaml-anchors-or-reference
+language: Yaml
+message: Do not use YAML anchors, aliases, or GitLab !reference; duplicate the configuration explicitly.
+severity: warning
+files:
+    - develop/**/.gitlab-ci.yml
+    - develop/**/.gitlab-ci.yaml
+rule:
+    any:
+        - kind: anchor
+        - kind: alias
+        - all:
+              - kind: tag
+              - regex: '^!reference$'

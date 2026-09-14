@@ -1,0 +1,11 @@
+id: no-unknown-parameters-typescript
+valid:
+  - |-
+      function enrich(cause: unknown) {}
+  - |-
+      function parse(value: Payload) {}
+invalid:
+  - |-
+      function parse(value: unknown) {}
+  - |-
+      const parse = (...values: unknown) => values;

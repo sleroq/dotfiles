@@ -1,0 +1,23 @@
+id: no-quality-gate-allow-failure
+valid:
+  - |-
+    test:
+      stage: test
+      script: go test ./...
+      allow_failure: false
+  - |-
+    deploy-preview:
+      stage: deploy
+      script: deploy preview
+      allow_failure: true
+invalid:
+  - |-
+    lint:
+      stage: lint
+      script: npm run lint
+      allow_failure: true
+  - |-
+    sast:
+      stage: test
+      script: run-sast
+      allow_failure: true

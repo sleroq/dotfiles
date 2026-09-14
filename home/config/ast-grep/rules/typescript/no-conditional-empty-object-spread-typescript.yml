@@ -1,0 +1,10 @@
+id: no-conditional-empty-object-spread-typescript
+language: TypeScript
+message: Build the object explicitly instead of conditionally spreading an empty object.
+severity: warning
+files:
+  - develop/**
+rule:
+  all:
+    - kind: spread_element
+    - regex: (?:\?\s*\{\s*\}|:\s*\{\s*\})

@@ -1,0 +1,11 @@
+id: no-unknown-type-aliases-tsx
+valid:
+  - |-
+      type Payload = string;
+  - |-
+      type MaybePayload = Payload | undefined;
+invalid:
+  - |-
+      type Payload = unknown;
+  - |-
+      export type Input = (unknown);

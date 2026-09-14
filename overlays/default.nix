@@ -3,6 +3,8 @@
   scrcpyPkgs,
   nixpkgs-master,
   nixpkgs,
+  rust-overlay,
+  sb,
 }:
 let
   inherit (nixpkgs.lib) composeManyExtensions;
@@ -38,10 +40,22 @@ rec {
     broadcast-box = final.callPackage ../packages/broadcast-box.nix { };
   };
 
+  sing-box-subscribe-cli = final: prev: {
+    sing-box-subscribe-cli = final.callPackage ../packages/sing-box-subscribe-cli.nix { };
+  };
+
+  trusttunnel-client = final: prev: {
+    trusttunnel-client = final.callPackage ../packages/trusttunnel-client.nix { };
+  };
+
   default = composeManyExtensions [
+    sb.overlays.default
+    rust-overlay.overlays.default
     scrcpy
     code-cursor
     # opencode
     broadcast-box
+    sing-box-subscribe-cli
+    trusttunnel-client
   ];
 }

@@ -1,0 +1,171 @@
+id: no-known-value-widening-typescript
+language: TypeScript
+message: This explicit broad type discards known type evidence. Keep inference, validate with `satisfies`, or use a named owner contract.
+severity: warning
+files:
+  - develop/**
+utils:
+  broad-type:
+    any:
+      - kind: predefined_type
+        regex: ^(?:unknown|object)$
+      - all:
+          - kind: object_type
+          - not:
+              regex: ^\{\s*\}$
+      - kind: generic_type
+        regex: ^(?:(?:Readonly|Partial|Required|NonNullable)\s*<\s*)*(?:Record\s*<|unknown\b|object\b|\{)
+  dictionary-type:
+    any:
+      - all:
+          - kind: object_type
+          - has:
+              kind: index_signature
+      - kind: generic_type
+        regex: ^(?:(?:Readonly|Partial|Required|NonNullable)\s*<\s*)*Record\s*<
+  broad-annotation:
+    all:
+      - kind: type_annotation
+      - has:
+          matches: broad-type
+  dictionary-annotation:
+    all:
+      - kind: type_annotation
+      - has:
+          matches: dictionary-type
+  known-expression:
+    any:
+      - kind: object
+      - kind: array
+      - kind: arrow_function
+      - kind: function_expression
+      - kind: class
+      - kind: new_expression
+      - kind: string
+      - kind: template_string
+      - kind: number
+      - kind: regex
+      - kind: "true"
+      - kind: "false"
+      - kind: "null"
+      - kind: unary_expression
+      - all:
+          - any:
+              - kind: as_expression
+              - kind: type_assertion
+              - kind: non_null_expression
+              - kind: satisfies_expression
+          - has:
+              matches: known-expression
+  empty-object-expression:
+    any:
+      - kind: object
+        regex: ^\{\s*\}$
+      - all:
+          - any:
+              - kind: as_expression
+              - kind: type_assertion
+              - kind: non_null_expression
+              - kind: satisfies_expression
+          - has:
+              matches: empty-object-expression
+  initialized-binding-or-property:
+    all:
+      - any:
+          - kind: variable_declarator
+          - kind: public_field_definition
+      - has:
+          field: type
+          matches: broad-annotation
+      - has:
+          field: value
+          matches: known-expression
+      - not:
+          all:
+            - has:
+                field: type
+                matches: dictionary-annotation
+            - has:
+                field: value
+                matches: empty-object-expression
+  function-boundary:
+    any:
+      - kind: function_declaration
+      - kind: function_expression
+      - kind: method_definition
+      - kind: arrow_function
+  known-return:
+    all:
+      - kind: return_statement
+      - has:
+          matches: known-expression
+  nonempty-known-return:
+    all:
+      - matches: known-return
+      - not:
+          has:
+            matches: empty-object-expression
+  broad-return:
+    all:
+      - matches: function-boundary
+      - has:
+          field: return_type
+          matches: broad-annotation
+      - any:
+          - all:
+              - not:
+                  has:
+                    field: return_type
+                    matches: dictionary-annotation
+              - any:
+                  - has:
+                      field: body
+                      matches: known-expression
+                  - has:
+                      matches: known-return
+                      stopBy:
+                        matches: function-boundary
+          - all:
+              - has:
+                  field: return_type
+                  matches: dictionary-annotation
+              - any:
+                  - all:
+                      - has:
+                          field: body
+                          matches: known-expression
+                      - not:
+                          has:
+                            field: body
+                            matches: empty-object-expression
+                  - has:
+                      matches: nonempty-known-return
+                      stopBy:
+                        matches: function-boundary
+  widening-assertion:
+    all:
+      - any:
+          - kind: as_expression
+          - kind: type_assertion
+      - has:
+          matches: broad-type
+          stopBy: end
+      - has:
+          matches: known-expression
+      - not:
+          all:
+            - has:
+                matches: dictionary-type
+                stopBy: end
+            - has:
+                matches: empty-object-expression
+      - not:
+          inside:
+            any:
+              - kind: as_expression
+              - kind: type_assertion
+rule:
+  any:
+    - matches: initialized-binding-or-property
+    - matches: broad-return
+    - matches: widening-assertion

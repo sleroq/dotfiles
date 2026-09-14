@@ -1,0 +1,20 @@
+id: no-shape-in-symbol-names-typescript
+language: TypeScript
+message: Rename this symbol for its domain role; shape describes structure rather than ownership.
+severity: warning
+files:
+  - develop/**
+rule:
+  any:
+    - all:
+        - kind: identifier
+        - regex: (?i)shape
+    - all:
+        - kind: type_identifier
+        - regex: (?i)shape
+    - all:
+        - kind: property_identifier
+        - regex: (?i)shape
+    - all:
+        - kind: private_property_identifier
+        - regex: (?i)shape

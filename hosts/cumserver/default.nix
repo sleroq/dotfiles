@@ -35,6 +35,7 @@ in
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
     ./modules/caddy.nix
+    ./modules/attic.nix
     ./modules/dev-env.nix
     ./modules/matterbridge.nix
     ./modules/mailserver.nix
@@ -47,8 +48,8 @@ in
     ./modules/oven-media-engine.nix
     ./modules/tuwunel.nix
     ./modules/element-call.nix
-    ./modules/marzban.nix
     ./modules/remnawave.nix
+    ./modules/remnawave-div-relay.nix
     ./modules/manictime.nix
     ./modules/traggo.nix
     ./modules/slusha.nix
@@ -56,6 +57,7 @@ in
     ./modules/minecraft.nix
     ./modules/frp.nix
     ./modules/restic.nix
+    ./modules/trusttunnel.nix
     ../../modules/syncplay.nix
     bayan
     kopoka
@@ -96,12 +98,23 @@ in
   '';
 
   cumserver.caddy.enable = true;
+  cumserver.attic.enable = true;
   cumserver.dev-env.enable = true;
   cumserver.matterbridge.enable = true;
   cumserver.mailserver.enable = true;
   cumserver.radicale.enable = true;
   cumserver.bore.enable = true;
   cumserver.podman.enable = true;
+
+  age.secrets.trusttunnelCredentials = {
+    owner = "trusttunnel";
+    group = "trusttunnel";
+    file = ./secrets/trusttunnelCredentials;
+  };
+  cumserver.trusttunnel = {
+    enable = true;
+    credentialsFile = config.age.secrets.trusttunnelCredentials.path;
+  };
 
   services.dockerRegistry = {
     enable = true;
@@ -128,16 +141,6 @@ in
     livekitKeyFile = config.age.secrets.livekitKeys.path;
   };
 
-  age.secrets.marzbanMetricsEnv = {
-    owner = "root";
-    group = "root";
-    file = ./secrets/marzbanMetricsEnv;
-  };
-  cumserver.marzban = {
-    enable = true;
-    metricsEnvironmentFile = config.age.secrets.marzbanMetricsEnv.path;
-  };
-
   age.secrets.remnawaveEnv.file = ./secrets/remnawaveEnv;
   age.secrets.remnawaveMetricsPassword = {
     owner = "prometheus";
@@ -145,6 +148,12 @@ in
     file = ./secrets/remnawaveMetricsPassword;
   };
   age.secrets.remnawaveSubscriptionPageEnv.file = ./secrets/remnawaveSubscriptionPageEnv;
+  age.secrets.remnawaveNodeEnv.file = ./secrets/remnawaveNodeEnv;
+  age.secrets.remnawaveToken.file = ./secrets/remnawaveToken;
+  age.secrets.remnawaveWarsawCertSyncKey = {
+    file = ./secrets/remnawaveWarsawCertSyncKey;
+    mode = "0400";
+  };
 
   cumserver.remnawave = {
     enable = true;
@@ -155,11 +164,19 @@ in
     environmentFile = config.age.secrets.remnawaveEnv.path;
     metricsPasswordFile = config.age.secrets.remnawaveMetricsPassword.path;
     subscriptionPage = {
-      enable = false;
-      domain = null;
+      enable = true;
+      domain = "uwu.sleroq.link";
       environmentFile = config.age.secrets.remnawaveSubscriptionPageEnv.path;
     };
+    node = {
+      enable = true;
+      clientTcpPort = 2080;
+      clientUdpPort = 8444;
+      environmentFile = config.age.secrets.remnawaveNodeEnv.path;
+    };
   };
+
+  cumserver.remnawaveDivRelay.enable = true;
 
   cumserver.manictime = {
     enable = false;
@@ -195,7 +212,7 @@ in
     remoteNodes = [
       {
         name = "Poland";
-        address = "${secrets.marzbanNode1IP}:9100";
+        address = "${secrets.polandNodeIP}:9100";
         passwordPath = config.age.secrets.nodeExporter1Password.path;
         enableTLS = true;
         tlsInsecure = true;

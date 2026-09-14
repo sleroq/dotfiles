@@ -1,0 +1,18 @@
+id: require-gitlab-deploy-resource-group
+language: Yaml
+message: Set resource_group on deploy jobs to serialize deployments to a shared environment.
+severity: warning
+files:
+  - develop/**/.gitlab-ci.yml
+  - develop/**/.gitlab-ci.yaml
+rule:
+  all:
+    - pattern: 'stage: deploy'
+    - inside:
+        stopBy: end
+        all:
+          - kind: block_mapping
+          - not:
+              has:
+                stopBy: end
+                pattern: 'resource_group: $GROUP'

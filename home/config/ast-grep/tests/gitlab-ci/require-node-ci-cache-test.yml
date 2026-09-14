@@ -1,0 +1,43 @@
+id: require-node-ci-cache
+valid:
+  - |-
+    test:
+      script:
+        - npm run test
+  - |-
+    default:
+      cache:
+        key:
+          files:
+            - package-lock.json
+        paths:
+          - .npm/
+    build:
+      script:
+        - npm run build
+  - |-
+    lint:
+      script:
+        - npm run lint:ci
+      cache:
+        paths:
+          - node_modules/
+  - |-
+    build:
+      script:
+        - npm --workspace=web run build
+      cache:
+        paths:
+          - .next/cache/
+invalid:
+  - |-
+    build:
+      script:
+        - npm run build
+  - |-
+    lint:
+      script: |
+        NODE_ENV=production npm run lint
+      cache:
+        paths:
+          - vendor/

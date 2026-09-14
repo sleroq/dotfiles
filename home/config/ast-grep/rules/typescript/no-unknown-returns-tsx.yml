@@ -1,0 +1,20 @@
+id: no-unknown-returns-tsx
+language: Tsx
+message: This function exposes unknown to its caller. Parse the value at its boundary and return a named domain type.
+severity: warning
+files:
+  - develop/**
+rule:
+  all:
+    - any:
+        - kind: function_declaration
+        - kind: function_expression
+        - kind: arrow_function
+        - kind: method_definition
+        - kind: function_signature
+        - kind: method_signature
+    - has:
+        field: return_type
+        all:
+          - kind: type_annotation
+          - regex: ^:\s*(?:unknown|(?:Promise|PromiseLike)\s*<\s*unknown\s*>|[^;]+\|\s*unknown|unknown\s*\|)

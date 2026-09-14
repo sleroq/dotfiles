@@ -1,0 +1,11 @@
+id: no-shape-in-symbol-names-tsx
+valid:
+  - |-
+      const payloadContract = {};
+  - |-
+      type Result = string;
+invalid:
+  - |-
+      const payloadShape = {};
+  - |-
+      type ShapeResult = string;

@@ -1,0 +1,9 @@
+id: no-widen-then-assert-tsx
+valid:
+  - |-
+      const parsed = value as Payload;
+  - |-
+      const broad = value as unknown;
+invalid:
+  - |-
+      const parsed = (value as unknown) as Payload;

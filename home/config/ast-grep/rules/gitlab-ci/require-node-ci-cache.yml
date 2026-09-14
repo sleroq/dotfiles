@@ -1,0 +1,30 @@
+id: require-node-ci-cache
+language: Yaml
+message: Cache .npm with package-lock.json and cache node_modules or the framework build output by branch.
+severity: warning
+files:
+  - develop/**/.gitlab-ci.yml
+  - develop/**/.gitlab-ci.yaml
+rule:
+  all:
+    - kind: stream
+    - has:
+        stopBy: end
+        all:
+          - any:
+              - kind: string_scalar
+              - kind: block_scalar
+          - regex: '(?m)(^|[;&|]|\n)[[:space:]]*(?:[[:alnum:]_]+=[^[:space:]]+[[:space:]]+)*npm(?:[[:space:]]+--?[[:alnum:]_.-]+(?:=[^[:space:]]+)?)?[[:space:]]+(?:run[[:space:]]+)?(?:build|lint)(?::[[:alnum:]_.-]+)?(?:[[:space:]]|$)'
+          - inside:
+              stopBy: end
+              pattern: |-
+                script: $COMMAND
+    - not:
+        has:
+          stopBy: end
+          all:
+            - regex: '(?:^|/|[\x27\x22])(?:\.npm|node_modules|\.next/cache)/?[\x27\x22]?$'
+            - inside:
+                stopBy: end
+                pattern: |-
+                  cache: $$$CACHE

@@ -1,0 +1,29 @@
+id: no-known-value-widening-tsx
+valid:
+  - |-
+    const value = { enabled: true };
+  - |-
+    const value: NamedContract = { enabled: true };
+  - |-
+    const value: unknown = getValue();
+  - |-
+    const values: Record<string, unknown> = {};
+  - |-
+    function getValues(): Record<string, unknown> { return {}; }
+  - |-
+    const value = {} as Record<string, unknown>;
+invalid:
+  - |-
+    const value: unknown = { enabled: true };
+  - |-
+    const value: object = [1, 2, 3];
+  - |-
+    const value: Record<string, unknown> = { enabled: true };
+  - |-
+    class Example { value: { enabled: unknown } = () => true; }
+  - |-
+    function getValue(): unknown { return { enabled: true }; }
+  - |-
+    const getValue = (): object => [1, 2, 3];
+  - |-
+    const value = { enabled: true } as unknown;

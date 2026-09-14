@@ -8,6 +8,8 @@ let
 in
 {
   "secrets/sing-box-outbounds.jsonc" = { publicKeys = commonPublicKeys; };
+  "secrets/sing-box-subscription-main" = { publicKeys = commonPublicKeys; };
+  "secrets/sing-box-subscription-cw" = { publicKeys = commonPublicKeys; };
   "secrets/webdav-cert.pem" = { publicKeys = commonPublicKeys; };
   "secrets/webdav-key.pem" = { publicKeys = commonPublicKeys; };
   "secrets/work-vpn/ca.crt" = { publicKeys = commonPublicKeys; };

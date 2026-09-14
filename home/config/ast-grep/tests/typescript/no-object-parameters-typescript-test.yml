@@ -1,0 +1,11 @@
+id: no-object-parameters-typescript
+valid:
+  - |-
+      function use(value: DomainValue) {}
+  - |-
+      function use(value: { id: string }) {}
+invalid:
+  - |-
+      function use(value: object) {}
+  - |-
+      const use = (value: object | null) => value;

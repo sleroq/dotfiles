@@ -1,0 +1,19 @@
+id: restrict-gitlab-retry
+valid:
+  - |-
+    test:
+      retry:
+        max: 1
+        when: runner_system_failure
+      script: go test ./...
+invalid:
+  - |-
+    test:
+      retry: 2
+      script: go test ./...
+  - |-
+    test:
+      retry:
+        max: 1
+        when: script_failure
+      script: go test ./...

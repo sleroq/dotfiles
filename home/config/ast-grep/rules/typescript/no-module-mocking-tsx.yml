@@ -1,0 +1,10 @@
+id: no-module-mocking-tsx
+language: Tsx
+message: Replace module mocking with dependency injection through a real interface or faithful test implementation.
+severity: warning
+files:
+  - develop/**
+rule:
+  all:
+    - kind: call_expression
+    - regex: ^(?:vi|jest)\s*(?:\.\s*(?:doMock|mock|unstable_mockModule)|\[\s*["'](?:doMock|mock|unstable_mockModule)["']\s*\])\s*\(

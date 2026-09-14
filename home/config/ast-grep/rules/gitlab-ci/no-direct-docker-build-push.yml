@@ -1,0 +1,17 @@
+id: no-direct-docker-build-push
+language: Yaml
+message: Use a /usr/local/bin build wrapper instead of docker build or docker push so CI uses the shared cache.
+severity: error
+files:
+  - develop/**/.gitlab-ci.yml
+  - develop/**/.gitlab-ci.yaml
+rule:
+  all:
+    - any:
+        - kind: string_scalar
+        - kind: block_scalar
+    - regex: '(?m)(^|[;&|]|\n)[[:space:]]*docker[[:space:]]+(build|push|buildx[[:space:]]+build)([[:space:]]|$)'
+    - inside:
+        stopBy: end
+        pattern: |-
+          script: $COMMAND

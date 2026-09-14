@@ -1,0 +1,10 @@
+id: no-reflect-get-tsx
+language: Tsx
+message: Replace Reflect.get with typed property access.
+severity: warning
+files:
+  - develop/**
+rule:
+  all:
+    - kind: call_expression
+    - regex: ^Reflect\s*(?:\.\s*get|\[\s*["']get["']\s*\])\s*\(

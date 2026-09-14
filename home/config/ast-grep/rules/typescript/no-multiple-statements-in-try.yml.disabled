@@ -1,0 +1,17 @@
+id: no-multiple-statements-in-try
+language: TypeScript
+message: Try blocks must contain only one direct statement.
+severity: error
+files:
+  - develop/**
+rule:
+  all:
+    - kind: try_statement
+    - has:
+        field: body
+        has:
+          nthChild:
+            position: 2
+            ofRule:
+              not:
+                kind: comment

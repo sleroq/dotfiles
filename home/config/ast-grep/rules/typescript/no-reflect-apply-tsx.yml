@@ -1,0 +1,10 @@
+id: no-reflect-apply-tsx
+language: Tsx
+message: Replace Reflect.apply with a typed function call.
+severity: warning
+files:
+  - develop/**
+rule:
+  all:
+    - kind: call_expression
+    - regex: ^Reflect\s*(?:\.\s*apply|\[\s*["']apply["']\s*\])\s*\(

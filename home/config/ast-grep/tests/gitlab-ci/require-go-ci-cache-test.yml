@@ -1,0 +1,37 @@
+id: require-go-ci-cache
+valid:
+  - |-
+    format:
+      script:
+        - gofmt -w .
+  - |-
+    .go-cache:
+      cache:
+        key:
+          files:
+            - go.sum
+        paths:
+          - .go/pkg/mod/
+          - .cache/go-build/
+    test:
+      script:
+        - go test ./...
+  - |-
+    build:
+      script:
+        - go -C cmd/server build .
+      cache:
+        paths:
+          - .cache/go-build/
+invalid:
+  - |-
+    test:
+      script:
+        - CGO_ENABLED=0 go test ./...
+  - |-
+    vet:
+      script: |
+        go vet ./...
+      cache:
+        paths:
+          - vendor/

@@ -1,0 +1,49 @@
+id: require-curly-braces-in-frg-typescript
+language: TypeScript
+message: Control-flow statement bodies must always use curly braces.
+severity: warning
+files:
+  - develop/frg/**
+rule:
+  any:
+    - all:
+        - kind: if_statement
+        - has:
+            field: consequence
+            not:
+              kind: statement_block
+    - all:
+        - kind: if_statement
+        - has:
+            field: alternative
+            all:
+              - not:
+                  has:
+                    kind: statement_block
+              - not:
+                  has:
+                    kind: if_statement
+    - all:
+        - kind: for_statement
+        - has:
+            field: body
+            not:
+              kind: statement_block
+    - all:
+        - kind: for_in_statement
+        - has:
+            field: body
+            not:
+              kind: statement_block
+    - all:
+        - kind: while_statement
+        - has:
+            field: body
+            not:
+              kind: statement_block
+    - all:
+        - kind: do_statement
+        - has:
+            field: body
+            not:
+              kind: statement_block

@@ -14,6 +14,9 @@ in
 
       $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
           ${opts.realConfigs}/ast-grep "$HOME/.config/ast-grep"
+
+      $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+          ${opts.realConfigs}/sgconfig.yml "$HOME/sgconfig.yml"
     '';
   };
 }

@@ -10,12 +10,10 @@
       bashInteractive
       btop
       curl
-      direnv
       fd
       git
       jq
       nil
-      nix-direnv
       nixfmt
       podman-compose
       ripgrep

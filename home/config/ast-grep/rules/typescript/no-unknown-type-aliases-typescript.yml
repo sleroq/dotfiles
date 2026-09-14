@@ -1,0 +1,10 @@
+id: no-unknown-type-aliases-typescript
+language: TypeScript
+message: This type alias hides unknown. Keep unknown explicit at the parsing boundary or use the parsed owner type.
+severity: warning
+files:
+  - develop/**
+rule:
+  all:
+    - kind: type_alias_declaration
+    - regex: =\s*\(*\s*unknown\s*\)*\s*;?$

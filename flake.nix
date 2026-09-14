@@ -8,6 +8,9 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
+    sb.url = "git+file:///Users/sleroq/develop/sb";
+    sb.inputs.nixpkgs.follows = "nixpkgs";
+
     easy-hosts.url = "github:tgirlcloud/easy-hosts";
 
     # Common NixOS flakes
@@ -44,6 +47,8 @@
 
     vicinae.url = "git+https://github.com/vicinaehq/vicinae?ref=refs/tags/v0.20.1"; # Lock version here to hit gh actions cache
     emacs-overlay.url = "github:nix-community/emacs-overlay";
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     zig.url = "github:mitchellh/zig-overlay";
     zls.url = "github:zigtools/zls";
     zed-interplanetary.url = "github:zed-industries/zed/nightly"; # Lock to hit the cache
@@ -67,9 +72,7 @@
     web-cum-army.url = "github:sleroq/web.cum.army";
     web-cum-army.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
-    # reactor.url = "github:sleroq/reactor";
-    reactor.url = "path:///Users/sleroq/develop/reactor";
-    reactor.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+    reactor.url = "github:sleroq/reactor";
 
     music-link = {
       url = "path:/Users/sleroq/develop/music-link";
@@ -106,23 +109,43 @@
         "aarch64-darwin"
       ];
 
+      perSystem =
+        { pkgs, ... }:
+        {
+          devShells.default = pkgs.mkShell {
+            packages = with pkgs; [
+              age
+              coreutils
+              nixfmt
+              python3
+            ];
+          };
+        };
+
       flake.overlays = import ./overlays/default.nix {
         inherit self nixpkgs;
-        inherit (inputs) scrcpyPkgs nixpkgs-master;
+        inherit (inputs)
+          scrcpyPkgs
+          nixpkgs-master
+          rust-overlay
+          sb
+          ;
       };
 
-      flake.homeConfigurations."dev@cumserver" = inputs.home-manager-cumserver.lib.homeManagerConfiguration {
-        pkgs = import inputs.nixpkgs-cumserver {
-          system = "x86_64-linux";
-          overlays = [ self.overlays.default ];
-        };
+      flake.homeConfigurations."dev@cumserver" =
+        inputs.home-manager-cumserver.lib.homeManagerConfiguration
+          {
+            pkgs = import inputs.nixpkgs-cumserver {
+              system = "x86_64-linux";
+              overlays = [ self.overlays.default ];
+            };
 
-        modules = [ ./home/hosts/cumserver-dev.nix ];
+            modules = [ ./home/hosts/cumserver-dev.nix ];
 
-        extraSpecialArgs = {
-          inherit self;
-        };
-      };
+            extraSpecialArgs = {
+              inherit self;
+            };
+          };
 
       # FIXME: This is a bit overengineered
       easy-hosts =

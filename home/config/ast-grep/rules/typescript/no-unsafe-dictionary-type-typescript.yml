@@ -1,0 +1,14 @@
+id: no-unsafe-dictionary-type-typescript
+language: TypeScript
+message: This dictionary's value type gives callers no concrete contract. Use an owner/schema-derived value type.
+severity: warning
+files:
+  - develop/**
+rule:
+  any:
+    - all:
+        - kind: generic_type
+        - regex: ^(?:Readonly\s*<\s*)?Record\s*<\s*(?:string|number|symbol|PropertyKey)(?:\s*\|\s*(?:string|number|symbol))*\s*,\s*(?:unknown|any|object|\{\s*\})(?:\s*\|[^>]*)?\s*>\s*>?$
+    - all:
+        - kind: index_signature
+        - regex: \[.*:\s*(?:string|number|symbol|PropertyKey)[^]]*\]\s*:\s*(?:unknown|any|object|\{\s*\})

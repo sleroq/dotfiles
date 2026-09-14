@@ -1,0 +1,36 @@
+id: require-gitlab-auto-cancel
+language: Yaml
+message: Set workflow.auto_cancel.on_new_commit to interruptible to cancel stale pipelines.
+severity: warning
+files:
+  - develop/**/.gitlab-ci.yml
+  - develop/**/.gitlab-ci.yaml
+rule:
+  all:
+    - kind: document
+    - has:
+        stopBy: end
+        any:
+          - pattern: 'stage: test'
+          - pattern: 'stage: build'
+          - pattern: 'stage: lint'
+          - all:
+              - pattern: 'stages: $$$'
+              - has:
+                  stopBy: end
+                  any:
+                    - pattern: '- test'
+                    - pattern: '- build'
+                    - pattern: '- lint'
+    - not:
+        has:
+          stopBy: end
+          all:
+            - pattern: 'workflow: $$$'
+            - has:
+                stopBy: end
+                all:
+                  - pattern: 'auto_cancel: $$$'
+                  - has:
+                      stopBy: end
+                      pattern: 'on_new_commit: interruptible'

@@ -1,0 +1,9 @@
+id: no-reflect-apply-typescript
+valid:
+  - |-
+      reflect.apply(fn, receiver, []);
+  - |-
+      Reflect.construct(Type, []);
+invalid:
+  - |-
+      Reflect.apply(fn, receiver, []);

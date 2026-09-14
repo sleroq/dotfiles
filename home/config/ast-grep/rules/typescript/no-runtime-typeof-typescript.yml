@@ -1,0 +1,20 @@
+id: no-runtime-typeof-typescript
+language: TypeScript
+message: A typeof check narrows a representation without establishing its contract. Parse input at its I/O boundary.
+severity: warning
+files:
+  - develop/**
+rule:
+  all:
+    - kind: unary_expression
+    - regex: ^typeof\b
+    - not:
+        inside:
+          stopBy: end
+          any:
+            - all:
+                - kind: function_declaration
+                - regex: \)\s*:\s*[^\{=>]+\bis\b
+            - all:
+                - kind: arrow_function
+                - regex: \)\s*:\s*[^=]+\bis\b

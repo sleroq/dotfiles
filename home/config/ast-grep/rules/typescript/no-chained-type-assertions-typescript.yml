@@ -1,0 +1,20 @@
+id: no-chained-type-assertions-typescript
+language: TypeScript
+message: This assertion chain discards type evidence. Keep the original precise type or parse input before narrowing it.
+severity: warning
+files:
+  - develop/**
+rule:
+  any:
+    - all:
+        - kind: as_expression
+        - has:
+            any:
+              - kind: as_expression
+              - kind: type_assertion
+    - all:
+        - kind: type_assertion
+        - has:
+            any:
+              - kind: as_expression
+              - kind: type_assertion
