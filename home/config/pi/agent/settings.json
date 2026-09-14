@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.84.4",
+  "lastChangelogVersion": "0.85.0",
   "defaultThinkingLevel": "low",
   "packages": [
     "npm:pi-subdir-context",
@@ -9,7 +9,7 @@
   "subagents": {
     "disableBuiltins": true
   },
-  "hideThinkingBlock": true,
+  "hideThinkingBlock": false,
   "theme": "dark",
   "defaultProvider": "FrankAI",
   "defaultModel": "FrankAgent",
