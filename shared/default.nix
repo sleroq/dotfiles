@@ -48,9 +48,7 @@
   services = {
     nixops-dns.domain = "1.1.1.1";
     fstrim.enable = true;
-    journald.extraConfig = ''
-      SystemMaxUse=2G
-    '';
+    journald.settings.Journal.SystemMaxUse = "2G";
   };
 
   nix = {

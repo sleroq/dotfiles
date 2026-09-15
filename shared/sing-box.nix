@@ -20,6 +20,7 @@
         {
           name = "main";
           urlFile = config.age.secrets.sing-box-subscription-main.path;
+          enable = false;
         }
         {
           name = "cw";
