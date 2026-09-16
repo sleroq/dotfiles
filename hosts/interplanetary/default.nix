@@ -26,6 +26,7 @@ in
     capSysAdmin = true;
     # Sunshine is only reachable through the already-trusted Tailscale interface.
     openFirewall = false;
+    settings.csrf_allowed_origins = "https://100.82.25.59:47990";
   };
 
   # Bootloader.
