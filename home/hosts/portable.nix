@@ -65,8 +65,13 @@ in
     ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSh54pu9bAH8DFBKPtswFJzevCft+gHZStJQ0trYGoj sleroq@cum.army
   '';
 
-  # Fix for https://github.com/ryantm/agenix/issues/308
-  launchd.agents."activate-agenix".config.KeepAlive = lib.mkForce { SuccessfulExit = false; };
+  # Darwin may purge DARWIN_USER_TEMP_DIR, where the agenix Home Manager module
+  # stores decrypted secrets. Relaunch when the SSH config becomes dangling.
+  # mkForce also removes the broken Crashed=false default from agenix#308.
+  launchd.agents."activate-agenix".config.KeepAlive = lib.mkForce {
+    SuccessfulExit = false;
+    PathState."${config.home.homeDirectory}/.ssh/config" = false;
+  };
 
   myHome = {
     astGrep.enable = true;
