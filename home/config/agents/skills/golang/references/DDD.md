@@ -137,6 +137,18 @@ When adding new behavior, ask:
 6. **Does it depend on external infrastructure?**
 7. **Can the domain behavior be tested without DB/network access?**
 
+## Architecture validation
+
+When a Go project has a `.go-arch-lint.yml`, run the architecture check after changing or reviewing package boundaries, imports, or DDD layers:
+
+```sh
+go-arch-lint check
+```
+
+Run it from the project root and resolve every dependency violation or explain why the declared architecture needs to change. Do not add layers or a `go-arch-lint` configuration merely to satisfy this guide; use it when the project has meaningful, stable dependency boundaries.
+
+`go-arch-lint` validates the declared package dependency graph. It does not prove that aggregates, invariants, business terminology, or other domain modeling decisions are correct, so validate those separately using the principles and checklist above.
+
 ## Default principle
 
 Prefer the **simplest design that keeps business rules explicit and domain boundaries clean**.
