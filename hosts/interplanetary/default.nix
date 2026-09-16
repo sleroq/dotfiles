@@ -20,6 +20,14 @@ in
 
   services.blueman.enable = true;
 
+  services.sunshine = {
+    enable = true;
+    autoStart = true;
+    capSysAdmin = true;
+    # Sunshine is only reachable through the already-trusted Tailscale interface.
+    openFirewall = false;
+  };
+
   # Bootloader.
   boot = {
     kernelPackages = pkgs.linuxKernel.packages.linux_zen;

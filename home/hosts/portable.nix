@@ -107,6 +107,7 @@ in
         wget
         dust
         ollama
+        moonlight-qt
         scrcpy
         typst
         inputs'.zig.packages.master
