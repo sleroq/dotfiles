@@ -44,10 +44,14 @@ in
   # TODO: Make conditional
   imports = [
     # ../modules/programs/gitui.nix
+
+
     # ../modules/programs/zellij.nix
   ];
 
   config = mkIf cfg.enable {
+    home.file.".golangci.yml".source = config.lib.file.mkOutOfStoreSymlink "${opts.realConfigs}/golangci.yml";
+
     home.sessionPath = [
       "${config.home.homeDirectory}/.local/bin"
        "${config.home.homeDirectory}/.deno/bin"
