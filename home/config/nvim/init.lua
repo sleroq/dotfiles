@@ -260,6 +260,26 @@ map({ "n", "v", "x" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format curren
 map({ "n" }, "<leader>e", "<cmd>Oil<CR>", { desc = "Open oil" })
 
 vim.api.nvim_create_user_command("TermNu", function() vim.cmd("terminal nu") end, {})
+
+local function copy_path(path, command)
+    if command.range == 1 then
+        path = path .. ":" .. command.line1
+    elseif command.range == 2 then
+        path = path .. ":" .. command.line1 .. "-" .. command.line2
+    end
+
+    vim.fn.setreg("+", path)
+    vim.notify("Copied " .. path)
+end
+
+vim.api.nvim_create_user_command("CopyRelativePath", function(command)
+    copy_path(vim.fn.expand("%:."), command)
+end, { range = true })
+
+vim.api.nvim_create_user_command("CopyAbsolutePath", function(command)
+    copy_path(vim.fn.expand("%:p"), command)
+end, { range = true })
+
 map({ "n" }, "<leader>t", "<Cmd>:vs | TermNu<CR>", { desc = "Open terminal" })
 map("t", "<C-w>n", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
