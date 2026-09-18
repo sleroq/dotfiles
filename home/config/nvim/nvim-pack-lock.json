@@ -20,6 +20,10 @@
       "rev": "914c91e34a8a9ad7faa6d4777eb116a924fbdeba",
       "src": "https://github.com/dmtrKovalenko/fff"
     },
+    "flash.nvim": {
+      "rev": "5f0f270fdc7c5b0c21d903ee85b9cb06f2ac636a",
+      "src": "https://github.com/folke/flash.nvim"
+    },
     "fogbell.vim": {
       "rev": "274cc13",
       "src": "https://github.com/jaredgorski/fogbell.vim"

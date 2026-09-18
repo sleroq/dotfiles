@@ -88,7 +88,7 @@ vim.pack.add({
     -- to avoid learning to type fast and setting up proper completion
     { src = "https://github.com/supermaven-inc/supermaven-nvim" },
     -- workaround for stupidity (asking agent about the code)
-    { src = "https://github.com/metal3d/opencode.nvim", version = "feat/opencode-v2" },
+    { src = "https://github.com/metal3d/opencode.nvim",                  version = "feat/opencode-v2" },
     -- another bloat dependency because opencode can't use telescope
     { src = "https://github.com/folke/snacks.nvim" },
 
@@ -105,7 +105,7 @@ vim.pack.add({
     -- Maybe this is useful for work
     { src = "https://github.com/harrisoncramer/gitlab.nvim" },
     { src = "https://github.com/stevearc/dressing.nvim" }, -- Recommended dep for gitlab.nvim
-    { src = "https://github.com/MunifTanjim/nui.nvim" }, -- Dep for gitlab.nvim
+    { src = "https://github.com/MunifTanjim/nui.nvim" },   -- Dep for gitlab.nvim
 
     -- Workaround for bloated config - so stuff gets disabled on large files
     { src = "https://github.com/pteroctopus/faster.nvim" },
@@ -279,31 +279,23 @@ require("snacks").setup({
 })
 
 local opencode = require("opencode")
-map({ "n", "x" }, "<leader>oa", function() opencode.ask("@this: ") end,
-    { desc = "Ask about this" })
+map({ "n", "x" }, "<leader>oa", function() opencode.ask("@this: ") end, { desc = "Ask about this" })
 map({ "n", "x" }, "<leader>os", function() opencode.select() end, { desc = "Select prompt" })
 map({ "n", "x" }, "<leader>o+", function() opencode.prompt("@this") end, { desc = "Add this" })
 map("n", "<leader>ot", function() opencode.toggle() end, { desc = "Toggle embedded" })
-map("n", "<leader>oc", function() opencode.select({ prompts = false, server = false }) end,
-    { desc = "Select command" })
 map("n", "<leader>on", function() opencode.command("session.new") end, { desc = "New session" })
 map("n", "<leader>oi", function() opencode.command("session.interrupt") end, { desc = "Interrupt session" })
-map("n", "<leader>oA", function() opencode.command("agent.cycle") end, { desc = "Cycle selected agent" })
-map("n", "<S-C-u>", function() opencode.command("session.half.page.up") end,
-    { desc = "Messages half page up" })
-map("n", "<S-C-d>", function() opencode.command("session.half.page.down") end,
-    { desc = "Messages half page down" })
 
 map("n", "<leader>w", function()
-  vim.wo.wrap = not vim.wo.wrap
+    vim.wo.wrap = not vim.wo.wrap
 
-  if vim.wo.wrap then
-    map("n", "j", "gj", { buffer = true })
-    map("n", "k", "gk", { buffer = true })
-  else
-    unmap("n", "j", { buffer = true })
-    unmap("n", "k", { buffer = true })
-  end
+    if vim.wo.wrap then
+        map("n", "j", "gj", { buffer = true })
+        map("n", "k", "gk", { buffer = true })
+    else
+        unmap("n", "j", { buffer = true })
+        unmap("n", "k", { buffer = true })
+    end
 end, { desc = "Toggle wrap + visual-line movement" })
 
 local zen = require("zen-mode")
@@ -361,7 +353,9 @@ vim.api.nvim_create_autocmd("FileType", {
         end
     end,
 })
-vim.api.nvim_create_user_command("SwitchToDeno", function() vim.cmd("LspStop ts_ls"); vim.cmd("LspStart denols") end, {})
+vim.api.nvim_create_user_command("SwitchToDeno", function()
+    vim.cmd("LspStop ts_ls"); vim.cmd("LspStart denols")
+end, {})
 
 vim.api.nvim_create_autocmd("PackChanged", { callback = function() nts.update() end })
 
@@ -375,8 +369,8 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 require("obsidian").setup({
     workspaces = {
         {
-          name = "vault",
-          path = "~/Sync/shared-org",
+            name = "vault",
+            path = "~/Sync/shared-org",
         },
     },
 })
