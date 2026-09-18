@@ -1,0 +1,10 @@
+{
+  "name": "opencode-direnv-plugin",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@opencode/plugin": "2.0.1"
+  }
+}

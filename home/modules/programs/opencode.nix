@@ -31,6 +31,11 @@ in
 
           $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
               ${opts.realConfigs}/opencode/* $HOME/.config/opencode/
+
+          if [ -z "$DRY_RUN_CMD" ]; then
+            ${pkgs.bun}/bin/bun install --frozen-lockfile \
+              --cwd ${opts.realConfigs}/opencode/plugins/direnv
+          fi
         '';
       }
     ]
