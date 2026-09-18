@@ -3,7 +3,7 @@ ruleDirs:
   - ../../.config/ast-grep/rules/frg
 customLanguages:
   svelte:
-    libraryPath: ../../.local/lib/tree-sitter-svelte
+    libraryPath: ~/.local/lib/tree-sitter-svelte
     extensions: [svelte]
     languageSymbol: tree_sitter_svelte
 languageInjections:

@@ -43,6 +43,7 @@
     lazygit
 
     htmx-lsp
+    svelte-language-server
     vscode-langservers-extracted
 
     nodejs

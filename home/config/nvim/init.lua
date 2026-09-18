@@ -194,9 +194,10 @@ vim.lsp.config["lua_ls"] = {
 
 vim.lsp.config["ast_grep"] = {
     cmd = { "ast-grep", "lsp", "--config", vim.fn.expand("~/sgconfig.yml") },
+    filetypes = vim.list_extend(vim.lsp.config.ast_grep.filetypes, { "svelte" }),
 }
 
-vim.lsp.enable({ "ast_grep", "lua_ls", "nixd", "gopls", "ts_ls" })
+vim.lsp.enable({ "ast_grep", "lua_ls", "nixd", "gopls", "ts_ls", "svelte" })
 
 require("oil").setup({
     lsp_file_methods = {
@@ -337,7 +338,7 @@ vim.api.nvim_create_autocmd("User", {
 local ts_parsers = {
     "go", "gomod", "gosum", "vim", "vimdoc", "javascript",
     "zig", "typescript", "json", "dockerfile", "sql",
-    "yaml", "bash", "gitignore", "prisma",
+    "yaml", "bash", "gitignore", "prisma", "svelte",
 }
 local nts = require("nvim-treesitter")
 nts.install(ts_parsers)
