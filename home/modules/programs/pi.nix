@@ -20,9 +20,10 @@ in
       {
         home.activation.installPi = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           PATH="${pkgs.bun}/bin:$HOME/.bun/bin:$PATH"
-          installedVersion="$(pi --version 2>/dev/null || true)"
-          oldestVersion="$(${pkgs.coreutils}/bin/printf '%s\n' ${minPiVersion} "$installedVersion" | ${pkgs.coreutils}/bin/sort -V | ${pkgs.coreutils}/bin/head -n 1)"
-          if ! command -v pi &> /dev/null || [ "$oldestVersion" != "${minPiVersion}" ]; then
+          if ! command -v pi > /dev/null ||
+            ! ${pkgs.coreutils}/bin/printf '%s\n' '${minPiVersion}' "$(pi --version)" |
+              ${pkgs.coreutils}/bin/sort --version-sort --check=quiet
+          then
             run ${pkgs.bun}/bin/bun install -g @earendil-works/pi-coding-agent@latest
           fi
         '';
