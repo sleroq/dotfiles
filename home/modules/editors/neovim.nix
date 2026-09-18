@@ -1,9 +1,20 @@
-{ pkgs, opts, lib, inputs', ... }:
+{
+  pkgs,
+  opts,
+  lib,
+  inputs',
+  ...
+}:
 
 {
   programs.neovim = {
     enable = true;
     package = inputs'.neovim-nightly-overlay.packages.default;
+    extraWrapperArgs = [
+      "--set"
+      "FFF_NVIM"
+      "${pkgs.vimPlugins.fff-nvim}"
+    ];
     withRuby = false;
     withPython3 = false;
     sideloadInitLua = true;
