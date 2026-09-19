@@ -106,15 +106,16 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1749143103,
-        "narHash": "sha256-mAbZ1AJ30Nk9lHdZIu2UHkMAjQlrwHJzOhAb3GAhUPI=",
+        "lastModified": 1789545632,
+        "narHash": "sha256-6MyCpA3Sw0n8OQivL2scNxUHJNBxkc7gpXvoTktkMPE=",
         "owner": "sleroq",
         "repo": "bayan",
-        "rev": "951d903be3974fff5f6589990324a037f672cbc2",
+        "rev": "bcdc55192e1ce63bc1dd719917d8e652d6e8def4",
         "type": "github"
       },
       "original": {
         "owner": "sleroq",
+        "ref": "track-bayan-events",
         "repo": "bayan",
         "type": "github"
       }
@@ -2240,11 +2241,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1788881743,
-        "narHash": "sha256-2V9GZGvPfrNzxFozhI9dcqV+c3QdA8YZrvAAzqEB+dI=",
+        "lastModified": 1786599213,
+        "narHash": "sha256-yNJd40f11EzXBjSByCB7IPpeFFAdeoSKKM67dGkfFoU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "d6524aaca2ff07876657ae2b323f24be4874944b",
+        "rev": "0e251e24a4f24e036a084b6b4b2d2491af4167f4",
         "type": "github"
       },
       "original": {

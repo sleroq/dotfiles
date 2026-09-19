@@ -81,7 +81,7 @@
     sieve.url = "git+ssh://git@github.com/sleroq/sieve";
     sieve.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
-    bayan.url = "github:sleroq/bayan";
+    bayan.url = "github:sleroq/bayan/track-bayan-events";
 
     kopoka.url = "git+ssh://git@github.com/sleroq/kopoka";
     kopoka.inputs.nixpkgs.follows = "nixpkgs-cumserver";
