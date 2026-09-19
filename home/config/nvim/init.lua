@@ -88,7 +88,7 @@ vim.pack.add({
     -- to avoid learning to type fast and setting up proper completion
     { src = "https://github.com/supermaven-inc/supermaven-nvim" },
     -- workaround for stupidity (asking agent about the code)
-    { src = "https://github.com/metal3d/opencode.nvim",                  version = "feat/opencode-v2" },
+    { src = "https://github.com/jensenojs/opencode.nvim",               version = "wip-v2" },
     -- another bloat dependency because opencode can't use telescope
     { src = "https://github.com/folke/snacks.nvim" },
 
@@ -299,13 +299,7 @@ require("snacks").setup({
     picker = { enabled = true },
 })
 
-local opencode = require("opencode")
-map({ "n", "x" }, "<leader>oa", function() opencode.ask("@this: ") end, { desc = "Ask about this" })
-map({ "n", "x" }, "<leader>os", function() opencode.select() end, { desc = "Select prompt" })
-map({ "n", "x" }, "<leader>o+", function() opencode.prompt("@this") end, { desc = "Add this" })
-map("n", "<leader>ot", function() opencode.toggle() end, { desc = "Toggle embedded" })
-map("n", "<leader>on", function() opencode.command("session.new") end, { desc = "New session" })
-map("n", "<leader>oi", function() opencode.command("session.interrupt") end, { desc = "Interrupt session" })
+require("opencode").setup({})
 
 map("n", "<leader>w", function()
     vim.wo.wrap = not vim.wo.wrap
