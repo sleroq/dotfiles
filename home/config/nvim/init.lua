@@ -109,7 +109,7 @@ vim.pack.add({
     { src = "https://github.com/vague2k/vague.nvim" },
     { src = "https://github.com/rose-pine/neovim" },
 
-    { src = "https://github.com/epwalsh/obsidian.nvim" },
+    { src = "https://github.com/obsidian-nvim/obsidian.nvim" },
 })
 
 require("faster").setup()
@@ -350,6 +350,16 @@ require("obsidian").setup({
           path = "~/Sync/shared-org",
         },
     },
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "markdown",
+    callback = function(args)
+        map("n", "gd", "<Cmd>ObsidianFollowLink<CR>", {
+            buffer = args.buf,
+            desc = "Follow Obsidian link",
+        })
+    end,
 })
 
 -- require("vague").setup({ transparent = true })
