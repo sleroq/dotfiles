@@ -10,6 +10,7 @@ vim.opt.undofile = true
 vim.opt.number = true
 -- vim.opt.relativenumber = true
 vim.o.breakindent = true
+vim.o.linebreak = true
 vim.o.timeoutlen = 200
 vim.o.completeopt = "menuone,noselect"
 vim.o.termguicolors = true
@@ -27,6 +28,8 @@ vim.opt.conceallevel = 2 -- for markdown shit
 -- experimental stuff
 vim.o.path = "**"         -- for the find command, maybe helps with completion as well
 vim.opt.lazyredraw = true -- presumably better for ssh
+
+vim.opt.runtimepath:prepend(vim.env.FFF_NVIM)
 
 vim.pack.add({
     -- To make sure neovim is not too fast:
@@ -46,6 +49,9 @@ vim.pack.add({
     -- workaround for skill issue using marks. this really helps for small brain:
     { src = "https://github.com/chentoast/marks.nvim" },
 
+    -- Jump anywhere visible with a couple of keystrokes:
+    { src = "https://github.com/folke/flash.nvim" },
+
     -- bloated file manager to avoid learning cd and ls:
     { src = "https://github.com/stevearc/oil.nvim" },
 
@@ -57,7 +63,6 @@ vim.pack.add({
 
     -- more bloat:
     { src = "https://github.com/nvim-telescope/telescope-ui-select.nvim" }, -- TODO: use atleast once?
-    -- another workaround for skill issue using marks
     { src = "https://github.com/nvim-telescope/telescope-frecency.nvim" },
 
     -- workaround for bad memory of keymaps (and helps with usage of registers)
@@ -83,7 +88,7 @@ vim.pack.add({
     -- to avoid learning to type fast and setting up proper completion
     { src = "https://github.com/supermaven-inc/supermaven-nvim" },
     -- workaround for stupidity (asking agent about the code)
-    { src = "https://github.com/NickvanDyke/opencode.nvim" },
+    { src = "https://github.com/jensenojs/opencode.nvim",               version = "wip-v2" },
     -- another bloat dependency because opencode can't use telescope
     { src = "https://github.com/folke/snacks.nvim" },
 
@@ -100,7 +105,7 @@ vim.pack.add({
     -- Maybe this is useful for work
     { src = "https://github.com/harrisoncramer/gitlab.nvim" },
     { src = "https://github.com/stevearc/dressing.nvim" }, -- Recommended dep for gitlab.nvim
-    { src = "https://github.com/MunifTanjim/nui.nvim" }, -- Dep for gitlab.nvim
+    { src = "https://github.com/MunifTanjim/nui.nvim" },   -- Dep for gitlab.nvim
 
     -- Workaround for bloated config - so stuff gets disabled on large files
     { src = "https://github.com/pteroctopus/faster.nvim" },
@@ -111,6 +116,10 @@ vim.pack.add({
 
     { src = "https://github.com/obsidian-nvim/obsidian.nvim" },
 })
+
+vim.g.fff = {
+    lazy_sync = true,
+}
 
 require("faster").setup()
 require "guess-indent".setup({})
@@ -124,11 +133,32 @@ require "marks".setup {
     mappings = {}
 }
 
+require("flash").setup({})
+
 require("supermaven-nvim").setup({ keymaps = { accept_suggestion = "<C-l>" } })
 
 require("neoclip").setup({ preview = true, })
 
 local telescope = require("telescope")
+
+local function find_noignore()
+    require("frecency.config").setup({
+        workspace_scan_cmd = {
+            "rg",
+            "--files",
+            "--hidden",
+            "--no-ignore",
+            "--glob",
+            "!**/.git/**",
+        },
+    })
+
+    telescope.extensions.frecency.frecency({
+        workspace = "CWD",
+        prompt_title = "Find files (including ignored)",
+    })
+end
+
 telescope.setup({
     defaults = {
         color_devicons = true,
@@ -141,11 +171,6 @@ telescope.setup({
             width = 400,
             prompt_position = "top",
             preview_cutoff = 40,
-        }
-    },
-    extensions = {
-        frecency = {
-            db_safe_mode = false,
         },
     },
 })
@@ -169,9 +194,10 @@ vim.lsp.config["lua_ls"] = {
 
 vim.lsp.config["ast_grep"] = {
     cmd = { "ast-grep", "lsp", "--config", vim.fn.expand("~/sgconfig.yml") },
+    filetypes = vim.list_extend(vim.lsp.config.ast_grep.filetypes, { "svelte" }),
 }
 
-vim.lsp.enable({ "ast_grep", "lua_ls", "nixd", "gopls", "ts_ls" })
+vim.lsp.enable({ "ast_grep", "lua_ls", "nixd", "gopls", "ts_ls", "svelte" })
 
 require("oil").setup({
     lsp_file_methods = {
@@ -203,32 +229,16 @@ gitlab.setup({
 })
 
 local tsbuiltin = require("telescope.builtin")
+local fff = require("fff")
 local map = vim.keymap.set
-
-local function find_noignore()
-    tsbuiltin.find_files({
-        find_command = {
-            "rg",
-            "--color=never",
-            "--no-heading",
-            "--with-filename",
-            "--line-number",
-            "--column",
-            "--smart-case",
-            "--files",
-            "--hidden",
-            "--no-ignore"
-        }
-    })
-end
+local unmap = vim.keymap.del
 
 vim.g.mapleader = " "
 map({ "v", "x" }, "<C-y>", '"+y', { desc = "System clipboard yank" })
 map({ "n" }, "<C-x>", "<Cmd>:Telescope neoclip<CR>", { desc = "Clipboard manager" }) -- maybe use registers like a chad instead of this?
-map({ "n" }, "<leader>/", tsbuiltin.live_grep, { desc = "Live grep" })
-map({ "n" }, "<leader><leader>", "<Cmd>:Telescope frecency workspace=CWD<CR>", { desc = "Find files" })
-map({ "n" }, "<leader>ff", tsbuiltin.find_files, { desc = "Find files" })
-map({ "n" }, "<leader>fF", find_noignore, { desc = "Find files no .gitignore" })
+map({ "n" }, "<leader>/", fff.live_grep, { desc = "Live grep" })
+map({ "n" }, "<leader><leader>", fff.find_files, { desc = "Find files" })
+map({ "n" }, "<leader>ff", find_noignore, { desc = "Find files no .gitignore" })
 map({ "n" }, "<leader>b", tsbuiltin.buffers, { desc = "Find buffers" }) -- is :b tab not enough?
 map({ "n" }, "<leader>n", "<Cmd>:bn<CR>", { desc = "Next buffer" })
 map({ "n" }, "<leader>p", "<Cmd>:bp<CR>", { desc = "Prev buffers" })
@@ -240,12 +250,38 @@ map({ "n" }, "<leader>gg", "<Cmd>:Neogit<CR>", { desc = "Open git shit" })
 map({ "n" }, "<leader>gm", gitlab.choose_merge_request, { desc = "Open git shit" })
 map({ "n" }, "<leader>u", "<Cmd>:UndotreeToggle<CR>", { desc = "Open undotree" })
 map({ "n" }, "gd", vim.lsp.buf.definition, { desc = "Jump to definition" })
+map({ "n", "x", "o" }, "s", function() require("flash").jump() end, { desc = "Flash jump" })
+map({ "n", "x", "o" }, "S", function() require("flash").treesitter() end, { desc = "Flash Treesitter" })
+map("o", "r", function() require("flash").remote() end, { desc = "Remote Flash" })
+map({ "o", "x" }, "R", function() require("flash").treesitter_search() end, { desc = "Treesitter search" })
+map("c", "<C-s>", function() require("flash").toggle() end, { desc = "Toggle Flash search" })
 
 map({ "n", "v", "x" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format current buffer" })
 map({ "n" }, "<leader>e", "<cmd>Oil<CR>", { desc = "Open oil" })
 
 vim.api.nvim_create_user_command("TermNu", function() vim.cmd("terminal nu") end, {})
+
+local function copy_path(path, command)
+    if command.range == 1 then
+        path = path .. ":" .. command.line1
+    elseif command.range == 2 then
+        path = path .. ":" .. command.line1 .. "-" .. command.line2
+    end
+
+    vim.fn.setreg("+", path)
+    vim.notify("Copied " .. path)
+end
+
+vim.api.nvim_create_user_command("CopyRelativePath", function(command)
+    copy_path(vim.fn.expand("%:."), command)
+end, { range = true })
+
+vim.api.nvim_create_user_command("CopyAbsolutePath", function(command)
+    copy_path(vim.fn.expand("%:p"), command)
+end, { range = true })
+
 map({ "n" }, "<leader>t", "<Cmd>:vs | TermNu<CR>", { desc = "Open terminal" })
+map("t", "<C-w>n", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 if vim.g.neovide then -- Copy paste for neovide
     map("n", "<sc-v>", 'l"+P')
@@ -258,20 +294,24 @@ if vim.g.neovide then -- Copy paste for neovide
     vim.g.neovide_opacity = 0.8
 end
 
-local opencode = require("opencode")
-map({ "n", "x" }, "<leader>oa", function() opencode.ask("@this: ", { submit = true }) end,
-    { desc = "Ask about this" })
-map({ "n", "x" }, "<leader>os", function() opencode.select() end, { desc = "Select prompt" })
-map({ "n", "x" }, "<leader>o+", function() opencode.prompt("@this") end, { desc = "Add this" })
-map("n", "<leader>ot", function() opencode.toggle() end, { desc = "Toggle embedded" })
-map("n", "<leader>oc", function() opencode.command() end, { desc = "Select command" })
-map("n", "<leader>on", function() opencode.command("session_new") end, { desc = "New session" })
-map("n", "<leader>oi", function() opencode.command("session_interrupt") end, { desc = "Interrupt session" })
-map("n", "<leader>oA", function() opencode.command("agent_cycle") end, { desc = "Cycle selected agent" })
-map("n", "<S-C-u>", function() opencode.command("messages_half_page_up") end,
-    { desc = "Messages half page up" })
-map("n", "<S-C-d>", function() opencode.command("messages_half_page_down") end,
-    { desc = "Messages half page down" })
+require("snacks").setup({
+    input = { enabled = true },
+    picker = { enabled = true },
+})
+
+require("opencode").setup({})
+
+map("n", "<leader>w", function()
+    vim.wo.wrap = not vim.wo.wrap
+
+    if vim.wo.wrap then
+        map("n", "j", "gj", { buffer = true })
+        map("n", "k", "gk", { buffer = true })
+    else
+        unmap("n", "j", { buffer = true })
+        unmap("n", "k", { buffer = true })
+    end
+end, { desc = "Toggle wrap + visual-line movement" })
 
 local zen = require("zen-mode")
 zen.setup({
@@ -293,11 +333,7 @@ zen.setup({
     },
 })
 local toggle_zen = function()
-    zen.toggle({
-        window = {
-            backdrop = 0,
-        },
-    })
+    zen.toggle()
 end
 map({ "n" }, "<leader>z", toggle_zen, { desc = "Toggle zen mode" })
 
@@ -316,7 +352,7 @@ vim.api.nvim_create_autocmd("User", {
 local ts_parsers = {
     "go", "gomod", "gosum", "vim", "vimdoc", "javascript",
     "zig", "typescript", "json", "dockerfile", "sql",
-    "yaml", "bash", "gitignore", "prisma",
+    "yaml", "bash", "gitignore", "prisma", "svelte",
 }
 local nts = require("nvim-treesitter")
 nts.install(ts_parsers)
@@ -332,7 +368,9 @@ vim.api.nvim_create_autocmd("FileType", {
         end
     end,
 })
-vim.api.nvim_create_user_command("SwitchToDeno", function() vim.cmd("LspStop ts_ls"); vim.cmd("LspStart denols") end, {})
+vim.api.nvim_create_user_command("SwitchToDeno", function()
+    vim.cmd("LspStop ts_ls"); vim.cmd("LspStart denols")
+end, {})
 
 vim.api.nvim_create_autocmd("PackChanged", { callback = function() nts.update() end })
 
@@ -346,8 +384,8 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 require("obsidian").setup({
     workspaces = {
         {
-          name = "vault",
-          path = "~/Sync/shared-org",
+            name = "vault",
+            path = "~/Sync/shared-org",
         },
     },
 })
@@ -366,4 +404,5 @@ vim.api.nvim_create_autocmd("FileType", {
 -- require("vague").setup()
 -- vim.cmd("colorscheme vague")
 vim.cmd("colorscheme rose-pine")
+vim.api.nvim_set_hl(0, "ZenBg", { bg = "NONE" })
 -- vim.cmd("colorscheme monochrome")

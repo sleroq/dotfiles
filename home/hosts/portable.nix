@@ -105,6 +105,7 @@ in
         inputs'.agenix.packages.default
         ffmpeg
         wget
+        uv
         dust
         ollama
         moonlight-qt

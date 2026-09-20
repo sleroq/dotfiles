@@ -1,7 +1,0 @@
-#+TITLE: Opencode Configuration
-
-Custom [[https://opencode.ai][opencode]] setup with specialized agents for research, architecture, and execution.
-
-* Credits
-
-Inspired by [[https://github.com/divaltor/.dotfiles/tree/main/backup/.config/opencode][divaltor/.dotfiles]]

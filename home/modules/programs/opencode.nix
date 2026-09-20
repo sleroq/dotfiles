@@ -19,9 +19,7 @@ in
       {
         home.activation.installOpencode2 = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           PATH="${pkgs.bun}/bin:$HOME/.bun/bin:$PATH"
-          if ! command -v opencode2 &> /dev/null; then
-            run ${pkgs.bun}/bin/bun install -g @opencode-ai/cli@next
-          fi
+          run ${pkgs.bun}/bin/bun install -g --trust @opencode/cli@latest
         '';
       }
 
@@ -31,6 +29,11 @@ in
 
           $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
               ${opts.realConfigs}/opencode/* $HOME/.config/opencode/
+
+          if [ -z "$DRY_RUN_CMD" ]; then
+            ${pkgs.bun}/bin/bun install --frozen-lockfile \
+              --cwd ${opts.realConfigs}/opencode/plugins/direnv
+          fi
         '';
       }
     ]

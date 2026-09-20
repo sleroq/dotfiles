@@ -16,6 +16,14 @@
       "rev": "2e7a50f",
       "src": "https://github.com/pteroctopus/faster.nvim"
     },
+    "fff": {
+      "rev": "914c91e34a8a9ad7faa6d4777eb116a924fbdeba",
+      "src": "https://github.com/dmtrKovalenko/fff"
+    },
+    "flash.nvim": {
+      "rev": "5f0f270fdc7c5b0c21d903ee85b9cb06f2ac636a",
+      "src": "https://github.com/folke/flash.nvim"
+    },
     "fogbell.vim": {
       "rev": "274cc13",
       "src": "https://github.com/jaredgorski/fogbell.vim"
@@ -86,8 +94,9 @@
       "src": "https://github.com/stevearc/oil.nvim"
     },
     "opencode.nvim": {
-      "rev": "2ddeebd3212596b51bf078e6ff52862655b80419",
-      "src": "https://github.com/NickvanDyke/opencode.nvim"
+      "rev": "a8ff335e724b42661222dfe5f943ecfbde68a3c8",
+      "src": "https://github.com/jensenojs/opencode.nvim",
+      "version": "'wip-v2'"
     },
     "plenary.nvim": {
       "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
