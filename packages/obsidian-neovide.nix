@@ -19,6 +19,10 @@ writeShellApplication {
     nvim_bin="$1"
     shift
 
+    # Obsidian's Electron wrapper exports its graphics libraries to child
+    # processes. Let Neovide's Nix wrapper provide its matching libraries.
+    unset LD_LIBRARY_PATH
+
     exec neovide --neovim-bin="$nvim_bin" -- "$@"
   '';
 }
