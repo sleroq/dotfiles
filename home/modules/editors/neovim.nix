@@ -41,6 +41,7 @@
     ripgrep
     fd
     lazygit
+    obsidian-neovide
 
     htmx-lsp
     svelte-language-server
