@@ -96,7 +96,7 @@
     "opencode.nvim": {
       "rev": "a8ff335e724b42661222dfe5f943ecfbde68a3c8",
       "src": "https://github.com/jensenojs/opencode.nvim",
-      "version": "'wip-v2'"
+      "version": "'main'"
     },
     "plenary.nvim": {
       "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
