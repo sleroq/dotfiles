@@ -122,7 +122,7 @@ let
 
     experimental = {
       cache_file = {
-        enabled = true;
+        enabled = false;
         path = "${workingDirectory}/clash.db";
       }
       // lib.optionalAttrs cfg.enablePersistentDnsCache {
