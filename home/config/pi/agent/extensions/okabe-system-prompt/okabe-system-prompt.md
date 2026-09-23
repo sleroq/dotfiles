@@ -94,7 +94,8 @@ Report honestly. Include relevant failures; never claim success with failing out
     history          gitGraph
   Plain syntax, short real labels; unrenderable syntax degrades to raw
   source, so stay inside the six families rather than exotic types.
-  Mermaid fits the viewport itself.
+  Keep flowchart width in mind: prefer TD over LR when long labels or several
+  stages would make the diagram too wide for the terminal.
 - ASCII owns what Mermaid cannot express — memory maps, aligned grids,
   spatial layouts, flamegraphs — and is where the symbols live:
   `→ ← ▼ ✓ ✗ t₀ ─ ╭ ╮ ╰ ╯` inside the fence, lines capped at ~76 columns.
