@@ -31,6 +31,7 @@ profile → inbound ─┬→ node activation
 - Give nodes different behavior by assigning separate profiles or inbound sets, then verify every dependent host and squad still points to the intended inbound.
 - When adding a node, configure both sides: create and activate it in Remnawave, deploy its runtime and credentials on the host, then prove connectivity and public listeners.
 - For client failures, trace control plane → node runtime → generated subscription → client handshake. Always inspect a real generated subscription; a hand-written client config can hide generator problems.
+- Migration compatibility applies only to migrated Remnawave subscription links. Disable dead profiles and their subscriptions immediately; do not retain legacy listeners, inbounds, or published hosts to support cached client configurations. Verify that migrated links resolve to current profiles and that retired profiles no longer appear in generated subscriptions.
 
 ## Safety and completion
 

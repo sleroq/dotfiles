@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   secrets,
   ...
@@ -7,6 +8,7 @@
 
 let
   domain = "waw.cum.army";
+  coverDomain = "beats.sleroq.link";
   tls = {
     enabled = true;
     certificate_path = "/var/lib/acme/${domain}/fullchain.pem";
@@ -37,6 +39,18 @@ let
     ];
     route = {
       rules = [
+        # RU uses the destination port to distinguish the dedicated beats
+        # selfsteal inbound from the unchanged legacy 2080 inbound.
+        {
+          inbound = [ "vless" ];
+          source_ip_cidr = [ "${secrets.ruRelayAddress}/32" ];
+          network = "tcp";
+          port = [ 443 ];
+          action = "route";
+          outbound = "xray";
+          override_address = "127.0.0.1";
+          override_port = 443;
+        }
         {
           inbound = [ "vless" ];
           source_ip_cidr = [ "${secrets.ruRelayAddress}/32" ];
@@ -69,11 +83,12 @@ in
     firewall = {
       allowedTCPPorts = [
         22
-        80 # Standalone ACME HTTP-01 challenges
+        80 # nginx serves ACME HTTP-01 challenges
+        443 # Remnawave Reality; nginx only listens on loopback for TLS
       ];
       extraInputRules = ''
         ip saddr ${secrets.cumserverAddress} tcp dport { 2080, 62052, 9100 } accept
-        ip saddr ${secrets.ruRelayAddress} tcp dport { 2080, 2443 } accept
+        ip saddr ${secrets.ruRelayAddress} tcp dport { 2080, 2084, 2443 } accept
       '';
     };
   };
@@ -82,8 +97,44 @@ in
     acceptTerms = true;
     defaults.email = "sleroq@cum.army";
     certs.${domain} = {
-      listenHTTP = ":80";
+      group = lib.mkForce "acme";
       reloadServices = [ "warsaw-tunnels.service" ];
+    };
+  };
+
+  # nginx's ACME module reloads on both certs; the tunnel also needs to read
+  # its waw.cum.army certificate after nginx takes over the HTTP-01 listener.
+  users.users.nginx.extraGroups = [ "acme" ];
+
+  services.nginx = {
+    enable = true;
+    virtualHosts = {
+      ${domain} = {
+        enableACME = true;
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
+        locations."/".return = "404";
+      };
+      ${coverDomain} = {
+        enableACME = true;
+        addSSL = true;
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+          {
+            addr = "127.0.0.1";
+            port = 9443;
+            ssl = true;
+          }
+        ];
+        locations."/".proxyPass = "http://127.0.0.1:9180";
+      };
     };
   };
 
@@ -95,6 +146,19 @@ in
   virtualisation = {
     podman.enable = true;
     oci-containers.backend = "podman";
+    oci-containers.containers.feishin = {
+      autoStart = true;
+      image = "ghcr.io/jeffvli/feishin:latest";
+      pull = "newer";
+      ports = [ "127.0.0.1:9180:9180" ];
+      environment = {
+        SERVER_NAME = "sleroq";
+        SERVER_LOCK = "true";
+        SERVER_TYPE = "navidrome";
+        SERVER_URL = "https://music.cum.army";
+        FS_PLAYBACK_WEB_AUDIO = "false";
+      };
+    };
     oci-containers.containers.remnanode = {
       autoStart = true;
       image = "docker.io/remnawave/node:2.8.0";

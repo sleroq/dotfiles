@@ -22,12 +22,12 @@ let
     inbounds = [
       {
         type = "direct";
-        tag = "vless-in";
+        tag = "beats-in";
         listen = "127.0.0.1";
-        listen_port = 12083;
+        listen_port = 12084;
         network = "tcp";
         override_address = "127.0.0.1";
-        override_port = 2080;
+        override_port = 443;
       }
     ];
     outbounds = [
@@ -48,7 +48,7 @@ let
     route = {
       rules = [
         {
-          inbound = [ "vless-in" ];
+          inbound = [ "beats-in" ];
           action = "route";
           outbound = "vless-tunnel";
         }

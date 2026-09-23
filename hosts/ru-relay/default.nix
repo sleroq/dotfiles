@@ -9,7 +9,6 @@ let
   directWarsawPort = 2082;
   backendAddress = secrets.cumserverAddress;
   warsawAddress = secrets.warsawAddress;
-  mainBackendPort = 2082;
   divBackendPort = 2081;
 in
 {
@@ -27,7 +26,6 @@ in
         mainRelayPort
         divRelayPort
         directWarsawPort
-        2083 # VLESS tunnel test route
       ];
       # Metrics are scraped only by cumserver, never exposed to clients.
       extraInputRules = ''
@@ -59,12 +57,10 @@ in
         frontend warsaw_ingress
           bind 0.0.0.0:${toString mainRelayPort}
           no log
-          default_backend cumserver_warsaw
+          default_backend warsaw_beats_tunnel
 
-        backend cumserver_warsaw
-          option tcp-check
-          default-server inter 5s fastinter 1s downinter 1s rise 2 fall 3
-          server cumserver ${backendAddress}:${toString mainBackendPort} check
+        backend warsaw_beats_tunnel
+          server local_tunnel 127.0.0.1:12084 check
 
         frontend warsaw_direct_ingress
           bind 0.0.0.0:${toString directWarsawPort}
@@ -74,15 +70,7 @@ in
         backend warsaw_direct
           option tcp-check
           default-server inter 5s fastinter 1s downinter 1s rise 2 fall 3
-          server warsaw ${warsawAddress}:2080 check
-
-        frontend warsaw_vless_tunnel_ingress
-          bind 0.0.0.0:2083
-          no log
-          default_backend warsaw_vless_tunnel
-
-        backend warsaw_vless_tunnel
-          server local_tunnel 127.0.0.1:12083 check
+          server warsaw ${warsawAddress}:2084 check
 
         frontend div_ingress
           bind 0.0.0.0:${toString divRelayPort}
