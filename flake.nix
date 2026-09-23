@@ -81,7 +81,7 @@
     sieve.url = "git+ssh://git@github.com/sleroq/sieve";
     sieve.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
-    bayan.url = "github:sleroq/bayan/track-bayan-events";
+    bayan.url = "github:sleroq/bayan";
 
     kopoka.url = "git+ssh://git@github.com/sleroq/kopoka";
     kopoka.inputs.nixpkgs.follows = "nixpkgs-cumserver";
@@ -219,6 +219,22 @@
               modules = [
                 inputs.disko.nixosModules.disko
               ];
+            };
+
+            ru-relay = withNixpkgsFor "ru-relay" {
+              arch = "x86_64";
+              tags = [ "server" ];
+
+              specialArgs.secrets = import ./hosts/ru-relay/secrets/default.nix;
+              modules = [ inputs.disko.nixosModules.disko ];
+            };
+
+            warsaw = withNixpkgsFor "warsaw" {
+              arch = "x86_64";
+              tags = [ "server" ];
+
+              specialArgs.secrets = import ./hosts/warsaw/secrets/default.nix;
+              modules = [ inputs.disko.nixosModules.disko ];
             };
 
             portable =

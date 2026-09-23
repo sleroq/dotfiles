@@ -1,0 +1,5 @@
+# Warsaw deployment notes
+
+Build the system on a capable Linux builder, not this VPS. Its small RAM cannot hold nixos-anywhere's disko closure in the kexec installer's tmpfs. For reinstall, use a small kexec image (the 24.11 image fits), partition and mount the disk with the installer tools, then run nixos-anywhere's `--phases install` with prebuilt `--store-paths` so the system closure is copied directly to `/mnt`. Temporary swap on the mounted disk may be needed during transfer. Verify the disk by-id path before partitioning.
+
+Preserve the existing SSH host ed25519 key with `--extra-files` during reinstall: it is also the age identity needed to decrypt this host's credentials. ACME listens on port 80 only while solving HTTP-01 challenges; Warsaw does not run an HTTP(S) site on port 443. After boot, wait for ACME to replace its bootstrap certificate with a trusted one before judging the tunnel healthy. RU's local HAProxy health check cannot detect remote TLS or authentication failures; verify the route with a real client connection.

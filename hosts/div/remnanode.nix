@@ -1,9 +1,8 @@
-{ config, pkgs, ... }:
+{ config, ... }:
 
 let
   managementPort = 62053;
   vlessPort = 2080;
-  hysteriaPort = 8443;
 in
 {
   age.secrets.remnawaveNodeEnv.file = ./secrets/remnawaveNodeEnv;
@@ -24,20 +23,6 @@ in
     "d /var/log/remnanode 0750 root root -"
   ];
 
-  # Hysteria2 sends 1280-byte QUIC datagrams. Tailscale's default 1280-byte
-  # interface MTU cannot carry those datagrams plus their IP/UDP headers.
-  systemd.services.remnawave-tailscale-mtu = {
-    description = "Raise the Tailscale MTU for Remnawave Hysteria2";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "tailscaled.service" ];
-    requires = [ "tailscaled.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = "${pkgs.iproute2}/bin/ip link set dev tailscale0 mtu 1360";
-    };
-  };
-
   # The panel and public relay both reach div privately. No Remnawave port is
   # exposed on div's public interface.
   networking.firewall.interfaces.tailscale0 = {
@@ -45,6 +30,5 @@ in
       managementPort
       vlessPort
     ];
-    allowedUDPPorts = [ hysteriaPort ];
   };
 }

@@ -1,3 +1,0 @@
-* Modules
-
-Shared modules across all non-server hosts.

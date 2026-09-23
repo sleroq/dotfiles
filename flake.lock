@@ -106,16 +106,15 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1789545632,
-        "narHash": "sha256-6MyCpA3Sw0n8OQivL2scNxUHJNBxkc7gpXvoTktkMPE=",
+        "lastModified": 1789854676,
+        "narHash": "sha256-R5ACJdRpOS24u+zu2IjEqyXaTQ7tTY3yov2mXhvVFXI=",
         "owner": "sleroq",
         "repo": "bayan",
-        "rev": "bcdc55192e1ce63bc1dd719917d8e652d6e8def4",
+        "rev": "31db65aed9c1a73082f748002a027ae412eb523d",
         "type": "github"
       },
       "original": {
         "owner": "sleroq",
-        "ref": "track-bayan-events",
         "repo": "bayan",
         "type": "github"
       }

@@ -68,9 +68,6 @@ let
     "secrets/zefxiEnv" = {
       publicKeys = commonPublicKeys;
     };
-    "secrets/nodeExporter1Password" = {
-      publicKeys = commonPublicKeys;
-    };
     "secrets/nodeExporter3Password" = {
       publicKeys = commonPublicKeys;
     };
@@ -105,9 +102,6 @@ let
       publicKeys = commonPublicKeys;
     };
     "secrets/remnawaveToken" = {
-      publicKeys = commonPublicKeys;
-    };
-    "secrets/remnawaveWarsawCertSyncKey" = {
       publicKeys = commonPublicKeys;
     };
   };

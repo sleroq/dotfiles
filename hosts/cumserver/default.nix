@@ -12,7 +12,10 @@ let
 
   bayan = serviceWrapper.mkTelegramBot {
     name = "bayan";
-    package = inputs'.bayan.packages.default;
+    # The current Bayan input changed go.mod without updating its upstream vendorHash.
+    package = inputs'.bayan.packages.default.overrideAttrs (_: {
+      vendorHash = "sha256-xmunloo879R+BJHcbHOSoWgU9dCc0esDSGj5/QqSzao=";
+    });
     secretFile = ./secrets/bayanEnv;
     dataDir = "/var/lib/bayan";
   };
@@ -49,7 +52,7 @@ in
     ./modules/tuwunel.nix
     ./modules/element-call.nix
     ./modules/remnawave.nix
-    ./modules/remnawave-div-relay.nix
+    ./modules/remnawave-relays.nix
     ./modules/manictime.nix
     ./modules/traggo.nix
     ./modules/slusha.nix
@@ -150,11 +153,6 @@ in
   };
   age.secrets.remnawaveSubscriptionPageEnv.file = ./secrets/remnawaveSubscriptionPageEnv;
   age.secrets.remnawaveNodeEnv.file = ./secrets/remnawaveNodeEnv;
-  age.secrets.remnawaveToken.file = ./secrets/remnawaveToken;
-  age.secrets.remnawaveWarsawCertSyncKey = {
-    file = ./secrets/remnawaveWarsawCertSyncKey;
-    mode = "0400";
-  };
 
   cumserver.remnawave = {
     enable = true;
@@ -172,12 +170,12 @@ in
     node = {
       enable = true;
       clientTcpPort = 2080;
-      clientUdpPort = 8444;
+      openClientTcpPort = false;
       environmentFile = config.age.secrets.remnawaveNodeEnv.path;
     };
   };
 
-  cumserver.remnawaveDivRelay.enable = true;
+  cumserver.remnawaveRelays.enable = true;
 
   cumserver.manictime = {
     enable = false;
@@ -190,11 +188,6 @@ in
     owner = "grafana";
     group = "grafana";
     file = ./secrets/grafanaPassword;
-  };
-  age.secrets.nodeExporter1Password = {
-    owner = "prometheus";
-    group = "prometheus";
-    file = ./secrets/nodeExporter1Password;
   };
   age.secrets.nodeExporter3Password = {
     owner = "prometheus";
@@ -212,11 +205,12 @@ in
     };
     remoteNodes = [
       {
+        name = "RU Relay";
+        address = "${secrets.ruRelayIP}:9100";
+      }
+      {
         name = "Poland";
         address = "${secrets.polandNodeIP}:9100";
-        passwordPath = config.age.secrets.nodeExporter1Password.path;
-        enableTLS = true;
-        tlsInsecure = true;
       }
       {
         name = "Dokploy";

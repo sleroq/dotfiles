@@ -21,17 +21,11 @@ in
         hash = "sha256-UIv8PxtJMlX7qClnPazFsSSl7G1BzsTT8VjrMIfB46Q=";
       };
       email = "admin@sleroq.link";
-      # Layer 4 routing lets TrustTunnel and Hysteria2 share public UDP/443.
       globalConfig = ''
         layer4 {
           udp/:443 {
-            @trusttunnel quic sni ${config.cumserver.trusttunnel.domain}
-            route @trusttunnel {
-              proxy udp/127.0.0.1:${toString config.cumserver.trusttunnel.port}
-            }
-
             route {
-              proxy udp/127.0.0.1:${toString config.cumserver.remnawave.node.clientUdpPort}
+              proxy udp/127.0.0.1:${toString config.cumserver.trusttunnel.port}
             }
           }
         }
