@@ -14,7 +14,7 @@
         lib
         config
         ;
-      enableSshAuthSocket = false;
+      enableSshAuthSocket = true;
     })
     ./scripts.nix
   ];
