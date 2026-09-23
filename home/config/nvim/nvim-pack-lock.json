@@ -76,6 +76,10 @@
       "rev": "831a97c",
       "src": "https://github.com/AckslD/nvim-neoclip.lua"
     },
+    "nvim-pi": {
+      "rev": "102e087179cfe8e65bd6b9ab2edbb86d64cecf2f",
+      "src": "https://github.com/aliou/nvim-pi"
+    },
     "nvim-treesitter": {
       "rev": "8b98b4470eb326f1c7b50dae79f8c963568e5720",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",

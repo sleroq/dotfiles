@@ -89,6 +89,7 @@ vim.pack.add({
     { src = "https://github.com/supermaven-inc/supermaven-nvim" },
     -- workaround for stupidity (asking agent about the code)
     { src = "https://github.com/jensenojs/opencode.nvim",               version = "wip-v2" },
+    { src = "https://github.com/aliou/nvim-pi" },
     -- another bloat dependency because opencode can't use telescope
     { src = "https://github.com/folke/snacks.nvim" },
 
@@ -136,6 +137,10 @@ require "marks".setup {
 require("flash").setup({})
 
 require("supermaven-nvim").setup({ keymaps = { accept_suggestion = "<C-l>" } })
+
+local pi_nvim = require("pi-nvim")
+pi_nvim.setup()
+vim.keymap.set("n", "<leader>pp", pi_nvim.toggle, { desc = "Toggle Pi" })
 
 require("neoclip").setup({ preview = true, })
 
@@ -289,9 +294,10 @@ if vim.g.neovide then -- Copy paste for neovide
     map("i", "<sc-v>", '<ESC>"+p')
     map("n", "<sc-v>", '"+p')
     map("t", "<sc-v>", '<C-\\><C-n>"+Pi')
-    vim.o.guifont = "JetBrainsMono Nerd Font:h14"
+
+    vim.o.guifont = "JetBrainsMono Nerd Font:h18"
     vim.g.neovide_cursor_vfx_mode = "pixiedust"
-    vim.g.neovide_opacity = 0.8
+    vim.g.neovide_opacity = 1.0
 end
 
 require("snacks").setup({
