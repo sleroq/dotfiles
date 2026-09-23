@@ -18,7 +18,7 @@ Use the cheapest direct source first. For a supplied URL or a basic “how do I 
 
 # Tools
 
-Use `rg` through `bash` for exact content and iterative discovery; use `find` for file discovery. Start with 1–2 high-signal searches.
+Use pi-fff's `find` for file/path discovery and `grep` for content search. Start with 1–2 high-signal searches; read the most relevant files next. Use grep MCP for remote code search and Exa for web research.
 
 Run independent calls together. Serialize dependent planning or edits to the same files/contracts. Parallelize for speed, not broader exploration.
 

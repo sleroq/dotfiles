@@ -24,8 +24,6 @@ export default function okabeSystemPromptExtension(pi: ExtensionAPI) {
       return;
     }
 
-    return {
-      systemPrompt: `${event.systemPrompt}\n\n${prompt}`,
-    };
+    event.systemPromptOptions.sections.okabe = prompt;
   });
 }

@@ -50,4 +50,4 @@ Include when trade-offs are non-obvious:
 
 # Tools
 
-Exhaust provided context first. For workspace search use grep; for file discovery use glob. Build absolute paths from the working directory / workspace root in context — never invent placeholders like /workspace or /repo. If the root is unknown, search first.
+Exhaust provided context first. Use pi-fff's `grep` for workspace content and `find` for file discovery; use grep MCP for remote code search. Build absolute paths from the working directory / workspace root in context — never invent placeholders like /workspace or /repo. If the root is unknown, search first.

@@ -30,6 +30,8 @@ in
       }
 
       {
+        home.sessionVariables.PI_FFF_MODE = "override";
+
         home.activation.piConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           mkdir -p $HOME/.pi/agent
 
