@@ -1088,11 +1088,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788267358,
-        "narHash": "sha256-nt+lUqYVpc9Y6JeMd2WmXzCDojasdadKo0mWcluvY2Y=",
+        "lastModified": 1789514889,
+        "narHash": "sha256-PFD1nxptCXJyJoiYO1gf/5Vv43yqGpHtMC6LUhl9/pQ=",
         "owner": "cachix",
         "repo": "git-hooks.nix",
-        "rev": "27555e2624241fb116b49095df4caaee85a25691",
+        "rev": "59f4ca0d063a1a3ec722c88b51a33004862e5379",
         "type": "github"
       },
       "original": {
@@ -1635,13 +1635,17 @@
         "nixpkgs": "nixpkgs_8"
       },
       "locked": {
-        "narHash": "sha256-XrdfzFr3zjEwfwA4zcTO9dE8q1fZeS63s76jV7Ac8zs=",
-        "path": "/Users/sleroq/develop/music-link",
-        "type": "path"
+        "lastModified": 1788996669,
+        "narHash": "sha256-gxu6hgTgOlif+iaIonOMWCG2WDxV58NQEFTWXoRGv10=",
+        "owner": "sleroq",
+        "repo": "music-link",
+        "rev": "a8822250c6d8ff1ab1d6f27a589200ef922d8b78",
+        "type": "github"
       },
       "original": {
-        "path": "/Users/sleroq/develop/music-link",
-        "type": "path"
+        "owner": "sleroq",
+        "repo": "music-link",
+        "type": "github"
       }
     },
     "neovim-nightly-overlay": {
@@ -1746,11 +1750,11 @@
         "nixpkgs": "nixpkgs_10"
       },
       "locked": {
-        "lastModified": 1789271913,
-        "narHash": "sha256-9cNioGJJ/2wH/153TefIRv33H98+Y5q2sGOdMWBtdN4=",
+        "lastModified": 1789964329,
+        "narHash": "sha256-1YOQ8lINVxBF3wNZFEu4hEvlp9A7dDj0ybIoVC295Ks=",
         "owner": "fufexan",
         "repo": "nix-gaming",
-        "rev": "04d8ba4c959ed2e1735ed1a2bc2bea8184065d1e",
+        "rev": "69ce0113e1a2d09452c848d05667fa38998fd76d",
         "type": "github"
       },
       "original": {
@@ -2083,11 +2087,11 @@
     },
     "nixpkgs_10": {
       "locked": {
-        "lastModified": 1789073787,
-        "narHash": "sha256-xfX/toC2QV707s06GbP4II/TxYF0fNQj7s5/LClNDKc=",
+        "lastModified": 1789632929,
+        "narHash": "sha256-RjR8AyvGlWuw16XRj7C1YDEw4E27ciuyPeB2nDMzgTU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "aff8a0b28396750446e5537a96461bc4facdb287",
+        "rev": "a32edd7654519351e48e80372a928df336394670",
         "type": "github"
       },
       "original": {

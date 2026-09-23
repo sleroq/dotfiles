@@ -88,8 +88,7 @@ vim.pack.add({
     -- to avoid learning to type fast and setting up proper completion
     { src = "https://github.com/supermaven-inc/supermaven-nvim" },
     -- workaround for stupidity (asking agent about the code)
-    { src = "https://github.com/jensenojs/opencode.nvim",               version = "wip-v2" },
-    { src = "https://github.com/aliou/nvim-pi" },
+    { src = "https://github.com/NickvanDyke/opencode.nvim",            version = "main" },
     -- another bloat dependency because opencode can't use telescope
     { src = "https://github.com/folke/snacks.nvim" },
 
@@ -115,7 +114,7 @@ vim.pack.add({
     { src = "https://github.com/vague2k/vague.nvim" },
     { src = "https://github.com/rose-pine/neovim" },
 
-    { src = "https://github.com/epwalsh/obsidian.nvim" },
+    { src = "https://github.com/obsidian-nvim/obsidian.nvim" },
 })
 
 vim.g.fff = {
@@ -248,7 +247,7 @@ map({ "n" }, "<leader>b", tsbuiltin.buffers, { desc = "Find buffers" }) -- is :b
 map({ "n" }, "<leader>n", "<Cmd>:bn<CR>", { desc = "Next buffer" })
 map({ "n" }, "<leader>p", "<Cmd>:bp<CR>", { desc = "Prev buffers" })
 map({ "n" }, "<leader>gr", tsbuiltin.lsp_references, { desc = "Telescope tags" })
-map({ "n" }, "<leader>r", tsbuiltin.resume, { desc = "Telescope resume last pick" })
+map({ "n" }, "<leader>r", function() Snacks.picker.resume() end, { desc = "Resume last picker" })
 map({ "n" }, "<leader>x", "<Cmd>:bd<CR>", { desc = "Quit the current buffer." })
 map({ "n" }, "<leader>X", "<Cmd>:bd!<CR>", { desc = "Force quit the current buffer." })
 map({ "n" }, "<leader>gg", "<Cmd>:Neogit<CR>", { desc = "Open git shit" })
@@ -305,7 +304,7 @@ require("snacks").setup({
     picker = { enabled = true },
 })
 
-require("opencode").setup({})
+vim.g.opencode_opts = {}
 
 map("n", "<leader>w", function()
     vim.wo.wrap = not vim.wo.wrap
@@ -394,6 +393,16 @@ require("obsidian").setup({
             path = "~/Sync/shared-org",
         },
     },
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "markdown",
+    callback = function(args)
+        map("n", "gd", "<Cmd>ObsidianFollowLink<CR>", {
+            buffer = args.buf,
+            desc = "Follow Obsidian link",
+        })
+    end,
 })
 
 -- require("vague").setup({ transparent = true })
