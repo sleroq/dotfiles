@@ -91,6 +91,7 @@ vim.pack.add({
     { src = "https://github.com/NickvanDyke/opencode.nvim",            version = "main" },
     -- another bloat dependency because opencode can't use telescope
     { src = "https://github.com/folke/snacks.nvim" },
+    { src = "https://github.com/aliou/nvim-pi" },
 
     { src = "https://github.com/mbbill/undotree" },
     -- not even sure if this is a skill issue or what,
@@ -115,11 +116,43 @@ vim.pack.add({
     { src = "https://github.com/rose-pine/neovim" },
 
     { src = "https://github.com/obsidian-nvim/obsidian.nvim" },
+    { src = "https://github.com/sotte/presenting.nvim" },
+    { src = "https://github.com/3rd/image.nvim" },
 })
 
 vim.g.fff = {
     lazy_sync = true,
 }
+
+-- presenting.nvim uses an unnamed scratch buffer, so resolve slide images against the source file.
+local presentation_source
+local presenting = require("presenting")
+local start_presentation = presenting.start
+presenting.start = function(...)
+    presentation_source = vim.api.nvim_buf_get_name(0)
+    return start_presentation(...)
+end
+
+require("image").setup({
+    backend = "kitty",
+    processor = "magick_cli",
+    integrations = {
+        markdown = {
+            enabled = true,
+            floating_windows = true,
+            resolve_image_path = function(document_path, image_path, fallback)
+                if document_path == "" and presentation_source then
+                    document_path = presentation_source
+                end
+                return fallback(document_path, image_path)
+            end,
+        },
+    },
+})
+
+presenting.setup({
+    options = { width = vim.o.columns },
+})
 
 require("faster").setup()
 require "guess-indent".setup({})
@@ -357,7 +390,7 @@ vim.api.nvim_create_autocmd("User", {
 local ts_parsers = {
     "go", "gomod", "gosum", "vim", "vimdoc", "javascript",
     "zig", "typescript", "json", "dockerfile", "sql",
-    "yaml", "bash", "gitignore", "prisma", "svelte",
+    "yaml", "bash", "gitignore", "prisma", "svelte", "markdown", "markdown_inline",
 }
 local nts = require("nvim-treesitter")
 nts.install(ts_parsers)
