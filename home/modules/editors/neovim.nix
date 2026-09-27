@@ -14,6 +14,10 @@
       "--set"
       "FFF_NVIM"
       "${pkgs.vimPlugins.fff-nvim}"
+      "--prefix"
+      "PATH"
+      ":"
+      "${lib.makeBinPath [ pkgs.imagemagick ]}"
     ];
     withRuby = false;
     withPython3 = false;
@@ -42,6 +46,7 @@
     fd
     lazygit
     obsidian-neovide
+    imagemagick # image.nvim's magick_cli processor
 
     htmx-lsp
     svelte-language-server
