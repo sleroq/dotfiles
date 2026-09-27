@@ -261,8 +261,8 @@ in
           version = "bb-data-v1-2026-07-30";
           owner = "Azarattum";
           repo = "BroadcastBox";
-          rev = "2de2aa97c6295a4d6e09a5fafac285ee243dd464";
-          hash = "sha256-kA0JmZZzifwX8gq73wwdVL1zHInLZMfHYxN1CRkMzpY=";
+          rev = "5ed1527214fa351c618db391e21c91729ba1bcb8";
+          hash = "sha256-goMQe3CHn+ThyfAnEyyqJfTfwK7Krw2XS5ejJE6i8sA=";
           vendorHash = "sha256-7BBYB2YJJ0f5Su7KXC0z8hff8kN8vY11k3kRo12m1W8=";
           frontendNpmDepsHash = "sha256-fPvAgEsUuC+qEuRMi7jV+HOH+ibjxNnqI6m/NNnnVAM=";
         };

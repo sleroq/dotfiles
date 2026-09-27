@@ -48,7 +48,6 @@ let
         NETWORK_TEST_ON_START = "false";
         LOGGING_DIRECTORY = "/var/lib/private/${instance.stateDirectory}/logs";
         STREAM_PROFILE_PATH = "/var/lib/private/${instance.stateDirectory}/profiles";
-        DISABLE_STATUS = "false";
         DISABLE_FRONTEND = "true";
       };
       resolvedSettings = defaultSettings // instance.settings;
