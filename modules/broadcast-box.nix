@@ -9,7 +9,6 @@ let
   enabledInstances = if cfg.enable then cfg.instances else { };
   instanceList = lib.mapAttrsToList (name: instance: instance // { inherit name; }) enabledInstances;
   backupInstances = lib.filterAttrs (_: instance: instance.backup.enable) enabledInstances;
-  nat1to1Ip = (builtins.head config.networking.interfaces.ens3.ipv4.addresses).address;
 
   envValueToString =
     value:
@@ -20,7 +19,7 @@ let
     else
       value;
 
-  mkRedisServer = name: instance: {
+  mkRedisServer = _: instance: {
     enable = true;
     bind = "127.0.0.1";
     port = instance.redisPort;
@@ -38,13 +37,13 @@ let
   };
 
   mkServiceEnvironment =
-    name: instance:
+    _: instance:
     let
       defaultSettings = {
         REDIS_URL = "redis://localhost:${toString instance.redisPort}/${toString instance.redisDb}";
         UDP_MUX_PORT = instance.udpPort;
         NETWORK_TYPES = "udp4";
-        NAT_1_TO_1_IP = nat1to1Ip;
+        NAT_1_TO_1_IP = cfg.publicIPv4;
         NETWORK_TEST_ON_START = "false";
         LOGGING_DIRECTORY = "/var/lib/private/${instance.stateDirectory}/logs";
         STREAM_PROFILE_PATH = "/var/lib/private/${instance.stateDirectory}/profiles";
@@ -128,7 +127,7 @@ let
       };
     };
 
-  mkCaddyVirtualHost = name: instance: {
+  mkCaddyVirtualHost = _: instance: {
     extraConfig = ''
       @websockets {
         header Connection *Upgrade*
@@ -203,6 +202,11 @@ in
 {
   options.cumserver.broadcast-box = {
     enable = lib.mkEnableOption "Broadcast Box WebRTC streaming server";
+
+    publicIPv4 = lib.mkOption {
+      type = lib.types.str;
+      description = "Public IPv4 address advertised for WebRTC traffic";
+    };
 
     instances = lib.mkOption {
       type = lib.types.attrsOf (

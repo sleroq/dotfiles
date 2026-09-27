@@ -17,6 +17,7 @@ in
     ../relay-common.nix
     ./disk-config.nix
     ./warsaw-tunnels.nix
+    ../../modules/broadcast-box.nix
   ];
 
   networking = {
@@ -24,6 +25,7 @@ in
     firewall = {
       allowedTCPPorts = [
         22
+        80
         mainRelayPort
         divRelayPort
         directWarsawPort
@@ -36,7 +38,37 @@ in
     };
   };
 
+  cumserver.broadcast-box = {
+    enable = true;
+    publicIPv4 = "185.147.26.212";
+    instances.production = {
+      domain = "alt-web.cum.army";
+      port = 8080;
+      udpPort = 8080;
+      redisPort = 6379;
+      redisDb = 0;
+      stateDirectory = "broadcast-box";
+      backup.enable = false;
+    };
+  };
+
   services = {
+    caddy = {
+      enable = true;
+      email = "sleroq@cum.army";
+      globalConfig = ''
+        https_port 8443
+        default_bind 127.0.0.1
+        servers {
+          protocols h1 h2
+        }
+      '';
+      virtualHosts."http://alt-web.cum.army".extraConfig = ''
+        bind 0.0.0.0
+        redir https://alt-web.cum.army{uri} permanent
+      '';
+    };
+
     haproxy = {
       enable = true;
       config = ''
@@ -59,7 +91,13 @@ in
         frontend warsaw_ingress
           bind 0.0.0.0:${toString mainRelayPort}
           no log
+          tcp-request inspect-delay 5s
+          tcp-request content accept if { req.ssl_hello_type 1 }
+          use_backend broadcast_box_https if { req.ssl_sni -i alt-web.cum.army }
           default_backend warsaw_beats_tunnel
+
+        backend broadcast_box_https
+          server caddy 127.0.0.1:8443 check
 
         backend warsaw_beats_tunnel
           server local_tunnel 127.0.0.1:12084 check
@@ -98,6 +136,8 @@ in
 
   };
 
+  # Apply routing changes with HAProxy's graceful reload, preserving proxy connections.
+  systemd.services.haproxy.reloadIfChanged = true;
   systemd.services.haproxy.serviceConfig = {
     LimitNOFILE = 65536;
     OOMScoreAdjust = -500;

@@ -47,7 +47,7 @@ in
     ./modules/monitoring
     ./modules/bore.nix
     ./modules/podman.nix
-    ./modules/broadcast-box.nix
+    ../../modules/broadcast-box.nix
     ./modules/oven-media-engine.nix
     ./modules/tuwunel.nix
     ./modules/element-call.nix
@@ -238,6 +238,7 @@ in
 
   cumserver.broadcast-box = {
     enable = true;
+    publicIPv4 = (builtins.head config.networking.interfaces.ens3.ipv4.addresses).address;
     instances = {
       production = {
         domain = "web.cum.army";
