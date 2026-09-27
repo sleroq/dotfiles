@@ -78,7 +78,6 @@ in
         "steam-chat.com"
         "valvesoftware.com"
         "energotransbank.com"
-        "web.cum.army"
         "alt-web.cum.army"
       ];
       directProcessNames = [
@@ -86,7 +85,6 @@ in
         "steamwebhelper"
       ];
       routeExcludeAddresses = [
-        "64.188.69.19/32"
         "185.147.26.212/32"
       ];
     };
