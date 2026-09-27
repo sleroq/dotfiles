@@ -1635,13 +1635,17 @@
         "nixpkgs": "nixpkgs_8"
       },
       "locked": {
-        "narHash": "sha256-XrdfzFr3zjEwfwA4zcTO9dE8q1fZeS63s76jV7Ac8zs=",
-        "path": "/Users/sleroq/develop/music-link",
-        "type": "path"
+        "lastModified": 1788996669,
+        "narHash": "sha256-gxu6hgTgOlif+iaIonOMWCG2WDxV58NQEFTWXoRGv10=",
+        "owner": "sleroq",
+        "repo": "music-link",
+        "rev": "a8822250c6d8ff1ab1d6f27a589200ef922d8b78",
+        "type": "github"
       },
       "original": {
-        "path": "/Users/sleroq/develop/music-link",
-        "type": "path"
+        "owner": "sleroq",
+        "repo": "music-link",
+        "type": "github"
       }
     },
     "neovim-nightly-overlay": {
