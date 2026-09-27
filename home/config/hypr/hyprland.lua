@@ -14,7 +14,7 @@ local menu = "tofi-drun --drun-launch=false | xargs --no-run-if-empty uwsm-app -
 local menuBin = "tofi-run | xargs --no-run-if-empty uwsm-app --"
 local menuApp = "vicinae"
 local menuWindows = "vicinae vicinae://extensions/vicinae/wm/switch-windows"
-local menuClipboard = "vicinae vicinae://extensions/vicinae/clipboard/history"
+local menuClipboard = "selection=$(cliphist list | tofi --prompt-text 'history' --padding-left='1%'); [ -n \"$selection\" ] && printf '%s\\n' \"$selection\" | cliphist decode | wl-copy"
 
 -------------------
 -- Autostart
