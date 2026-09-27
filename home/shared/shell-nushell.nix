@@ -57,17 +57,17 @@ let
     }
   '';
 
-  paths =
-    lib.concatLists [
-      [ "${config.home.homeDirectory}/.nix-profile/bin" ]
-      [ "/etc/profiles/per-user/${config.home.username}/bin" ]
-      [ "/nix/var/nix/profiles/default/bin" ]
-      [ "/run/wrappers/bin" ]
-      [ "/run/current-system/sw/bin" ]
-      [ "${config.home.homeDirectory}/.local/bin" ]
-      config.home.sessionPath
-      [ "${config.home.profileDirectory}/bin" ]
-    ];
+  paths = lib.concatLists [
+    [ "${config.home.homeDirectory}/.nix-profile/bin" ]
+    [ "/etc/profiles/per-user/${config.home.username}/bin" ]
+    [ "/nix/var/nix/profiles/default/bin" ]
+    [ "/usr/local/bin" ]
+    [ "/run/wrappers/bin" ]
+    [ "/run/current-system/sw/bin" ]
+    [ "${config.home.homeDirectory}/.local/bin" ]
+    config.home.sessionPath
+    [ "${config.home.profileDirectory}/bin" ]
+  ];
 
   binPaths = lib.pipe paths [
     (map (
