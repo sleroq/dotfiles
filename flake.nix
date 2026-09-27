@@ -174,6 +174,7 @@
               };
               modules = [
                 inputs.home-manager-interplanetary.nixosModules.home-manager
+                inputs.sb.nixosModules.default
                 inputs.aagl.nixosModules.default
                 {
                   home-manager.sharedModules = [
@@ -253,6 +254,7 @@
                 modules = [
                   inputs.determinate.darwinModules.default
                   inputs.agenix.darwinModules.default
+                  inputs.sb.darwinModules.default
                   inputs.home-manager-portable.darwinModules.home-manager
                   (
                     { inputs, inputsResolved', ... }:

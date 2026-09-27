@@ -106,11 +106,11 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1789854676,
-        "narHash": "sha256-R5ACJdRpOS24u+zu2IjEqyXaTQ7tTY3yov2mXhvVFXI=",
+        "lastModified": 1790506800,
+        "narHash": "sha256-nR8t9upcy1xdsj8cB6qzDnbcaxgAestijXoCbsY4wR8=",
         "owner": "sleroq",
         "repo": "bayan",
-        "rev": "31db65aed9c1a73082f748002a027ae412eb523d",
+        "rev": "41d2ee085b4704ecba136e276d623ddb33d3c007",
         "type": "github"
       },
       "original": {
@@ -1635,17 +1635,13 @@
         "nixpkgs": "nixpkgs_8"
       },
       "locked": {
-        "lastModified": 1788996669,
-        "narHash": "sha256-gxu6hgTgOlif+iaIonOMWCG2WDxV58NQEFTWXoRGv10=",
-        "owner": "sleroq",
-        "repo": "music-link",
-        "rev": "a8822250c6d8ff1ab1d6f27a589200ef922d8b78",
-        "type": "github"
+        "narHash": "sha256-XrdfzFr3zjEwfwA4zcTO9dE8q1fZeS63s76jV7Ac8zs=",
+        "path": "/Users/sleroq/develop/music-link",
+        "type": "path"
       },
       "original": {
-        "owner": "sleroq",
-        "repo": "music-link",
-        "type": "github"
+        "path": "/Users/sleroq/develop/music-link",
+        "type": "path"
       }
     },
     "neovim-nightly-overlay": {
@@ -2616,11 +2612,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788806580,
-        "narHash": "sha256-LlQwyl83sEF5WeGsjBAXNCqKmLeVNStMdp3Iwq98Sn8=",
+        "lastModified": 1790266378,
+        "narHash": "sha256-xWkBWz720dXFu/HD1SEShvcnlVpH6sDwvW0B1vo3/k4=",
         "owner": "sleroq",
         "repo": "proxy-helper",
-        "rev": "2bf02d28bb7eeb8af29e3b8bd725b1aecde4b210",
+        "rev": "743bb4c00f9c6e62044e947b18496b1729f05ef1",
         "type": "github"
       },
       "original": {
