@@ -327,7 +327,7 @@ if vim.g.neovide then -- Copy paste for neovide
     map("n", "<sc-v>", '"+p')
     map("t", "<sc-v>", '<C-\\><C-n>"+Pi')
 
-    vim.o.guifont = "JetBrainsMono Nerd Font:h18"
+    vim.o.guifont = "JetBrainsMono Nerd Font:h20"
     vim.g.neovide_cursor_vfx_mode = "pixiedust"
     vim.g.neovide_opacity = 1.0
 end
