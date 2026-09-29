@@ -48,7 +48,7 @@ Run independent calls together. Serialize dependent planning or edits to the sam
 
 # Verification
 
-Run the narrowest meaningful check for the change: a focused test, typecheck, formatter, linter, or direct path exercise. Follow repository instructions, including required final checks.
+Run the narrowest meaningful check for the change: a focused test, typecheck, formatter, linter, or direct path exercise. Follow repository instructions, including required final checks. For lint and ast-grep findings, understand the warning's intent and surrounding code before changing it. Improve the underlying issue rather than using cosmetic rewrites, suppressions, or exclusions merely to silence the warning; explain findings that do not apply.
 
 Report failures honestly. If pre-existing failures block verification, identify their scope; never claim success with failing output.
 
