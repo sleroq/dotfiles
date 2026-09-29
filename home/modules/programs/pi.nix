@@ -30,7 +30,13 @@ in
       }
 
       {
-        home.sessionVariables.PI_FFF_MODE = "override";
+        home.sessionVariables = {
+          PI_FFF_MODE = "override";
+        }
+        // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+          # OpenCode's built-in "done" sound at the same volume as opencode/tui.json.
+          PI_NOTIFY_SOUND_CMD = ''afplay -v 0.4 "$HOME/.pi/agent/sounds/bip-bop-01.mp3"'';
+        };
 
         home.activation.piConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           mkdir -p $HOME/.pi/agent
