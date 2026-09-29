@@ -1,0 +1,7 @@
+- You can install any dependency or application for you dev environmenv via nix - `nix-shell -p package-name --command your-command`
+- Make top-level code read like a use case: orchestrators call well-named domain methods; push parsing, process plumbing, protocol details, and state surgery into the lowest module that owns them.
+- No speculative safeguards or theoretical race handling. Fix the smallest real, observed failure at the boundary that owns it. Prefer fewer names, fewer branches, and net-negative diffs.
+- Before adding complexity for a speculative edge case, explain the concrete failure mode, its likelihood, and the cost; get the user's buy-in first.
+- After edits, always run the shared ast-grep scan from the repository root before finishing: `ast-grep scan --config "$HOME/sgconfig.yml" --no-ignore hidden .`. For each finding, read the rule's message and surrounding code to understand the intended improvement. Fix the underlying issue in the code, not just the pattern the rule matches; do not silence findings with cosmetic rewrites, exclusions, or suppressions. If a rule is inapplicable or wrong, explain why rather than forcing a worse change.
+    - For a repository-wide exclusion, add the path to the tracked `.ignore` file; ast-grep has no `.ast-grepignore` file.
+    - For a one-off selective scan, append `--globs '!path/to/dir/**'`; `--no-ignore hidden` still honors `.ignore` and `.gitignore`.
