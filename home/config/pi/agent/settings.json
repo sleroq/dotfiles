@@ -1,26 +1,27 @@
 {
-  "lastChangelogVersion": "0.87.1",
+  "lastChangelogVersion": "0.99.1",
   "defaultThinkingLevel": "low",
   "packages": [
     "npm:pi-subdir-context",
-    "git:github.com/sleroq/pi-mcp-adapter@2712bd14ef5f0f187a02fb1d4072daad2a466577",
     "npm:@gotgenes/pi-subagents",
     "npm:pi-worktree-extension",
     "npm:@ff-labs/pi-fff",
-    "npm:pi-compact-transcript"
+    "npm:pi-compact-transcript",
+    "npm:pi-notify",
+    "npm:@narumitw/pi-btw"
   ],
   "hideThinkingBlock": true,
+  "showCacheMissNotices": true,
   "markdown": {
     "mermaid": "final"
   },
   "theme": "dark",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-6-sol",
+  "defaultModel": "gpt-6.1-sol",
   "enabledModels": [
     "FrankAI/FrankAI",
-    "FrankAI/FrankAgent",
-    "openai-codex/gpt-6-sol",
-    "openai-codex/gpt-6-luna"
+    "openai-codex/gpt-6-astra",
+    "openai-codex/gpt-6.1-sol"
   ],
   "outputPad": 0
 }

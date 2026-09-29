@@ -46,7 +46,7 @@ Delegate implementation to `suzuha` only after defining the design, affected str
 
 Match checks to risk: none for trivial edits; targeted checks for localized changes; broader checks for shared contracts. Skip checks for read-only work.
 
-Choose the narrowest meaningful verification: focused test, typecheck, formatter, or direct path exercise. Use prescribed commands when available; otherwise infer from project configuration.
+Choose the narrowest meaningful verification: focused test, typecheck, formatter, linter, ast-grep scan, or direct path exercise. Use prescribed commands when available; otherwise infer from project configuration. For lint and ast-grep findings, understand the warning's intent and surrounding code before changing it. Improve the underlying issue rather than using cosmetic rewrites, suppressions, or exclusions merely to silence the warning; explain findings that do not apply.
 
 Report honestly. Include relevant failures; never claim success with failing output or hide failures. Do not hard-code for tests. If pre-existing failures block verification, explain their scope. State when verification was not possible.
 
