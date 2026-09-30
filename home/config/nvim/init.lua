@@ -19,6 +19,10 @@ vim.o.updatetime = 2000
 vim.o.swapfile = false
 vim.opt.splitright = true
 vim.opt.expandtab = true
+vim.opt.foldmethod = "manual" -- UFO supplies automatic folds while allowing manual zf folds.
+vim.opt.foldlevel = 99 -- Keep folds open until explicitly closed.
+vim.opt.foldlevelstart = 99
+vim.opt.foldenable = true
 vim.cmd.packadd("nohlsearch")
 vim.cmd.packadd("cfilter")
 vim.o.grepprg = "rg --vimgrep --hidden --glob '!.git/*' --glob '!node_modules/*'"
@@ -34,8 +38,8 @@ vim.opt.runtimepath:prepend(vim.env.FFF_NVIM)
 vim.pack.add({
     -- To make sure neovim is not too fast:
     { src = "https://github.com/nvim-treesitter/nvim-treesitter",        version = "main" },
-    -- 16k+ loc of lua bloat to show results of fuzzy search:
-    { src = "https://github.com/nvim-telescope/telescope.nvim",          version = "master" },
+    { src = "https://github.com/kevinhwang91/promise-async" },
+    { src = "https://github.com/kevinhwang91/nvim-ufo" },
 
     -- To avoid learning git cli:
     { src = "https://github.com/NeogitOrg/neogit" },
@@ -54,17 +58,13 @@ vim.pack.add({
 
     -- bloated file manager to avoid learning cd and ls:
     { src = "https://github.com/stevearc/oil.nvim" },
+    { src = "https://github.com/Eutrius/Otree.nvim" },
 
     -- can't code if I don't see pretty icon on my screen:
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
 
     -- maybe actually useful stuff:
     { src = "https://github.com/neovim/nvim-lspconfig" },
-
-    -- more bloat:
-    { src = "https://github.com/nvim-telescope/telescope-ui-select.nvim" }, -- TODO: use atleast once?
-    { src = "https://github.com/nvim-telescope/telescope-frecency.nvim" },
-    { src = "https://github.com/jvgrootveld/telescope-zoxide" },
 
     -- workaround for bad memory of keymaps (and helps with usage of registers)
     { src = "https://github.com/folke/which-key.nvim" },
@@ -90,7 +90,7 @@ vim.pack.add({
     { src = "https://github.com/supermaven-inc/supermaven-nvim" },
     -- workaround for stupidity (asking agent about the code)
     { src = "https://github.com/NickvanDyke/opencode.nvim",            version = "main" },
-    -- another bloat dependency because opencode can't use telescope
+    -- picker and input UI for opencode
     { src = "https://github.com/folke/snacks.nvim" },
     { src = "https://github.com/aliou/nvim-pi" },
 
@@ -123,6 +123,22 @@ vim.pack.add({
 
 vim.g.fff = {
     lazy_sync = true,
+    layout = {
+        width = 1,
+        height = 1,
+        prompt_position = "top",
+        preview_position = "right",
+        preview_size = 0.5,
+        flex = false, -- Keep the preview beside the files, even in narrow windows.
+        -- FFF reserves border cells even with "none"; spaces keep those cells opaque.
+        border = {
+            { " ", " ", " ", " ", " ", " ", " ", " " },
+            { " ", " ", " ", " ", " " },
+        },
+    },
+    hl = {
+        border = "NormalFloat",
+    },
 }
 
 -- presenting.nvim uses an unnamed scratch buffer, so resolve slide images against the source file.
@@ -134,26 +150,40 @@ presenting.start = function(...)
     return start_presentation(...)
 end
 
-require("image").setup({
-    backend = "kitty",
-    processor = "magick_cli",
-    integrations = {
-        markdown = {
-            enabled = true,
-            floating_windows = true,
-            resolve_image_path = function(document_path, image_path, fallback)
-                if document_path == "" and presentation_source then
-                    document_path = presentation_source
-                end
-                return fallback(document_path, image_path)
-            end,
+-- Terminal image rendering is unavailable in Neovide and headless/embedded sessions.
+if not vim.g.neovide and vim.uv.guess_handle(1) == "tty" then
+    require("image").setup({
+        backend = "kitty",
+        processor = "magick_cli",
+        integrations = {
+            markdown = {
+                enabled = true,
+                floating_windows = true,
+                resolve_image_path = function(document_path, image_path, fallback)
+                    if document_path == "" and presentation_source then
+                        document_path = presentation_source
+                    end
+                    return fallback(document_path, image_path)
+                end,
+            },
         },
-    },
-})
+    })
+end
 
 presenting.setup({
     options = { width = vim.o.columns },
 })
+
+local ufo = require("ufo")
+ufo.setup({
+    provider_selector = function()
+        return { "treesitter", "indent" }
+    end,
+})
+vim.keymap.set("n", "zR", ufo.openAllFolds, { desc = "Open all folds" })
+vim.keymap.set("n", "zM", ufo.closeAllFolds, { desc = "Close all folds" })
+vim.keymap.set("n", "zr", ufo.openFoldsExceptKinds, { desc = "Open folds except configured kinds" })
+vim.keymap.set("n", "zm", ufo.closeFoldsWith, { desc = "Close another fold level" })
 
 require("faster").setup()
 require "guess-indent".setup({})
@@ -177,44 +207,15 @@ vim.keymap.set("n", "<leader>pp", pi_nvim.toggle, { desc = "Toggle Pi" })
 
 require("neoclip").setup({ preview = true, })
 
-local telescope = require("telescope")
-
 local function find_noignore()
-    require("frecency.config").setup({
-        workspace_scan_cmd = {
-            "rg",
-            "--files",
-            "--hidden",
-            "--no-ignore",
-            "--glob",
-            "!**/.git/**",
-        },
-    })
-
-    telescope.extensions.frecency.frecency({
-        workspace = "CWD",
-        prompt_title = "Find files (including ignored)",
+    Snacks.picker.files({
+        hidden = true,
+        ignored = true,
+        exclude = { "**/.git/**" },
+        matcher = { frecency = true },
+        title = "Find files (including ignored)",
     })
 end
-
-telescope.setup({
-    defaults = {
-        color_devicons = true,
-        sorting_strategy = "ascending",
-        borderchars = { "", "", "", "", "", "", "", "" },
-        path_displays = "smart",
-        layout_strategy = "horizontal",
-        layout_config = {
-            height = 100,
-            width = 400,
-            prompt_position = "top",
-            preview_cutoff = 40,
-        },
-    },
-})
-telescope.load_extension("frecency")
-telescope.load_extension("ui-select")
-telescope.load_extension("zoxide")
 
 vim.lsp.config["lua_ls"] = {
     settings = {
@@ -239,6 +240,7 @@ vim.lsp.config["ast_grep"] = {
 vim.lsp.enable({ "ast_grep", "lua_ls", "nixd", "gopls", "ts_ls", "svelte" })
 
 require("oil").setup({
+    default_file_explorer = false,
     lsp_file_methods = {
         enabled = true,
         timeout_ms = 1000,
@@ -255,11 +257,39 @@ require("oil").setup({
     },
 })
 
+-- Otree has no icon-provider option; reuse Oil's provider for every scanned entry.
+local otree_fs = require("Otree.fs")
+local scan_otree_dir = otree_fs.scan_dir
+local oil_icon = require("oil.util").get_icon_provider()
+otree_fs.scan_dir = function(...)
+    local nodes = scan_otree_dir(...)
+    for _, node in ipairs(nodes) do
+        node.icon, node.icon_hl = oil_icon(node.type, node.link_path or node.filename)
+    end
+    return nodes
+end
+
+require("Otree").setup({
+    open_on_left = false,
+    win_size = 35,
+    hijack_netrw = true,
+    oil = "float",
+    keymaps = {
+        ["gh"] = "actions.goto_home_dir",
+    },
+})
+
 require("neogit").setup({
     kind = "replace",
 })
 
-require("diffview")
+require("diffview").setup({
+    file_panel = {
+        win_config = {
+            width = 25,
+        },
+    },
+})
 local gitlab = require("gitlab")
 gitlab.setup({
     connection_settings = {
@@ -267,23 +297,23 @@ gitlab.setup({
     },
 })
 
-local tsbuiltin = require("telescope.builtin")
 local fff = require("fff")
 local map = vim.keymap.set
 local unmap = vim.keymap.del
 
 vim.g.mapleader = " "
 map({ "v", "x" }, "<C-y>", '"+y', { desc = "System clipboard yank" })
-map({ "n" }, "<C-x>", "<Cmd>:Telescope neoclip<CR>", { desc = "Clipboard manager" }) -- maybe use registers like a chad instead of this?
+map({ "n" }, "<C-x>", function() Snacks.picker.pick("neoclip") end, { desc = "Clipboard history" })
 map({ "n" }, "<leader>/", fff.live_grep, { desc = "Live grep" })
 map({ "n" }, "<leader><leader>", fff.find_files, { desc = "Find files" })
 map({ "n" }, "<leader>ff", find_noignore, { desc = "Find files no .gitignore" })
-map("n", "<leader>fp", telescope.extensions.zoxide.list, { desc = "Switch project (zoxide)" })
-map({ "n" }, "<leader>b", tsbuiltin.buffers, { desc = "Find buffers" }) -- is :b tab not enough?
+map("n", "<leader>fp", function() Snacks.picker.zoxide() end, { desc = "Switch project (zoxide)" })
+map({ "n" }, "<leader>b", function() Snacks.picker.buffers() end, { desc = "Find buffers" }) -- is :b tab not enough?
 map({ "n" }, "<leader>n", "<Cmd>:bn<CR>", { desc = "Next buffer" })
 map({ "n" }, "<leader>p", "<Cmd>:bp<CR>", { desc = "Prev buffers" })
-map({ "n" }, "<leader>gr", tsbuiltin.lsp_references, { desc = "Telescope tags" })
+map({ "n" }, "<leader>gr", function() Snacks.picker.lsp_references() end, { desc = "LSP references" })
 map({ "n" }, "<leader>r", function() Snacks.picker.resume() end, { desc = "Resume last picker" })
+map("n", "<leader>fl", function() Snacks.picker.pickers() end, { desc = "List Snacks pickers" })
 map({ "n" }, "<leader>x", "<Cmd>:bd<CR>", { desc = "Quit the current buffer." })
 map({ "n" }, "<leader>X", "<Cmd>:bd!<CR>", { desc = "Force quit the current buffer." })
 map({ "n" }, "<leader>gg", "<Cmd>:Neogit<CR>", { desc = "Open git shit" })
@@ -297,7 +327,18 @@ map({ "o", "x" }, "R", function() require("flash").treesitter_search() end, { de
 map("c", "<C-s>", function() require("flash").toggle() end, { desc = "Toggle Flash search" })
 
 map({ "n", "v", "x" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format current buffer" })
-map({ "n" }, "<leader>e", "<cmd>Oil<CR>", { desc = "Open oil" })
+map("n", "<leader>e", "<cmd>Otree<CR>", { desc = "Toggle file tree sidebar" })
+map("n", "<leader>E", function()
+    require("Otree.actions").focus_tree()
+    vim.api.nvim_win_set_config(0, {
+        relative = "editor",
+        row = 0,
+        col = 0,
+        width = vim.o.columns,
+        height = vim.o.lines - vim.o.cmdheight,
+        border = "none",
+    })
+end, { desc = "Open fullscreen file tree" })
 
 vim.api.nvim_create_user_command("TermNu", function() vim.cmd("terminal nu") end, {})
 
@@ -330,14 +371,66 @@ if vim.g.neovide then -- Copy paste for neovide
     map("n", "<sc-v>", '"+p')
     map("t", "<sc-v>", '<C-\\><C-n>"+Pi')
 
-    vim.o.guifont = "JetBrainsMono Nerd Font:h20"
+    local font_size = 20
+    local function change_font_size(delta)
+        font_size = math.max(1, font_size + delta)
+        vim.o.guifont = "JetBrainsMono Nerd Font:h" .. font_size
+    end
+    change_font_size(0)
+
+    local modes = { "n", "v", "i", "c", "t" }
+    map(modes, "<D-+>", function() change_font_size(1) end, { desc = "Increase font size" })
+    map(modes, "<D-=>", function() change_font_size(1) end, { desc = "Increase font size" })
+    map(modes, "<D-->", function() change_font_size(-1) end, { desc = "Decrease font size" })
+
     vim.g.neovide_cursor_vfx_mode = "pixiedust"
     vim.g.neovide_opacity = 1.0
 end
 
 require("snacks").setup({
     input = { enabled = true },
-    picker = { enabled = true },
+    picker = {
+        enabled = true,
+        ui_select = true,
+        sources = {
+            neoclip = {
+                title = "Clipboard history",
+                finder = function()
+                    local items = {}
+                    for _, entry in ipairs(require("neoclip.storage").get().yanks) do
+                        local text = table.concat(entry.contents, "\n")
+                        items[#items + 1] = {
+                            text = text,
+                            preview = { text = text, ft = entry.filetype },
+                            entry = entry,
+                        }
+                    end
+                    return items
+                end,
+                format = "text",
+                preview = "preview",
+                confirm = function(picker, item)
+                    picker:close()
+                    if item then
+                        require("neoclip.handlers").set_registers({ '"' }, item.entry)
+                    end
+                end,
+            },
+        },
+        layout = {
+            config = function(layout)
+                layout.fullscreen = true
+                local function remove_borders(box)
+                    box.border = "none"
+                    for _, child in ipairs(box) do
+                        remove_borders(child)
+                    end
+                end
+                remove_borders(layout.layout)
+                return layout
+            end,
+        },
+    },
 })
 
 vim.g.opencode_opts = {}
@@ -355,7 +448,21 @@ map("n", "<leader>w", function()
 end, { desc = "Toggle wrap + visual-line movement" })
 
 local zen = require("zen-mode")
+local zen_float_shadow
 zen.setup({
+    border = "none",
+    window = { backdrop = 1 },
+    on_open = function()
+        if vim.g.neovide then
+            zen_float_shadow = vim.g.neovide_floating_shadow
+            vim.g.neovide_floating_shadow = false
+        end
+    end,
+    on_close = function()
+        if vim.g.neovide then
+            vim.g.neovide_floating_shadow = zen_float_shadow
+        end
+    end,
     plugins = {
         kitty = {
             enabled = true,
@@ -391,7 +498,7 @@ vim.api.nvim_create_autocmd("User", {
 })
 
 local ts_parsers = {
-    "go", "gomod", "gosum", "vim", "vimdoc", "javascript",
+    "go", "gomod", "gosum", "vim", "vimdoc", "javascript", "nix", "lua",
     "zig", "typescript", "json", "dockerfile", "sql",
     "yaml", "bash", "gitignore", "prisma", "svelte", "markdown", "markdown_inline",
 }
@@ -403,7 +510,6 @@ vim.api.nvim_create_autocmd("FileType", {
         local filetype = args.match
         local lang = vim.treesitter.language.get_lang(filetype)
         if lang and vim.treesitter.language.add(lang) then
-            vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"               -- folds, provided by Neovim
             vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()" -- indentation, provided by nvim-treesitter
             vim.treesitter.start()                                            -- syntax highlighting, provided by Neovim
         end
@@ -445,5 +551,5 @@ vim.api.nvim_create_autocmd("FileType", {
 -- require("vague").setup()
 -- vim.cmd("colorscheme vague")
 vim.cmd("colorscheme rose-pine")
-vim.api.nvim_set_hl(0, "ZenBg", { bg = "NONE" })
+vim.api.nvim_set_hl(0, "ZenBg", { link = "Normal" })
 -- vim.cmd("colorscheme monochrome")

@@ -1,5 +1,9 @@
 {
   "plugins": {
+    "Otree.nvim": {
+      "rev": "1540ea0a300916f1c43063fda185463b3e8f2f40",
+      "src": "https://github.com/Eutrius/Otree.nvim"
+    },
     "atlas.vim": {
       "rev": "f254465adbcae565d9cf8c987f5a797c1f9cf922",
       "src": "https://github.com/huyvohcmc/atlas.vim"
@@ -127,7 +131,7 @@
       "src": "https://github.com/nvim-telescope/telescope-frecency.nvim"
     },
     "telescope-ui-select.nvim": {
-      "rev": "6e51d7d",
+      "rev": "6e51d7da30bd139a6950adf2a47fda6df9fa06d2",
       "src": "https://github.com/nvim-telescope/telescope-ui-select.nvim"
     },
     "telescope-zoxide": {
@@ -136,8 +140,7 @@
     },
     "telescope.nvim": {
       "rev": "40aedd8a68c78a656a10a8d62d80c54af59420fb",
-      "src": "https://github.com/nvim-telescope/telescope.nvim",
-      "version": "'master'"
+      "src": "https://github.com/nvim-telescope/telescope.nvim"
     },
     "undotree": {
       "rev": "6fa6b57cda8459e1e4b2ca34df702f55242f4e4d",
