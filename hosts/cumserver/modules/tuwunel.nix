@@ -104,6 +104,7 @@ in
       defaults.email = config.services.caddy.email;
       certs."${cfg.turn.domain}" = {
         webroot = "/var/lib/acme/acme-challenge";
+        reloadServices = [ "coturn.service" ];
       };
     };
 
@@ -275,8 +276,14 @@ in
     ];
 
     networking.firewall = lib.mkIf cfg.turn.enable {
-      allowedTCPPorts = [ 5349 ];
-      allowedUDPPorts = [ 5349 ];
+      allowedTCPPorts = [
+        3478
+        5349
+      ];
+      allowedUDPPorts = [
+        3478
+        5349
+      ];
       allowedUDPPortRanges = [
         {
           from = cfg.turn.minPort;
