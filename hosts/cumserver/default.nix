@@ -393,6 +393,7 @@ in
   };
   services.sieve = {
     enable = true;
+    port = 8089;
     environmentFile = config.age.secrets.sieveEnv.path;
   };
 

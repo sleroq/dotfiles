@@ -81,7 +81,6 @@
     # music-link.url = "path:/Users/sleroq/develop/music-link";
 
     sieve.url = "git+ssh://git@github.com/sleroq/sieve";
-    sieve.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     bayan.url = "github:sleroq/bayan";
 
