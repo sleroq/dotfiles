@@ -1,4 +1,5 @@
 {
+  pkgs,
   secrets,
   ...
 }:
@@ -48,6 +49,11 @@ in
       redisPort = 6379;
       redisDb = 0;
       stateDirectory = "broadcast-box";
+      package = pkgs.broadcast-box.override {
+        version = "unstable-2026-09-28";
+        rev = "f4b084b86b5397dfcd41641aec0f3bf953acac31";
+        hash = "sha256-3uabwwnLs2hCfKk7cUw5ZCN9Ig39lU0pl28NYOlSYqU=";
+      };
       backup.enable = false;
     };
   };
