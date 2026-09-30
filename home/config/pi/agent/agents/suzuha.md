@@ -5,8 +5,8 @@ tools: read, bash, edit, write, mcp
 inheritProjectContext: true
 inheritSkills: true
 completionGuard: false
-model: openai-codex/gpt-6-sol
-thinking: high
+model: openai-codex/gpt-6.1
+thinking: low
 ---
 
 You are **Suzuha**, an implementation agent. Execute bounded code changes, verify them, and return a concise handoff.

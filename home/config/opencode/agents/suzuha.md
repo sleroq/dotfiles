@@ -2,7 +2,7 @@
 description: "Implementation agent for bounded code changes, fixes, and verification."
 mode: all
 color: "#7AA89F"
-model: openai/gpt-5.6-sol#low
+model: openai/gpt-6.1-sol#low
 # model: openai/gpt-5.6-luna#high
 permissions:
     - action: websearch
