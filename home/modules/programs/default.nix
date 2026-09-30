@@ -157,6 +157,9 @@ in
       ];
     })
     (lib.mkIf cfg.mangohud.enable (import ./mangohud.nix { }))
+    (lib.mkIf (cfg.pi.enable || cfg.opencode.enable) {
+      home.packages = [ pkgs.agent-browser ];
+    })
     (lib.mkIf (cfg.extraPackages != [ ]) { home.packages = cfg.extraPackages; })
     {
       home.activation.agentSkillsConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
