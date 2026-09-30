@@ -64,6 +64,7 @@ vim.pack.add({
     -- more bloat:
     { src = "https://github.com/nvim-telescope/telescope-ui-select.nvim" }, -- TODO: use atleast once?
     { src = "https://github.com/nvim-telescope/telescope-frecency.nvim" },
+    { src = "https://github.com/jvgrootveld/telescope-zoxide" },
 
     -- workaround for bad memory of keymaps (and helps with usage of registers)
     { src = "https://github.com/folke/which-key.nvim" },
@@ -213,6 +214,7 @@ telescope.setup({
 })
 telescope.load_extension("frecency")
 telescope.load_extension("ui-select")
+telescope.load_extension("zoxide")
 
 vim.lsp.config["lua_ls"] = {
     settings = {
@@ -276,6 +278,7 @@ map({ "n" }, "<C-x>", "<Cmd>:Telescope neoclip<CR>", { desc = "Clipboard manager
 map({ "n" }, "<leader>/", fff.live_grep, { desc = "Live grep" })
 map({ "n" }, "<leader><leader>", fff.find_files, { desc = "Find files" })
 map({ "n" }, "<leader>ff", find_noignore, { desc = "Find files no .gitignore" })
+map("n", "<leader>fp", telescope.extensions.zoxide.list, { desc = "Switch project (zoxide)" })
 map({ "n" }, "<leader>b", tsbuiltin.buffers, { desc = "Find buffers" }) -- is :b tab not enough?
 map({ "n" }, "<leader>n", "<Cmd>:bn<CR>", { desc = "Next buffer" })
 map({ "n" }, "<leader>p", "<Cmd>:bp<CR>", { desc = "Prev buffers" })

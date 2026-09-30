@@ -130,6 +130,10 @@
       "rev": "6e51d7d",
       "src": "https://github.com/nvim-telescope/telescope-ui-select.nvim"
     },
+    "telescope-zoxide": {
+      "rev": "54bfe630bad08dc9891ec78c7cf8db38dd725c97",
+      "src": "https://github.com/jvgrootveld/telescope-zoxide"
+    },
     "telescope.nvim": {
       "rev": "40aedd8a68c78a656a10a8d62d80c54af59420fb",
       "src": "https://github.com/nvim-telescope/telescope.nvim",
