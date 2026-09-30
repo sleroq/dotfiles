@@ -42,6 +42,9 @@
     home-manager-cumserver.url = "github:nix-community/home-manager/f3a30376bb9eb2f6f61816be7d6ed954b6d2a3b9";
     home-manager-cumserver.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
+    cliamp.url = "github:bjarneo/cliamp";
+    cliamp.inputs.nixpkgs.follows = "nixpkgs-portable";
+
     # HM-related inputs used by home modules
     nix-gaming.url = "github:fufexan/nix-gaming";
 

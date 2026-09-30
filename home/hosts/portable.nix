@@ -103,6 +103,10 @@ in
       extraPackages = with pkgs; [
         nerd-fonts.jetbrains-mono
         inputs'.agenix.packages.default
+        # Upstream only exposes Linux flake packages; its derivation also supports Darwin.
+        (pkgs.callPackage "${self.inputs.cliamp}/nix/package.nix" {
+          version = self.inputs.cliamp.shortRev;
+        })
         ffmpeg
         wget
         uv

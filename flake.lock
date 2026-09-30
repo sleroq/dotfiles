@@ -245,6 +245,26 @@
         "type": "github"
       }
     },
+    "cliamp": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-portable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790706378,
+        "narHash": "sha256-nc89xImCE+VTQEzq8GdH92WTxrM/zTUVvtg+YQnfuSU=",
+        "owner": "bjarneo",
+        "repo": "cliamp",
+        "rev": "7af51fff694ab31c0a6764d4248f9964fba7e42b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "bjarneo",
+        "repo": "cliamp",
+        "type": "github"
+      }
+    },
     "complement": {
       "flake": false,
       "locked": {
