@@ -1,4 +1,10 @@
-{ config, lib, pkgs, inputs', secrets, ... }:
+{
+  config,
+  lib,
+  inputs',
+  secrets,
+  ...
+}:
 
 let
   cfg = config.cumserver.mailserver;
@@ -6,7 +12,8 @@ let
 
   primaryDomain = lib.elemAt config.mailserver.domains 0;
 
-  generateLoginAccountEntry = userConf:
+  generateLoginAccountEntry =
+    userConf:
     let
       emailAddress = "${userConf.name}@${primaryDomain}";
 
@@ -22,16 +29,16 @@ let
       # - "localpart" -> "localpart@primaryDomain"
       # - "user@other.com" -> "user@other.com"
       # - "@domain.com" -> "@domain.com" (for domain catch-alls)
-      userDefinedAliasesList = userConf.aliases or [];
-      processedAliasesConfig = lib.optionalAttrs (userDefinedAliasesList != []) {
-        aliases = map (aliasEntry:
-          if lib.strings.hasInfix "@" aliasEntry then aliasEntry
-          else "${aliasEntry}@${primaryDomain}"
+      userDefinedAliasesList = userConf.aliases or [ ];
+      processedAliasesConfig = lib.optionalAttrs (userDefinedAliasesList != [ ]) {
+        aliases = map (
+          aliasEntry:
+          if lib.strings.hasInfix "@" aliasEntry then aliasEntry else "${aliasEntry}@${primaryDomain}"
         ) userDefinedAliasesList;
       };
 
-      userDefinedAliasesRegexp = userConf.aliasesRegexp or [];
-      aliasesRegexpConfig = lib.optionalAttrs (userDefinedAliasesRegexp != []) {
+      userDefinedAliasesRegexp = userConf.aliasesRegexp or [ ];
+      aliasesRegexpConfig = lib.optionalAttrs (userDefinedAliasesRegexp != [ ]) {
         aliasesRegexp = userDefinedAliasesRegexp;
       };
 
@@ -57,7 +64,8 @@ let
     in
     {
       name = emailAddress;
-      value = accountBaseConfig
+      value =
+        accountBaseConfig
         // catchAllForPrimaryDomainConfig
         // processedAliasesConfig
         // aliasesRegexpConfig
@@ -68,10 +76,13 @@ let
     };
 
   generatedLoginAccounts = lib.listToAttrs (map generateLoginAccountEntry secrets.mailUsers);
-in {
+in
+{
   options.cumserver.mailserver = {
     enable = lib.mkEnableOption "Mail server";
-    backup.enable = lib.mkEnableOption "backups" // { default = true; };
+    backup.enable = lib.mkEnableOption "backups" // {
+      default = true;
+    };
   };
 
   config = lib.mkMerge [
@@ -82,19 +93,25 @@ in {
           message = "Caddy has to be enabled for mailserver to work";
         }
         {
-          assertion = lib.isList secrets.mailUsers && lib.all (user: lib.isAttrs user && user ? "name" && user ? "passwordSecretName") secrets.mailUsers;
+          assertion =
+            lib.isList secrets.mailUsers
+            && lib.all (
+              user: lib.isAttrs user && user ? "name" && user ? "passwordSecretName"
+            ) secrets.mailUsers;
           message = "secrets.mailUsers must be a list of users, each with at least 'name' and 'passwordSecretName'.";
         }
       ];
 
-      age.secrets = lib.listToAttrs (lib.map (userConf: {
-        name = userConf.passwordSecretName;
-        value = {
-          owner = "virtualMail";
-          group = "virtualMail";
-          file = ../secrets/mail/${userConf.passwordSecretName};
-        };
-      }) secrets.mailUsers);
+      age.secrets = lib.listToAttrs (
+        lib.map (userConf: {
+          name = userConf.passwordSecretName;
+          value = {
+            owner = "virtualMail";
+            group = "virtualMail";
+            file = ../secrets/mail/${userConf.passwordSecretName};
+          };
+        }) secrets.mailUsers
+      );
 
       mailserver = {
         inherit fqdn;
@@ -113,10 +130,8 @@ in {
 
       # Wait for caddy, so certs are ready on first ever boot
       systemd.services.dovecot.after = [ "caddy.service" ];
-
-      services.rspamd.package = pkgs.rspamd.override {
-        pcre2 = pkgs.pcre2.override { withJitSealloc = false; };
-      };
+      # The TLS policy daemon listens on a Unix socket.
+      systemd.services.postfix-tlspol.serviceConfig.RestrictAddressFamilies = lib.mkAfter [ "AF_UNIX" ];
 
       services.caddy.virtualHosts."mail.cum.army" = {
         extraConfig = ''
@@ -137,7 +152,10 @@ in {
         passwordFile = config.age.secrets.resticMailPassword.path;
         environmentFile = config.age.secrets.resticS3Keys.path;
         initialize = true;
-        paths = [ "/var/vmail" "/var/sieve" ];
+        paths = [
+          "/var/vmail"
+          "/var/sieve"
+        ];
         exclude = [
           "**/tmp/*"
           "**/cache/*"

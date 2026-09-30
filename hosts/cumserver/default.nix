@@ -22,7 +22,10 @@ let
 
   kopoka = serviceWrapper.mkTelegramBot {
     name = "kopoka";
-    package = inputs'.kopoka.packages.default;
+    # Upstream still requests Go 1.25, which was removed from nixpkgs-unstable.
+    package = inputs'.kopoka.packages.default.overrideAttrs (_: {
+      nativeBuildInputs = [ pkgs.go ];
+    });
     secretFile = ./secrets/kopokaEnv;
   };
 
@@ -97,9 +100,7 @@ in
 
   services.qemuGuest.enable = true;
 
-  services.journald.extraConfig = ''
-    SystemMaxUse=100M
-  '';
+  services.journald.settings.Journal.SystemMaxUse = "100M";
 
   cumserver.caddy.enable = true;
   cumserver.attic.enable = true;
@@ -246,6 +247,7 @@ in
         udpPort = 8080;
         redisPort = 6379;
         redisDb = 0;
+        settings.INTERFACE_FILTER = "ens3";
         stateDirectory = "broadcast-box";
         backup.enable = true;
       };
@@ -256,6 +258,7 @@ in
         udpPort = 8081;
         redisPort = 6380;
         redisDb = 1;
+        settings.INTERFACE_FILTER = "ens3";
         stateDirectory = "broadcast-box-testing";
         backup.enable = false;
         package = pkgs.broadcast-box.override {
@@ -275,6 +278,7 @@ in
         udpPort = 8082;
         redisPort = 6381;
         redisDb = 2;
+        settings.INTERFACE_FILTER = "ens3";
         stateDirectory = "broadcast-box-development";
         backup.enable = false;
       };
