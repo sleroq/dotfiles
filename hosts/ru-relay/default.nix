@@ -17,6 +17,7 @@ in
   imports = [
     ../relay-common.nix
     ./disk-config.nix
+    ./coturn.nix
     ./warsaw-tunnels.nix
     ../../modules/broadcast-box.nix
   ];
