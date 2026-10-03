@@ -52,11 +52,7 @@
         version = "0.53.26-alpha";
         hash = "0daapymbkq5s9qdya9g7a4ay6813n1abyfb36rva0kpdhkppqhph";
       };
-      helium = {
-        enable = true;
-        version = "0.15.4.1";
-        hash = "sha256-h3yxZnMb/EHvPJALQlJgHUVYUNsfuv0pnewgf6K6sx8=";
-      };
+      helium.enable = true;
 
       mpv.enable = true;
       kitty = {

@@ -33,17 +33,7 @@ in
       };
     };
 
-    helium = {
-      enable = lib.mkEnableOption "helium";
-      version = lib.mkOption {
-        type = lib.types.str;
-        description = "Override version for helium";
-      };
-      hash = lib.mkOption {
-        type = lib.types.str;
-        description = "Override hash for helium";
-      };
-    };
+    helium.enable = lib.mkEnableOption "helium";
     lf.enable = lib.mkEnableOption "lf file manager";
     zathura.enable = lib.mkEnableOption "Zathura PDF viewer";
 
@@ -89,7 +79,7 @@ in
     })
     (lib.mkIf cfg.helium.enable {
       home.packages = [
-        (pkgs.callPackage ../../../packages/helium.nix { inherit (cfg.helium) version hash; })
+        (pkgs.callPackage ../../../packages/helium.nix { })
       ];
     })
     (lib.mkIf cfg.lf.enable (import ./lf.nix { inherit pkgs; }))
