@@ -76,20 +76,21 @@
     cum-army.url = "github:sleroq/cum.army";
     cum-army.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
-    web-cum-army.url = "github:sleroq/web.cum.army";
-    web-cum-army.inputs.nixpkgs.follows = "nixpkgs-cumserver";
-
     reactor.url = "github:sleroq/reactor";
+
+    # Immutable local release until Starflake is published; rooted on cumserver.
+    starflake.url = "path:/nix/store/54cvmdx330v5f81d0b7gdrvb6qvy6kzl-source";
+    starflake.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     music-link.url = "github:sleroq/music-link";
     # music-link.url = "path:/Users/sleroq/develop/music-link";
 
-    sieve.url = "git+ssh://git@github.com/sleroq/sieve";
+    # Keep the module pinned; the host overrides its package with the running legacy binary.
+    # Future bot-split deployment (requires the new SIEVE_* credentials):
+    # sieve.url = "git+ssh://git@github.com/sleroq/sieve";
+    sieve.url = "git+ssh://git@github.com/sleroq/sieve?rev=7696c1bdc3c4f2e43b93a801d0b7012c3398be7e";
 
     bayan.url = "github:sleroq/bayan";
-
-    kopoka.url = "git+ssh://git@github.com/sleroq/kopoka";
-    kopoka.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     spoiler-images.url = "github:sleroq/spoiler-images";
     spoiler-images.inputs.nixpkgs.follows = "nixpkgs-cumserver";
@@ -207,7 +208,7 @@
                 )
                 inputs.disko.nixosModules.disko
                 inputs.mailserver.nixosModules.default
-                inputs.reactor.nixosModules.reactor # TODO: Avoid using system modules for stuff like this
+                inputs.starflake.nixosModules.default
                 inputs.sieve.nixosModules.sieve
                 inputs.nixos-facter-modules.nixosModules.facter
                 inputs.nix-minecraft.nixosModules.minecraft-servers
@@ -224,6 +225,7 @@
 
               modules = [
                 inputs.disko.nixosModules.disko
+                inputs.starflake.nixosModules.default
               ];
             };
 

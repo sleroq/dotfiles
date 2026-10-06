@@ -1,21 +1,11 @@
 {
   config,
-  inputs,
   lib,
-  pkgs,
   ...
 }:
 
 let
   cfg = config.sleroq.navidrome;
-  musicLinkPackage = inputs.music-link.lib.${pkgs.stdenv.hostPlatform.system}.makePackage {
-    themes = [
-      "base"
-      "daylight"
-      "phosphor"
-    ];
-    defaultTheme = "phosphor";
-  };
 in
 {
   options.sleroq.navidrome = {
@@ -84,17 +74,6 @@ in
           Enabled = cfg.metrics.enable;
           MetricsPath = cfg.metrics.path;
         };
-      };
-    };
-
-    systemd.services.music-link = {
-      description = "music-link Navidrome share page server";
-      wantedBy = [ "multi-user.target" ];
-      after = [ "navidrome.service" ];
-      environment.MUSIC_LINK_SITE_URL = "https://${cfg.cloudflared.hostname}";
-      serviceConfig = {
-        DynamicUser = true;
-        ExecStart = "${musicLinkPackage}/bin/music-link";
       };
     };
 

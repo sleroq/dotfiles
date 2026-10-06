@@ -4,37 +4,8 @@
   pkgs,
   secrets,
   config,
-  inputs',
   ...
 }:
-let
-  serviceWrapper = import ./modules/telegram-bot.nix { inherit config lib pkgs; };
-
-  bayan = serviceWrapper.mkTelegramBot {
-    name = "bayan";
-    # The current Bayan input changed go.mod without updating its upstream vendorHash.
-    package = inputs'.bayan.packages.default.overrideAttrs (_: {
-      vendorHash = "sha256-xmunloo879R+BJHcbHOSoWgU9dCc0esDSGj5/QqSzao=";
-    });
-    secretFile = ./secrets/bayanEnv;
-    dataDir = "/var/lib/bayan";
-  };
-
-  kopoka = serviceWrapper.mkTelegramBot {
-    name = "kopoka";
-    # Upstream still requests Go 1.25, which was removed from nixpkgs-unstable.
-    package = inputs'.kopoka.packages.default.overrideAttrs (_: {
-      nativeBuildInputs = [ pkgs.go ];
-    });
-    secretFile = ./secrets/kopokaEnv;
-  };
-
-  spoiler-images = serviceWrapper.mkTelegramBot {
-    name = "spoiler-images";
-    package = inputs'.spoiler-images.packages.default;
-    secretFile = ./secrets/spoilerImagesEnv;
-  };
-in
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -66,9 +37,7 @@ in
     ./modules/trusttunnel.nix
     ../../modules/attic-cache.nix
     ../../modules/syncplay.nix
-    bayan
-    kopoka
-    spoiler-images
+    ./modules/starflake.nix
   ];
   facter.reportPath = ./facter.json;
 
@@ -206,6 +175,10 @@ in
     };
     remoteNodes = [
       {
+        name = "Roundy";
+        address = "147.45.150.135:9100";
+      }
+      {
         name = "RU Relay";
         address = "${secrets.ruRelayIP}:9100";
       }
@@ -306,18 +279,27 @@ in
   #   webrtcUlpfec = true;
   # };
 
-  services.bayan.enable = true;
-  services.kopoka.enable = true;
-  services.spoiler-images.enable = true;
+  # Keep the legacy Sieve binary across system switches and garbage collection.
+  # The imported module is pinned, but its bot-split package is NOT deployed.
+  # Future deployment: remove this override only after configuring the bot token,
+  # staging channel, and permissions; the input's default package then takes over.
+  # services.sieve.package = inputs.sieve.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  services.sieve.package = pkgs.symlinkJoin {
+    name = "sieve-known-good-0.1.0";
+    paths = [
+      (builtins.appendContext "/nix/store/yc3gkyc9wxgx9drl3yhr8imlqig6wxhi-sieve-known-good-0.1.0" {
+        "/nix/store/yc3gkyc9wxgx9drl3yhr8imlqig6wxhi-sieve-known-good-0.1.0" = {
+          path = true;
+        };
+      })
+    ];
+    meta.mainProgram = "sieve";
+  };
 
   age.secrets.reactorEnv = {
     owner = "reactor";
     group = "reactor";
     file = ./secrets/reactorEnv;
-  };
-  services.reactor = {
-    enable = true;
-    environmentFile = config.age.secrets.reactorEnv.path;
   };
 
   users.groups.restic-backups.members = [
