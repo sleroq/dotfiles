@@ -63,6 +63,9 @@
     scrcpyPkgs.url = "github:nixos/nixpkgs/77a0bdd";
     nixpkgs-master.url = "github:nixos/nixpkgs/master";
 
+    # Single-quality MoQ pilot; release source is copied to the build host.
+    moq-box.url = "path:/nix/store/ylvjypxd1ajx918qk694wsdqff922asb-source";
+
     # Cumserver flakes
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs-cumserver";
@@ -234,7 +237,10 @@
               tags = [ "server" ];
 
               specialArgs.secrets = import ./hosts/ru-relay/secrets/default.nix;
-              modules = [ inputs.disko.nixosModules.disko ];
+              modules = [
+                inputs.disko.nixosModules.disko
+                inputs.moq-box.nixosModules.default
+              ];
             };
 
             warsaw = withNixpkgsFor "warsaw" {

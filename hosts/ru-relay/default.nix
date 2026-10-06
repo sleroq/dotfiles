@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   secrets,
   ...
@@ -59,6 +60,12 @@ in
     };
   };
 
+  services.moq-box = {
+    enable = true;
+    domain = "moq.cum.army";
+    relayDomain = "moq-relay.cum.army";
+  };
+
   services = {
     caddy = {
       enable = true;
@@ -100,8 +107,12 @@ in
           no log
           tcp-request inspect-delay 5s
           tcp-request content accept if { req.ssl_hello_type 1 }
-          use_backend broadcast_box_https if { req.ssl_sni -i alt-web.cum.army }
+          use_backend moq_https if { req.ssl_sni -i moq-relay.cum.army }
+          use_backend broadcast_box_https if { req.ssl_sni -i alt-web.cum.army moq.cum.army }
           default_backend warsaw_beats_tunnel
+
+        backend moq_https
+          server relay 127.0.0.1:${toString config.services.moq-box.httpsPort} check
 
         backend broadcast_box_https
           server caddy 127.0.0.1:8443 check
