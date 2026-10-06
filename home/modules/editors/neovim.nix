@@ -17,7 +17,10 @@
       "--prefix"
       "PATH"
       ":"
-      "${lib.makeBinPath [ pkgs.imagemagick ]}"
+      "${lib.makeBinPath [
+        pkgs.imagemagick
+        pkgs.mermaid-cli
+      ]}"
     ];
     withRuby = false;
     withPython3 = false;
@@ -47,6 +50,7 @@
     lazygit
     obsidian-neovide
     imagemagick # image.nvim's magick_cli processor
+    mermaid-cli # diagram.nvim's Mermaid renderer (mmdc)
 
     htmx-lsp
     svelte-language-server

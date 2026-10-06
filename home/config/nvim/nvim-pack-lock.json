@@ -4,9 +4,21 @@
       "rev": "1540ea0a300916f1c43063fda185463b3e8f2f40",
       "src": "https://github.com/Eutrius/Otree.nvim"
     },
+    "agent-workbench.nvim": {
+      "rev": "3f633c9ce4855958fc5eed51d465cee4447b1584",
+      "src": "https://github.com/saya-ashen/agent-workbench.nvim"
+    },
     "atlas.vim": {
       "rev": "f254465adbcae565d9cf8c987f5a797c1f9cf922",
       "src": "https://github.com/huyvohcmc/atlas.vim"
+    },
+    "codediff.nvim": {
+      "rev": "09d9ebef2cc5a5c04db7a349cd6c61bdf84ecc8e",
+      "src": "https://github.com/esmuellert/codediff.nvim"
+    },
+    "diagram.nvim": {
+      "rev": "54d71d6ae72afa236eedb2a918a35d7414ba39f6",
+      "src": "https://github.com/3rd/diagram.nvim"
     },
     "diffview.nvim": {
       "rev": "4516612",
@@ -60,6 +72,10 @@
       "rev": "f353e8c",
       "src": "https://github.com/chentoast/marks.nvim"
     },
+    "markview.nvim": {
+      "rev": "190bb227c9d3eb4451b81fa16ea3d2efde2d67c5",
+      "src": "https://github.com/OXY2DEV/markview.nvim"
+    },
     "monochrome.nvim": {
       "rev": "2de78d9",
       "src": "https://github.com/kdheepak/monochrome.nvim"
@@ -84,10 +100,6 @@
       "rev": "831a97c",
       "src": "https://github.com/AckslD/nvim-neoclip.lua"
     },
-    "nvim-pi": {
-      "rev": "102e087179cfe8e65bd6b9ab2edbb86d64cecf2f",
-      "src": "https://github.com/aliou/nvim-pi"
-    },
     "nvim-treesitter": {
       "rev": "8b98b4470eb326f1c7b50dae79f8c963568e5720",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
@@ -108,11 +120,6 @@
     "oil.nvim": {
       "rev": "b73018b75affd13fa38e2fc94ef753b465f770d7",
       "src": "https://github.com/stevearc/oil.nvim"
-    },
-    "opencode.nvim": {
-      "rev": "a8ff335e724b42661222dfe5f943ecfbde68a3c8",
-      "src": "https://github.com/jensenojs/opencode.nvim",
-      "version": "'main'"
     },
     "plenary.nvim": {
       "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",

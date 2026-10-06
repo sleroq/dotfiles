@@ -45,7 +45,7 @@ vim.pack.add({
     { src = "https://github.com/NeogitOrg/neogit" },
     -- deps for neogit:
     { src = "https://github.com/nvim-lua/plenary.nvim" },
-    { src = "https://github.com/sindrets/diffview.nvim" },
+    { src = "https://github.com/esmuellert/codediff.nvim" },
 
     -- Highlights what lines have been changed (can't remember myself):
     { src = "https://github.com/lewis6991/gitsigns.nvim" },
@@ -88,11 +88,11 @@ vim.pack.add({
     -- { src = "onsails/lspkind.nvim" },
     -- to avoid learning to type fast and setting up proper completion
     { src = "https://github.com/supermaven-inc/supermaven-nvim" },
-    -- workaround for stupidity (asking agent about the code)
-    { src = "https://github.com/NickvanDyke/opencode.nvim",            version = "main" },
-    -- picker and input UI for opencode
+    -- Native Pi sessions, workspaces, and reviewed edits:
+    { src = "https://github.com/OXY2DEV/markview.nvim" },
+    { src = "https://github.com/saya-ashen/agent-workbench.nvim" },
+    -- Picker and input UI:
     { src = "https://github.com/folke/snacks.nvim" },
-    { src = "https://github.com/aliou/nvim-pi" },
 
     { src = "https://github.com/mbbill/undotree" },
     -- not even sure if this is a skill issue or what,
@@ -104,11 +104,6 @@ vim.pack.add({
     -- https://github.com/coffebar/neovim-project -- maybe this
     { src = "https://github.com/folke/zen-mode.nvim" },
 
-    -- Maybe this is useful for work
-    { src = "https://github.com/harrisoncramer/gitlab.nvim" },
-    { src = "https://github.com/stevearc/dressing.nvim" }, -- Recommended dep for gitlab.nvim
-    { src = "https://github.com/MunifTanjim/nui.nvim" },   -- Dep for gitlab.nvim
-
     -- Workaround for bloated config - so stuff gets disabled on large files
     { src = "https://github.com/pteroctopus/faster.nvim" },
 
@@ -119,6 +114,7 @@ vim.pack.add({
     { src = "https://github.com/obsidian-nvim/obsidian.nvim" },
     { src = "https://github.com/sotte/presenting.nvim" },
     { src = "https://github.com/3rd/image.nvim" },
+    { src = "https://github.com/3rd/diagram.nvim" },
 })
 
 vim.g.fff = {
@@ -168,6 +164,13 @@ if not vim.g.neovide and vim.uv.guess_handle(1) == "tty" then
             },
         },
     })
+    -- Render fenced Mermaid blocks inline; requires mermaid-cli's mmdc on PATH.
+    require("diagram").setup({
+        integrations = { require("diagram.integrations.markdown") },
+        renderer_options = {
+            mermaid = { theme = "dark", background = "transparent" },
+        },
+    })
 end
 
 presenting.setup({
@@ -201,9 +204,12 @@ require("flash").setup({})
 
 require("supermaven-nvim").setup({ keymaps = { accept_suggestion = "<C-l>" } })
 
-local pi_nvim = require("pi-nvim")
-pi_nvim.setup()
-vim.keymap.set("n", "<leader>pp", pi_nvim.toggle, { desc = "Toggle Pi" })
+require("agent-workbench").setup({
+    -- Apply each workspace's direnv environment only to its Pi process.
+    cli = { bin = "direnv", args = { "exec", ".", "pi" } },
+    layout = { default = "side", side = { position = "right", width = 80 } },
+    workspace_bar = { show = "always" },
+})
 
 require("neoclip").setup({ preview = true, })
 
@@ -276,25 +282,17 @@ require("Otree").setup({
     oil = "float",
     keymaps = {
         ["gh"] = "actions.goto_home_dir",
+        ["g."] = "actions.toggle_hidden",
     },
 })
 
 require("neogit").setup({
     kind = "replace",
+    diff_viewer = "codediff",
 })
 
-require("diffview").setup({
-    file_panel = {
-        win_config = {
-            width = 25,
-        },
-    },
-})
-local gitlab = require("gitlab")
-gitlab.setup({
-    connection_settings = {
-        insecure = true,
-    },
+require("codediff").setup({
+    explorer = { width = 25 },
 })
 
 local fff = require("fff")
@@ -302,6 +300,14 @@ local map = vim.keymap.set
 local unmap = vim.keymap.del
 
 vim.g.mapleader = " "
+map("n", "<leader>pp", "<Cmd>AgentWorkbench<CR>", { desc = "Toggle Pi workbench" })
+map({ "n", "v" }, "<leader>pm", "<Cmd>AgentWorkbenchSendMention<CR>", { desc = "Pi mention file/selection" })
+map("n", "<leader>pn", "<Cmd>AgentWorkbenchNewSession<CR>", { desc = "New Pi session" })
+map("n", "<leader>pr", "<Cmd>AgentWorkbenchResume<CR>", { desc = "Resume Pi session" })
+map("n", "<leader>ps", "<Cmd>AgentWorkbenchSessions<CR>", { desc = "Pi live sessions" })
+map("n", "<leader>pw", "<Cmd>AgentWorkbenchWorkspaceSidebar<CR>", { desc = "Pi workspaces" })
+map("n", "<leader>pd", "<Cmd>AgentWorkbenchDiff<CR>", { desc = "Review Pi changes" })
+map("n", "<leader>pa", "<Cmd>AgentWorkbenchAttention<CR>", { desc = "Pi pending requests" })
 map({ "v", "x" }, "<C-y>", '"+y', { desc = "System clipboard yank" })
 map({ "n" }, "<C-x>", function() Snacks.picker.pick("neoclip") end, { desc = "Clipboard history" })
 map({ "n" }, "<leader>/", fff.live_grep, { desc = "Live grep" })
@@ -317,7 +323,7 @@ map("n", "<leader>fl", function() Snacks.picker.pickers() end, { desc = "List Sn
 map({ "n" }, "<leader>x", "<Cmd>:bd<CR>", { desc = "Quit the current buffer." })
 map({ "n" }, "<leader>X", "<Cmd>:bd!<CR>", { desc = "Force quit the current buffer." })
 map({ "n" }, "<leader>gg", "<Cmd>:Neogit<CR>", { desc = "Open git shit" })
-map({ "n" }, "<leader>gm", gitlab.choose_merge_request, { desc = "Open git shit" })
+map("n", "<leader>gd", "<Cmd>CodeDiff<CR>", { desc = "Review Git changes" })
 map({ "n" }, "<leader>u", "<Cmd>:UndotreeToggle<CR>", { desc = "Open undotree" })
 map({ "n" }, "gd", vim.lsp.buf.definition, { desc = "Jump to definition" })
 map({ "n", "x", "o" }, "s", function() require("flash").jump() end, { desc = "Flash jump" })
@@ -363,6 +369,8 @@ end, { range = true })
 
 map({ "n" }, "<leader>t", "<Cmd>:vs | TermNu<CR>", { desc = "Open terminal" })
 map("t", "<C-w>n", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+map("n", "<leader>bc", "<Cmd>bdelete<CR>", { desc = "Close buffer" })
+map("t", "<leader>bc", "<C-\\><C-n><Cmd>bdelete<CR>", { desc = "Close buffer" })
 
 if vim.g.neovide then -- Copy paste for neovide
     map("n", "<sc-v>", 'l"+P')
@@ -432,8 +440,6 @@ require("snacks").setup({
         },
     },
 })
-
-vim.g.opencode_opts = {}
 
 map("n", "<leader>w", function()
     vim.wo.wrap = not vim.wo.wrap
