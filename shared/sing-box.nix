@@ -85,6 +85,8 @@ in
         "steamwebhelper"
       ];
       routeExcludeAddresses = [
+        # Keep bootstrap DNS outside the TUN without bypassing system DNS.
+        "9.9.9.9/32"
         "185.147.26.212/32"
       ];
     };
@@ -131,7 +133,7 @@ in
             {
               type = "udp";
               tag = "bootstrap-dns";
-              server = "1.1.1.1";
+              server = "9.9.9.9";
               server_port = 53;
             }
             {
