@@ -1,8 +1,16 @@
-{ pkgs, opts, lib, inputs', config, ... }:
+{
+  pkgs,
+  opts,
+  lib,
+  inputs',
+  config,
+  ...
+}:
 
 with lib;
 let
-  hy3Plugin = "${inputs'.hy3.packages.hy3}/lib/libhy3.so";
+  hy3Package = inputs'.hy3.packages.hy3.override { hyprland = pkgs.hyprland; };
+  hy3Plugin = "${hy3Package}/lib/libhy3.so";
   hyprlandScripts = {
     followMouseToggle = pkgs.writeShellScriptBin "hypr-follow-mouse-toggle" ''
       #!/usr/bin/env sh
@@ -89,7 +97,7 @@ mkMerge [
 
     home.packages = with pkgs; [
       hyprland-per-window-layout
-      inputs'.hy3.packages.hy3
+      hy3Package
       hyprpolkitagent
       hyprpicker
 

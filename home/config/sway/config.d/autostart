@@ -1,8 +1,7 @@
 # Autostart
-# TODO: Move to uwsm, hopefully getting rid of following workarounds
-exec dbus-sway-environment
-exec systemctl --user start nixos-fake-graphical-session.target
-exec systemctl --user import-environment
+# Import the session environment and stop its targets when Sway exits.
+include /etc/sway/config.d/nixos.conf
+exec sway-session-cleanup
 exec swaycons
 
 exec exec swaykbdd # Per-window keyboard layout
