@@ -9,6 +9,7 @@
 let
   cfg = config.myHome.programs.pi;
   minPiVersion = "0.80.0";
+  bunInstall = "${config.xdg.cacheHome}/.bun";
 in
 {
   options.myHome.programs.pi = {
@@ -19,7 +20,8 @@ in
     lib.mkMerge [
       {
         home.activation.installPi = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          PATH="${pkgs.bun}/bin:$HOME/.bun/bin:$PATH"
+          export BUN_INSTALL="${bunInstall}"
+          PATH="${pkgs.bun}/bin:$BUN_INSTALL/bin:$PATH"
           if ! command -v pi > /dev/null ||
             ! ${pkgs.coreutils}/bin/printf '%s\n' '${minPiVersion}' "$(pi --version)" |
               ${pkgs.coreutils}/bin/sort --version-sort --check=quiet
@@ -30,7 +32,9 @@ in
       }
 
       {
+        home.sessionPath = lib.mkBefore [ "${bunInstall}/bin" ];
         home.sessionVariables = {
+          BUN_INSTALL = bunInstall;
           PI_FFF_MODE = "override";
         }
         // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
@@ -41,8 +45,18 @@ in
         home.activation.piConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           mkdir -p $HOME/.pi/agent
 
-          $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
-              ${opts.realConfigs}/pi/agent/* $HOME/.pi/agent/
+          # OAuth refresh tokens rotate and must not be shared between hosts.
+          if [ -L "$HOME/.pi/agent/auth.json" ]; then
+            run install -m 600 "$HOME/.pi/agent/auth.json" "$HOME/.pi/agent/auth.json.tmp"
+            run mv "$HOME/.pi/agent/auth.json.tmp" "$HOME/.pi/agent/auth.json"
+          fi
+
+          for path in ${opts.realConfigs}/pi/agent/*; do
+            case "$path" in
+              */auth.json) continue ;;
+            esac
+            $DRY_RUN_CMD ln -sfn $VERBOSE_ARG "$path" "$HOME/.pi/agent/"
+          done
         '';
       }
     ]
