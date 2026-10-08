@@ -24,7 +24,7 @@ _:
       background_alpha = 0.2;
       position = "top-left";
       table_columns = 4;
-      toggle_hud = "Shift_R+F12";
+      toggle_hud = "F8";
       font_size = 20;
       gpu_color = "2e9762";
       cpu_color = "2e97cb";

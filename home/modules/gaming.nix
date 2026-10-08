@@ -1,4 +1,11 @@
-{ inputs', pkgs, lib, config, opts, ... }:
+{
+  inputs',
+  pkgs,
+  lib,
+  config,
+  opts,
+  ...
+}:
 
 let
   cfg = config.myHome.gaming;
@@ -26,7 +33,12 @@ in
 
     (lib.mkIf cfg.osu.enable {
       home.packages = with inputs'.nix-gaming.packages; [
-        osu-lazer-bin
+        # Preloading GameMode into the AppImage's bubblewrap crashes on exit.
+        (osu-lazer-bin.override {
+          gmrun_enable = false;
+          # Match the sandbox's glibc to the host graphics drivers.
+          inherit (pkgs) appimageTools;
+        })
         pkgs.opentabletdriver
       ];
     })
@@ -65,18 +77,18 @@ in
             xwayland
 
             (glfw.override { withMinecraftPatch = true; })
-              # .overrideAttrs (old: {
-              #   pname = "glfw-waywall";
-              #   patches = [
-              #     (pkgs.fetchpatch {
-              #       url = "https://raw.githubusercontent.com/tesselslate/waywall/be3e018bb5f7c25610da73cc320233a26dfce948/contrib/glfw.patch";
-              #       sha256 = "8Sho5Yoj/FpV7utWz3aCXNvJKwwJ3ZA3qf1m2WNxm5M=";
-              #     })
-              #   ];
-              # }))
+            # .overrideAttrs (old: {
+            #   pname = "glfw-waywall";
+            #   patches = [
+            #     (pkgs.fetchpatch {
+            #       url = "https://raw.githubusercontent.com/tesselslate/waywall/be3e018bb5f7c25610da73cc320233a26dfce948/contrib/glfw.patch";
+            #       sha256 = "8Sho5Yoj/FpV7utWz3aCXNvJKwwJ3ZA3qf1m2WNxm5M=";
+            #     })
+            #   ];
+            # }))
           ];
           additionalPrograms = [
-            (pkgs.waywall.overrideAttrs (old: {
+            (pkgs.waywall.overrideAttrs (_: {
               src = pkgs.fetchFromGitHub {
                 owner = "tesselslate";
                 repo = "waywall";
@@ -85,7 +97,10 @@ in
               };
             }))
           ];
-          jdks = [ pkgs.jdk21 pkgs.graalvmPackages.graalvm-oracle ];
+          jdks = [
+            pkgs.jdk21
+            pkgs.graalvmPackages.graalvm-oracle
+          ];
         })
       ];
     })

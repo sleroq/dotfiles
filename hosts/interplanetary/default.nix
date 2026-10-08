@@ -1,4 +1,11 @@
-{ config, pkgs, self, username, lib, ... }:
+{
+  config,
+  pkgs,
+  self,
+  username,
+  lib,
+  ...
+}:
 let
   tailscaleStateDir = "/boot/tailscale-initrd";
   initrdTailscaleState = "${tailscaleStateDir}/tailscaled.state";
@@ -125,7 +132,7 @@ in
             ];
             serviceConfig = {
               # Keep initrd Tailscale disabled until a separate node state exists on /boot.
-              ExecStart = ''${tailscaleCfg.package}/bin/tailscaled --state=${lib.escapeShellArg initrdTailscaleState} --socket=/run/tailscale/tailscaled.sock --port=${toString tailscaleCfg.port} --tun ${lib.escapeShellArg tailscaleCfg.interfaceName}'';
+              ExecStart = "${tailscaleCfg.package}/bin/tailscaled --state=${lib.escapeShellArg initrdTailscaleState} --socket=/run/tailscale/tailscaled.sock --port=${toString tailscaleCfg.port} --tun ${lib.escapeShellArg tailscaleCfg.interfaceName}";
               Restart = "on-failure";
               RuntimeDirectory = "tailscale";
               RuntimeDirectoryMode = "0755";
@@ -173,6 +180,8 @@ in
   };
 
   networking.hostName = "sleroq-interplanetary"; # TODO: infer from flake definition somehow
+  # NetworkManager must not flush addresses owned by tailscaled.
+  networking.networkmanager.unmanaged = [ "interface-name:${tailscaleCfg.interfaceName}" ];
 
   hardware.opentabletdriver.enable = true;
   hardware.opentabletdriver.daemon.enable = true;
@@ -185,7 +194,10 @@ in
   # programs.anime-game-launcher.enable = true;
   # programs.anime-games-launcher.enable = true;
 
-  environment.systemPackages = [ pkgs.freerdp pkgs.android-tools ]; # FIXME: Is this not included in remmina package or whatever?
+  environment.systemPackages = [
+    pkgs.freerdp
+    pkgs.android-tools
+  ]; # FIXME: Is this not included in remmina package or whatever?
 
   # Define a user account
   users.defaultUserShell = pkgs.bash;
@@ -193,7 +205,17 @@ in
     shell = pkgs.nushell;
     isNormalUser = true;
     description = "The main user";
-    extraGroups = [ "networkmanager" "input" "wheel" "video" "libvirtd" "adbusers" "uinput" "kvm" "gamemode" ];
+    extraGroups = [
+      "networkmanager"
+      "input"
+      "wheel"
+      "video"
+      "libvirtd"
+      "adbusers"
+      "uinput"
+      "kvm"
+      "gamemode"
+    ];
 
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSh54pu9bAH8DFBKPtswFJzevCft+gHZStJQ0trYGoj sleroq@cum.army"
@@ -205,8 +227,8 @@ in
   # btw Stardew Valley SMAPI does not work with nix-ld enabled lol
   # programs.nix-ld.enable = true;
   # programs.nix-ld.libraries = with pkgs; [
-    # Add any missing dynamic libraries for unpackaged programs
-    # here, NOT in environment.systemPackages
+  # Add any missing dynamic libraries for unpackaged programs
+  # here, NOT in environment.systemPackages
   # ];
 
   services.openssh = {
@@ -272,11 +294,10 @@ in
   # path filtering drops those replies before they reach the marked socket.
   networking.firewall.checkReversePath = "loose";
   sleroq.sing-box.routeExcludeAddresses = [
-    # OS route bypasses for the direct DNS bootstrap endpoint and LAN/VPN
-    # address space. The current proxy endpoint also needs an OS route bypass
+    # OS route bypasses for LAN/VPN address space. The current proxy
+    # endpoint also needs an OS route bypass
     # with plain auto_route; auto_detect_interface does not prevent its outer
     # connection from re-entering tun0 on this host.
-    "1.1.1.1/32"
     "45.144.51.81/32" # node1.yamarkov.ru, selected proxy endpoint.
     "10.0.0.0/8"
     "172.16.0.0/12"

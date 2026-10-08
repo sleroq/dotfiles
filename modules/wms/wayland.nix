@@ -1,5 +1,32 @@
-{ pkgs, inputs', lib, ... }:
 {
+  pkgs,
+  inputs,
+  lib,
+  ...
+}:
+{
+  nixpkgs.overlays = [
+    inputs.hyprland.overlays.hyprland-packages
+    inputs.hyprland.overlays.hyprland-extras
+    (
+      final: prev:
+      lib.genAttrs [
+        "aquamarine"
+        "hyprcursor"
+        "hyprgraphics"
+        "hyprlang"
+        "hyprland-guiutils"
+        "xdg-desktop-portal-hyprland"
+      ] (name: prev.${name}.override { stdenv = final.gcc16Stdenv; })
+      // {
+        glaze-hyprland = prev.glaze-hyprland.overrideAttrs {
+          version = "7.2.0";
+          src = inputs.glaze;
+        };
+      }
+    )
+  ];
+
   services.dbus.enable = true;
   environment.systemPackages = with pkgs; [
     dbus
@@ -19,7 +46,7 @@
   programs.hyprland = {
     enable = true;
     withUWSM = true;
-    package = inputs'.hyprland.packages.hyprland;
-    # portalPackage = inputs'.hyprland.packages.xdg-desktop-portal-hyprland;
+    package = pkgs.hyprland;
+    portalPackage = pkgs.xdg-desktop-portal-hyprland;
   };
 }

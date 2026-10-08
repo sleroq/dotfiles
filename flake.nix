@@ -15,15 +15,19 @@
 
     # Common NixOS flakes
     agenix.url = "github:ryantm/agenix";
-    # hyprland.url = "github:hyprwm/Hyprland/dd220ef";
-    # hy3.url = "github:outfoxxed/hy3/4b42544";
-    hyprland.url = "github:hyprwm/Hyprland";
-    hy3.url = "github:outfoxxed/hy3";
+    hyprland.url = "github:hyprwm/Hyprland/v0.56.2";
+    hyprland.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
+    hyprland.inputs.hyprutils.url = "github:hyprwm/hyprutils/v0.14.2";
+    hyprland.inputs.xdph.url = "github:hyprwm/xdg-desktop-portal-hyprland/v1.4.1";
+    hy3.url = "github:outfoxxed/hy3/hl0.56.0.1";
     hy3.inputs.hyprland.follows = "hyprland";
+    # Hyprland 0.56 requires Glaze 7; the host provides Glaze 8.
+    glaze.url = "github:stephenberry/glaze/v7.2.0";
+    glaze.flake = false;
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
 
-    caelestia_shell-interplanetary.url = "github:caelestia-dots/shell";
+    caelestia_shell-interplanetary.url = "github:caelestia-dots/shell/v2.5.0";
     caelestia_shell-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
 
     # Per-host nixpkgs pins

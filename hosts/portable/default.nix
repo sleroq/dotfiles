@@ -1,8 +1,6 @@
 {
   flakeRoot,
   pkgs,
-  config,
-  lib,
   ...
 }:
 
@@ -80,10 +78,9 @@ in
     directProcessNames = [
       "steam_osx"
     ];
-    # OS route bypasses for bootstrap/proxy endpoints, private LAN/VPN
+    # OS route bypasses for proxy endpoints, private LAN/VPN
     # destinations, link-local IPv6, and multicast traffic.
     routeExcludeAddresses = [
-      "1.1.1.1/32" # Direct DNS bootstrap for proxy endpoint hostnames.
       "45.144.51.81/32" # node1.yamarkov.ru, selected proxy endpoint.
       "10.0.0.0/8"
       "172.16.0.0/12"

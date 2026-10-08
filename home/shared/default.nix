@@ -1,6 +1,13 @@
 # This direcotry is meant for configurations relevant on every host
 
-{ pkgs, inputs', lib, config, self, ... }:
+{
+  pkgs,
+  inputs',
+  lib,
+  config,
+  self,
+  ...
+}:
 
 {
   imports = [
@@ -18,7 +25,6 @@
     })
     ./scripts.nix
   ];
-
 
   home = {
     username = "sleroq";
@@ -61,46 +67,51 @@
       };
 
       extraPackages =
-        let base = with pkgs; [
-          # monero-gui
-          # signal-desktop
-          legcord
+        let
+          base = with pkgs; [
+            # monero-gui
+            # signal-desktop
+            legcord
 
-          # teamspeak6-client
-          syncplay
+            # teamspeak6-client
+            syncplay
 
-          # krita
-          # libreoffice-fresh
-          xournalpp
-          picard # music tagger
+            # krita
+            # libreoffice-fresh
+            xournalpp
+            picard # music tagger
 
-          # obsidian
-          qbittorrent
-          thunderbird
+            # obsidian
+            qbittorrent
+            thunderbird
 
-          keepassxc
+            keepassxc
 
-          nemo
+            nemo
 
-          kdePackages.filelight
-          p7zip
-          unzip
-          nomacs # Image viewer
+            kdePackages.filelight
+            p7zip
+            unzip
+            nomacs # Image viewer
 
-          # CLI
-          # rclone
-          gdb
-          ffmpeg
+            # CLI
+            # rclone
+            gdb
+            ffmpeg
 
-          # Remote stuff
-          # bore-cli
-          remmina
-          # nomachine-client
-          # rustdesk
-          # vial
-          inputs'.agenix.packages.default
+            # Remote stuff
+            # bore-cli
+            remmina
+            # nomachine-client
+            # rustdesk
+            # vial
+            inputs'.agenix.packages.default
+          ];
+        in
+        base
+        ++ lib.optionals (lib.attrByPath [ "myHome" "programs" "exodus" "enable" ] false config) [
+          pkgs.exodus
         ];
-        in base ++ lib.optionals (lib.attrByPath [ "myHome" "programs" "exodus" "enable" ] false config) [ pkgs.exodus ];
     };
 
     development = {

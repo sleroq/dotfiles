@@ -37,7 +37,7 @@ in
       zed.enable = false;
     };
     gaming = {
-      etterna.enable = true;
+      etterna.enable = false;
       osu.enable = true;
       minecraft.enable = true;
     };
@@ -68,6 +68,8 @@ in
       ];
     };
   };
+
+  programs.obs-studio.plugins = [ (pkgs.callPackage ../../packages/obs-moq.nix { }) ];
 
   programs.caelestia = {
     settings = {
