@@ -33,6 +33,7 @@
     # Per-host nixpkgs pins
     nixpkgs-interplanetary.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-cumserver.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
+    nixpkgs-roundy.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-div.url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-26.05&rev=b3fe9581c9061c749abef42b6d4ee7b7c05c33fa&shallow=1";
     nixpkgs-portable.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
 
@@ -84,6 +85,10 @@
     # Immutable local release until Starflake is published; rooted on cumserver.
     starflake.url = "path:/nix/store/54cvmdx330v5f81d0b7gdrvb6qvy6kzl-source";
     starflake.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+
+    # Initial Roundy release until its native package is published upstream.
+    roundy.url = "path:/nix/store/6g2pvnd4rqc1rjm9v2fli1clx5lg6h91-source";
+    roundy.inputs.nixpkgs-stable.follows = "nixpkgs-roundy";
 
     music-link.url = "github:sleroq/music-link";
     # music-link.url = "path:/Users/sleroq/develop/music-link";
@@ -230,6 +235,16 @@
                 inputs.disko.nixosModules.disko
                 inputs.starflake.nixosModules.default
               ];
+            };
+
+            roundy = withNixpkgsFor "roundy" {
+              arch = "x86_64";
+              tags = [ "server" ];
+              specialArgs = {
+                inherit inputs;
+                secrets = import ./hosts/roundy/secrets/default.nix;
+              };
+              modules = [ inputs.starflake.nixosModules.default ];
             };
 
             ru-relay = withNixpkgsFor "ru-relay" {

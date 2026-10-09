@@ -3,6 +3,7 @@
   inputs,
   inputs',
   lib,
+  secrets,
   ...
 }:
 {
@@ -132,7 +133,7 @@
           labels.instance = "div";
         }
         {
-          targets = [ "147.45.150.135:9599" ];
+          targets = [ "${secrets.roundyAddress}:9599" ];
           labels.instance = "roundy";
         }
       ];

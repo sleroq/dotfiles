@@ -32,44 +32,46 @@ in
       };
     };
     remoteNodes = lib.mkOption {
-      type = lib.types.listOf (lib.types.submodule {
-        options = {
-          name = lib.mkOption {
-            type = lib.types.str;
-            description = "Name of the remote node";
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+              description = "Name of the remote node";
+            };
+            address = lib.mkOption {
+              type = lib.types.str;
+              description = "Address of the remote node (IP:PORT)";
+            };
+            podmanAddress = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = "Address of the remote Podman exporter (host:port)";
+            };
+            username = lib.mkOption {
+              type = lib.types.str;
+              default = "prometheus";
+              description = "Username for basic auth";
+            };
+            passwordPath = lib.mkOption {
+              type = lib.types.nullOr lib.types.path;
+              default = null;
+              description = "Path to the password file for basic auth";
+            };
+            enableTLS = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+              description = "Enable TLS encryption";
+            };
+            tlsInsecure = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+              description = "Skip TLS certificate verification";
+            };
           };
-          address = lib.mkOption {
-            type = lib.types.str;
-            description = "Address of the remote node (IP:PORT)";
-          };
-          podmanAddress = lib.mkOption {
-            type = lib.types.nullOr lib.types.str;
-            default = null;
-            description = "Address of the remote Podman exporter (host:port)";
-          };
-          username = lib.mkOption {
-            type = lib.types.str;
-            default = "prometheus";
-            description = "Username for basic auth";
-          };
-          passwordPath = lib.mkOption {
-            type = lib.types.nullOr lib.types.path;
-            default = null;
-            description = "Path to the password file for basic auth";
-          };
-          enableTLS = lib.mkOption {
-            type = lib.types.bool;
-            default = false;
-            description = "Enable TLS encryption";
-          };
-          tlsInsecure = lib.mkOption {
-            type = lib.types.bool;
-            default = false;
-            description = "Skip TLS certificate verification";
-          };
-        };
-      });
-      default = [];
+        }
+      );
+      default = [ ];
       description = "List of remote nodes to monitor";
     };
   };
@@ -142,106 +144,122 @@ in
         enable = true;
         # Keep enough history for troubleshooting without filling the root disk.
         extraFlags = [
-          "--storage.tsdb.retention.time=14d"
-          "--storage.tsdb.retention.size=4GB"
+          "--storage.tsdb.retention.time=90d"
+          "--storage.tsdb.retention.size=24GB"
         ];
         scrapeConfigs = [
-            {
-                job_name = "prometheus";
-                static_configs = [{ targets = [ "127.0.0.1:9090" ]; }];
-            }
-            {
-                job_name = "node-local";
-                static_configs = [{ targets = [ "127.0.0.1:9100" ]; }];
-                relabel_configs = [
-                    {
-                        target_label = "job";
-                        replacement = "node";
-                    }
-                    {
-                        target_label = "instance";
-                        replacement = cfg.localNodeName;
-                    }
-                    {
-                        target_label = "node_name";
-                        replacement = cfg.localNodeName;
-                    }
-                    {
-                        target_label = "node_type";
-                        replacement = "local";
-                    }
-                ];
-            }
-            {
-                job_name = "fabric";
-                static_configs = [{ targets = [ "127.0.0.1:25585" ]; }];
-            }
-            {
-                job_name = "nerugaysya-bot";
-                static_configs = [{ targets = [ "127.0.0.1:2112" ]; }];
-            }
-        ] ++ lib.optionals (config.cumserver.frp.enable or false) [
+          {
+            job_name = "prometheus";
+            static_configs = [ { targets = [ "127.0.0.1:9090" ]; } ];
+          }
+          {
+            job_name = "node-local";
+            static_configs = [ { targets = [ "127.0.0.1:9100" ]; } ];
+            relabel_configs = [
+              {
+                target_label = "job";
+                replacement = "node";
+              }
+              {
+                target_label = "instance";
+                replacement = cfg.localNodeName;
+              }
+              {
+                target_label = "node_name";
+                replacement = cfg.localNodeName;
+              }
+              {
+                target_label = "node_type";
+                replacement = "local";
+              }
+            ];
+          }
+          {
+            job_name = "fabric";
+            static_configs = [ { targets = [ "127.0.0.1:25585" ]; } ];
+          }
+          {
+            job_name = "nerugaysya-bot";
+            static_configs = [ { targets = [ "127.0.0.1:2112" ]; } ];
+          }
+        ]
+        ++ lib.optionals (config.cumserver.frp.enable or false) [
           {
             job_name = "frps";
-            static_configs = [{ targets = [ "127.0.0.1:${toString config.services.frp.instances.frps.settings.webServer.port}" ]; }];
+            static_configs = [
+              {
+                targets = [ "127.0.0.1:${toString config.services.frp.instances.frps.settings.webServer.port}" ];
+              }
+            ];
           }
-        ] ++ lib.optionals (config.cumserver.restic.enable or false) [
+        ]
+        ++ lib.optionals (config.cumserver.restic.enable or false) [
           {
             job_name = "restic";
-            static_configs = [{ targets = [ "127.0.0.1:${toString config.cumserver.restic.port}" ]; }];
+            static_configs = [ { targets = [ "127.0.0.1:${toString config.cumserver.restic.port}" ]; } ];
           }
-        ] ++ lib.optionals (config.cumserver.slusha.enable or false) [
+        ]
+        ++ lib.optionals (config.cumserver.slusha.enable or false) [
           {
             job_name = "slusha";
             metrics_path = "/metrics";
-            static_configs = [{ targets = [ "127.0.0.1:${toString config.cumserver.slusha.webPort}" ]; }];
+            static_configs = [ { targets = [ "127.0.0.1:${toString config.cumserver.slusha.webPort}" ]; } ];
           }
-        ] ++ lib.optionals (cfg.navidrome.address != null) [
+        ]
+        ++ lib.optionals (cfg.navidrome.address != null) [
           {
             job_name = "navidrome";
             metrics_path = cfg.navidrome.metricsPath;
-            static_configs = [{
-              targets = [ cfg.navidrome.address ];
-              labels.instance = cfg.navidrome.nodeName;
-            }];
-          }
-        ] ++ (map (node: {
-            job_name = "node-${lib.strings.toLower node.name}";
-            static_configs = [{
-                targets = [ node.address ];
-                labels = {
-                    node_name = node.name;
-                    node_type = "remote";
-                };
-            }];
-            basic_auth = lib.mkIf (node.passwordPath != null) {
-                inherit (node) username;
-                password_file = toString node.passwordPath;
-            };
-            scheme = if node.enableTLS then "https" else "http";
-            tls_config = lib.mkIf node.enableTLS {
-                insecure_skip_verify = node.tlsInsecure;
-            };
-            relabel_configs = [
-                {
-                    target_label = "job";
-                    replacement = "node";
-                }
-                {
-                    source_labels = [ "node_name" ];
-                    target_label = "instance";
-                    replacement = "\${1}";
-                }
+            static_configs = [
+              {
+                targets = [ cfg.navidrome.address ];
+                labels.instance = cfg.navidrome.nodeName;
+              }
             ];
-        }) cfg.remoteNodes) ++ (map (node: {
+          }
+        ]
+        ++ (map (node: {
+          job_name = "node-${lib.strings.toLower node.name}";
+          static_configs = [
+            {
+              targets = [ node.address ];
+              labels = {
+                node_name = node.name;
+                node_type = "remote";
+              };
+            }
+          ];
+          basic_auth = lib.mkIf (node.passwordPath != null) {
+            inherit (node) username;
+            password_file = toString node.passwordPath;
+          };
+          scheme = if node.enableTLS then "https" else "http";
+          tls_config = lib.mkIf node.enableTLS {
+            insecure_skip_verify = node.tlsInsecure;
+          };
+          relabel_configs = [
+            {
+              target_label = "job";
+              replacement = "node";
+            }
+            {
+              source_labels = [ "node_name" ];
+              target_label = "instance";
+              replacement = "\${1}";
+            }
+          ];
+        }) cfg.remoteNodes)
+        ++ (map (node: {
           job_name = "podman-${lib.strings.toLower node.name}";
-          static_configs = [{
-            targets = [ node.podmanAddress ];
-            labels = {
-              node_name = node.name;
-              node_type = "remote";
-            };
-          }];
+          static_configs = [
+            {
+              targets = [ node.podmanAddress ];
+              labels = {
+                node_name = node.name;
+                node_type = "remote";
+              };
+            }
+          ];
           relabel_configs = [
             {
               source_labels = [ "node_name" ];
@@ -251,10 +269,13 @@ in
           ];
         }) (lib.filter (node: node.podmanAddress != null) cfg.remoteNodes));
         exporters = {
-            node = {
-                enable = true;
-                enabledCollectors = [ "systemd" "processes" ];
-            };
+          node = {
+            enable = true;
+            enabledCollectors = [
+              "systemd"
+              "processes"
+            ];
+          };
         };
       };
       loki = {

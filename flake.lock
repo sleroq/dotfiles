@@ -2753,11 +2753,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1749066335,
-        "narHash": "sha256-VYtydz2A2onIdl43wMJuWhc/oFs+U8UK+E6+qaC0qRg=",
+        "lastModified": 1791499699,
+        "narHash": "sha256-7dM6N9B0qLXeaAprxmcAuBleOxftPZrR0hbj6Q+RQc0=",
         "owner": "sleroq",
         "repo": "sleroq.link",
-        "rev": "89a4dd15e5f695b50aff32e884deeb48eba15d82",
+        "rev": "8e065668085264db8cbf4b5053c6fa3a7acfecc7",
         "type": "github"
       },
       "original": {

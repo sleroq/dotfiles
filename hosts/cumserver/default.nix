@@ -176,7 +176,7 @@
     remoteNodes = [
       {
         name = "Roundy";
-        address = "147.45.150.135:9100";
+        address = "${secrets.roundyAddress}:9100";
       }
       {
         name = "RU Relay";

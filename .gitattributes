@@ -1,4 +1,6 @@
 /hosts/cumserver/secrets/*.nix filter=git-crypt diff=git-crypt
+/hosts/roundy/secrets/* binary
+/hosts/roundy/secrets/*.nix filter=git-crypt diff=git-crypt
 /hosts/ru-relay/secrets/*.nix filter=git-crypt diff=git-crypt
 /hosts/warsaw/secrets/*.nix filter=git-crypt diff=git-crypt
 /shared/secrets/*.nix filter=git-crypt diff=git-crypt
@@ -10,3 +12,4 @@
 /home/config/opencode/* filter=git-crypt diff=git-crypt
 /home/config/opencode/README.org !filter !diff
 /.gitattributes !filter !diff
+/.beans/dotfiles-d1bx--prepare-nixos-vps-and-migrate-roundy-mongodb-and-c.md filter=git-crypt diff=git-crypt
