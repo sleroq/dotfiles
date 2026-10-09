@@ -5,8 +5,8 @@ _:
     enable = true;
     themeFile = "Catppuccin-Macchiato";
     keybindings = {
-      "kitty_mod+t" = "new_tab_with_cwd";
-      "cmd+t" = "new_tab_with_cwd";
+      "kitty_mod+t" = "launch --type=tab --cwd=current --location=after";
+      "cmd+t" = "launch --type=tab --cwd=current --location=after";
     };
     settings = {
       font_family = "JetBrainsMono Nerd Font";
