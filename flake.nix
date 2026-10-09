@@ -33,6 +33,7 @@
     # Per-host nixpkgs pins
     nixpkgs-interplanetary.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-cumserver.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
+    nixpkgs-roundy.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-div.url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-26.05&rev=b3fe9581c9061c749abef42b6d4ee7b7c05c33fa&shallow=1";
     nixpkgs-portable.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
 
@@ -63,6 +64,9 @@
     scrcpyPkgs.url = "github:nixos/nixpkgs/77a0bdd";
     nixpkgs-master.url = "github:nixos/nixpkgs/master";
 
+    # Single-quality MoQ pilot; release source is copied to the build host.
+    moq-box.url = "path:/nix/store/ylvjypxd1ajx918qk694wsdqff922asb-source";
+
     # Cumserver flakes
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs-cumserver";
@@ -76,20 +80,25 @@
     cum-army.url = "github:sleroq/cum.army";
     cum-army.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
-    web-cum-army.url = "github:sleroq/web.cum.army";
-    web-cum-army.inputs.nixpkgs.follows = "nixpkgs-cumserver";
-
     reactor.url = "github:sleroq/reactor";
+
+    # Immutable local release until Starflake is published; rooted on cumserver.
+    starflake.url = "path:/nix/store/54cvmdx330v5f81d0b7gdrvb6qvy6kzl-source";
+    starflake.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+
+    # Initial Roundy release until its native package is published upstream.
+    roundy.url = "path:/nix/store/6g2pvnd4rqc1rjm9v2fli1clx5lg6h91-source";
+    roundy.inputs.nixpkgs-stable.follows = "nixpkgs-roundy";
 
     music-link.url = "github:sleroq/music-link";
     # music-link.url = "path:/Users/sleroq/develop/music-link";
 
-    sieve.url = "git+ssh://git@github.com/sleroq/sieve";
+    # Keep the module pinned; the host overrides its package with the running legacy binary.
+    # Future bot-split deployment (requires the new SIEVE_* credentials):
+    # sieve.url = "git+ssh://git@github.com/sleroq/sieve";
+    sieve.url = "git+ssh://git@github.com/sleroq/sieve?rev=7696c1bdc3c4f2e43b93a801d0b7012c3398be7e";
 
     bayan.url = "github:sleroq/bayan";
-
-    kopoka.url = "git+ssh://git@github.com/sleroq/kopoka";
-    kopoka.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     spoiler-images.url = "github:sleroq/spoiler-images";
     spoiler-images.inputs.nixpkgs.follows = "nixpkgs-cumserver";
@@ -207,7 +216,7 @@
                 )
                 inputs.disko.nixosModules.disko
                 inputs.mailserver.nixosModules.default
-                inputs.reactor.nixosModules.reactor # TODO: Avoid using system modules for stuff like this
+                inputs.starflake.nixosModules.default
                 inputs.sieve.nixosModules.sieve
                 inputs.nixos-facter-modules.nixosModules.facter
                 inputs.nix-minecraft.nixosModules.minecraft-servers
@@ -224,7 +233,18 @@
 
               modules = [
                 inputs.disko.nixosModules.disko
+                inputs.starflake.nixosModules.default
               ];
+            };
+
+            roundy = withNixpkgsFor "roundy" {
+              arch = "x86_64";
+              tags = [ "server" ];
+              specialArgs = {
+                inherit inputs;
+                secrets = import ./hosts/roundy/secrets/default.nix;
+              };
+              modules = [ inputs.starflake.nixosModules.default ];
             };
 
             ru-relay = withNixpkgsFor "ru-relay" {
@@ -232,7 +252,10 @@
               tags = [ "server" ];
 
               specialArgs.secrets = import ./hosts/ru-relay/secrets/default.nix;
-              modules = [ inputs.disko.nixosModules.disko ];
+              modules = [
+                inputs.disko.nixosModules.disko
+                inputs.moq-box.nixosModules.default
+              ];
             };
 
             warsaw = withNixpkgsFor "warsaw" {

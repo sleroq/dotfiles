@@ -79,6 +79,8 @@ in
         "valvesoftware.com"
         "energotransbank.com"
         "alt-web.cum.army"
+        "reg.cloud"
+        "quietplace.xyz"
       ];
       directProcessNames = [
         "steam"
