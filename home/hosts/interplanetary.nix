@@ -75,11 +75,16 @@ in
 
   programs.caelestia = {
     settings = {
-      bar.status = {
-        showBattery = false;
-        showBluetooth = true;
-        showNetwork = false;
-      };
+      bar.statusIcons = [
+        {
+          id = "lockStatus";
+          enabled = true;
+        }
+        {
+          id = "bluetooth";
+          enabled = true;
+        }
+      ];
     };
   };
 

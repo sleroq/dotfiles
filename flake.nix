@@ -29,6 +29,7 @@
 
     caelestia_shell-interplanetary.url = "github:caelestia-dots/shell/v2.5.0";
     caelestia_shell-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
+    caelestia_shell-interplanetary.inputs.quickshell.url = "git+https://git.outfoxxed.me/quickshell/quickshell?ref=refs/tags/v0.3.2";
 
     # Per-host nixpkgs pins
     nixpkgs-interplanetary.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";

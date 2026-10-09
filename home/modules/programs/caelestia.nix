@@ -13,20 +13,20 @@ _: {
         }
         {
           timeout = 800000;
-          idleActon = "dpms off";
+          idleAction = "dpms off";
           returnAction = "dpms on";
         }
         {
           timeout = 120000;
-          idleAction = ["systemctl" "suspend-then-hibernate"];
+          idleAction = [
+            "systemctl"
+            "suspend-then-hibernate"
+          ];
         }
       ];
       services = {
         weatherLocation = "43.25654,76.92848";
-        useFahrenheit = false;
-      };
-      bar.status = {
-        showBattery = false;
+        weatherUnits = "Celsius";
       };
       paths.wallpaperDir = "~/Pictures/wallpapers";
       utilities.toasts.kbLayoutChanged = false;
