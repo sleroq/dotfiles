@@ -1,8 +1,13 @@
-{ lib, config, pkgs, ... }: 
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 with lib;
 let
   cfg = config.sleroq.wms;
-  sddm-astronaut = pkgs.sddm-astronaut.override { 
+  sddm-astronaut = pkgs.sddm-astronaut.override {
     # embeddedTheme = "hyprland_kath";
   };
 in
@@ -10,6 +15,7 @@ in
   options.sleroq.wms.enable = mkEnableOption "window manager stack (SDDM, portals)";
 
   imports = [
+    ./caelestia.nix
     ./wayland.nix
     ./x11.nix
   ];

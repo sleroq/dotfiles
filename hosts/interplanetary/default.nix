@@ -170,8 +170,6 @@ in
 
   services.system76-scheduler.enable = true;
 
-  powerManagement.cpuFreqGovernor = "performance";
-
   services.logind.settings.Login = {
     # don’t shutdown when power button is short-pressed
     HandlePowerKey = "ignore";

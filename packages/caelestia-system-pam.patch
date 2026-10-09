@@ -1,0 +1,8 @@
+diff --git a/modules/lock/Pam.qml b/modules/lock/Pam.qml
+--- a/modules/lock/Pam.qml
++++ b/modules/lock/Pam.qml
+@@ -79,2 +79,2 @@ Scope {
+-        config: "passwd"
+-        configDirectory: Quickshell.shellPath("assets/pam.d")
++        config: "caelestia"
++        configDirectory: "/etc/pam.d"
