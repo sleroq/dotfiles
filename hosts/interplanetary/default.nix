@@ -18,6 +18,9 @@ in
     "${self}/modules/webdav.nix"
   ];
 
+  # The generated disk-swap UUID no longer exists; use the shared zram swap.
+  swapDevices = lib.mkForce [ ];
+
   hardware.amdgpu.initrd.enable = true;
 
   hardware.bluetooth = {
