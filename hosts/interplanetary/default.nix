@@ -296,6 +296,9 @@ in
   # interface while the unmarked default route points at tun0. Strict reverse
   # path filtering drops those replies before they reach the marked socket.
   networking.firewall.checkReversePath = "loose";
+  # There is no upstream IPv6 route. Advertising one through the TUN makes
+  # browsers use IPv6 for Steam's direct CDN traffic, which sing-box cannot dial.
+  sleroq.sing-box.enableIPv6 = false;
   sleroq.sing-box.routeExcludeAddresses = [
     # OS route bypasses for LAN/VPN address space. The current proxy
     # endpoint also needs an OS route bypass
