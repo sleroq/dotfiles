@@ -188,6 +188,9 @@ in
   hardware.opentabletdriver.daemon.enable = true;
 
   services.udev.extraRules = ''
+    # This Bluetooth USB controller failed runtime suspend; keep only it awake.
+    ACTION=="add|bind", SUBSYSTEM=="pci", KERNEL=="0000:11:00.0", ATTR{power/control}="on"
+
     KERNEL=="hidraw*", ATTRS{idVendor}=="056a", MODE="0660", GROUP="users", TAG+="uaccess"
     SUBSYSTEM=="usb", ATTR{idVendor}=="0ac3", MODE="0660", GROUP="users", TAG+="uaccess"
   '';
