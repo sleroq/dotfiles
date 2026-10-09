@@ -100,6 +100,10 @@
       "rev": "831a97c",
       "src": "https://github.com/AckslD/nvim-neoclip.lua"
     },
+    "nvim-pi": {
+      "rev": "102e087179cfe8e65bd6b9ab2edbb86d64cecf2f",
+      "src": "https://github.com/aliou/nvim-pi"
+    },
     "nvim-treesitter": {
       "rev": "8b98b4470eb326f1c7b50dae79f8c963568e5720",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
@@ -120,6 +124,10 @@
     "oil.nvim": {
       "rev": "b73018b75affd13fa38e2fc94ef753b465f770d7",
       "src": "https://github.com/stevearc/oil.nvim"
+    },
+    "opencode.nvim": {
+      "rev": "b51972a4c13118836116e132c41a7a3e739ad1b9",
+      "src": "https://github.com/NickvanDyke/opencode.nvim"
     },
     "plenary.nvim": {
       "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
