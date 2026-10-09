@@ -198,7 +198,7 @@ if hy3 then
     bind(super .. " + U", hy3.make_group("h"))
     bind(super .. " + C", hy3.make_group("v"))
     bind(super .. " + B", hy3.make_group("tab"))
-    bind(super .. " + A", hy3.change_focus("raise"))
+    -- bind(super .. " + A", hy3.change_focus("raise"))
     bind(super .. " + SHIFT + A", hy3.change_focus("lower"))
     bind(super .. " + I", hy3.expand("expand"))
     bind(super .. " + SHIFT + I", hy3.expand("shrink"))
