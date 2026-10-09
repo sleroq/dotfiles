@@ -19,7 +19,7 @@ in
   myHome = {
     wms = {
       wayland = {
-        sway.enable = true;
+        sway.enable = false;
         hyprland = {
           extraConfig = ''
             -- See https://wiki.hypr.land/Configuring/Basics/Monitors/
