@@ -1,0 +1,13 @@
+Delete --enable-unsafe-webgpu wrappers, and remove teams wrapper completely.
+Remove the firefox completely from the dotfiles including configs and userChrome.css
+remove scrcpu override so we use the latest version.
+remove vicinae input completely
+update neovim nightly input to latest version
+just remove webdav from interplanetary, why do we need it anyway
+remove the gamemode rule like we'd discussed
+remove remove boot unlocking fully and simplify the config. we do not need it for now at all. just simple boot
+remove anytype package and any install of it and git rules
+remove script for measuring sing-box proxies
+remove info about migrations we done from starflake.md and generally rewrite so it's useful for the long time, because migration info likely info and super stale
+remove oven-media-engine module and config completely from the repo
+remove manictime module and config completely

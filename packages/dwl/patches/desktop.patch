@@ -1,0 +1,1144 @@
+diff --git a/Makefile b/Makefile
+index b71571f..7732c58 100644
+--- a/Makefile
++++ b/Makefile
+@@ -12,12 +12,12 @@ DWLDEVCFLAGS = -g -Wpedantic -Wall -Wextra -Wdeclaration-after-statement \
+ 	-Wfloat-conversion
+ 
+ # CFLAGS / LDFLAGS
+-PKGS      = wayland-server xkbcommon libinput $(XLIBS)
++PKGS      = libdrm pangocairo wayland-server xkbcommon libinput $(XLIBS)
+ DWLCFLAGS = `$(PKG_CONFIG) --cflags $(PKGS)` $(WLR_INCS) $(DWLCPPFLAGS) $(DWLDEVCFLAGS) $(CFLAGS)
+ LDLIBS    = `$(PKG_CONFIG) --libs $(PKGS)` $(WLR_LIBS) -lm $(LIBS)
+ 
+ all: dwl
+-dwl: dwl.c client.h config.h ime.h util.h config.mk cursor-shape-v1-protocol.h \
++dwl: dwl.c client.h config.h ime.h util.h workspaces.h window-state.h input-layout.h group-tabs.h config.mk cursor-shape-v1-protocol.h \
+ 	ext-image-copy-capture-v1-protocol.h \
+ 	pointer-constraints-unstable-v1-protocol.h wlr-layer-shell-unstable-v1-protocol.h \
+ 	wlr-output-power-management-unstable-v1-protocol.h xdg-shell-protocol.h \
+@@ -63,7 +63,7 @@ clean:
+ dist: clean
+ 	mkdir -p dwl-$(VERSION)
+ 	cp -R LICENSE* Makefile CHANGELOG.md README.md client.h config.def.h \
+-		config.mk protocols dwl.1 dwl.c ime.h util.h dwl.desktop \
++		config.mk protocols dwl.1 dwl.c ime.h util.h workspaces.h window-state.h input-layout.h group-tabs.h dwl.desktop \
+ 		dwl-$(VERSION)
+ 	tar -caf dwl-$(VERSION).tar.gz dwl-$(VERSION)
+ 	rm -rf dwl-$(VERSION)
+diff --git a/dwl.c b/dwl.c
+index f7031dd..f0e6b0f 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -81,7 +81,7 @@
+ 
+ /* macros */
+ #define CLEANMASK(mask)         (mask & ~WLR_MODIFIER_CAPS)
+-#define VISIBLEON(C, M)         ((M) && (C)->mon == (M) && ((C)->tags & (M)->tagset[(M)->seltags]))
++#define VISIBLEON(C, M) client_visible((C), (M))
+ #define TAGMASK                 ((1u << TAGCOUNT) - 1)
+ #define LISTEN(E, L, H)         wl_signal_add((E), ((L)->notify = (H), (L)))
+ #define LISTEN_STATIC(E, H)     do { struct wl_listener *_l = ecalloc(1, sizeof(*_l)); _l->notify = (H); wl_signal_add((E), _l); } while (0)
+@@ -160,6 +160,9 @@ typedef struct {
+ 	unsigned int bw;
+ 	uint32_t tags;
+ 	int isfloating, isurgent, isfullscreen;
++	int overlay, sticky, maximized, pane, initially_placed;
++	xkb_layout_index_t xkb_layout;
++	struct wlr_box maximize_restore;
+ } Client;
+ 
+ typedef struct {
+@@ -210,7 +213,13 @@ typedef struct {
+ 	void (*arrange)(Monitor *);
+ } Layout;
+ 
++typedef struct {
++	struct wlr_scene_buffer *scene;
++	struct wlr_box box;
++} GroupStrip;
++
+ struct Monitor {
++	GroupStrip strips[2];
+ 	struct wl_list link;
+ 	struct wl_list dwl_ipc_outputs;
+ 	struct wlr_output *wlr_output;
+@@ -233,6 +242,11 @@ struct Monitor {
+ 	int nmaster;
+ 	char ltsymbol[16];
+ 	int asleep;
++	int overlay_open, move_group;
++	Client *overlay_focus, *underlay_focus;
++	Client *tabs[31][2];
++	int grouped[31], stacked[31];
++	float ratio[31];
+ };
+ 
+ typedef struct {
+@@ -499,6 +513,21 @@ static struct wl_listener xwayland_ready = {.notify = xwaylandready};
+ static struct wlr_xwayland *xwayland;
+ #endif
+ 
++static int client_visible(Client *c, Monitor *m);
++static void groupmode(const Arg *arg);
++static void grouporientation(const Arg *arg);
++static void tabcycle(const Arg *arg);
++static void panefocus(const Arg *arg);
++static void groupreorder(const Arg *arg);
++static void groupselect(const Arg *arg);
++static void workspacetag(const Arg *arg);
++static void workspacestep(const Arg *arg);
++static void overlaytoggle(const Arg *arg);
++static void overlaysend(const Arg *arg);
++static void stickyToggle(const Arg *arg);
++static void maximizetoggle(const Arg *arg);
++static void focusfollowtoggle(const Arg *arg);
++
+ /* configuration, allows nested code to access above variables */
+ #include "config.h"
+ 
+@@ -506,6 +535,10 @@ static struct wlr_xwayland *xwayland;
+ #include "client.h"
+ 
+ #include "ime.h"
++#include "group-tabs.h"
++#include "workspaces.h"
++#include "window-state.h"
++#include "input-layout.h"
+ 
+ /* function implementations */
+ void
+@@ -529,13 +562,13 @@ applybounds(Client *c, struct wlr_box *bbox)
+ 	}
+ 
+ 	if (c->geom.x >= bbox->x + bbox->width)
+-		c->geom.x = bbox->x + bbox->width - c->geom.width;
++		c->geom.x = bbox->x + bbox->width - (c->isfloating && !c->overlay && !c->isfullscreen ? 1 : c->geom.width);
+ 	if (c->geom.y >= bbox->y + bbox->height)
+-		c->geom.y = bbox->y + bbox->height - c->geom.height;
++		c->geom.y = bbox->y + bbox->height - (c->isfloating && !c->overlay && !c->isfullscreen ? 1 : c->geom.height);
+ 	if (c->geom.x + c->geom.width <= bbox->x)
+-		c->geom.x = bbox->x;
++		c->geom.x = bbox->x - (c->isfloating && !c->overlay && !c->isfullscreen ? c->geom.width - 1 : 0);
+ 	if (c->geom.y + c->geom.height <= bbox->y)
+-		c->geom.y = bbox->y;
++		c->geom.y = bbox->y - (c->isfloating && !c->overlay && !c->isfullscreen ? c->geom.height - 1 : 0);
+ }
+ 
+ void
+@@ -575,6 +608,8 @@ arrange(Monitor *m)
+ 
+ 	if (!m->wlr_output->enabled)
+ 		return;
++	group_tabs_disable(m);
++	panes_reconcile(m);
+ 
+ 	wl_list_for_each(c, &clients, link) {
+ 		if (c->mon == m) {
+@@ -593,9 +628,14 @@ arrange(Monitor *m)
+ 	/* We move all clients (except fullscreen and unmanaged) to LyrTile while
+ 	 * in floating layout to avoid "real" floating clients be always on top */
+ 	wl_list_for_each(c, &clients, link) {
+-		if (c->mon != m || c->scene->node.parent == layers[LyrFS])
++		if (c->mon != m)
+ 			continue;
+ 
++		if (c->overlay) {
++			wlr_scene_node_reparent(&c->scene->node, layers[LyrOverlay]);
++			continue;
++		}
++		if (c->scene->node.parent == layers[LyrFS]) continue;
+ 		wlr_scene_node_reparent(&c->scene->node,
+ 				(!m->lt[m->sellt]->arrange && c->isfloating)
+ 						? layers[LyrTile]
+@@ -604,8 +644,12 @@ arrange(Monitor *m)
+ 								: c->scene->node.parent);
+ 	}
+ 
+-	if (m->lt[m->sellt]->arrange)
++	if (m->grouped[workspace(m)] && m->lt[m->sellt]->arrange)
++		panes_arrange(m);
++	else if (m->lt[m->sellt]->arrange)
+ 		m->lt[m->sellt]->arrange(m);
++	wl_list_for_each(c, &clients, link)
++		if (VISIBLEON(c, m) && c->maximized && !c->isfullscreen) resize(c, m->w, 0);
+ 	motionnotify(0, NULL, 0, 0, 0, 0);
+ 	checkidleinhibitor(NULL);
+ }
+@@ -714,9 +758,20 @@ buttonpress(struct wl_listener *listener, void *data)
+ 	Client *c = NULL;
+ 	LayerSurface *l = NULL;
+ 	const Button *b;
++	static uint32_t tab_button;
+ 
+ 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+ 
++	if (event->state == WL_POINTER_BUTTON_STATE_RELEASED && tab_button == event->button) {
++		tab_button = 0;
++		cursor_mode = CurNormal;
++		return;
++	}
++	if (!locked && event->state == WL_POINTER_BUTTON_STATE_PRESSED &&
++			event->button == BTN_LEFT && group_tabs_click(cursor->x, cursor->y)) {
++		tab_button = event->button;
++		return;
++	}
+ 	switch (event->state) {
+ 	case WL_POINTER_BUTTON_STATE_PRESSED:
+ 		cursor_mode = CurPressed;
+@@ -847,6 +902,7 @@ cleanupmon(struct wl_listener *listener, void *data)
+ 	size_t i;
+ 
+ 	DwlIpcOutput *ipc_output, *ipc_output_tmp;
++	group_tabs_destroy(m);
+ 	wl_list_for_each_safe(ipc_output, ipc_output_tmp, &m->dwl_ipc_outputs, link)
+ 		wl_resource_destroy(ipc_output->resource);
+ 
+@@ -997,7 +1053,9 @@ commitnotify(struct wl_listener *listener, void *data)
+ 		setmon(c, NULL, 0); /* Make sure to reapply rules in mapnotify() */
+ 
+ 		wlr_xdg_toplevel_set_wm_capabilities(c->surface.xdg->toplevel,
+-				WLR_XDG_TOPLEVEL_WM_CAPABILITIES_FULLSCREEN);
++				WLR_XDG_TOPLEVEL_WM_CAPABILITIES_FULLSCREEN |
++				WLR_XDG_TOPLEVEL_WM_CAPABILITIES_MAXIMIZE);
++		maximize_client(c, c->surface.xdg->toplevel->requested.maximized);
+ 		if (c->decoration)
+ 			requestdecorationmode(&c->set_decoration_mode, c->decoration);
+ 		wlr_xdg_toplevel_set_size(c->surface.xdg->toplevel, 0, 0);
+@@ -1070,6 +1128,7 @@ createkeyboard(struct wlr_keyboard *keyboard)
+ 
+ 	/* Add the new keyboard to the group */
+ 	wlr_keyboard_group_add_keyboard(kb_group->wlr_group, keyboard);
++	window_keyboard_track(keyboard);
+ }
+ 
+ KeyboardGroup *
+@@ -1279,7 +1338,8 @@ createpointer(struct wlr_pointer *pointer)
+ 		}
+ 
+ 		if (libinput_device_config_scroll_has_natural_scroll(device))
+-			libinput_device_config_scroll_set_natural_scroll_enabled(device, natural_scrolling);
++			libinput_device_config_scroll_set_natural_scroll_enabled(device,
++					natural_scrolling && libinput_device_config_tap_get_finger_count(device));
+ 
+ 		if (libinput_device_config_dwt_is_available(device))
+ 			libinput_device_config_dwt_set_enabled(device, disable_while_typing);
+@@ -1613,7 +1673,7 @@ dwl_ipc_output_printstatus_to(DwlIpcOutput *ipc_output)
+ 		wl_list_for_each(c, &clients, link) {
+ 			if (c->mon != monitor)
+ 				continue;
+-			if (!(c->tags & tagmask))
++			if (c->overlay || !(c->tags & tagmask))
+ 				continue;
+ 			if (c == focused)
+ 				is_focused_client = 1;
+@@ -1734,8 +1794,9 @@ focusclient(Client *c, int lift)
+ 	Client *old_c = NULL;
+ 	LayerSurface *old_l = NULL;
+ 
+-	if (locked)
++	if (locked || (c && !client_is_unmanaged(c) && !VISIBLEON(c, c->mon)))
+ 		return;
++	if (c && c->overlay) c->mon->overlay_focus = c;
+ 
+ 	/* Raise client in stacking order if requested */
+ 	if (c && lift)
+@@ -1784,6 +1845,7 @@ focusclient(Client *c, int lift)
+ 			client_activate_surface(s, 0);
+ 		focused_client = NULL;
+ 	}
++	group_tabs_refresh();
+ 	printstatus();
+ 
+ 	if (!c) {
+@@ -1799,6 +1861,7 @@ focusclient(Client *c, int lift)
+ 	input_method_relay_set_focus(input_method_relay, client_surface(c));
+ 
+ 	/* Have a client, so focus its top-level wlr_surface */
++	window_keyboard_focus(c);
+ 	client_notify_enter(client_surface(c), wlr_seat_get_keyboard(seat));
+ 
+ 	/* Activate the new client */
+@@ -1966,7 +2029,8 @@ keypress(struct wl_listener *listener, void *data)
+ 	/* Translate libinput keycode -> xkbcommon */
+ 	uint32_t keycode = event->keycode + 8;
+ 	struct wlr_keyboard *kb = &group->wlr_group->keyboard;
+-	xkb_layout_index_t layout = xkb_state_key_get_layout(kb->xkb_state, keycode);
++	/* Compositor shortcuts keep their physical US positions in RU layout. */
++	xkb_layout_index_t layout = 0;
+ 	int handled = 0;
+ 
+ 	// Get the keysyms for level 0 (normal) and level 1 (shifted)
+@@ -2022,6 +2086,7 @@ keypressmod(struct wl_listener *listener, void *data)
+ 	if (input_method_keyboard_grab_forward_modifiers(group))
+ 		return;
+ 
++	if (focused_client) focused_client->xkb_layout = group->wlr_group->keyboard.modifiers.group;
+ 	wlr_seat_set_keyboard(seat, &group->wlr_group->keyboard);
+ 	/* Send modifiers to the client. */
+ 	wlr_seat_keyboard_notify_modifiers(seat,
+@@ -2150,8 +2215,10 @@ mapnotify(struct wl_listener *listener, void *data)
+ 	 * If there is no parent, apply rules */
+ 	if ((p = client_get_parent(c))) {
+ 		c->isfloating = 1;
++		c->overlay = p->overlay;
+ 		setmon(c, p->mon, p->tags);
+ 	} else {
++		if (selmon && focustop(selmon)) c->pane = focustop(selmon)->pane;
+ 		applyrules(c);
+ 	}
+ 	printstatus();
+@@ -2159,7 +2226,7 @@ mapnotify(struct wl_listener *listener, void *data)
+ unset_fullscreen:
+ 	m = c->mon ? c->mon : xytomon(c->geom.x, c->geom.y);
+ 	wl_list_for_each(w, &clients, link) {
+-		if (w != c && w != p && w->isfullscreen && m == w->mon && (w->tags & c->tags))
++		if (!c->overlay && w != c && w != p && w->isfullscreen && m == w->mon && (w->tags & c->tags))
+ 			setfullscreen(w, 0);
+ 	}
+ }
+@@ -2167,19 +2234,8 @@ unset_fullscreen:
+ void
+ maximizenotify(struct wl_listener *listener, void *data)
+ {
+-	/* This event is raised when a client would like to maximize itself,
+-	 * typically because the user clicked on the maximize button on
+-	 * client-side decorations. dwl doesn't support maximization, but
+-	 * to conform to xdg-shell protocol we still must send a configure.
+-	 * Since xdg-shell protocol v5 we should ignore request of unsupported
+-	 * capabilities, just schedule a empty configure when the client uses <5
+-	 * protocol version
+-	 * wlr_xdg_surface_schedule_configure() is used to send an empty reply. */
+ 	Client *c = wl_container_of(listener, c, maximize);
+-	if (c->surface.xdg->initialized
+-			&& wl_resource_get_version(c->surface.xdg->toplevel->resource)
+-					< XDG_TOPLEVEL_WM_CAPABILITIES_SINCE_VERSION)
+-		wlr_xdg_surface_schedule_configure(c->surface.xdg);
++	maximize_client(c, c->surface.xdg->toplevel->requested.maximized);
+ }
+ 
+ void
+@@ -2191,7 +2247,7 @@ monocle(Monitor *m)
+ 	wl_list_for_each(c, &clients, link) {
+ 		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
+ 			continue;
+-		resize(c, m->w, 0);
++		resize(c, c->maximized ? m->w : tiled_geometry(m, m->w), 0);
+ 		n++;
+ 	}
+ 	if (n)
+@@ -2231,18 +2287,6 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
+ 	struct wlr_surface *surface = NULL;
+ 	struct wlr_pointer_constraint_v1 *constraint;
+ 
+-	/* Find the client under the pointer and send the event along. */
+-	xytonode(cursor->x, cursor->y, &surface, &c, &l, &sx, &sy);
+-
+-	if (cursor_mode == CurPressed && !seat->drag
+-			&& surface != seat->pointer_state.focused_surface
+-			&& toplevel_from_wlr_surface(seat->pointer_state.focused_surface, &w, &focusedl) >= 0) {
+-		c = w;
+-		surface = seat->pointer_state.focused_surface;
+-		sx = cursor->x - (focusedl ? focusedl->scene->node.x : w->geom.x);
+-		sy = cursor->y - (focusedl ? focusedl->scene->node.y : w->geom.y);
+-	}
+-
+ 	/* time is 0 in internal calls meant to restore pointer focus. */
+ 	if (time) {
+ 		wlr_relative_pointer_manager_v1_send_relative_motion(
+@@ -2301,6 +2345,19 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
+ 		return;
+ 	}
+ 
++	/* Hit-test after movement; constraints above still use the old position. */
++	c = NULL;
++	xytonode(cursor->x, cursor->y, &surface, &c, &l, &sx, &sy);
++
++	if (cursor_mode == CurPressed && !seat->drag
++			&& surface != seat->pointer_state.focused_surface
++			&& toplevel_from_wlr_surface(seat->pointer_state.focused_surface, &w, &focusedl) >= 0) {
++		c = w;
++		surface = seat->pointer_state.focused_surface;
++		sx = cursor->x - (focusedl ? focusedl->scene->node.x : w->geom.x);
++		sy = cursor->y - (focusedl ? focusedl->scene->node.y : w->geom.y);
++	}
++
+ 	/* If there's no client surface under the cursor, set the cursor image to a
+ 	 * default. This is what makes the cursor image appear when you move it
+ 	 * off of a client or over its border. */
+@@ -2335,6 +2392,7 @@ moveresize(const Arg *arg)
+ 		return;
+ 
+ 	/* Float the window and tell motionnotify to grab it */
++	maximize_client(grabc, 0);
+ 	setfloating(grabc, 1);
+ 	switch (cursor_mode = arg->ui) {
+ 	case CurMove:
+@@ -2684,13 +2742,15 @@ void
+ setfloating(Client *c, int floating)
+ {
+ 	Client *p = client_get_parent(c);
++	if (c->isfloating && !floating && !c->overlay && c->mon)
++		c->mon->tabs[workspace(c->mon)][c->pane] = c;
+ 	c->isfloating = floating;
+ 	/* If in floating layout do not change the client's layer */
+ 	if (!c->mon || !client_surface(c)->mapped || !c->mon->lt[c->mon->sellt]->arrange)
+ 		return;
+ 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen ||
+ 			(p && p->isfullscreen) ? LyrFS
+-			: c->isfloating ? LyrFloat : LyrTile]);
++			: c->overlay ? LyrOverlay : c->isfloating ? LyrFloat : LyrTile]);
+ 	arrange(c->mon);
+ 	printstatus();
+ }
+@@ -2704,7 +2764,7 @@ setfullscreen(Client *c, int fullscreen)
+ 	c->bw = fullscreen ? 0 : borderpx;
+ 	client_set_fullscreen(c, fullscreen);
+ 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen
+-			? LyrFS : c->isfloating ? LyrFloat : LyrTile]);
++			? LyrFS : c->overlay ? LyrOverlay : c->isfloating ? LyrFloat : LyrTile]);
+ 
+ 	if (fullscreen) {
+ 		c->prev = c->geom;
+@@ -2740,6 +2800,13 @@ setmfact(const Arg *arg)
+ 
+ 	if (!arg || !selmon || !selmon->lt[selmon->sellt]->arrange)
+ 		return;
++	if (selmon->grouped[workspace(selmon)]) {
++		unsigned int w = workspace(selmon);
++		f = (selmon->ratio[w] ? selmon->ratio[w] : 0.55f) + arg->f;
++		if (f >= 0.1f && f <= 0.9f) selmon->ratio[w] = f;
++		arrange(selmon);
++		return;
++	}
+ 	f = arg->f < 1.0f ? arg->f + selmon->mfact : arg->f - 1.0f;
+ 	if (f < 0.1 || f > 0.9)
+ 		return;
+@@ -2755,6 +2822,7 @@ setmon(Client *c, Monitor *m, uint32_t newtags)
+ 	if (oldmon == m)
+ 		return;
+ 	c->mon = m;
++	window_initial_placement(c);
+ 	c->prev = c->geom;
+ 
+ 	/* Scene graph sends surface leave/enter events on move and resize */
+@@ -2764,6 +2832,7 @@ setmon(Client *c, Monitor *m, uint32_t newtags)
+ 		/* Make sure window actually overlaps with the monitor */
+ 		resize(c, c->geom, 0);
+ 		c->tags = newtags ? newtags : m->tagset[m->seltags]; /* assign tags of target monitor */
++		if (!c->isfloating && !c->overlay) m->tabs[workspace(m)][c->pane] = c;
+ 		setfullscreen(c, c->isfullscreen); /* This will call arrange(c->mon) */
+ 		setfloating(c, c->isfloating);
+ 	}
+@@ -3078,35 +3147,7 @@ tagmon(const Arg *arg)
+ void
+ tile(Monitor *m)
+ {
+-	unsigned int mw, my, ty;
+-	int i, n = 0;
+-	Client *c;
+-
+-	wl_list_for_each(c, &clients, link)
+-		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen)
+-			n++;
+-	if (n == 0)
+-		return;
+-
+-	if (n > m->nmaster)
+-		mw = m->nmaster ? (int)roundf(m->w.width * m->mfact) : 0;
+-	else
+-		mw = m->w.width;
+-	i = my = ty = 0;
+-	wl_list_for_each(c, &clients, link) {
+-		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
+-			continue;
+-		if (i < m->nmaster) {
+-			resize(c, (struct wlr_box){.x = m->w.x, .y = m->w.y + my, .width = mw,
+-				.height = (m->w.height - my) / (MIN(n, m->nmaster) - i)}, 0);
+-			my += c->geom.height;
+-		} else {
+-			resize(c, (struct wlr_box){.x = m->w.x + mw, .y = m->w.y + ty,
+-				.width = m->w.width - mw, .height = (m->w.height - ty) / (n - i)}, 0);
+-			ty += c->geom.height;
+-		}
+-		i++;
+-	}
++	ordinary_tile(m);
+ }
+ 
+ void
+@@ -3121,8 +3162,10 @@ togglefloating(const Arg *arg)
+ {
+ 	Client *sel = focustop(selmon);
+ 	/* return if fullscreen */
+-	if (sel && !sel->isfullscreen)
++	if (sel && !sel->isfullscreen && !sel->overlay) {
++		maximize_client(sel, 0);
+ 		setfloating(sel, !sel->isfloating);
++	}
+ }
+ 
+ void
+@@ -3188,6 +3231,7 @@ unmapnotify(struct wl_listener *listener, void *data)
+ {
+ 	/* Called when the surface is unmapped, and should no longer be shown. */
+ 	Client *c = wl_container_of(listener, c, unmap);
++	window_forget(c);
+ 	if (c == grabc) {
+ 		cursor_mode = CurNormal;
+ 		grabc = NULL;
+@@ -3339,6 +3383,7 @@ void
+ updatetitle(struct wl_listener *listener, void *data)
+ {
+ 	Client *c = wl_container_of(listener, c, set_title);
++	group_tabs_refresh();
+ 	if (c == focustop(c->mon))
+ 		printstatus();
+ 
+@@ -3388,6 +3433,7 @@ virtualkeyboard(struct wl_listener *listener, void *data)
+ 	/* virtual keyboards shouldn't share keyboard group */
+ 	KeyboardGroup *group = createkeyboardgroup();
+ 	group->virtual_keyboard = &kb->keyboard;
++	window_keyboard_track(&kb->keyboard);
+ 	/* Set the keymap to match the group keymap */
+ 	wlr_keyboard_set_keymap(&kb->keyboard, group->wlr_group->keyboard.keymap);
+ 	LISTEN(&kb->keyboard.base.events.destroy, &group->destroy, destroykeyboardgroup);
+@@ -3429,9 +3475,11 @@ xytonode(double x, double y, struct wlr_surface **psurface,
+ 				!(node = wlr_scene_node_at(&layers[layer]->node, x, y, nx, ny)))
+ 			continue;
+ 
+-		if (node->type == WLR_SCENE_NODE_BUFFER)
+-			surface = wlr_scene_surface_try_from_buffer(
+-					wlr_scene_buffer_from_node(node))->surface;
++		if (node->type == WLR_SCENE_NODE_BUFFER) {
++			struct wlr_scene_surface *ss = wlr_scene_surface_try_from_buffer(wlr_scene_buffer_from_node(node));
++			if (ss) surface = ss->surface;
++			else break;
++		}
+ 	}
+ 
+ 	if (psurface) *psurface = surface;
+diff --git a/group-tabs.h b/group-tabs.h
+new file mode 100644
+index 0000000..942a26c
+--- /dev/null
++++ b/group-tabs.h
+@@ -0,0 +1,151 @@
++#include <cairo.h>
++#include <pango/pangocairo.h>
++#include <drm_fourcc.h>
++#include <wlr/types/wlr_buffer.h>
++#include <wlr/interfaces/wlr_buffer.h>
++
++static unsigned int workspace(Monitor *m);
++static int pane_member(Client *c, Monitor *m, int pane);
++
++typedef struct {
++	struct wlr_buffer base;
++	cairo_surface_t *image;
++} TabBuffer;
++
++static void
++tab_buffer_destroy(struct wlr_buffer *base)
++{
++	TabBuffer *buffer = wl_container_of(base, buffer, base);
++	cairo_surface_destroy(buffer->image);
++	free(buffer);
++}
++
++static bool
++tab_buffer_access(struct wlr_buffer *base, uint32_t flags, void **data,
++		uint32_t *format, size_t *stride)
++{
++	TabBuffer *buffer = wl_container_of(base, buffer, base);
++	*data = cairo_image_surface_get_data(buffer->image);
++	*format = DRM_FORMAT_ARGB8888;
++	*stride = cairo_image_surface_get_stride(buffer->image);
++	return true;
++}
++
++static void tab_buffer_end(struct wlr_buffer *base) {}
++static const struct wlr_buffer_impl tab_buffer_impl = {
++	.destroy = tab_buffer_destroy,
++	.begin_data_ptr_access = tab_buffer_access,
++	.end_data_ptr_access = tab_buffer_end,
++};
++
++static void
++group_tabs_disable(Monitor *m)
++{
++	int p;
++	for (p = 0; p < 2; p++)
++		if (m->strips[p].scene) wlr_scene_node_set_enabled(&m->strips[p].scene->node, false);
++}
++
++static void
++group_tabs_destroy(Monitor *m)
++{
++	int p;
++	for (p = 0; p < 2; p++)
++		if (m->strips[p].scene) wlr_scene_node_destroy(&m->strips[p].scene->node);
++}
++
++static void
++group_tabs_render(Monitor *m, int pane, struct wlr_box box)
++{
++	Client *c;
++	GroupStrip *strip = &m->strips[pane];
++	TabBuffer *buffer;
++	cairo_t *cr;
++	PangoLayout *text;
++	PangoFontDescription *font;
++	int count = 0, i = 0, left, right;
++	wl_list_for_each(c, &clients, link) if (pane_member(c, m, pane)) count++;
++	if (!count) return;
++	buffer = ecalloc(1, sizeof(*buffer));
++	buffer->image = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, box.width, 26);
++	wlr_buffer_init(&buffer->base, &tab_buffer_impl, box.width, 26);
++	cr = cairo_create(buffer->image);
++	text = pango_cairo_create_layout(cr);
++	font = pango_font_description_from_string("Sans 10");
++	pango_layout_set_font_description(text, font);
++	pango_layout_set_ellipsize(text, PANGO_ELLIPSIZE_END);
++	pango_layout_set_single_paragraph_mode(text, TRUE);
++	wl_list_for_each(c, &clients, link) {
++		if (!pane_member(c, m, pane)) continue;
++		left = box.width * i / count;
++		right = box.width * ++i / count;
++		cairo_save(cr);
++		cairo_rectangle(cr, left, 0, right - left, 26);
++		cairo_clip(cr);
++		if (m->tabs[workspace(m)][pane] == c) cairo_set_source_rgb(cr, c == focustop(m) ? .30 : .25, .35, .48);
++		else cairo_set_source_rgb(cr, .12, .14, .18);
++		cairo_paint(cr);
++		pango_layout_set_width(text, MAX(1, right - left - 12) * PANGO_SCALE);
++		pango_layout_set_text(text, client_get_title(c) ? client_get_title(c) : "", -1);
++		cairo_set_source_rgb(cr, .92, .92, .92);
++		cairo_move_to(cr, left + 6, 4);
++		pango_cairo_show_layout(cr, text);
++		cairo_restore(cr);
++	}
++	pango_font_description_free(font);
++	g_object_unref(text);
++	cairo_destroy(cr);
++	cairo_surface_flush(buffer->image);
++	if (!strip->scene) strip->scene = wlr_scene_buffer_create(layers[LyrTile], &buffer->base);
++	else wlr_scene_buffer_set_buffer(strip->scene, &buffer->base);
++	wlr_buffer_drop(&buffer->base);
++	strip->box = box;
++	strip->box.height = 26;
++	wlr_scene_node_set_position(&strip->scene->node, box.x, box.y);
++	wlr_scene_node_set_enabled(&strip->scene->node, true);
++}
++
++static void
++group_tabs_refresh(void)
++{
++	Monitor *m;
++	int p;
++	wl_list_for_each(m, &mons, link) for (p = 0; p < 2; p++)
++		if (m->strips[p].scene && m->strips[p].scene->node.enabled)
++			group_tabs_render(m, p, m->strips[p].box);
++}
++
++/* Invert the same floored boundaries used to draw the tab rectangles. */
++static int
++group_tab_index(int x, int width, int count)
++{
++	return ((x + 1) * count - 1) / width;
++}
++
++static int
++group_tabs_click(double x, double y)
++{
++	struct wlr_scene_node *node;
++	Monitor *m;
++	Client *c;
++	double nx, ny;
++	int p, count, index, i;
++	node = wlr_scene_node_at(&scene->tree.node, x, y, &nx, &ny);
++	wl_list_for_each(m, &mons, link) for (p = 0; p < 2; p++) {
++		GroupStrip *strip = &m->strips[p];
++		if (!strip->scene || node != &strip->scene->node) continue;
++		count = 0;
++		wl_list_for_each(c, &clients, link) if (pane_member(c, m, p)) count++;
++		index = group_tab_index((int)nx, strip->box.width, count);
++		i = 0;
++		wl_list_for_each(c, &clients, link) {
++			if (!pane_member(c, m, p) || i++ != index) continue;
++			m->tabs[workspace(m)][p] = c;
++			selmon = m;
++			arrange(m);
++			focusclient(c, 1);
++			return 1;
++		}
++	}
++	return 0;
++}
+diff --git a/input-layout.h b/input-layout.h
+new file mode 100644
+index 0000000..c3a221c
+--- /dev/null
++++ b/input-layout.h
+@@ -0,0 +1,49 @@
++/* wlroots 0.20 exposes XKB state, not its internal modifier notification API.
++ * Keep connected physical/virtual keyboard states in sync with the seat group. */
++typedef struct {
++	struct wl_list link;
++	struct wlr_keyboard *keyboard;
++	struct wl_listener destroy;
++} WindowKeyboard;
++static struct wl_list window_keyboards = { &window_keyboards, &window_keyboards };
++
++static void
++window_keyboard_destroy(struct wl_listener *listener, void *data)
++{
++	WindowKeyboard *device = wl_container_of(listener, device, destroy);
++	wl_list_remove(&device->link);
++	wl_list_remove(&device->destroy.link);
++	free(device);
++}
++
++static void
++window_keyboard_track(struct wlr_keyboard *keyboard)
++{
++	WindowKeyboard *device = ecalloc(1, sizeof(*device));
++	device->keyboard = keyboard;
++	wl_list_insert(&window_keyboards, &device->link);
++	LISTEN(&keyboard->base.events.destroy, &device->destroy, window_keyboard_destroy);
++}
++
++static void
++window_keyboard_layout(struct wlr_keyboard *keyboard, xkb_layout_index_t layout)
++{
++	xkb_state_update_mask(keyboard->xkb_state, keyboard->modifiers.depressed,
++		keyboard->modifiers.latched, keyboard->modifiers.locked, 0, 0, layout);
++	keyboard->modifiers.group = xkb_state_serialize_layout(keyboard->xkb_state, XKB_STATE_LAYOUT_EFFECTIVE);
++}
++
++static void
++window_keyboard_focus(Client *c)
++{
++	WindowKeyboard *device;
++	struct wlr_keyboard *keyboard = wlr_seat_get_keyboard(seat);
++	if (!keyboard || !c) return;
++	wl_list_for_each(device, &window_keyboards, link) {
++		window_keyboard_layout(device->keyboard, c->xkb_layout);
++		if (device->keyboard->group)
++			window_keyboard_layout(&device->keyboard->group->keyboard, c->xkb_layout);
++	}
++	window_keyboard_layout(keyboard, c->xkb_layout);
++	wlr_seat_keyboard_notify_modifiers(seat, &keyboard->modifiers);
++}
+diff --git a/window-state.h b/window-state.h
+new file mode 100644
+index 0000000..803b5b4
+--- /dev/null
++++ b/window-state.h
+@@ -0,0 +1,112 @@
++/* First-map placement runs before setmon saves prev or arranges maximization.
++ * It never runs again for an existing client, including unmap/remap. */
++static void
++window_initial_placement(Client *c)
++{
++	if (!c->mon || c->initially_placed || !client_surface(c)->mapped) return;
++	if (c->isfloating) {
++		Client *parent = client_get_parent(c);
++		struct wlr_box area = parent ? parent->geom : c->mon->w;
++		c->geom.x = area.x + MAX(0, (area.width - c->geom.width) / 2);
++		c->geom.y = area.y + MAX(0, (area.height - c->geom.height) / 2);
++	}
++	c->initially_placed = 1;
++	if (c->maximized) c->maximize_restore = c->geom;
++}
++
++/* Overlay membership never changes tags; hiding only disables scene nodes. */
++static void
++overlaytoggle(const Arg *arg)
++{
++	Client *c, *target = NULL;
++	Monitor *m = selmon;
++	if (!m) return;
++	if (!m->overlay_open) m->underlay_focus = focustop(m);
++	m->overlay_open ^= 1;
++	arrange(m);
++	if (m->overlay_open) {
++		target = m->overlay_focus;
++		if (!target) wl_list_for_each(c, &fstack, flink)
++			if (c->mon == m && c->overlay) { target = c; break; }
++	} else target = m->underlay_focus;
++	focusclient(target && VISIBLEON(target, m) ? target : focustop(m), 0);
++	printstatus();
++}
++
++static void
++overlaysend(const Arg *arg)
++{
++	Client *c = focustop(selmon);
++	if (!c) return;
++	if (c->overlay) {
++		c->overlay = 0;
++		wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen ? LyrFS : LyrFloat]);
++		c->tags = selmon->tagset[selmon->seltags];
++		if (selmon->overlay_focus == c) selmon->overlay_focus = NULL;
++	} else {
++		c->overlay = 1;
++		c->isfloating = 1;
++		selmon->overlay_focus = c;
++	}
++	arrange(selmon);
++	focusclient(focustop(selmon), 0);
++	printstatus();
++}
++
++static void
++stickyToggle(const Arg *arg)
++{
++	Client *c = focustop(selmon);
++	if (!c || c->overlay) return;
++	c->sticky ^= 1;
++	arrange(selmon);
++	printstatus();
++}
++
++static void
++maximize_client(Client *c, int maximized)
++{
++	if (!c || c->isfullscreen || c->maximized == maximized ||
++			(c->type == XDGShell && !c->surface.xdg->initialized)) return;
++	c->maximized = maximized;
++	if (maximized && client_surface(c)->mapped) c->maximize_restore = c->geom;
++	if (c->type == XDGShell) wlr_xdg_toplevel_set_maximized(c->surface.xdg->toplevel, maximized);
++#ifdef XWAYLAND
++	else wlr_xwayland_surface_set_maximized(c->surface.xwayland, maximized, maximized);
++#endif
++	if (!client_surface(c)->mapped) return;
++	if (c->mon) {
++		resize(c, maximized ? c->mon->w : c->maximize_restore, 0);
++		arrange(c->mon);
++		if (maximized) wlr_scene_node_raise_to_top(&c->scene->node);
++	}
++}
++
++static void
++maximizetoggle(const Arg *arg)
++{
++	Client *c = focustop(selmon);
++	if (c) maximize_client(c, !c->maximized);
++}
++
++static void
++focusfollowtoggle(const Arg *arg)
++{
++	sloppyfocus ^= 1;
++}
++
++static void
++window_forget(Client *c)
++{
++	Monitor *m;
++	unsigned int w;
++	wl_list_for_each(m, &mons, link) {
++		if (m->overlay_focus == c) m->overlay_focus = NULL;
++		if (m->underlay_focus == c) m->underlay_focus = NULL;
++		for (w = 0; w < TAGCOUNT; w++) {
++			if (m->tabs[w][0] == c) m->tabs[w][0] = NULL;
++			if (m->tabs[w][1] == c) m->tabs[w][1] = NULL;
++		}
++	}
++	c->overlay = c->sticky = c->maximized = 0;
++}
+diff --git a/workspaces.h b/workspaces.h
+new file mode 100644
+index 0000000..2eab5c6
+--- /dev/null
++++ b/workspaces.h
+@@ -0,0 +1,288 @@
++/* Flat workspace panes. Client.link is the authoritative tab order. */
++static unsigned int
++workspace(Monitor *m)
++{
++	return (unsigned int)__builtin_ctz(m->tagset[m->seltags]);
++}
++
++static int
++workspace_member(Client *c, Monitor *m)
++{
++	return m && c->mon == m && !c->overlay &&
++		(c->sticky || (c->tags & m->tagset[m->seltags]));
++}
++
++static int
++pane_member(Client *c, Monitor *m, int pane)
++{
++	return workspace_member(c, m) && !c->isfloating && c->pane == pane;
++}
++
++static void
++panes_reconcile(Monitor *m)
++{
++	Client *c, *first[2] = {NULL, NULL};
++	unsigned int w = workspace(m);
++	int found[2] = {0, 0}, p;
++	wl_list_for_each(c, &clients, link) {
++		if (!workspace_member(c, m) || c->isfloating)
++			continue;
++		p = c->pane;
++		if (!first[p]) first[p] = c;
++		if (m->tabs[w][p] == c) found[p] = 1;
++	}
++	for (p = 0; p < 2; p++)
++		if (!found[p]) m->tabs[w][p] = first[p];
++	if (!first[0] && first[1]) {
++		wl_list_for_each(c, &clients, link)
++			if (pane_member(c, m, 1)) c->pane = 0;
++		m->tabs[w][0] = m->tabs[w][1];
++		m->tabs[w][1] = NULL;
++	}
++}
++
++static int
++client_visible(Client *c, Monitor *m)
++{
++	if (!m || c->mon != m) return 0;
++	if (c->overlay) return m->overlay_open;
++	if (!workspace_member(c, m)) return 0;
++	return c->isfloating || !m->lt[m->sellt]->arrange || !m->grouped[workspace(m)] ||
++		m->tabs[workspace(m)][c->pane] == c;
++}
++
++/* Each shared edge contributes 2px: 4px inner gaps, 8x4px outer gaps. */
++static struct wlr_box
++tiled_geometry(Monitor *m, struct wlr_box box)
++{
++	int left = box.x == m->w.x ? 8 : 2;
++	int top = box.y == m->w.y ? 4 : 2;
++	int right = box.x + box.width == m->w.x + m->w.width ? 8 : 2;
++	int bottom = box.y + box.height == m->w.y + m->w.height ? 4 : 2;
++	box.x += left;
++	box.y += top;
++	box.width = MAX(1, box.width - left - right);
++	box.height = MAX(1, box.height - top - bottom);
++	return box;
++}
++
++static void
++ordinary_tile(Monitor *m)
++{
++	Client *c;
++	struct wlr_box box;
++	int n = 0, i = 0, masters, width, row, count;
++	wl_list_for_each(c, &clients, link)
++		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen) n++;
++	if (!n) return;
++	masters = MIN(n, m->nmaster);
++	width = n > masters ? (masters ? (int)roundf(m->w.width * m->mfact) : 0) : m->w.width;
++	wl_list_for_each(c, &clients, link) {
++		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen) continue;
++		row = i < masters ? i : i - masters;
++		count = i < masters ? masters : n - masters;
++		box = m->w;
++		box.x += i < masters ? 0 : width;
++		box.width = i < masters ? width : m->w.width - width;
++		box.y += m->w.height * row / count;
++		box.height = m->w.height * (row + 1) / count - m->w.height * row / count;
++		resize(c, tiled_geometry(m, box), 0);
++		i++;
++	}
++}
++
++static void
++panes_arrange(Monitor *m)
++{
++	unsigned int w = workspace(m);
++	Client *c;
++	struct wlr_box box;
++	int split = m->tabs[w][1] != NULL, p;
++	float ratio = m->ratio[w] ? m->ratio[w] : 0.55f;
++	for (p = 0; p < 2; p++) {
++		c = m->tabs[w][p];
++		if (!c || c->isfullscreen) continue;
++		box = m->w;
++		if (split && m->stacked[w]) {
++			box.height = p ? m->w.height - (int)(m->w.height * ratio) : (int)(m->w.height * ratio);
++			if (p) box.y += (int)(m->w.height * ratio);
++		} else if (split) {
++			box.width = p ? m->w.width - (int)(m->w.width * ratio) : (int)(m->w.width * ratio);
++			if (p) box.x += (int)(m->w.width * ratio);
++		}
++		box = c->maximized ? m->w : tiled_geometry(m, box);
++		if (!c->maximized) {
++			group_tabs_render(m, p, box);
++			box.y += 26;
++			box.height = MAX(1, box.height - 26);
++		}
++		resize(c, box, 0);
++	}
++}
++
++static int
++group_navigation(Client *c)
++{
++	return c && c->mon->grouped[workspace(c->mon)] &&
++		c->mon->lt[c->mon->sellt]->arrange && !c->isfloating && !c->overlay;
++}
++
++static void
++pane_keep_focus(Monitor *m)
++{
++	Client *c = focustop(m);
++	if (c && !c->isfloating && !c->overlay)
++		m->tabs[workspace(m)][c->pane] = c;
++}
++
++static void
++groupmode(const Arg *arg)
++{
++	if (!selmon) return;
++	pane_keep_focus(selmon);
++	selmon->grouped[workspace(selmon)] ^= 1;
++	arrange(selmon);
++	focusclient(focustop(selmon), 1);
++}
++
++static void
++grouporientation(const Arg *arg)
++{
++	if (!selmon) return;
++	pane_keep_focus(selmon);
++	selmon->grouped[workspace(selmon)] = 1;
++	selmon->stacked[workspace(selmon)] = arg->i;
++	arrange(selmon);
++}
++
++static void
++tabcycle(const Arg *arg)
++{
++	Client *c, *sel = focustop(selmon), *next = NULL, *last = NULL;
++	int passed = 0;
++	if (!group_navigation(sel)) { focusstack(arg); return; }
++	wl_list_for_each(c, &clients, link) {
++		if (!pane_member(c, selmon, sel->pane)) continue;
++		if (!next) next = c;
++		if (c == sel) {
++			if (arg->i < 0 && last) { next = last; break; }
++			passed = 1;
++		} else if (passed && arg->i > 0) { next = c; break; }
++		last = c;
++	}
++	if (arg->i < 0 && next == sel) next = last;
++	if (!next) return;
++	selmon->tabs[workspace(selmon)][sel->pane] = next;
++	arrange(selmon);
++	focusclient(next, 1);
++}
++
++static int
++pane_neighbor(int pane, int direction)
++{
++	int next = pane + direction;
++	return next >= 0 && next < 2 ? next : -1;
++}
++
++static void
++panefocus(const Arg *arg)
++{
++	Client *sel = focustop(selmon), *next;
++	int pane;
++	if (!group_navigation(sel)) { focusstack(arg); return; }
++	pane = pane_neighbor(sel->pane, arg->i);
++	if (pane < 0) { focusstack(arg); return; }
++	next = selmon->tabs[workspace(selmon)][pane];
++	if (next) focusclient(next, 1);
++	else focusstack(arg);
++}
++
++/* Called only at a tab-list edge. A singleton left split shifts the old
++ * pane right; outward edges with two panes never create a third pane. */
++static int
++pane_cross(Client *sel, int direction)
++{
++	Monitor *m = sel->mon;
++	Client *c, *edge = NULL;
++	unsigned int w = workspace(m);
++	int next;
++	if (!m->tabs[w][1] && direction < 0) {
++		wl_list_for_each(c, &clients, link)
++			if (pane_member(c, m, 0)) c->pane = 1;
++		m->tabs[w][1] = m->tabs[w][0];
++		m->tabs[w][0] = NULL;
++		sel->pane = 0;
++	} else {
++		next = pane_neighbor(sel->pane, direction);
++		if (next < 0) return 0;
++		/* Enter the destination at its facing edge, not at an incidental
++		 * position inherited from interleaved global client order. */
++		wl_list_for_each(c, &clients, link) {
++			if (c == sel || !pane_member(c, m, next)) continue;
++			edge = c;
++			if (direction > 0) break;
++		}
++		if (edge) {
++			wl_list_remove(&sel->link);
++			wl_list_insert(direction > 0 ? edge->link.prev : &edge->link, &sel->link);
++		}
++		sel->pane = next;
++	}
++	m->grouped[w] = 1;
++	m->tabs[w][sel->pane] = sel;
++	return 1;
++}
++
++static void
++groupreorder(const Arg *arg)
++{
++	Client *c, *sel = focustop(selmon), *neighbor = NULL;
++	struct wl_list *node;
++	if (!sel || sel->isfloating || sel->overlay) return;
++	node = arg->i > 0 ? sel->link.next : sel->link.prev;
++	while (node != &clients) {
++		c = wl_container_of(node, c, link);
++		if (pane_member(c, selmon, sel->pane)) { neighbor = c; break; }
++		node = arg->i > 0 ? node->next : node->prev;
++	}
++	if (neighbor) {
++		wl_list_remove(&sel->link);
++		wl_list_insert(arg->i > 0 ? &neighbor->link : neighbor->link.prev, &sel->link);
++	} else if (!pane_cross(sel, arg->i)) {
++		return;
++	}
++	selmon->tabs[workspace(selmon)][sel->pane] = sel;
++	arrange(selmon);
++	focusclient(sel, 1);
++}
++
++static void
++groupselect(const Arg *arg)
++{
++	if (selmon) selmon->move_group ^= 1;
++}
++
++static void
++workspacetag(const Arg *arg)
++{
++	Client *c, *sel = focustop(selmon);
++	if (!sel || sel->overlay) return;
++	wl_list_for_each(c, &clients, link)
++		if (c == sel || (selmon->move_group && pane_member(c, selmon, sel->pane)))
++			c->tags = arg->ui & TAGMASK;
++	selmon->move_group = 0;
++	arrange(selmon);
++	focusclient(focustop(selmon), 1);
++	printstatus();
++}
++
++static void
++workspacestep(const Arg *arg)
++{
++	Arg target;
++	int next;
++	if (!selmon) return;
++	next = ((int)workspace(selmon) + arg->i + TAGCOUNT) % TAGCOUNT;
++	target.ui = 1u << next;
++	view(&target);
++}

@@ -16,6 +16,7 @@ in
 
   imports = [
     ./caelestia.nix
+    ./dwl.nix
     ./wayland.nix
     ./x11.nix
   ];

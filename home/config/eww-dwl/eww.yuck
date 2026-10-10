@@ -1,0 +1,102 @@
+(defvar null "null")
+(deflisten state :initial '{"desktop":{"monitor":"DP-1","title":"","app_id":"","fullscreen":false,"floating":false,"workspaces":[{"id":1,"active":true,"occupied":false,"urgent":false},{"id":2,"active":false,"occupied":false,"urgent":false},{"id":3,"active":false,"occupied":false,"urgent":false},{"id":4,"active":false,"occupied":false,"urgent":false},{"id":5,"active":false,"occupied":false,"urgent":false},{"id":6,"active":false,"occupied":false,"urgent":false},{"id":7,"active":false,"occupied":false,"urgent":false},{"id":8,"active":false,"occupied":false,"urgent":false},{"id":9,"active":false,"occupied":false,"urgent":false},{"id":10,"active":false,"occupied":false,"urgent":false}]},"audio":{"output":null,"input":null,"outputs":[],"inputs":[],"streams":[]},"drawers":{"top":false,"audio":false}}' "dwl-helper watch")
+(deflisten media :initial "Nothing playing" "playerctl --follow metadata --format '{{artist}} — {{title}}'")
+(defpoll clock :interval "10s" "date +%H:%M")
+
+(defwidget sidebar-content []
+  (box :orientation "v" :space-evenly false :spacing 12 :class "sidebar"
+    (button :class "clock" :onclick "dwl-helper drawer top toggle" clock)
+    (box :orientation "v" :space-evenly false :spacing 4
+      (for ws in {state.desktop.workspaces}
+        (button :class "workspace ${ws.active ? 'active' : ''} ${ws.occupied ? 'occupied' : ''} ${ws.urgent ? 'urgent' : ''}"
+          :onclick "dwl-helper workspace ${ws.id}" "${ws.id}")))
+    (label :text {state.desktop.title} :angle 90 :limit-width 35 :tooltip {state.desktop.title} :vexpand true)
+    (systray :class "tray" :orientation "v" :icon-size 18 :spacing 8 :space-evenly false :halign "center")
+    (button :onclick "dwl-helper drawer audio toggle" :tooltip "Audio" "♫")
+    (button :onclick "swaync-client -t" :tooltip "Notifications" "●")
+    (button :onclick "swaylock -f" :timeout "10s" :tooltip "Lock" "Lock")))
+
+(defwidget top-content []
+  (eventbox :onhover "dwl-helper drawer top enter" :onhoverlost "dwl-helper drawer top leave"
+    (box :class "drawer" :orientation "v" :space-evenly false :spacing 18
+      (box :space-evenly false :spacing 24
+        (calendar :show-heading true :show-day-names true)
+        (box :orientation "v" :space-evenly false :spacing 12 :hexpand true
+          (label :class "heading" :text "SYSTEM" :xalign 0)
+          (label :text "CPU  ${round(EWW_CPU.avg, 0)}%" :xalign 0)
+          (progress :value {EWW_CPU.avg})
+          (label :text "RAM  ${round(EWW_RAM.used_mem_perc, 0)}%" :xalign 0)
+          (progress :value {EWW_RAM.used_mem_perc})
+          (for sensor in {jq(EWW_TEMPS, "to_entries")}
+            (label :text "${sensor.key}: ${round(sensor.value, 0)}°C" :xalign 0))))
+      (label :class "heading" :text media :limit-width 65 :tooltip media)
+      (box :spacing 12
+        (button :onclick "playerctl previous" "Previous")
+        (button :onclick "playerctl play-pause" "Play / pause")
+        (button :onclick "playerctl next" "Next")))))
+
+(defwidget device-control [device kind]
+  (box :orientation "v" :space-evenly false :spacing 8
+    (label :text {device == null ? "No device available" : device.label} :xalign 0 :limit-width 38)
+    (box :visible {device != null} :space-evenly false :spacing 10
+      (button :onclick "dwl-helper audio ${kind}-mute" {device?.muted == true ? "Unmute" : "Mute"})
+      (scale :hexpand true :min 0 :max 150 :value {device?.volume ?: 0}
+        :onchange "dwl-helper audio ${kind}-volume {}")
+      (label :text "${round(device?.volume ?: 0, 0)}%"))))
+
+(defwidget audio-content []
+  (eventbox :onhover "dwl-helper drawer audio enter" :onhoverlost "dwl-helper drawer audio leave"
+    (scroll :hscroll false :vscroll true
+      (box :class "drawer" :orientation "v" :space-evenly false :spacing 16
+        (label :class "heading" :text "OUTPUT" :xalign 0)
+        (device-control :device {state.audio.output} :kind "output")
+        (box :orientation "v" :space-evenly false :spacing 4
+          (for device in {state.audio.outputs}
+            (button :class {device.id == state.audio.output?.id ? "selected" : ""}
+              :onclick "dwl-helper audio output-default '${device.name}'" :halign "fill"
+              (label :text {device.label} :limit-width 40 :xalign 0))))
+        (label :class "heading" :text "MICROPHONE" :xalign 0)
+        (device-control :device {state.audio.input} :kind "input")
+        (box :orientation "v" :space-evenly false :spacing 4
+          (for device in {state.audio.inputs}
+            (button :class {device.id == state.audio.input?.id ? "selected" : ""}
+              :onclick "dwl-helper audio input-default '${device.name}'"
+              (label :text {device.label} :limit-width 40 :xalign 0))))
+        (label :class "heading" :text "APPLICATIONS" :xalign 0)
+        (label :visible {arraylength(state.audio.streams) == 0} :text "No active streams" :xalign 0)
+        (for stream in {state.audio.streams}
+          (box :class "stream" :orientation "v" :space-evenly false :spacing 8
+            (label :text {stream.name} :xalign 0 :limit-width 38)
+            (box :space-evenly false :spacing 10
+              (button :onclick "dwl-helper audio stream-mute ${stream.id}" {stream.muted ? "Unmute" : "Mute"})
+              (scale :hexpand true :min 0 :max 150 :value {stream.volume}
+                :onchange "dwl-helper audio stream-volume ${stream.id} {}")
+              (label :text "${round(stream.volume, 0)}%"))
+            (box :orientation "v" :space-evenly false :spacing 4
+              (for sink in {state.audio.outputs}
+                (button :class {stream.output == sink.id ? "selected" : ""}
+                  :onclick "dwl-helper audio stream-output ${stream.id} ${sink.id}"
+                  (label :text "→ ${sink.label}" :xalign 0 :limit-width 38))))))))))
+
+(defwindow sidebar []
+  :monitor '["DP-1","WL-1",0]' :stacking "fg" :exclusive true
+  :geometry (geometry :anchor "left center" :width "52px" :height "100%")
+  (sidebar-content))
+(defwindow top-sensor []
+  :monitor '["DP-1","WL-1",0]' :stacking "fg" :exclusive false
+  :geometry (geometry :anchor "top center" :width "260px" :height "3px")
+  (eventbox :onhover "dwl-helper drawer top enter --source sensor" :onhoverlost "dwl-helper drawer top leave --source sensor"
+    (box :class "sensor")))
+(defwindow audio-sensor []
+  :monitor '["DP-1","WL-1",0]' :stacking "fg" :exclusive false
+  :geometry (geometry :anchor "right center" :width "3px" :height "220px")
+  (eventbox :onhover "dwl-helper drawer audio enter --source sensor" :onhoverlost "dwl-helper drawer audio leave --source sensor"
+    (box :class "sensor")))
+(defwindow top-drawer []
+  :monitor '["DP-1","WL-1",0]' :stacking "fg" :exclusive false
+  :geometry (geometry :anchor "top center" :width "580px" :height "330px" :y "3px")
+  (top-content))
+(defwindow audio-drawer []
+  :monitor '["DP-1","WL-1",0]' :stacking "fg" :exclusive false
+  :geometry (geometry :anchor "right center" :width "380px" :height "75%" :x "3px")
+  (audio-content))

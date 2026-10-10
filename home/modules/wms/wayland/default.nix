@@ -1,9 +1,19 @@
-{ inputs', pkgs, lib, config, opts, self, ... }:
+{
+  inputs',
+  pkgs,
+  lib,
+  config,
+  opts,
+  self,
+  ...
+}:
 
 let
   cfg = config.myHome.wms.wayland;
 in
 {
+  imports = [ ./dwl.nix ];
+
   options.myHome.wms.wayland = {
     enable = lib.mkEnableOption "Default wayland stuff";
     hyprland = {
@@ -64,8 +74,34 @@ in
       # };
     })
 
-    # (import ../../programs/swaync.nix { })
-    (lib.mkIf cfg.hyprland.enable (import ./hyprland.nix { inherit pkgs opts lib inputs' config self; }))
-    (lib.mkIf cfg.sway.enable (import ./sway.nix { inherit pkgs opts lib self; }))
+    (lib.mkIf (cfg.hyprland.enable || cfg.dwl.enable) (
+      import ../../programs/flameshot.nix { inherit pkgs config; }
+    ))
+    (lib.mkIf (cfg.hyprland.enable || cfg.dwl.enable) (
+      import ../../programs/mic-mute.nix { inherit pkgs; }
+    ))
+
+    (lib.mkIf cfg.hyprland.enable (
+      import ./hyprland.nix {
+        inherit
+          pkgs
+          opts
+          lib
+          inputs'
+          config
+          self
+          ;
+      }
+    ))
+    (lib.mkIf cfg.sway.enable (
+      import ./sway.nix {
+        inherit
+          pkgs
+          opts
+          lib
+          self
+          ;
+      }
+    ))
   ];
 }

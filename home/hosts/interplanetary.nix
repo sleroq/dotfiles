@@ -20,6 +20,7 @@ in
     wms = {
       wayland = {
         sway.enable = false;
+        dwl.enable = true;
         hyprland = {
           extraConfig = ''
             -- See https://wiki.hypr.land/Configuring/Basics/Monitors/

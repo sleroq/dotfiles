@@ -21,6 +21,8 @@
     hyprland.inputs.xdph.url = "github:hyprwm/xdg-desktop-portal-hyprland/v1.4.1";
     hy3.url = "github:outfoxxed/hy3/hl0.56.0.1";
     hy3.inputs.hyprland.follows = "hyprland";
+    dwl.url = "git+https://codeberg.org/dwl/dwl?ref=refs/tags/v0.9";
+    dwl.flake = false;
     # Hyprland 0.56 requires Glaze 7; the host provides Glaze 8.
     glaze.url = "github:stephenberry/glaze/v7.2.0";
     glaze.flake = false;

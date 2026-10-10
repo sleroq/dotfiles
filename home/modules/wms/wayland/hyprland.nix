@@ -55,8 +55,6 @@ let
   };
 in
 mkMerge [
-  (import ../../programs/flameshot.nix { inherit pkgs config; })
-  (import ../../programs/mic-mute.nix { inherit pkgs; })
   (import ../../programs/caelestia.nix { inherit pkgs; })
   {
     home.activation.hyprland = hm.dag.entryAfter [ "writeBoundary" ] ''

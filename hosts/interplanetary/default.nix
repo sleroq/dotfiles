@@ -29,6 +29,7 @@ in
   };
 
   services.blueman.enable = true;
+  sleroq.wms.dwl.enable = true;
 
   services.sunshine = {
     enable = true;

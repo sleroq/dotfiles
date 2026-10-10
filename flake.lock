@@ -506,6 +506,23 @@
         "type": "github"
       }
     },
+    "dwl": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1789898318,
+        "narHash": "sha256-PYBOi/A9n1611XBEaZW9PolSfjwe1KWoI2VbVrS2s0Q=",
+        "ref": "refs/tags/v0.9",
+        "rev": "98bea2c27f99c549023fb394bfd983a439d8ccb9",
+        "revCount": 1368,
+        "type": "git",
+        "url": "https://codeberg.org/dwl/dwl"
+      },
+      "original": {
+        "ref": "refs/tags/v0.9",
+        "type": "git",
+        "url": "https://codeberg.org/dwl/dwl"
+      }
+    },
     "easy-hosts": {
       "locked": {
         "lastModified": 1755470564,
@@ -2548,6 +2565,7 @@
         "cum-army": "cum-army",
         "determinate": "determinate",
         "disko": "disko",
+        "dwl": "dwl",
         "easy-hosts": "easy-hosts",
         "emacs-overlay": "emacs-overlay",
         "flake-parts": "flake-parts_2",

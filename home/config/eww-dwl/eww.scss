@@ -1,0 +1,38 @@
+$bg: #242129;
+$surface: #302c36;
+$purple: #c5a9d6;
+$border: #a288b9;
+* { all: unset; font-family: sans-serif; font-size: 13px; color: #ded9e3; }
+window { background: transparent; }
+tooltip { background: $bg; opacity: 1; border: 1px solid $border; border-radius: 6px; padding: 8px 10px; }
+tooltip label { font-size: 15px; color: #f0eaf4; }
+menu { background: $bg; opacity: 1; border: 1px solid $border; padding: 4px; }
+menuitem { padding: 7px 12px; }
+menuitem label { font-size: 15px; }
+menuitem:hover { background: $surface; }
+menuitem:disabled label { color: #8e8797; }
+menu separator { background: $border; min-height: 1px; margin: 4px 0; }
+.sidebar { background: $bg; border-right: 1px solid $border; padding: 14px 4px; }
+button { background: $surface; border-radius: 6px; padding: 7px 10px; }
+button:hover { background: #49404f; }
+button:active, button.selected, button.active { background: $purple; color: $bg; }
+.sidebar button { padding: 7px 4px; }
+.sidebar .clock label { font-family: monospace; font-size: 11px; }
+.sidebar .workspace { padding: 6px 2px; color: #8e8797; }
+.tray > widget { min-width: 24px; min-height: 24px; }
+.tray image { min-width: 24px; min-height: 24px; }
+.workspace.occupied { color: #ded9e3; }
+.workspace.active { color: $bg; }
+.workspace.urgent { border: 1px solid #dc9dad; }
+.drawer { background: $bg; border: 1px solid $border; border-radius: 10px; padding: 20px; }
+.heading { color: $purple; font-weight: bold; }
+.sensor { background: rgba(162, 136, 185, 0.18); }
+.stream { background: $surface; border-radius: 8px; padding: 12px; }
+scale trough, progressbar trough { background: #48414f; border-radius: 8px; min-height: 5px; }
+scale highlight, progressbar progress { background: $purple; border-radius: 8px; min-height: 5px; }
+scale slider { background: #ded9e3; border-radius: 50%; min-width: 12px; min-height: 12px; }
+calendar { padding: 6px; }
+calendar:selected { background: $purple; color: $bg; }
+calendar.header { color: $purple; }
+calendar:indeterminate { color: #77717f; }
+scrollbar slider { background: #65576e; border-radius: 6px; min-width: 4px; }
