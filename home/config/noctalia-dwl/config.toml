@@ -1,0 +1,98 @@
+# Native Noctalia v5.2.1 DWL defaults; GUI state overrides this file.
+[bar]
+order = ["default"]
+
+[bar.default]
+position = "left"
+thickness = 74
+margin_edge = 0
+margin_ends = 0
+margin_opposite_edge = 0
+radius = 0
+radius_top_left = 0
+radius_top_right = 0
+radius_bottom_left = 0
+radius_bottom_right = 0
+reserve_space = true
+start = ["launcher", "workspaces"]
+center = ["clock"]
+end = ["tray", "media", "volume", "notifications", "control-center", "clipboard", "session"]
+
+[shell]
+polkit_agent = true
+clipboard_enabled = true
+clipboard_history_max_entries = 500
+setup_wizard_enabled = false
+launch_apps_custom_command = "uwsm-app -- $CMD"
+telemetry_enabled = false
+
+[shell.launcher.dmenu.entry.run]
+label = "Run command"
+prefix = "run"
+freeform = true
+exec = "uwsm-app -- {query}"
+
+[audio]
+enable_overdrive = true
+
+[system.monitor]
+enabled = true
+
+[theme]
+source = "builtin"
+builtin = "Noctalia"
+mode = "dark"
+
+[theme.templates]
+enable_builtin_templates = false
+enable_community_templates = false
+
+[wallpaper]
+directory = "~/Pictures/wallpapers"
+
+[wallpaper.default]
+path = "~/Pictures/wallpapers/03779_vyoletznebula_3840x2160.jpg"
+
+[lockscreen]
+enabled = true
+lock_before_suspend = true
+
+[idle]
+behavior_order = ["lock", "screen-off", "suspend"]
+
+[idle.behavior.lock]
+enabled = true
+timeout = 600
+action = "lock"
+
+[idle.behavior.screen-off]
+enabled = true
+timeout = 800
+action = "screen_off"
+
+[idle.behavior.suspend]
+enabled = true
+timeout = 1200
+action = "command"
+command = "systemctl suspend-then-hibernate"
+
+[[shell.session.actions]]
+action = "lock"
+
+[[shell.session.actions]]
+action = "logout"
+command = "uwsm stop"
+
+[[shell.session.actions]]
+action = "lock_and_suspend"
+
+[[shell.session.actions]]
+action = "reboot"
+
+[[shell.session.actions]]
+action = "shutdown"
+
+# Service provisions the stable key at runtime, outside the Nix store.
+[storage]
+key_source = "file"
+key_file = "@storageKey@"

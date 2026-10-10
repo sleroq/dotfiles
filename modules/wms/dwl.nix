@@ -29,7 +29,6 @@ in
     programs.uwsm.enable = true;
     environment.systemPackages = [ config.programs.dwl.package ];
     services.displayManager.sessionPackages = [ session ];
-    security.pam.services.swaylock = { };
 
     xdg.portal = {
       wlr = {

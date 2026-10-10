@@ -21,6 +21,11 @@ static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You ca
 /* logging */
 static int log_level = WLR_ERROR;
 
+/* window resizing: 0 TL, 1 TR, 2 BL, 3 BR, 4 nearest corner */
+static const int resize_corner = 4;
+static const int warp_cursor = 0;
+static const int lock_cursor = 0;
+
 static const Rule rules[] = {
 	/* Explicit one-off floating terminal identity, not an application rule. */
 	{ "dwl-floating-terminal", NULL, 0, 1, -1 },
@@ -117,14 +122,14 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 static const Key keys[] = {
 	{ MODKEY, XKB_KEY_Return, spawn, {.v = (const char *[]) {"uwsm-app", "--", "kitty", "--single-instance", "--instance-group", "dwl", "--override", "remember_window_size=no", NULL}} },
 	{ WLR_MODIFIER_ALT, XKB_KEY_Return, spawn, {.v = (const char *[]) {"uwsm-app", "--", "kitty", "--single-instance", "--instance-group", "dwl", "--override", "remember_window_size=no", "--class", "dwl-floating-terminal", NULL}} },
-	{ MODKEY, XKB_KEY_p, spawn, {.v = (const char *[]) {"dwl-launcher", "apps", NULL}} },
-	{ MODKEY, XKB_KEY_o, spawn, {.v = (const char *[]) {"dwl-launcher", "apps", NULL}} },
-	{ MODKEY, XKB_KEY_semicolon, spawn, {.v = (const char *[]) {"dwl-launcher", "apps", NULL}} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_p, spawn, {.v = (const char *[]) {"dwl-launcher", "run", NULL}} },
-	{ MODKEY, XKB_KEY_z, spawn, {.v = (const char *[]) {"dwl-launcher", "clipboard", NULL}} },
+	{ MODKEY, XKB_KEY_p, spawn, {.v = (const char *[]) {"noctalia", "msg", "panel-toggle", "launcher", NULL}} },
+	{ MODKEY, XKB_KEY_o, spawn, {.v = (const char *[]) {"noctalia", "msg", "panel-toggle", "launcher", NULL}} },
+	{ MODKEY, XKB_KEY_semicolon, spawn, {.v = (const char *[]) {"noctalia", "msg", "panel-toggle", "launcher", NULL}} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_p, spawn, {.v = (const char *[]) {"noctalia", "msg", "panel-toggle", "launcher", "/run", NULL}} },
+	{ MODKEY, XKB_KEY_z, spawn, {.v = (const char *[]) {"noctalia", "msg", "panel-toggle", "clipboard", NULL}} },
 	{ MODKEY, XKB_KEY_y, spawn, {.v = (const char *[]) {"uwsm-app", "--", "nemo", NULL}} },
-	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT, XKB_KEY_l, spawn, {.v = (const char *[]) {"swaylock", NULL}} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_n, spawn, {.v = (const char *[]) {"swaync-client", "-t", NULL}} },
+	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT, XKB_KEY_l, spawn, {.v = (const char *[]) {"noctalia", "msg", "session", "lock", NULL}} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_n, spawn, {.v = (const char *[]) {"noctalia", "msg", "panel-toggle", "control-center", "notifications", NULL}} },
 	{ MODKEY, XKB_KEY_b, groupmode, {0} },
 	{ MODKEY, XKB_KEY_x, overlaytoggle, {0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_v, maximizetoggle, {0} },
@@ -137,7 +142,7 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space, togglefloating, {0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_c, killclient, {0} },
 	{ MODKEY, XKB_KEY_F8, focusfollowtoggle, {0} },
-	{ MODKEY, XKB_KEY_m, spawn, {.v = (const char *[]) {"mic-mute-toggle", NULL}} },
+	{ MODKEY, XKB_KEY_m, spawn, {.v = (const char *[]) {"noctalia", "msg", "mic-mute", NULL}} },
 	{ MODKEY, XKB_KEY_h, tabcycle, {.i = -1} },
 	{ MODKEY, XKB_KEY_Left, tabcycle, {.i = -1} },
 	{ MODKEY, XKB_KEY_l, tabcycle, {.i = 1} },
@@ -173,16 +178,16 @@ static const Key keys[] = {
 	{ 0, XKB_KEY_Print, spawn, {.v = (const char *[]) {"flameshot", "gui", NULL}} },
 	{ WLR_MODIFIER_SHIFT, XKB_KEY_Print, spawn, SHCMD("flameshot full -c -p \"$HOME/Pictures/Screenshots\"") },
 	{ MODKEY, XKB_KEY_Print, spawn, {.v = (const char *[]) {"share-screenshot", NULL}} },
-	{ 0, XKB_KEY_XF86AudioRaiseVolume, spawn, {.v = (const char *[]) {"pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%", NULL}} },
-	{ 0, XKB_KEY_XF86AudioLowerVolume, spawn, {.v = (const char *[]) {"pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%", NULL}} },
-	{ 0, XKB_KEY_XF86AudioMute, spawn, {.v = (const char *[]) {"mic-mute-toggle", NULL}} },
-	{ 0, XKB_KEY_XF86Calculator, spawn, {.v = (const char *[]) {"mic-mute-toggle", NULL}} },
-	{ 0, XKB_KEY_XF86AudioMicMute, spawn, {.v = (const char *[]) {"mic-mute-toggle", NULL}} },
-	{ 0, XKB_KEY_XF86MonBrightnessUp, spawn, {.v = (const char *[]) {"brightnessctl", "set", "+5%", NULL}} },
-	{ 0, XKB_KEY_XF86MonBrightnessDown, spawn, {.v = (const char *[]) {"brightnessctl", "set", "5%-", NULL}} },
-	{ 0, XKB_KEY_XF86AudioPlay, spawn, {.v = (const char *[]) {"playerctl", "play-pause", NULL}} },
-	{ 0, XKB_KEY_XF86AudioNext, spawn, {.v = (const char *[]) {"playerctl", "next", NULL}} },
-	{ 0, XKB_KEY_XF86AudioPrev, spawn, {.v = (const char *[]) {"playerctl", "previous", NULL}} },
+	{ 0, XKB_KEY_XF86AudioRaiseVolume, spawn, {.v = (const char *[]) {"noctalia", "msg", "volume-up", "5", NULL}} },
+	{ 0, XKB_KEY_XF86AudioLowerVolume, spawn, {.v = (const char *[]) {"noctalia", "msg", "volume-down", "5", NULL}} },
+	{ 0, XKB_KEY_XF86AudioMute, spawn, {.v = (const char *[]) {"noctalia", "msg", "mic-mute", NULL}} },
+	{ 0, XKB_KEY_XF86Calculator, spawn, {.v = (const char *[]) {"noctalia", "msg", "mic-mute", NULL}} },
+	{ 0, XKB_KEY_XF86AudioMicMute, spawn, {.v = (const char *[]) {"noctalia", "msg", "mic-mute", NULL}} },
+	{ 0, XKB_KEY_XF86MonBrightnessUp, spawn, {.v = (const char *[]) {"noctalia", "msg", "brightness-up", "current", "5", NULL}} },
+	{ 0, XKB_KEY_XF86MonBrightnessDown, spawn, {.v = (const char *[]) {"noctalia", "msg", "brightness-down", "current", "5", NULL}} },
+	{ 0, XKB_KEY_XF86AudioPlay, spawn, {.v = (const char *[]) {"noctalia", "msg", "media", "toggle", NULL}} },
+	{ 0, XKB_KEY_XF86AudioNext, spawn, {.v = (const char *[]) {"noctalia", "msg", "media", "next", NULL}} },
+	{ 0, XKB_KEY_XF86AudioPrev, spawn, {.v = (const char *[]) {"noctalia", "msg", "media", "previous", NULL}} },
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT, XKB_KEY_F1, chvt, {.ui = 1} },
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT, XKB_KEY_F2, chvt, {.ui = 2} },
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT, XKB_KEY_F3, chvt, {.ui = 3} },

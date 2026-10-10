@@ -6,11 +6,12 @@ from pathlib import Path
 import shlex
 import socket
 import subprocess
+import sys
 import tempfile
 import time
 
 
-def run():
+def run(overlay_only=False, overlay_modal=False, overlay_fullscreen=False):
     with tempfile.TemporaryDirectory(prefix="dwl-transitions-") as directory:
         root = Path(directory)
         root.chmod(0o700)
@@ -48,13 +49,137 @@ def run():
                         *(("-m", "shift") if shift else ()), "-m", "logo")
                 time.sleep(.2)
 
-            def geometry(state, size):
+            def geometry(state, size, fixture_log=None):
                 def observed():
-                    lines = (root / "session.log").read_text().splitlines()
+                    lines = (fixture_log or root / "session.log").read_text().splitlines()
                     states = [x for x in lines if x.startswith("GTK maximized=")]
                     sizes = [x for x in lines if x.startswith("GTK size=")]
                     return states and sizes and states[-1] == f"GTK maximized={state}" and sizes[-1] == f"GTK size={size}"
                 wait(observed)
+
+            def overlay_send():
+                start(str(root / "fixture"), "normal", "overlay-send")
+                wait(lambda: title() == "overlay-send")
+                geometry(0, "500x300")
+                key("x", True)
+                key("x")
+                wait(lambda: title() == "overlay-send")
+                key("2")  # a normal workspace send must remove overlay membership
+                wait(lambda: title() != "overlay-send")
+                key("x")  # hide the overlay before visiting the destination
+                key("w")
+                wait(lambda: title() == "overlay-send")
+                geometry(0, "500x300")
+                key("x")  # ordinary windows must not follow the open overlay
+                key("q")
+                wait(lambda: title() != "overlay-send")
+                key("w")
+                wait(lambda: title() != "overlay-send")
+                key("x")  # close the empty modal overlay before ordinary focus
+                wait(lambda: title() == "overlay-send")
+                key("x", True)
+                key("x")
+                wait(lambda: title() == "overlay-send")
+                key("2")  # return to the current workspace from the open overlay
+                wait(lambda: title() != "overlay-send")
+                key("x")
+                wait(lambda: title() == "overlay-send")
+                geometry(0, "500x300")
+                print("PASS: overlay send to normal/current workspace, visibility, focus and floating size")
+
+            def modal_overlay():
+                start(str(root / "fixture"), "maximize", "underlay")
+                wait(lambda: title() == "underlay")
+                start(str(root / "fixture"), "normal", "special")
+                wait(lambda: title() == "special")
+                key("x", True)
+                key("x")
+                wait(lambda: title() == "special")
+                command("grim", str(root / "open.png"))
+                for direction in ("h", "l", "j", "k"):
+                    key(direction)
+                    assert title() == "special"
+                before = (root / "session.log").read_text().count("GTK button=")
+                command("wlrctl", "pointer", "move", "-10000", "-10000")
+                command("wlrctl", "pointer", "move", "100", "100")
+                command("wlrctl", "pointer", "click", "left")
+                time.sleep(.2)
+                assert title() == "special"
+                assert (root / "session.log").read_text().count("GTK button=") == before
+                key("w")
+                assert title() == "special"
+                key("q")
+                assert title() == "special"
+                key("x")
+                wait(lambda: title() == "underlay")
+                command("grim", str(root / "closed.png"))
+                # Sample the underlay and special interior in the real rendered output.
+                def pixels(path):
+                    data = subprocess.check_output(("convert", str(path), "rgb:-"), env=env)
+                    return [tuple(data[(y * 1280 + x) * 3:(y * 1280 + x) * 3 + 3])
+                            for x, y in ((100, 100), (640, 400))]
+                opened, closed = pixels(root / "open.png"), pixels(root / "closed.png")
+                assert sum(opened[0]) < sum(closed[0]), (opened, closed)
+                assert opened[1] == closed[1], "special client was dimmed"
+                key("x")
+                command("grim", str(root / "reopened.png"))
+                assert pixels(root / "reopened.png") == opened
+                print("PASS: modal special focus, blocked underlay clicks, workspace switches, dim and restore")
+
+            def fullscreen_overlay():
+                fixture_log = root / "fullscreen.log"
+                with fixture_log.open("w") as output:
+                    processes.append(subprocess.Popen((str(root / "fixture"), "normal", "special-fullscreen"),
+                                                      env=env, stdout=output, stderr=log))
+                wait(lambda: title() == "special-fullscreen")
+                geometry(0, "500x300", fixture_log)
+                key("x", True)  # leave the first client hidden while mapping the second
+                start(str(root / "fixture"), "normal", "special-float")
+                wait(lambda: title() == "special-float")
+                key("x", True)
+                key("x")
+                wait(lambda: title() == "special-float")
+                key("l")
+                wait(lambda: title() == "special-fullscreen")
+                key("v")
+                geometry(0, "1280x720", fixture_log)
+                # Upstream blocks cycling away from childless fullscreen clients.
+                command("wtype", "-k", "d")
+                wait(lambda: title() == "DWL-transient-test")
+                command("wlrctl", "pointer", "move", "-10000", "-10000")
+                command("wlrctl", "pointer", "move", "640", "360")
+                command("wlrctl", "pointer", "click", "left")
+                assert title() == "DWL-transient-test"
+                # Keep its parent link (and focus policy) but uncover the center.
+                key("x", True)
+
+                def raise_float():
+                    # Focusstack explicitly raises the selected client's scene node.
+                    if title() != "special-float":
+                        key("l")
+                    assert title() == "special-float"
+                    command("wlrctl", "pointer", "move", "-10000", "-10000")
+                    command("wlrctl", "pointer", "move", "640", "360")
+                    command("wlrctl", "pointer", "click", "left")
+                    wait(lambda: title() == "special-fullscreen")
+
+                raise_float()
+                for _ in range(3):
+                    key("x")
+                    key("x")
+                    raise_float()
+                    key("w")
+                    raise_float()
+                    key("q")
+                    raise_float()
+                key("v")
+                geometry(0, "500x300", fixture_log)
+                key("v")
+                geometry(0, "1280x720", fixture_log)
+                raise_float()
+                key("v")
+                geometry(0, "500x300", fixture_log)
+                print("PASS: special fullscreen above keyboard-raised float, pointer hit, hide/reopen, workspace arrange, fullscreen transient and geometry restore")
 
             try:
                 start("dwl")
@@ -63,6 +188,15 @@ def run():
                 wait(lambda: (root / "helper.sock").exists())
                 flags = shlex.split(subprocess.check_output(("pkg-config", "--cflags", "--libs", "gtk+-3.0"), text=True))
                 command("cc", str(Path(__file__).with_name("transient.c")), "-o", str(root / "fixture"), *flags)
+                if overlay_fullscreen:
+                    fullscreen_overlay()
+                    return
+                if overlay_modal:
+                    modal_overlay()
+                    return
+                if overlay_only:
+                    overlay_send()
+                    return
                 protocol = str(Path(__file__).with_name("virtual-pointer.xml"))
                 command("wayland-scanner", "client-header", protocol, str(root / "virtual-pointer.h"))
                 command("wayland-scanner", "private-code", protocol, str(root / "virtual-pointer.c"))
@@ -191,6 +325,7 @@ def run():
                 assert images[0] == images[1] == images[2], "offscreen geometry jumped across commit/release"
                 modifier.wait(timeout=6)
                 assert all(p.poll() is None for p in processes if p not in (drag, modifier, third, resize_modifier))
+                overlay_send()
                 print("PASS: floating size memory after resize/maximize, unmaximize/retile, grouped floating focus, H/L tabs, J/K panes in both orientations, title click, application click, strip reservation, stable offscreen drag")
             finally:
                 for process in reversed(processes):
@@ -204,4 +339,5 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    run(overlay_only="--overlay-send" in sys.argv, overlay_modal="--overlay-modal" in sys.argv,
+        overlay_fullscreen="--overlay-fullscreen" in sys.argv)

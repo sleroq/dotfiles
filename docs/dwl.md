@@ -8,24 +8,21 @@ window policies are included.
 ## Ownership
 
 - `packages/dwl/`: pinned DWL v0.9 (`98bea2c`), wlroots 0.20, XWayland,
-  upstream IPC v2, then a local desktop patch. Window/layout/input policy lives
+  upstream IPC v2, then the local desktop patch, then `better-resize.patch`. Window/layout/input policy lives
   in feature headers, including compositor-owned Cairo/Pango group tabs, not
   a daemon or plugin framework.
-- `packages/dwl-helper/`: Rust IPC/audio subscriptions, commands, and drawer
-  hover coordination. Eww receives newline-delimited JSON through `deflisten`.
-- `home/config/eww-dwl/`: fixed-width exclusive left sidebar, read-only window
-  title, workspaces/tray/clock, and non-exclusive calendar/resource/media and
-  audio drawers. Only the sidebar changes the compositor work area.
-- `modules/wms/dwl.nix` and `home/modules/wms/wayland/dwl.nix`: UWSM readiness,
-  session-scoped services, portals, launchers, wallpaper, lock/idle, and monitor
-  configuration. Caelestia is restricted to Hyprland.
+- `home/config/noctalia-dwl/`: native Noctalia v5 shell defaults, installed as
+  `~/.config/noctalia/config.toml` after native schema validation. Noctalia owns
+  the exclusive 74px left sidebar, launcher, clipboard, notifications, audio,
+  wallpaper, polkit agent, lockscreen, and idle policy.
+- `modules/wms/dwl.nix` and `home/modules/wms/wayland/dwl.nix`: UWSM,
+  session-scoped services, portals, and monitor configuration.
 
-`awww` is the current upstream/Nixpkgs name for swww. Wallpaper remains
-`~/Pictures/wallpapers/03779_vyoletznebula_3840x2160.jpg`. Kanshi configures
-`DP-1` at 2560×1440, 180 Hz, scale 1. GTK handles file selection; the wlr portal
-handles screenshots/screencasts in DWL without replacing Hyprland's portal.
-Its monitor/window chooser uses tofi's dmenu mode with an absolute executable
-path: the portal service's restricted PATH cannot find the desktop's launchers.
+Wallpaper remains `~/Pictures/wallpapers/03779_vyoletznebula_3840x2160.jpg`;
+Noctalia browses `~/Pictures/wallpapers`. Kanshi configures `DP-1` at
+2560×1440, 180 Hz, scale 1. GTK handles file selection; the wlr portal handles
+screenshots/screencasts. Its tofi monitor/window chooser remains independent
+of the Noctalia launcher and uses an absolute executable path.
 
 ## Window behavior
 
@@ -40,7 +37,9 @@ Floating/overlay selections use visible-window focus order, and outward pane
 focus can leave for floating windows.
 
 `Super+X` opens/hides an independent floating overlay. `Super+Shift+X` changes
-membership; returning a member uses the current underlying workspace. Overlay
+membership; returning a member uses the current underlying workspace. Sending
+an overlay member with `Super+1…0` also removes it from the overlay, placing it
+on the selected ordinary workspace without changing its floating geometry. Overlay
 toggles never retag, disconnect, resize, or retile clients. Transient dialogs
 inherit membership and preserve the underlying fullscreen state. Ordinary
 workspaces can change beneath the open overlay. The original removal of a tiled member
@@ -55,20 +54,30 @@ maximization first; returning to a grouped tile selects that window's tab.
 `Super+Shift+Space` remembers each window's last floating dimensions, including
 manual resizing, and restores them when floating again. Tiled/maximized sizes
 never replace this memory; toggling does not reset position.
+`Super+right-drag` resizes from the nearest corner selected by the pointer's
+starting quadrant, without teleporting the cursor. `Super+left-drag` moves.
 Ordinary floating windows can extend beyond output edges, retaining one visible
 pixel instead of jumping back by their whole size. US/RU keyboard layout is
 remembered per window using public XKB APIs.
 
 See [compositor controls](../packages/dwl/README.md) and
-[widget configuration](../home/config/eww-dwl/README.md) for the complete list.
+[widget configuration](../home/config/noctalia-dwl/README.md) for the complete list.
 There is deliberately **no Super+Tab**.
 
 ## Session policy
 
 UWSM owns environment publication, startup, and teardown. The DWL desktop entry
-runs `dwl -s "uwsm finalize"`; Eww/helper/wallpaper/notification/idle services
-are conditioned on `XDG_CURRENT_DESKTOP=dwl`. Long-lived launches use
-`uwsm-app`; short volume, screenshot, and helper commands do not.
+runs `dwl -s "uwsm finalize"`. `dwl-noctalia.service`, Kitty, and Kanshi are
+conditioned on `XDG_CURRENT_DESKTOP=dwl` and stop with the graphical session.
+Caelestia remains Hyprland-only; shared cliphist services skip DWL because
+Noctalia owns its clipboard. No Eww/helper or companion shell daemons are
+installed or launched by the DWL module. Noctalia app launches use
+`uwsm-app -- $CMD`; logout runs `uwsm stop`.
+
+Native `noctalia msg` IPC handles shell shortcuts; workspaces use the existing
+`zdwl_ipc_manager_v2` compositor protocol without a custom bridge.
+GUI overrides in `~/.local/state/noctalia/settings.toml` win over the declarative
+config; remove the relevant overrides to restore repository defaults.
 
 `dwl-kitty.service` starts a hidden Kitty instance with the session. Super+Return
 and Alt+Return create tiled/floating OS windows in its `dwl` instance group;
@@ -83,37 +92,23 @@ unresolved timeout-unit question.
 
 ## Deployment and verification
 
-The configuration is registered in the system profile and persistently activated
-with `switch-to-configuration switch`. The initial EFI-space failure was resolved
-by deleting 27 older system generations and refreshing boot entries, retaining
-the booted generation, the pre-DWL rollback, and the current deployment.
-Activation does not replace the running compositor. Log out and select
-**DWL (UWSM)** in SDDM to load updated compositor code and compiled shortcuts;
-Hyprland remains available. `uwsm stop` ends the current DWL session.
+Build/review the `interplanetary` Home Manager configuration and compositor
+without activating a running session. After deployment, log out and select
+**DWL (UWSM)** in SDDM to load compiled shortcuts. Hyprland remains available.
+Noctalia uses the existing PAM `login` service and its native logind
+lock-before-suspend inhibitor. Audio overdrive retains the 150% ceiling.
 
-Build the desktop packages or the `interplanetary` system normally; do not build
-server derivations locally. The compositor's boundary harness and Rust socket
-checks cover visibility, pane membership/cleanup, geometry, XKB restoration,
-readiness, abandoned sockets, shutdown, and hover handoff ordering.
+Home Manager substitutes the absolute storage-key path and validates the TOML.
+The service provisions a private runtime key once, preserving it across restarts
+for clipboard persistence without a Secret Service daemon.
+The compositor boundary and transition harnesses remain relevant to window
+policy. `packages/dwl-helper/`, Eww config, and the hover/lock fixtures are
+retained **legacy-only**: they are not installed/launched and do not validate
+Noctalia. `packages/dwl/tests/noctalia.py` exercises compiled shell shortcuts,
+native panels, encrypted clipboard persistence across restart, notification
+ownership, workspace IPC, rendering, and native lock lifetime in disposable
+headless DWL/DBus sessions. PAM unlock, physical inputs, suspend/resume, real
+audio devices, and session startup/logout still require desktop testing.
 
-Isolated headless runtime tests exercise real clients, IPC workspace changes,
-overlay rectangle/focus preservation, distinct maximize/fullscreen, Eww drawer
-hover, wallpaper, and per-application audio volume/mute/routing. They do not
-replace final physical-monitor/input/session testing. The screencast portal was
-also tested in the physical DWL session: tofi selection, session creation, and
-PipeWire remote access delivered five video buffers each for DP-1 (2560×1440)
-and a dedicated Kitty fixture window, without saving images or recordings.
-
-For helper development, include PulseAudio in the runtime library search path:
-
-```sh
-cd packages/dwl-helper
-nix-shell -p pkg-config libpulseaudio cargo-machete --run '
-  export LD_LIBRARY_PATH=$(pkg-config --variable=libdir libpulse)
-  cargo test && cargo clippy --workspace --all-targets --all-features -- -D warnings && cargo machete
-'
-```
-
-The required shared ast-grep scan currently crashes with exit 139 before
-reporting findings, including outside the repository with the shared config.
-Tracked as `dotfiles-q7v1`; no rules or paths were suppressed.
+The required shared ast-grep scan has previously crashed with exit 139
+(`dotfiles-q7v1`); no rules or paths were suppressed.

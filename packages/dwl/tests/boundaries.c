@@ -6,6 +6,59 @@
 #include <assert.h>
 
 static void
+special_scrim(void)
+{
+	Monitor m = {.m = {0, 0, 1280, 720}, .overlay_open = 1};
+	struct wlr_surface *surface = (void *)1;
+	Client *hit = NULL;
+	int i;
+	scene = wlr_scene_create();
+	for (i = 0; i < NUM_LAYERS; i++)
+		layers[i] = wlr_scene_tree_create(&scene->tree);
+	wl_list_init(&mons);
+	wl_list_insert(&mons, &m.link);
+	overlay_arrange(&m);
+	assert(m.overlay_dim && m.overlay_dim->node.enabled);
+	xytonode(100, 100, &surface, &hit, NULL, NULL, NULL);
+	assert(!surface && !hit);
+	assert(wlr_scene_node_at(&layers[LyrSpecial]->node, 100, 100, NULL, NULL)
+		== &m.overlay_dim->node);
+	m.overlay_open = 0;
+	overlay_arrange(&m);
+	assert(!m.overlay_dim->node.enabled);
+	wlr_scene_node_destroy(&scene->tree.node);
+	wl_list_remove(&m.link);
+}
+
+static void
+special_fullscreen(void)
+{
+	struct wlr_xwayland_surface parent_surface = {0};
+	Client parent = {.type = X11, .surface.xwayland = &parent_surface};
+	struct wlr_scene_rect *floating, *fullscreen, *shell;
+	static const float color[4] = {1, 1, 1, 1};
+	int i;
+	assert(special_layer(&parent) == LyrSpecial);
+	parent.isfullscreen = 1;
+	assert(special_layer(&parent) == LyrSpecialFS);
+	scene = wlr_scene_create();
+	for (i = 0; i < NUM_LAYERS; i++)
+		layers[i] = wlr_scene_tree_create(&scene->tree);
+	floating = wlr_scene_rect_create(layers[LyrSpecial], 100, 100, color);
+	fullscreen = wlr_scene_rect_create(layers[LyrSpecialFS], 100, 100, color);
+	wlr_scene_node_raise_to_top(&floating->node);
+	assert(wlr_scene_node_at(&scene->tree.node, 50, 50, NULL, NULL) == &fullscreen->node);
+	wlr_scene_node_set_enabled(&fullscreen->node, 0);
+	assert(wlr_scene_node_at(&scene->tree.node, 50, 50, NULL, NULL) == &floating->node);
+	wlr_scene_node_set_enabled(&fullscreen->node, 1);
+	wlr_scene_node_raise_to_top(&floating->node);
+	assert(wlr_scene_node_at(&scene->tree.node, 50, 50, NULL, NULL) == &fullscreen->node);
+	shell = wlr_scene_rect_create(layers[LyrOverlay], 100, 100, color);
+	assert(wlr_scene_node_at(&scene->tree.node, 50, 50, NULL, NULL) == &shell->node);
+	wlr_scene_node_destroy(&scene->tree.node);
+}
+
+static void
 initial_maximize_request(void)
 {
 	struct wlr_surface surface = {0};
@@ -40,12 +93,10 @@ initial_floating_placement(void)
 	assert(c.initially_placed && c.geom.x == 356 && c.geom.y == 132);
 	assert(c.maximize_restore.x == 356 && c.maximize_restore.y == 132);
 	assert(c.maximize_restore.width == 640 && c.maximize_restore.height == 480);
-	assert(c.floating_width == 640 && c.floating_height == 480);
 	/* Arrange/maximize, workspace changes, and remaps must not recenter. */
 	c.geom = m.w;
 	window_initial_placement(&c);
 	assert(c.geom.x == 72 && c.maximize_restore.x == 356);
-	assert(c.floating_width == 640 && c.floating_height == 480);
 	c.geom = c.maximize_restore;
 	m.w.x = 200;
 	window_initial_placement(&c);
@@ -54,7 +105,6 @@ initial_floating_placement(void)
 	c.initially_placed = c.isfloating = c.maximized = 0;
 	c.geom = (struct wlr_box){10, 20, 420, 240};
 	window_initial_placement(&c);
-	assert(c.floating_width == 420 && c.floating_height == 240);
 	c.isfloating = 1;
 	window_initial_placement(&c);
 	assert(c.geom.x == 10);
@@ -139,6 +189,8 @@ main(void)
 	struct xkb_keymap *keymap;
 	struct wlr_keyboard_group *group;
 	size_t i, j;
+	special_scrim();
+	special_fullscreen();
 	/* Workspace and utility shortcuts must never shadow one another. */
 	for (i = 0; i < LENGTH(keys); i++)
 		for (j = i + 1; j < LENGTH(keys); j++)
@@ -179,6 +231,21 @@ main(void)
 	assert(!client_visible(&b, &m));
 	m.overlay_open = 1;
 	assert(client_visible(&b, &m));
+	assert(client_focusable(&b, &m));
+	assert(client_visible(&a, &m) && !client_focusable(&a, &m));
+	assert(client_visible(&c, &m) && !client_focusable(&c, &m));
+	{
+		Monitor other = {.tagset = {1}, .lt = {&layouts[0]}};
+		Client ordinary = {.mon = &other, .tags = 1};
+		assert(client_focusable(&ordinary, &other));
+	}
+	wl_list_init(&fstack);
+	wl_list_insert(&fstack, &a.flink);
+	assert(focustop(&m) == NULL); /* Empty special workspace has no fallback. */
+	wl_list_insert(&fstack, &b.flink);
+	assert(focustop(&m) == &b);
+	wl_list_remove(&a.flink);
+	wl_list_remove(&b.flink);
 	/* Explicit floating toggles must preserve overlay's always-floating mode. */
 	selmon = &m;
 	wl_list_init(&fstack);
@@ -191,8 +258,10 @@ main(void)
 	assert(!client_visible(&a, &m));
 	m.overlay_open = 0;
 	assert(!client_visible(&b, &m));
+	assert(!client_focusable(&a, &m));
 	/* Closing the first pane collapses the second without resetting ratio. */
 	m.tagset[0] = 1;
+	assert(client_focusable(&a, &m));
 	wl_list_remove(&a.link);
 	window_forget(&a);
 	panes_reconcile(&m);

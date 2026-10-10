@@ -1,4 +1,8 @@
-# DWL widgets
+# Legacy DWL Eww widgets
+
+Retained fixtures only: not installed or launched by the active DWL session.
+The active shell is [native Noctalia v5](../noctalia-dwl/README.md).
+Hover/lock tests below validate legacy Eww/helper behavior, not Noctalia.
 
 Requires Eww with Wayland support, `dwl-helper` (running daemon), `playerctl`,
 `swaylock`, and `swaync-client` on the session PATH.

@@ -38,6 +38,16 @@ dialog(GtkWidget *parent, GdkEventKey *event, gpointer data)
 }
 
 static gboolean
+pointer_enter(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
+{
+	(void)widget;
+	(void)data;
+	printf("GTK pointer=%.0f,%.0f\n", event->x, event->y);
+	fflush(stdout);
+	return FALSE;
+}
+
+static gboolean
 application_click(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
 	(void)widget;
@@ -70,7 +80,8 @@ main(int argc, char **argv)
 		gtk_window_fullscreen(GTK_WINDOW(parent));
 	if (maximize)
 		gtk_window_maximize(GTK_WINDOW(parent));
-	gtk_widget_add_events(parent, GDK_BUTTON_PRESS_MASK);
+	gtk_widget_add_events(parent, GDK_BUTTON_PRESS_MASK | GDK_ENTER_NOTIFY_MASK);
+	g_signal_connect(parent, "enter-notify-event", G_CALLBACK(pointer_enter), NULL);
 	g_signal_connect(parent, "button-press-event", G_CALLBACK(application_click), NULL);
 	gtk_widget_show_all(parent);
 	gtk_main();

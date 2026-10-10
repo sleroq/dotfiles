@@ -21,4 +21,6 @@ Follow-up floating size memory implemented: Super+Shift+Space saves per-client f
 
 Corrected the virtual-pointer fixture's relative motion arguments to Wayland fixed-point values: raw integers had silently reduced drag distance by 256. The enhanced regression exercises actual 140x60 resize deltas and 3000px attempted drag motion.
 
+Resize-patch verification follow-up (2026-10-10): the checked-in `desktop.patch` currently lacks the `floating_width`/`floating_height` fields and restore logic described above, while `boundaries.c` and `transitions.py` still expect them. A fresh package builds, but the headless transition suite fails before resizing: after tile/float it retains 1260x708 instead of restoring 500x300. Restore the missing production diff or reconcile the tests; the independent four-corner resize fixture does not depend on size memory.
+
 Pending deployment: root tmux is unavailable. Latest built system is `/tmp/dwl-window-system` -> `/nix/store/a6y0qr7gp7d1a7j1rzddixlgpjnapvls-nixos-system-sleroq-interplanetary-26.11.20261007.39ad350`; compositor is `/tmp/dwl-compositor` -> `/nix/store/g0mfq7hi45p5rixkbrsgdgr7wg90n4qk-dwl-0.9`. Non-disruptive activation and then user relogin required; recheck the running binary before deployment.

@@ -77,9 +77,7 @@ in
     (lib.mkIf (cfg.hyprland.enable || cfg.dwl.enable) (
       import ../../programs/flameshot.nix { inherit pkgs config; }
     ))
-    (lib.mkIf (cfg.hyprland.enable || cfg.dwl.enable) (
-      import ../../programs/mic-mute.nix { inherit pkgs; }
-    ))
+    (lib.mkIf cfg.hyprland.enable (import ../../programs/mic-mute.nix { inherit pkgs; }))
 
     (lib.mkIf cfg.hyprland.enable (
       import ./hyprland.nix {

@@ -1,6 +1,7 @@
 /* A held-button move across commits/release, or one interactive size change. */
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <wayland-client.h>
 #include "virtual-pointer.h"
@@ -37,6 +38,12 @@ int
 main(int argc, char **argv)
 {
 	int resizing = argc > 1 && !strcmp(argv[1], "resize");
+	int quadrant = resizing && argc > 2 ? atoi(argv[2]) : 3;
+	int xoffset = resizing && argc > 3 ? atoi(argv[3]) : 0;
+	int yoffset = resizing && argc > 4 ? atoi(argv[4]) : 0;
+	int dx = argc > 2 ? 35 : 140;
+	int dy = argc > 2 ? 15 : 60;
+	assert(quadrant >= 0 && quadrant < 4);
 	uint32_t button = resizing ? 273 : 272;
 	struct wl_display *display = wl_display_connect(NULL);
 	struct wl_registry *registry;
@@ -48,12 +55,14 @@ main(int argc, char **argv)
 	assert(wl_display_roundtrip(display) >= 0 && manager);
 	pointer = zwlr_virtual_pointer_manager_v1_create_virtual_pointer(manager, NULL);
 	zwlr_virtual_pointer_v1_motion_absolute(pointer, 1,
-		resizing ? 100 : 500, resizing ? 100 : 300, 1280, 720);
+		resizing ? xoffset + (quadrant & 1 ? 450 : 100) : 500,
+		resizing ? yoffset + (quadrant & 2 ? 250 : 100) : 300, 1280, 720);
 	zwlr_virtual_pointer_v1_frame(pointer);
 	zwlr_virtual_pointer_v1_button(pointer, 2, button, WL_POINTER_BUTTON_STATE_PRESSED);
 	zwlr_virtual_pointer_v1_frame(pointer);
 	zwlr_virtual_pointer_v1_motion(pointer, 3,
-		wl_fixed_from_int(resizing ? 140 : 3000), wl_fixed_from_int(resizing ? 60 : 0));
+		wl_fixed_from_int(resizing ? (quadrant & 1 ? dx : -dx) : 3000),
+		wl_fixed_from_int(resizing ? (quadrant & 2 ? dy : -dy) : 0));
 	zwlr_virtual_pointer_v1_frame(pointer);
 	if (!resizing) {
 		checkpoint(display, "outside");
