@@ -4,7 +4,8 @@ order = ["default"]
 
 [bar.default]
 position = "left"
-thickness = 74
+thickness = 52
+padding = 6
 margin_edge = 0
 margin_ends = 0
 margin_opposite_edge = 0
@@ -16,21 +17,31 @@ radius_bottom_right = 0
 reserve_space = true
 start = ["launcher", "workspaces"]
 center = ["clock"]
-end = ["tray", "media", "volume", "notifications", "control-center", "clipboard", "session"]
+end = ["tray", "media", "volume", "notifications", "control-center", "vicinae_clipboard", "session"]
+
+[widget.launcher.actions]
+left = "exec vicinae toggle"
+
+[widget.vicinae_clipboard]
+type = "launcher"
+glyph = "clipboard"
+
+[widget.vicinae_clipboard.actions]
+left = "exec vicinae 'vicinae://launch/clipboard/history?toggle=true'"
+
+[widget.tray]
+scale = 1.5
 
 [shell]
+card_borders = false
+button_borders = false
+input_borders = false
+popup_borders = false
 polkit_agent = true
-clipboard_enabled = true
-clipboard_history_max_entries = 500
+clipboard_enabled = false
 setup_wizard_enabled = false
 launch_apps_custom_command = "uwsm-app -- $CMD"
 telemetry_enabled = false
-
-[shell.launcher.dmenu.entry.run]
-label = "Run command"
-prefix = "run"
-freeform = true
-exec = "uwsm-app -- {query}"
 
 [audio]
 enable_overdrive = true
@@ -39,8 +50,8 @@ enable_overdrive = true
 enabled = true
 
 [theme]
-source = "builtin"
-builtin = "Noctalia"
+source = "custom"
+custom_palette = "Rose-Pine-Flat"
 mode = "dark"
 
 [theme.templates]

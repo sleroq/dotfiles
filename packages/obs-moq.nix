@@ -11,10 +11,10 @@
 }:
 
 let
-  version = "0.6.10";
+  version = "0.6.12";
   libmoq = fetchzip {
     url = "https://github.com/moq-dev/moq/releases/download/libmoq-v${version}/moq-${version}-x86_64-unknown-linux-gnu.tar.gz";
-    hash = "sha256-DBnqBJfnEPmYK+X/7AP77+t8uXl3qSnRe4Da+QbCVWM=";
+    hash = "sha256-mGbIzpWs5k151RE6IALB8gzp+9xqO+ghshEcg/zTAH8=";
   };
 in
 stdenv.mkDerivation {
@@ -24,9 +24,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "moq-dev";
     repo = "moq";
-    # Match the released libmoq; the obs-moq tag expects an unreleased moq-c archive.
-    rev = "cd59d15b07c2c2c8a5bfa8a2e82b3bbc24e82a76";
-    hash = "sha256-nRrxPmzZLQ+1ZVRhWmnxRvDn11UsmJlYI0Ioq8/urXA=";
+    rev = "libmoq-v${version}";
+    hash = "sha256-wXpBwI63AOz/O2NhkSnOBOlXYSeSurDhar5JOb0HbXA=";
   };
 
   sourceRoot = "source/cpp/obs";

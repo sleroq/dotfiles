@@ -6,26 +6,26 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "trusttunnel-client";
-  version = "1.1.5";
+  version = "1.1.11";
 
   src =
     let
       releases = {
         x86_64-linux = {
           platform = "linux-x86_64";
-          hash = "sha256-dZVXgS56KAGD9yDjc7N08/zLlXWFMs+KlL6pA97CypY=";
+          hash = "sha256-AOBUams1hA27krdB3/PaZzKnS/LWxYHgRLtFZ8DZaCU=";
         };
         aarch64-linux = {
           platform = "linux-aarch64";
-          hash = "sha256-2xfk4vlxLeJpuOMZZJEyRIf+kHfCI+ULYCZo2Ii16B8=";
+          hash = "sha256-iA6civ1czn/zjFOXjw6lMP+V5nm8/vacUSeyazaS0RA=";
         };
         x86_64-darwin = {
           platform = "macos-universal";
-          hash = "sha256-SvEocDKBsqnbXO2IE4wYB47X2INWNwHq0v92qIpjyX8=";
+          hash = "sha256-4sZ6rqlB/Nz8JOyYaBZEYvzqjR9zH2koxJu+8wDc8aM=";
         };
         aarch64-darwin = {
           platform = "macos-universal";
-          hash = "sha256-SvEocDKBsqnbXO2IE4wYB47X2INWNwHq0v92qIpjyX8=";
+          hash = "sha256-4sZ6rqlB/Nz8JOyYaBZEYvzqjR9zH2koxJu+8wDc8aM=";
         };
       };
       release = releases.${stdenvNoCC.hostPlatform.system};

@@ -7,7 +7,6 @@
     "npm:pi-worktree-extension",
     "npm:@ff-labs/pi-fff",
     "npm:pi-compact-transcript",
-    "npm:pi-notify",
     "npm:@narumitw/pi-btw"
   ],
   "hideThinkingBlock": true,

@@ -11,10 +11,10 @@ local fastTerminal = "kitty"
 local fileManager = "uwsm-app -- nemo"
 
 local menu = "tofi-drun --drun-launch=false | xargs --no-run-if-empty uwsm-app --"
-local menuBin = "tofi-run | xargs --no-run-if-empty uwsm-app --"
-local menuApp = "vicinae"
+local menuBin = "vicinae 'vicinae://launch/system/run?toggle=true'"
+local menuApp = "vicinae toggle"
 local menuWindows = "vicinae vicinae://extensions/vicinae/wm/switch-windows"
-local menuClipboard = "selection=$(cliphist list | tofi --prompt-text 'history' --padding-left='1%'); [ -n \"$selection\" ] && printf '%s\\n' \"$selection\" | cliphist decode | wl-copy"
+local menuClipboard = "vicinae 'vicinae://launch/clipboard/history?toggle=true'"
 
 -------------------
 -- Autostart
@@ -137,13 +137,7 @@ hl.animation({ leaf = "workspaces", enabled = true, speed = 1, bezier = "default
 
 local super = "SUPER"
 
-local function bind(keys, dispatcher, flags)
-    -- The launcher catchall requires a submap. Keep normal desktop bindings
-    -- active while that persistent base submap is selected.
-    flags = flags or {}
-    flags.submap_universal = true
-    hl.bind(keys, dispatcher, flags)
-end
+local bind = hl.bind
 
 local function exec(keys, command, flags)
     bind(keys, hl.dsp.exec_cmd(command), flags)
@@ -204,29 +198,8 @@ if hy3 then
     bind(super .. " + SHIFT + I", hy3.expand("shrink"))
 end
 
-bind(super .. " + O", hl.dsp.global("caelestia:launcher"))
+exec(super .. " + O", menuApp)
 bind("CTRL + ALT + L", hl.dsp.global("caelestia:lock"))
-
-local interruptFlags = { ignore_mods = true, non_consuming = true }
-hl.define_submap("global", function()
-    for _, key in ipairs({
-        "catchall",
-        "mouse:272",
-        "mouse:273",
-        "mouse:274",
-        "mouse:275",
-        "mouse:276",
-        "mouse:277",
-        "mouse_up",
-        "mouse_down",
-    }) do
-        bind(key, hl.dsp.global("caelestia:launcherInterrupt"), interruptFlags)
-    end
-end)
-
-hl.on("hyprland.start", function()
-    hl.dispatch(hl.dsp.submap("global"))
-end)
 
 if hy3 then
     for _, entry in ipairs(directions) do

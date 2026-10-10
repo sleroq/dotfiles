@@ -1,6 +1,10 @@
 # This direcotry is meant for configurations relevant on every desktop host
 
-{ pkgs, config, secrets, ... }:
+{
+  pkgs,
+  secrets,
+  ...
+}:
 {
   imports = [
     ../modules/flatpak.nix
@@ -11,7 +15,6 @@
     ./sing-box.nix
     ../modules/openvpn-work-vpn.nix
     ../modules/kwallet.nix
-    ../modules/webdav.nix
     ../modules/tailscale.nix
   ];
 
@@ -26,7 +29,7 @@
     enable = true;
     algorithm = "lz4"; # Bad compression but fast
   };
-  systemd.oomd.enableUserSlices = true;  # take action on user-space process hierarchies
+  systemd.oomd.enableUserSlices = true; # take action on user-space process hierarchies
 
   # If other stuff doesn't help:
   # services.earlyoom = {
@@ -43,7 +46,11 @@
   nixpkgs.config.android_sdk.accept_license = true;
 
   # FIXME: There is probably some conflicts in this confiuation
-  networking.nameservers = [ "1.1.1.1" "1.1.0.1" "8.8.8.8" ];
+  networking.nameservers = [
+    "1.1.1.1"
+    "1.1.0.1"
+    "8.8.8.8"
+  ];
 
   services = {
     nixops-dns.domain = "1.1.1.1";
@@ -59,7 +66,6 @@
         "https://nix-community.cachix.org"
         "https://cache.nixos.org/"
         "https://hyprland.cachix.org"
-        "https://vicinae.cachix.org"
 
         # From zed flake
         "https://zed.cachix.org"
@@ -71,13 +77,15 @@
         "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
-        "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
 
         # From zed flake
         "zed.cachix.org-1:/pHQ6dpMsAZk2DiP4WCL0p9YDNKWj2Q5FL20bNmw1cU="
         # "conduit:eEKoUwlQGDdYmAI/Q/0slVlegqh/QmAvQd7HBSm21Wk="
       ];
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
     };
     gc = {
       automatic = true;
@@ -133,7 +141,6 @@
     twemoji-color-font
   ];
 
-  # WARNING: Do not toch, firefox will fucking explode
   fonts.fontconfig.localConf = ''
     <fontconfig>
       <alias>
@@ -155,15 +162,26 @@
     </fontconfig>
   '';
 
-  environment.shells = with pkgs; [ bash nushell ];
-  environment.pathsToLink = [ "/share/bash" "/share/nushell" ];
+  environment.shells = with pkgs; [
+    bash
+    nushell
+  ];
+  environment.pathsToLink = [
+    "/share/bash"
+    "/share/nushell"
+  ];
 
   services.flatpak.enable = true;
 
   security.polkit.enable = true;
 
   security.pam.loginLimits = [
-    { domain = "@users"; item = "rtprio"; type = "-"; value = 1; }
+    {
+      domain = "@users";
+      item = "rtprio";
+      type = "-";
+      value = 1;
+    }
   ];
 
   # Udev rules for Vial keyboard configuration
@@ -181,7 +199,7 @@
     KERNEL=="hidraw*", ATTRS{idVendor}=="8089", ATTRS{idProduct}=="0005", ATTRS{serial}=="00CDAB10239BBC788B39E339E300", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
 
     ATTRS{idVendor}=="4653", ATTRS{idProduct}=="0001", ENV{ID_INPUT_JOYSTICK}=""
- '';
+  '';
 
   # Allow plugdev access to ANNE PRO 2
   # https://github.com/sizezero/dev-notes/blob/master/anne-pro-2.org
@@ -227,13 +245,5 @@
       "Yaagl"
       "sophon-server"
     ];
-  };
-
-  programs.firefox = {
-    enable = true;
-    autoConfig = builtins.readFile(builtins.fetchurl {
-      url = "https://raw.githubusercontent.com/MrOtherGuy/fx-autoconfig/master/program/config.js";
-      sha256 = "1mx679fbc4d9x4bnqajqx5a95y1lfasvf90pbqkh9sm3ch945p40";
-    });
   };
 }

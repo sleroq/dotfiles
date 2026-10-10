@@ -1,4 +1,10 @@
-{ pkgs, opts, config, lib, ... }:
+{
+  pkgs,
+  opts,
+  config,
+  lib,
+  ...
+}:
 with lib;
 let
   cfg = config.myHome.development;
@@ -45,21 +51,22 @@ in
   imports = [
     # ../modules/programs/gitui.nix
 
-
     # ../modules/programs/zellij.nix
   ];
 
   config = mkIf cfg.enable {
-    home.file.".golangci.yml".source = config.lib.file.mkOutOfStoreSymlink "${opts.realConfigs}/golangci.yml";
+    home.file.".golangci.yml".source =
+      config.lib.file.mkOutOfStoreSymlink "${opts.realConfigs}/golangci.yml";
 
     home.sessionPath = [
       "${config.home.homeDirectory}/.local/bin"
-       "${config.home.homeDirectory}/.deno/bin"
-       "${config.home.homeDirectory}/.bun/bin"
-       "${config.home.homeDirectory}/.npm/bin"
-       "${config.home.homeDirectory}/develop/go/bin"
+      "${config.home.homeDirectory}/.deno/bin"
+      "${config.home.homeDirectory}/.bun/bin"
+      "${config.home.homeDirectory}/.npm/bin"
+      "${config.home.homeDirectory}/develop/go/bin"
       "${config.home.homeDirectory}/.local/share/pnpm"
-    ] ++ lib.optional brewEnabled "/opt/homebrew/bin";
+    ]
+    ++ lib.optional brewEnabled "/opt/homebrew/bin";
 
     home.sessionVariables = {
       GOPATH = "${config.home.homeDirectory}/develop/go";
@@ -70,12 +77,17 @@ in
 
     programs.nushell = {
       extraEnv = ''
-        ${if darwinMagicShit then ''
-          $env.CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER = (xcrun --find clang | str trim)
-          $env.CC = (xcrun --find clang | str trim)
-          $env.CXX = (xcrun --find clang++ | str trim)
-          $env.SDKROOT = (xcrun --show-sdk-path | str trim)
-        '' else ""}
+        ${
+          if darwinMagicShit then
+            ''
+              $env.CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER = (xcrun --find clang | str trim)
+              $env.CC = (xcrun --find clang | str trim)
+              $env.CXX = (xcrun --find clang++ | str trim)
+              $env.SDKROOT = (xcrun --show-sdk-path | str trim)
+            ''
+          else
+            ""
+        }
       '';
     };
 
@@ -83,12 +95,17 @@ in
       initContent = ''
         ${if brewEnabled then ''eval "$(/opt/homebrew/bin/brew shellenv)"'' else ""}
 
-        ${if darwinMagicShit then ''
-          export CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=$(xcrun --find clang)
-          export CC=$(xcrun --find clang)
-          export CXX=$(xcrun --find clang++)
-          export SDKROOT=$(xcrun --show-sdk-path)
-        '' else ""}
+        ${
+          if darwinMagicShit then
+            ''
+              export CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=$(xcrun --find clang)
+              export CC=$(xcrun --find clang)
+              export CXX=$(xcrun --find clang++)
+              export SDKROOT=$(xcrun --show-sdk-path)
+            ''
+          else
+            ""
+        }
       '';
     };
 
@@ -96,12 +113,17 @@ in
       initExtra = ''
         ${if brewEnabled then ''eval "$(/opt/homebrew/bin/brew shellenv)"'' else ""}
 
-        ${if darwinMagicShit then ''
-          export CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=$(xcrun --find clang)
-          export CC=$(xcrun --find clang)
-          export CXX=$(xcrun --find clang++)
-          export SDKROOT=$(xcrun --show-sdk-path)
-        '' else ""}
+        ${
+          if darwinMagicShit then
+            ''
+              export CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=$(xcrun --find clang)
+              export CC=$(xcrun --find clang)
+              export CXX=$(xcrun --find clang++)
+              export SDKROOT=$(xcrun --show-sdk-path)
+            ''
+          else
+            ""
+        }
       '';
     };
 
@@ -148,7 +170,7 @@ in
 
       zstd # For compressing stuff
 
-      pre-commit # Some repos use this (e.g. anytype)
+      pre-commit
 
       redis # for redis-cli
     ];

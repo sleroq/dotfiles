@@ -2,6 +2,7 @@
 
 Needs dwl, noctalia, wtype, grim, gdbus and Python 3 on PATH.
 Run through dbus-run-session, not on the desktop's session bus.
+Vicinae is a disposable argv-recording stub: routing, not GUI rendering, is tested.
 Only owned headless processes are started or signalled. Audio, idle actions,
 polkit registration, network requests and production storage are disabled.
 """
@@ -42,8 +43,15 @@ enabled = false
 [idle.behavior.suspend]
 enabled = false
 ''')
+        bin_directory = root / "bin"
+        bin_directory.mkdir()
+        vicinae_log = root / "vicinae.log"
+        stub = bin_directory / "vicinae"
+        stub.write_text(f"#!/bin/sh\nprintf '%s\\n' \"$@\" >> '{vicinae_log}'\n")
+        stub.chmod(0o700)
         environment = dict(os.environ)
         environment.update(
+            PATH=f"{bin_directory}:{environment['PATH']}",
             XDG_RUNTIME_DIR=str(root), XDG_CONFIG_HOME=str(root / "config"),
             XDG_CACHE_HOME=str(root / "cache"), XDG_STATE_HOME=str(root / "state"),
             WAYLAND_DISPLAY="wayland-0", XDG_CURRENT_DESKTOP="dwl", GDK_BACKEND="wayland",
@@ -83,30 +91,29 @@ enabled = false
                 shell = start("noctalia")
                 wait_for(lambda: any(root.glob("noctalia-wayland-*.sock")), "missing Noctalia socket")
                 wait_for(lambda: status()["barVisible"], "bar not visible")
-                shortcut("-M", "logo", "-k", "o", "-m", "logo")
-                wait_for(lambda: status()["activePanelId"] == "launcher", "Super+O launcher binding")
-                message("panel-close")
+                for count, key_name in enumerate(("p", "o", "semicolon"), start=1):
+                    shortcut("-M", "logo", "-k", key_name, "-m", "logo")
+                    wait_for(lambda: vicinae_log.exists() and len(vicinae_log.read_text().splitlines()) >= count,
+                             f"Super+{key_name} Vicinae binding")
+                    assert vicinae_log.read_text().splitlines() == ["toggle"] * count
+                    assert status()["activePanelId"] != "launcher", "native launcher opened for apps"
                 shortcut("-M", "logo", "-M", "shift", "-k", "p", "-m", "shift", "-m", "logo")
-                wait_for(lambda: status()["activePanelId"] == "launcher", "Super+Shift+P run binding")
-                message("panel-close")
+                wait_for(lambda: len(vicinae_log.read_text().splitlines()) == 4, "Super+Shift+P run binding")
+                assert vicinae_log.read_text().splitlines() == ["toggle"] * 3 + ["vicinae://launch/system/run?toggle=true"]
+                assert status()["activePanelId"] not in ("launcher", "clipboard")
                 for tab in ("audio", "calendar", "system", "notifications"):
                     assert message("panel-open", "control-center", tab) == "ok"
                     wait_for(lambda: status()["activePanelId"] == "control-center", f"missing {tab} panel")
                     message("panel-close")
-                payload = "isolated-noctalia-fixture"
-                assert message("clipboard-copy", payload) == "ok"
-                wait_for(lambda: message("clipboard-text") == payload, "clipboard copy failed")
-                entries = root / "state/noctalia/clipboard/entries"
-                wait_for(lambda: any(entries.glob("*.enc")), "clipboard history not persisted")
-                assert all(payload.encode() not in entry.read_bytes() for entry in entries.glob("*.enc"))
                 shell.terminate()
                 shell.wait(timeout=5)
                 shell = start("noctalia")
                 wait_for(lambda: any(root.glob("noctalia-wayland-*.sock")), "missing restarted Noctalia socket")
                 shortcut("-M", "logo", "-k", "z", "-m", "logo")
-                wait_for(lambda: status()["activePanelId"] == "clipboard", "Super+Z clipboard binding")
-                shortcut("-k", "Return")
-                wait_for(lambda: message("clipboard-text") == payload, "clipboard history lost on restart")
+                wait_for(lambda: len(vicinae_log.read_text().splitlines()) == 5, "Super+Z clipboard binding")
+                assert vicinae_log.read_text().splitlines() == ["toggle"] * 3 + [
+                    "vicinae://launch/system/run?toggle=true", "vicinae://launch/clipboard/history?toggle=true"]
+                assert status()["activePanelId"] not in ("launcher", "clipboard")
                 owner = command("gdbus", "call", "--session", "--dest", "org.freedesktop.DBus", "--object-path", "/org/freedesktop/DBus", "--method", "org.freedesktop.DBus.GetConnectionUnixProcessID", "org.freedesktop.Notifications")
                 assert owner == f"(uint32 {shell.pid},)", owner
                 assert message("notification-show", "Smoke test", "Isolated DWL") == "ok"
@@ -122,8 +129,8 @@ enabled = false
                 wait_for(lambda: status()["locked"], "Ctrl+Alt+L native lock binding")
                 time.sleep(1)
                 assert shell.poll() is None and compositor.poll() is None and status()["locked"]
-                print("PASS: compiled launcher/run/clipboard/lock bindings; native panels, encrypted clipboard persistence, notification ownership, workspace IPC, rendering and lock lifetime")
-                print("NOT TESTED: PAM unlock, physical monitor, UWSM/SDDM lifecycle, suspend/resume or real audio devices")
+                print("PASS: compiled Vicinae routing/run/clipboard/lock bindings; native panels, restart/reconnect, notification ownership, workspace IPC, rendering and lock lifetime")
+                print("NOT TESTED: actual Vicinae rendering/history persistence, sidebar pointer click, PAM unlock, physical monitor, UWSM/SDDM lifecycle, suspend/resume or real audio devices")
             except BaseException:
                 log.flush()
                 log.seek(0)

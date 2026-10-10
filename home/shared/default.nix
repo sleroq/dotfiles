@@ -53,12 +53,8 @@
     };
 
     programs = {
-      anytype = {
-        enable = false;
-        version = "0.53.26-alpha";
-        hash = "0daapymbkq5s9qdya9g7a4ay6813n1abyfb36rva0kpdhkppqhph";
-      };
       helium.enable = true;
+      remmina.enable = lib.mkDefault true;
 
       mpv.enable = true;
       kitty = {
@@ -101,7 +97,6 @@
 
             # Remote stuff
             # bore-cli
-            remmina
             # nomachine-client
             # rustdesk
             # vial

@@ -21,7 +21,6 @@ Spotify = { icon = "󰓇", color = "#1ed760" }
 beekeeper-studio = { icon = "󰆼", color = "#fad83b" }
 chromium = { icon = "", color = "#a1c2fa", size = "13pt" }
 discord = { icon = "󰙯", color = "#404eed" }
-firefox = { icon = "", color = "#ff8817", size = "13pt" }
 kitty = { icon = " " }
 geary = { icon = "", color = "#f6d32d" }
 gnome-calendar = { icon = "", color = "#3584e4" }

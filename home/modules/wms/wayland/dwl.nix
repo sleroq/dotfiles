@@ -7,6 +7,7 @@
 }:
 let
   cfg = config.myHome.wms.wayland.dwl;
+  noctalia = pkgs.callPackage (self + /packages/noctalia-dwl.nix) { };
   storageKey = "${config.xdg.stateHome}/noctalia/storage.key";
   provisionKey = pkgs.writeShellScript "noctalia-storage-key" ''
     if [ ! -f ${lib.escapeShellArg storageKey} ]; then
@@ -18,7 +19,7 @@ let
   noctaliaConfig = pkgs.runCommand "noctalia-dwl-config.toml" { } ''
     substitute ${self + /home/config/noctalia-dwl/config.toml} "$out" \
       --replace-fail '@storageKey@' ${lib.escapeShellArg storageKey}
-    ${lib.getExe pkgs.noctalia} config validate "$out"
+    ${lib.getExe noctalia} config validate "$out"
   '';
   sessionUnit = {
     After = [ "graphical-session.target" ];
@@ -31,13 +32,20 @@ in
   options.myHome.wms.wayland.dwl.enable = lib.mkEnableOption "the minimal DWL desktop";
 
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgs; [
+    home.packages = [
       noctalia
-      kitty
-      nemo
-      nerd-fonts.symbols-only
+      pkgs.kitty
+      pkgs.nemo
+      pkgs.nerd-fonts.symbols-only
     ];
+    xdg.dataFile."icons/Tela".source = noctalia.trayIcons;
     xdg.configFile."noctalia/config.toml".source = noctaliaConfig;
+    xdg.configFile."noctalia/palettes/Rose-Pine-Flat.json".source =
+      self + /home/config/noctalia-dwl/Rose-Pine-Flat.json;
+    xdg.configFile."systemd/user/app-dwl-obs-.scope.d/timeout.conf".text = ''
+      [Scope]
+      TimeoutStopSec=15s
+    '';
 
     services.kanshi.settings = [
       {
@@ -73,7 +81,7 @@ in
         };
         Service = {
           ExecStartPre = provisionKey;
-          ExecStart = lib.getExe pkgs.noctalia;
+          ExecStart = lib.getExe noctalia;
           Restart = "on-failure";
         };
         Install.WantedBy = [ "graphical-session.target" ];

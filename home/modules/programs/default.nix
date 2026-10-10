@@ -19,21 +19,8 @@ in
   ];
 
   options.myHome.programs = {
-    anytype = {
-      enable = lib.mkEnableOption "anytype";
-      version = lib.mkOption {
-        type = lib.types.str;
-        default = "";
-        description = "Override version for anytype";
-      };
-      hash = lib.mkOption {
-        type = lib.types.str;
-        default = "";
-        description = "Override hash for anytype";
-      };
-    };
-
     helium.enable = lib.mkEnableOption "helium";
+    remmina.enable = lib.mkEnableOption "Remmina";
     lf.enable = lib.mkEnableOption "lf file manager";
     zathura.enable = lib.mkEnableOption "Zathura PDF viewer";
 
@@ -54,10 +41,8 @@ in
         default = pkgs.obs-studio;
       };
     };
-    teams.enable = lib.mkEnableOption "Teams";
     chromium = {
       enable = lib.mkEnableOption "chromium";
-      unsafeWebGPU = lib.mkEnableOption "unsafe webgpu";
     };
     accounting.enable = lib.mkEnableOption "accounting software";
     activity-watch.enable = lib.mkEnableOption "Activity Watch";
@@ -72,16 +57,12 @@ in
   };
 
   config = lib.mkMerge [
-    (lib.mkIf cfg.anytype.enable {
-      home.packages = [
-        (pkgs.callPackage ../../../packages/anytype.nix { inherit (cfg.anytype) version hash; })
-      ];
-    })
     (lib.mkIf cfg.helium.enable {
       home.packages = [
         (pkgs.callPackage ../../../packages/helium.nix { })
       ];
     })
+    (lib.mkIf cfg.remmina.enable { home.packages = [ pkgs.remmina ]; })
     (lib.mkIf cfg.lf.enable (import ./lf.nix { inherit pkgs; }))
     (lib.mkIf cfg.zathura.enable (import ./zathura.nix { }))
 
@@ -103,7 +84,6 @@ in
       home.sessionVariables.TERMINAL = "wezterm";
     })
 
-    (lib.mkIf cfg.teams.enable (import ./teams.nix { inherit pkgs; }))
     (lib.mkIf cfg.obs.enable {
       programs.obs-studio = {
         enable = true;
@@ -126,8 +106,7 @@ in
           "--enable-features=VaapiVideoDecoder"
           "--use-angle=vulkan"
           "--ozone-platform=wayland"
-        ]
-        ++ (lib.optional cfg.chromium.unsafeWebGPU "--enable-unsafe-webgpu");
+        ];
       };
     })
     (lib.mkIf cfg.accounting.enable {

@@ -1,4 +1,9 @@
-{ pkgs, inputs', ... }:
+{
+  pkgs,
+  inputs',
+  lib,
+  ...
+}:
 
 let
   bottles = pkgs.bottles.override {
@@ -22,6 +27,7 @@ in
         sway.enable = false;
         dwl.enable = true;
         hyprland = {
+          enable = lib.mkForce false;
           extraConfig = ''
             -- See https://wiki.hypr.land/Configuring/Basics/Monitors/
             hl.monitor({
@@ -46,15 +52,12 @@ in
     };
 
     programs = {
+      remmina.enable = false;
       pi.enable = true;
       kitty.enable = true;
       obs.enable = true;
-      chromium = {
-        enable = true;
-        unsafeWebGPU = true;
-      };
+      chromium.enable = true;
       opencode.enable = true;
-      teams.enable = true;
       exodus.enable = true;
       mangohud.enable = true;
       extraPackages = with pkgs; [
@@ -62,7 +65,8 @@ in
         # ollama-rocm
         # chatbox
         scrcpy
-        inputs'.zig.packages.master
+        # Match the Zig release supported by the locked ZLS.
+        inputs'.zig.packages."0.17.0"
         inputs'.zls.packages.default
         bottles
         qFlipper

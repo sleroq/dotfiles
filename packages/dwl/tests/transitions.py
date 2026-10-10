@@ -1,17 +1,15 @@
 """Real headless grouped-window regression; never connects to the physical seat."""
 import hashlib
-import json
 import os
 from pathlib import Path
 import shlex
-import socket
 import subprocess
 import sys
 import tempfile
 import time
 
 
-def run(overlay_only=False, overlay_modal=False, overlay_fullscreen=False):
+def run(overlay_only=False, overlay_modal=False, overlay_fullscreen=False, overlay_spawn=False):
     with tempfile.TemporaryDirectory(prefix="dwl-transitions-") as directory:
         root = Path(directory)
         root.chmod(0o700)
@@ -19,8 +17,7 @@ def run(overlay_only=False, overlay_modal=False, overlay_fullscreen=False):
                    XDG_CONFIG_HOME=str(root / "config"), XDG_CACHE_HOME=str(root / "cache"),
                    GDK_BACKEND="wayland", GIO_USE_VFS="local", WLR_BACKENDS="headless",
                    WLR_HEADLESS_OUTPUTS="1", WLR_RENDERER="pixman",
-                   PULSE_SERVER="unix:" + str(root / "disabled-pulse.sock"),
-                   DWL_HELPER_SOCKET=str(root / "helper.sock"))
+                   PULSE_SERVER="unix:" + str(root / "disabled-pulse.sock"))
         env.pop("NOTIFY_SOCKET", None)
         processes = []
         with (root / "session.log").open("w+") as log:
@@ -39,10 +36,8 @@ def run(overlay_only=False, overlay_modal=False, overlay_fullscreen=False):
                     time.sleep(.05)
 
             def title():
-                with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
-                    connection.connect(env["DWL_HELPER_SOCKET"])
-                    connection.sendall(b'"watch"\n')
-                    return json.loads(connection.makefile().readline())["desktop"]["title"]
+                return subprocess.check_output((str(root / "ipc-title"),), env=env,
+                                               text=True, timeout=5).rstrip("\n")
 
             def key(name, shift=False):
                 command("wtype", "-M", "logo", *(("-M", "shift") if shift else ()), "-k", name,
@@ -57,10 +52,63 @@ def run(overlay_only=False, overlay_modal=False, overlay_fullscreen=False):
                     return states and sizes and states[-1] == f"GTK maximized={state}" and sizes[-1] == f"GTK size={size}"
                 wait(observed)
 
+            def spawn_overlay():
+                underlay_log = root / "underlay.log"
+                ordinary_log = root / "ordinary.log"
+                with underlay_log.open("w") as output:
+                    underlay = subprocess.Popen((str(root / "fixture"), "underlay"),
+                                                env=env, stdout=output, stderr=log)
+                    processes.append(underlay)
+                wait(lambda: title() == "DWL-underlay-test")
+                geometry(0, "1280x720", underlay_log)
+                key("x")  # empty special workspace must own the new window
+                with ordinary_log.open("w") as output:
+                    processes.append(subprocess.Popen((str(root / "fixture"), "ordinary", "ordinary-spawn"),
+                                                      env=env, stdout=output, stderr=log))
+                wait(lambda: title() == "ordinary-spawn")
+                geometry(0, "500x300", ordinary_log)
+                geometry(0, "1280x720", underlay_log)
+                key("w")
+                assert title() == "ordinary-spawn"
+                key("x")
+                wait(lambda: title() != "ordinary-spawn")
+                key("q")
+                wait(lambda: title() == "DWL-underlay-test")
+                geometry(0, "1280x720", underlay_log)
+                key("x")
+                wait(lambda: title() == "ordinary-spawn")
+                command("wtype", "-k", "d")
+                wait(lambda: title() == "DWL-transient-test")
+                key("w")
+                assert title() == "DWL-transient-test"
+                key("x")
+                wait(lambda: title() not in ("ordinary-spawn", "DWL-transient-test"))
+                key("x")
+                wait(lambda: title() == "DWL-transient-test")
+                key("c", True)
+                wait(lambda: title() == "ordinary-spawn")
+                key("x")
+                underlay.terminate()
+                underlay.wait(timeout=3)
+                closed_log = root / "closed.log"
+                with closed_log.open("w") as output:
+                    processes.append(subprocess.Popen((str(root / "fixture"), "ordinary", "closed-spawn"),
+                                                      env=env, stdout=output, stderr=log))
+                wait(lambda: title() == "closed-spawn")
+                geometry(0, "1260x708", closed_log)
+                key("x")
+                wait(lambda: title() == "ordinary-spawn")
+                key("x")
+                wait(lambda: title() == "closed-spawn")
+                print("PASS: ordinary special spawn, forced float, workspace-independent membership, transient inheritance, fullscreen underlay and closed-special tiling")
+
             def overlay_send():
-                start(str(root / "fixture"), "normal", "overlay-send")
+                fixture_log = root / "overlay-send.log"
+                with fixture_log.open("w") as output:
+                    processes.append(subprocess.Popen((str(root / "fixture"), "normal", "overlay-send"),
+                                                      env=env, stdout=output, stderr=log))
                 wait(lambda: title() == "overlay-send")
-                geometry(0, "500x300")
+                geometry(0, "500x300", fixture_log)
                 key("x", True)
                 key("x")
                 wait(lambda: title() == "overlay-send")
@@ -69,7 +117,7 @@ def run(overlay_only=False, overlay_modal=False, overlay_fullscreen=False):
                 key("x")  # hide the overlay before visiting the destination
                 key("w")
                 wait(lambda: title() == "overlay-send")
-                geometry(0, "500x300")
+                geometry(0, "500x300", fixture_log)
                 key("x")  # ordinary windows must not follow the open overlay
                 key("q")
                 wait(lambda: title() != "overlay-send")
@@ -84,7 +132,7 @@ def run(overlay_only=False, overlay_modal=False, overlay_fullscreen=False):
                 wait(lambda: title() != "overlay-send")
                 key("x")
                 wait(lambda: title() == "overlay-send")
-                geometry(0, "500x300")
+                geometry(0, "500x300", fixture_log)
                 print("PASS: overlay send to normal/current workspace, visibility, focus and floating size")
 
             def modal_overlay():
@@ -184,10 +232,17 @@ def run(overlay_only=False, overlay_modal=False, overlay_fullscreen=False):
             try:
                 start("dwl")
                 wait(lambda: (root / "wayland-0").exists())
-                start("dwl-helper", "daemon")
-                wait(lambda: (root / "helper.sock").exists())
+                protocol = str(Path(__file__).with_name("dwl-ipc-unstable-v2.xml"))
+                command("wayland-scanner", "client-header", protocol, str(root / "dwl-ipc.h"))
+                command("wayland-scanner", "private-code", protocol, str(root / "dwl-ipc.c"))
+                ipc_flags = shlex.split(subprocess.check_output(("pkg-config", "--cflags", "--libs", "wayland-client"), text=True))
+                command("cc", "-I" + str(root), str(Path(__file__).with_name("ipc-title.c")),
+                        str(root / "dwl-ipc.c"), "-o", str(root / "ipc-title"), *ipc_flags)
                 flags = shlex.split(subprocess.check_output(("pkg-config", "--cflags", "--libs", "gtk+-3.0"), text=True))
                 command("cc", str(Path(__file__).with_name("transient.c")), "-o", str(root / "fixture"), *flags)
+                if overlay_spawn:
+                    spawn_overlay()
+                    return
                 if overlay_fullscreen:
                     fullscreen_overlay()
                     return
@@ -340,4 +395,4 @@ def run(overlay_only=False, overlay_modal=False, overlay_fullscreen=False):
 
 if __name__ == "__main__":
     run(overlay_only="--overlay-send" in sys.argv, overlay_modal="--overlay-modal" in sys.argv,
-        overlay_fullscreen="--overlay-fullscreen" in sys.argv)
+        overlay_fullscreen="--overlay-fullscreen" in sys.argv, overlay_spawn="--overlay-spawn" in sys.argv)

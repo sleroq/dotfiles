@@ -22,12 +22,10 @@
     ./modules/bore.nix
     ./modules/podman.nix
     ../../modules/broadcast-box.nix
-    ./modules/oven-media-engine.nix
     ./modules/tuwunel.nix
     ./modules/element-call.nix
     ./modules/remnawave.nix
     ./modules/remnawave-relays.nix
-    ./modules/manictime.nix
     ./modules/traggo.nix
     ./modules/slusha.nix
     ./modules/n8n.nix
@@ -147,11 +145,6 @@
 
   cumserver.remnawaveRelays.enable = true;
 
-  cumserver.manictime = {
-    enable = false;
-    domain = "time.cum.army";
-  };
-
   cumserver.traggo.enable = true;
 
   age.secrets.grafanaPassword = {
@@ -262,22 +255,6 @@
 
   cumserver.minecraft.cum.enable = true;
   # cumserver.minecraft.forever-chu.enable = true;
-
-  # cumserver.oven-media-engine = {
-  #   enable = true;
-  #   domain = "web.cum.army";
-
-  #   videoBypass = false;
-  #   videoCodec = "h264";
-  #   videoWidth = 1920;
-  #   videoHeight = 1080;
-  #   videoBitrate = 5000000;
-
-  #   # WebRTC optimizations
-  #   webrtcRtx = true;
-  #   webrtcJitterBuffer = true;
-  #   webrtcUlpfec = true;
-  # };
 
   # Keep the legacy Sieve binary across system switches and garbage collection.
   # The imported module is pinned, but its bot-split package is NOT deployed.

@@ -56,7 +56,6 @@
     # HM-related inputs used by home modules
     nix-gaming.url = "github:fufexan/nix-gaming";
 
-    vicinae.url = "git+https://github.com/vicinaehq/vicinae?ref=refs/tags/v0.20.1"; # Lock version here to hit gh actions cache
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
@@ -64,7 +63,6 @@
     zls.url = "github:zigtools/zls";
     zed-interplanetary.url = "github:zed-industries/zed/nightly"; # Lock to hit the cache
 
-    scrcpyPkgs.url = "github:nixos/nixpkgs/77a0bdd";
     nixpkgs-master.url = "github:nixos/nixpkgs/master";
 
     # Single-quality MoQ pilot; release source is copied to the build host.
@@ -138,9 +136,8 @@
         };
 
       flake.overlays = import ./overlays/default.nix {
-        inherit self nixpkgs;
+        inherit nixpkgs;
         inherit (inputs)
-          scrcpyPkgs
           nixpkgs-master
           rust-overlay
           sb
@@ -337,7 +334,6 @@
                     args
                     // rec {
                       agenixModule = inputs.agenix.homeManagerModules.default;
-                      vicinae = inputs.vicinae.homeManagerModules.default;
                       inputs' = inputsResolved';
                       inherit (inputs) self;
 

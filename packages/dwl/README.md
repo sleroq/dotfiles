@@ -43,13 +43,15 @@ All shortcuts below use Super unless otherwise specified.
   While open, only special-workspace clients can receive focus on that monitor;
   the ordinary desktop remains visible under a 35% dark-gray scrim.
   An empty special workspace does not fall back to ordinary focus.
+  New managed windows spawn floating in the special workspace when it is open
+  on their rule-selected monitor; transient dialogs inherit their parent’s membership.
 - `Shift+V`: work-area maximize; `V`: native fullscreen; `Shift+Space`: float;
   `Ctrl+Y`: sticky; `Shift+C`: close. Super+F8 toggles focus-following.
 - Super+right-drag: resize from the nearest corner selected by the starting
   quadrant, without teleporting the cursor; Super+left-drag: move.
 - Super+Return: Kitty; Alt+Return: floating Kitty. Both open OS windows in the
   same `dwl` Kitty instance, started hidden with the DWL session.
-- `P` / `O` / semicolon: apps; `Shift+P`: Noctalia `/run` free-command provider; `Z`: clipboard; `Y`: Nemo.
+- `P` / `O` / semicolon: `vicinae toggle` (also sidebar launcher left click); `Shift+P`: Vicinae Run; `Z`: Vicinae clipboard history (also sidebar clipboard left click); `Y`: Nemo.
 - Ctrl+Alt+L: native Noctalia lock; `Shift+N`: control-center notifications.
 - Print: Flameshot GUI; Shift+Print: full screenshot saved/copied;
   Super+Print: share screenshot. AudioMute, AudioMicMute, Calculator, and Super+M toggle the microphone;
@@ -106,8 +108,10 @@ first-map floating placement/maximize restore, and real XKB layout restore.
 It never opens a backend or graphical session.
 
 `tests/noctalia.py` runs the current native shell in an isolated headless DWL
-and DBus session. It checks compiled launcher/run/clipboard/lock shortcuts,
-control-center panels, encrypted clipboard persistence across restart,
+and DBus session. It checks all three compiled app shortcuts using a disposable
+Vicinae argv-recording stub, plus Vicinae run/clipboard routing and native lock shortcuts. This checks
+command routing, not actual Vicinae rendering/history persistence or sidebar pointer clicks. It checks
+control-center panels and restart/reconnect,
 notification ownership, workspace IPC, rendering, and lock lifetime. It never
 authenticates or uses real audio; PAM unlock, physical inputs, suspend/resume,
 and UWSM/SDDM lifecycle remain manual checks. Put the newly built compositor
@@ -117,37 +121,9 @@ and native Noctalia on PATH before running:
 nix-shell -p wtype grim glib --run 'dbus-run-session -- python3 packages/dwl/tests/noctalia.py'
 ```
 
-**Legacy Eww/helper fixtures (not Noctalia validation; not installed or launched):**
-
-`tests/hover.py` independently starts a headless compositor, helper, and Eww;
-three complete hover cycles exercise first-motion entry/exit and sensor-to-drawer
-handoff. A GTK fixture checks initial native maximization, repeated normal-size
-restoration, transient overlay visibility/focus, and underlying fullscreen preservation. It uses a temporary runtime/config directory and
-disables audio access. With the built compositor/helper on PATH:
-
-```sh
-nix-shell -p python3 eww playerctl wlrctl wtype gtk3 pkg-config gcc \
-  --command 'python3 packages/dwl/tests/hover.py'
-```
-
-`tests/lock.py` clicks the actual sidebar lock button in a disposable headless
-session, including a 300ms startup delay. It checks daemon survival past the
-widget deadline, fail-closed gray rendering after locker death, and compositor
-SIGTERM shutdown while locked. It never authenticates or touches the active
-session; normal PAM unlock and physical logout are not covered.
-
-```sh
-nix-shell -p wlrctl --run 'python3 packages/dwl/tests/lock.py'
-```
-
-Historical pre-Noctalia runtime verification also covered real Wayland/XWayland clients, pane
-layouts, overlay geometry/focus, native fullscreen/work-area maximize, wallpaper,
-and isolated audio-stream controls. Physical monitors/input, portals, and session
-startup/logout still need final desktop quality testing.
-
 `tests/resize.py` independently checks four sequential outward corner resizes
 (500×300 → 535×315 → 570×330 → 605×345 → 640×360) with a normal floating GTK
-fixture and a headless compositor, without helper/Eww or floating-size memory.
+fixture and a headless compositor, without floating-size memory.
 Pointer-entry coordinates after release also assert that resizing never teleports
 the cursor.
 
@@ -160,6 +136,9 @@ nix-shell -p python3 wtype gtk3 pkg-config gcc wayland wayland-scanner \
 unmaximize/retile, grouped floating focus fallback, hidden-tab H/L and pane J/K in both orientations,
 strip reservation, title click selection (including a rounded three-tab boundary),
 application clicks, and an oversized floating drag stable across commits/release.
+`tests/ipc-title.c` queries the focused title through native DWL IPC solely for
+these transition tests, using the test-local `dwl-ipc-unstable-v2.xml` fixture.
+It prints one snapshot and exits; no runtime daemon is involved.
 `tests/drag.c` is a dedicated held-button virtual-pointer fixture; its protocol XML
 comes from swaywm/wlr-protocols (MIT license included in the file).
 
@@ -171,7 +150,7 @@ nix-shell -p python3 wlrctl wtype gtk3 pkg-config gcc grim wayland wayland-scann
 Focused modal regression (isolated headless session; also samples rendered dimming):
 
 ```sh
-nix-shell -p python3 wlrctl wtype gtk3 pkg-config gcc grim imagemagick \
+nix-shell -p python3 wlrctl wtype gtk3 pkg-config gcc grim imagemagick wayland wayland-scanner \
   --run 'dbus-run-session -- python3 packages/dwl/tests/transitions.py --overlay-modal'
 ```
 
@@ -179,6 +158,14 @@ Focused fullscreen ordering regression (real pointer hits, fullscreen transient,
 keyboard-raised floater, hide/reopen, workspace switches and size restoration):
 
 ```sh
-nix-shell -p python3 wlrctl wtype gtk3 pkg-config gcc \
+nix-shell -p python3 wlrctl wtype gtk3 pkg-config gcc wayland wayland-scanner \
   --run 'dbus-run-session -- python3 packages/dwl/tests/transitions.py --overlay-fullscreen'
+```
+
+Focused new-window placement regression (ordinary app, transient inheritance,
+workspace switches, fullscreen underlay preservation and closed-special tiling):
+
+```sh
+nix-shell -p python3 wlrctl wtype gtk3 pkg-config gcc wayland wayland-scanner \
+  --run 'dbus-run-session -- python3 packages/dwl/tests/transitions.py --overlay-spawn'
 ```

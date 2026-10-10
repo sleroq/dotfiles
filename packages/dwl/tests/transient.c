@@ -62,10 +62,11 @@ main(int argc, char **argv)
 {
 	GtkWidget *parent;
 	int underlay = argc > 1 && !g_strcmp0(argv[1], "underlay");
+	int ordinary = argc > 1 && !g_strcmp0(argv[1], "ordinary");
 	int named = argc > 2;
 	int maximize = argc > 1 && !g_strcmp0(argv[1], "maximize");
 	int oversized = argc > 1 && !g_strcmp0(argv[1], "oversized");
-	g_set_prgname(underlay ? "dwl-underlay-test" : "dwl-floating-terminal");
+	g_set_prgname(underlay ? "dwl-underlay-test" : ordinary ? "dwl-ordinary-test" : "dwl-floating-terminal");
 	gtk_init(&argc, &argv);
 	parent = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(parent), named ? argv[2] : underlay ? "DWL-underlay-test" : "DWL-parent-test");

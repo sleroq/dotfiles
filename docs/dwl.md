@@ -13,14 +13,15 @@ window policies are included.
   a daemon or plugin framework.
 - `home/config/noctalia-dwl/`: native Noctalia v5 shell defaults, installed as
   `~/.config/noctalia/config.toml` after native schema validation. Noctalia owns
-  the exclusive 74px left sidebar, launcher, clipboard, notifications, audio,
+  the exclusive 52px left sidebar, notifications, audio,
   wallpaper, polkit agent, lockscreen, and idle policy.
 - `modules/wms/dwl.nix` and `home/modules/wms/wayland/dwl.nix`: UWSM,
   session-scoped services, portals, and monitor configuration.
 
 Wallpaper remains `~/Pictures/wallpapers/03779_vyoletznebula_3840x2160.jpg`;
-Noctalia browses `~/Pictures/wallpapers`. Kanshi configures `DP-1` at
-2560×1440, 180 Hz, scale 1. GTK handles file selection; the wlr portal handles
+Noctalia browses `~/Pictures/wallpapers`. The shell uses the dark Rosé Pine
+palette with 24px tray icons in the narrower sidebar. Kanshi configures `DP-1`
+at 2560×1440, 180 Hz, scale 1. GTK handles file selection; the wlr portal handles
 screenshots/screencasts. Its tofi monitor/window chooser remains independent
 of the Noctalia launcher and uses an absolute executable path.
 
@@ -70,11 +71,16 @@ UWSM owns environment publication, startup, and teardown. The DWL desktop entry
 runs `dwl -s "uwsm finalize"`. `dwl-noctalia.service`, Kitty, and Kanshi are
 conditioned on `XDG_CURRENT_DESKTOP=dwl` and stop with the graphical session.
 Caelestia remains Hyprland-only; shared cliphist services skip DWL because
-Noctalia owns its clipboard. No Eww/helper or companion shell daemons are
+Vicinae owns its clipboard; Sway’s shared cliphist configuration is unchanged. No Eww/helper or companion shell daemons are
 installed or launched by the DWL module. Noctalia app launches use
 `uwsm-app -- $CMD`; logout runs `uwsm stop`.
 
-Native `noctalia msg` IPC handles shell shortcuts; workspaces use the existing
+`Super+P/O/semicolon` and the sidebar launcher left click run `vicinae toggle`.
+`Super+Shift+P` opens Vicinae Run; `Super+Z` and the sidebar clipboard button
+open Vicinae clipboard history. Vicinae owns app/run/clipboard pickers and
+records history natively; Noctalia’s history retention is disabled while its
+basic copy/paste transport stays active.
+Native `noctalia msg` IPC handles the other shell shortcuts; workspaces use the existing
 `zdwl_ipc_manager_v2` compositor protocol without a custom bridge.
 GUI overrides in `~/.local/state/noctalia/settings.toml` win over the declarative
 config; remove the relevant overrides to restore repository defaults.
@@ -100,12 +106,15 @@ lock-before-suspend inhibitor. Audio overdrive retains the 150% ceiling.
 
 Home Manager substitutes the absolute storage-key path and validates the TOML.
 The service provisions a private runtime key once, preserving it across restarts
-for clipboard persistence without a Secret Service daemon.
+to retain access to old encrypted Noctalia clipboard history without a Secret
+Service daemon. That history and its master key are preserved, not imported
+into Vicinae.
 The compositor boundary and transition harnesses remain relevant to window
-policy. `packages/dwl-helper/`, Eww config, and the hover/lock fixtures are
-retained **legacy-only**: they are not installed/launched and do not validate
-Noctalia. `packages/dwl/tests/noctalia.py` exercises compiled shell shortcuts,
-native panels, encrypted clipboard persistence across restart, notification
+policy: the transition tests query focused titles directly through a test-only
+native Wayland IPC probe. The Rust bridge, DWL Eww config, and Eww-specific
+hover/lock fixtures are removed. `packages/dwl/tests/noctalia.py` exercises compiled shell shortcuts,
+Vicinae command routing through a disposable stub (not actual Vicinae rendering),
+native panels, restart/reconnect, notification
 ownership, workspace IPC, rendering, and native lock lifetime in disposable
 headless DWL/DBus sessions. PAM unlock, physical inputs, suspend/resume, real
 audio devices, and session startup/logout still require desktop testing.

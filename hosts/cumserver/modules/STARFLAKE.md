@@ -1,30 +1,56 @@
 # Starflake on cumserver
 
-`starflake.nix` migrates `spoiler-images` (stateless) and `bayan` (existing `/var/lib/bayan`) to independent application profiles. Existing runtime identities, agenix secrets and Bayan Restic backups are retained. Neither service exposes a new firewall port. Prometheus scrapes the loopback exporter on port 9598.
+## Architecture and deployments
 
-The controller is currently an unpublished, immutable source snapshot pinned in `flake.nix`/`flake.lock`. Its source is kept in `system.extraDependencies`, so cumserver can evaluate the same input without a macOS checkout. To install the dotfiles on a fresh machine, copy that pinned source store path from cumserver first. Also copy the content-addressed Sieve compatibility snapshot referenced in `hosts/cumserver/default.nix`; the existing Sieve input expects different secret variable names, so this migration deliberately preserves the running binary rather than downgrading it. Replace this input with a published Git revision when Starflake has a remote repository.
+`starflake.nix` configures independent application releases without rebuilding NixOS for each release. NixOS owns runtime identities, agenix secrets, state directories, sandboxing and backups. An unprivileged worker resolves/builds each source; a separate root controller switches its fixed Nix profile and verifies runtime health. Application units are `starflake-app-NAME.service`; controller configuration is `/etc/starflake/NAME.json`.
 
-To upgrade the controller from `~/develop/starflake`: run its Go/static checks and Linux VM check, archive it with `nix flake archive --json path:$HOME/develop/starflake`, set `inputs.starflake.url` to the returned immutable `path`, and update only that input's lock. Build/deploy with `--build-host cumserver --target-host cumserver`.
+| Deployment | Source | Persistent data | Release policy |
+| --- | --- | --- | --- |
+| `reactor` | `github:sleroq/reactor/main`, package `default` | `/var/lib/reactor` | Local builds allowed; 3 retained generations |
+| `bayan` | `github:sleroq/bayan/main` | `/var/lib/bayan` | Cache-only builds; 3 retained generations |
+| `spoiler-images` | `github:sleroq/spoiler-images/master` | Stateless | Default build/retention policy |
 
-Application releases need no dotfiles lock update or NixOS rebuild:
+All three poll every 10 minutes and have host-owned initial packages. Initial packages bootstrap deployments without an existing journal; they do not overwrite active releases. No new firewall ports are exposed. Reactor and Bayan data have Restic backups configured in `default.nix` and `starflake.nix`, respectively.
+
+## Controller source and host deployment
+
+The **current** controller input is an unpublished immutable source snapshot pinned in `flake.nix`/`flake.lock`, not a permanent distribution requirement. `system.extraDependencies` retains its source on cumserver for future evaluations. On a fresh machine, copy the pinned source from cumserver before evaluating the host configuration, for example `nix copy --from ssh://cumserver PINNED_SOURCE_STORE_PATH`, using the path in the current lock file.
+
+To update from a local Starflake checkout, run its Go/static checks and Linux VM check, then archive it with `nix flake archive --json path:$HOME/develop/starflake`. Set `inputs.starflake.url` to the returned immutable `path` and update only that input's lock (`nix flake update starflake`). Build/deploy with `--build-host cumserver --target-host cumserver`; do not build the full server locally. Replace this snapshot workflow with a published Git revision when the controller has a remote repository.
+
+Application releases require neither a dotfiles lock update nor a NixOS rebuild. Runtime configuration and secret changes still require a host deployment.
+
+## Operations and recovery
+
+Run control commands as root on cumserver; substitute any configured deployment name for `bayan`:
 
 ```sh
-ssh cumserver 'starflake status bayan'
-ssh cumserver 'starflake reconcile bayan'
-ssh cumserver 'starflake status spoiler-images'
-ssh cumserver 'curl -fsS http://127.0.0.1:9598/metrics'
+sudo starflake status bayan
+sudo starflake history bayan
+sudo starflake reconcile bayan
+sudo starflake pause bayan
+sudo starflake resume bayan
+sudo starflake retry bayan
+sudo starflake rollback bayan
+journalctl -u starflake-reconcile-bayan -u starflake-build-bayan -u starflake-app-bayan
 ```
 
-## Grafana dashboard
+`status` and `history` display JSON state. `reconcile` runs a reconciliation; unchanged healthy polls do not restart the app. `pause` suspends automatic updates, while `resume` re-enables discovery. `retry` clears rejection so an unchanged failed candidate can be attempted again; normal polling deduplicates rejected identities. `rollback` selects retained known-good history and pauses updates so polling does not immediately reverse it.
 
-[Starflake](https://cum.army/grafana/d/starflake/starflake) is provisioned from `monitoring/dashboards/starflake.json` by the existing Grafana dashboard provider. It uses the `Prometheus1` and `Loki1` datasources; no additional exporter port or datasource is needed.
+Failed builds leave the active release running. Failed activation restores and verifies the previous profile; first-release failure stops the app. Interrupted transactions are recovered before another build. If rollback health fails, retain the journal and investigate rather than deleting controller state.
 
-Filter by host and deployment. Five fleet-level summary cards stay the same size as services are added; the sortable fleet table puts health, release/update state, read errors, outcome, revision and timing on one row per host/deployment. Unhealthy rows sort first. A health timeline makes outages visible, and action rates are aggregated by action rather than drawing one line per service. The log panel shows cumserver journal streams only (these streams have no host label), filtered by deployment; the host filter applies to metrics, not logs. Freshness turns amber after 15 minutes and red after 30 minutes, based on the current 10-minute polling interval. Release age is informational: unchanged healthy polls do not advance the last successful release timestamp. Process health is not application readiness, recorded duration is not a full deployment histogram, and binary rollback does not restore data.
+**Rollback restores binaries only**, not application data, credentials or host configuration. Verify backups and schema compatibility before releases that change persistent data; any data restoration is a separate operator recovery action. Do not delete profiles, journals, generations or backups as a troubleshooting shortcut, and do not run a second instance against the same bot credentials/state.
 
-The Loki capacity incident is resolved: filesystem headroom was restored and fresh Starflake journal streams are flowing again. Loki's WAL guard rejects writes above its 90% usage threshold with the misleading `Ingester is shutting down` error even when `/ready` succeeds, so verify actual ingestion as well as readiness if this recurs. Do not disable the guard or remove existing generations/backups without approval.
+## Metrics and dashboard diagnostics
 
-## Migration recovery
+Prometheus scrapes cumserver's read-only loopback exporter at `127.0.0.1:9598`; the scrape configuration also includes Div and Roundy on port 9599. Do not expose the exporter publicly: it contains revision and operational information and has no control API.
 
-The migration's stopped-state Bayan backup is `/root/starflake-migration-20260930/bayan`; original system/package GC roots are `starflake-migration-system` and `starflake-migration-bayan`. Keep them until recovery is independently verified; no server-wide garbage collection was performed. Kopoka has been retired from the host configuration at the operator's request; its encrypted secret is retained for a possible future return.
+```sh
+curl -fsS http://127.0.0.1:9598/metrics
+```
 
-`starflake pause`, `resume`, `retry` and `rollback` operate on a named deployment. Rollback pauses automatic updates and restores binaries only, not application data. Do not start the obsolete `bayan.service`/`spoiler-images.service` alongside `starflake-app-*`; duplicate Telegram pollers conflict.
+The [Starflake dashboard](https://cum.army/grafana/d/starflake/starflake) is provisioned from `monitoring/dashboards/starflake.json` using `Prometheus1` and `Loki1`. Filter by host/deployment to inspect health, update state, read errors, revisions, attempt timing and action outcomes. Logs show cumserver journal streams filtered by deployment; the host filter applies to metrics, not logs.
+
+For an unhealthy deployment, inspect `starflake_service_healthy`, `starflake_read_error`, status/history and the three unit journals above. For stale reconciliation, check the last-attempt timestamp and polling/paused state; dashboard freshness is amber after 15 minutes and red after 30 minutes. Last-success time tracks releases, not unchanged healthy polls, so release age alone is not a stalled-poller signal. Process health is not application readiness, and recorded duration is not a full deployment histogram.
+
+If dashboard metrics or logs disappear, check the exporter response, Prometheus scrape health and actual Loki ingestion as well as readiness. Loki's filesystem WAL guard can reject writes above its usage threshold even while `/ready` succeeds; inspect storage headroom and ingestion errors rather than disabling the guard or deleting retained data.

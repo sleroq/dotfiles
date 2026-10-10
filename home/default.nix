@@ -1,6 +1,5 @@
 {
   agenixModule,
-  vicinae,
   inputs',
   realConfigs,
   flakeRoot,
@@ -20,7 +19,6 @@
       ./modules/ast-grep.nix
       ./shared
       agenixModule
-      vicinae
     ];
 
     extraSpecialArgs = {

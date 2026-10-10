@@ -53,11 +53,33 @@ in
         };
       };
       services.cliphist.enable = true;
-      services.vicinae.enable = true;
-      services.vicinae.package = inputs'.vicinae.packages.default;
+      home.activation.vicinae = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        if [ -d "${config.xdg.configHome}/vicinae" ] && [ ! -L "${config.xdg.configHome}/vicinae" ]; then
+          $DRY_RUN_CMD rmdir $VERBOSE_ARG "${config.xdg.configHome}/vicinae"
+        fi
+
+        $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+          ${opts.realConfigs}/vicinae "${config.xdg.configHome}/vicinae"
+      '';
+      systemd.user.services.vicinae = {
+        Unit = {
+          Description = "Vicinae Launcher Daemon";
+          After = [ "graphical-session.target" ];
+          Requires = [ "dbus.socket" ];
+          PartOf = [ "graphical-session.target" ];
+        };
+        Service = {
+          ExecStart = "${pkgs.vicinae}/bin/vicinae server --replace";
+          Restart = "always";
+          RestartSec = 60;
+          KillMode = "process";
+        };
+        Install.WantedBy = [ "graphical-session.target" ];
+      };
 
       # Packages universal for all window managers
       home.packages = with pkgs; [
+        vicinae
         wl-clipboard
         # cava
         grim
