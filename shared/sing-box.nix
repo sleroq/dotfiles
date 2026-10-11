@@ -20,6 +20,13 @@ let
       action = "hijack-dns";
     }
     {
+      # Roblox UDP can match the BitTorrent/uTP sniffer. The Flatpak game
+      # process is named Main, so match its executable before protocol routing.
+      process_path = [ "/app/bin/sober" ];
+      action = "route";
+      outbound = "proxy";
+    }
+    {
       protocol = "bittorrent";
       action = "route";
       outbound = "direct";
