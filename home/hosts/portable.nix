@@ -55,17 +55,21 @@ in
     DOCKER_DEFAULT_PLATFORM = "linux/amd64";
   };
 
-  age.secrets.ssh-config = {
-    file = ../secrets/ssh-config;
-    path = "${config.home.homeDirectory}/.ssh/config";
+  age = {
+    # macOS purges DARWIN_USER_TEMP_DIR, agenix's default, leaving dangling links.
+    # Keep both the generation store and its current-generation link in state.
+    secretsDir = "${config.xdg.stateHome}/agenix";
+    secretsMountPoint = "${config.xdg.stateHome}/agenix.d";
+    secrets.ssh-config = {
+      file = ../secrets/ssh-config;
+      path = "${config.home.homeDirectory}/.ssh/config";
+    };
   };
 
-  # Darwin may purge DARWIN_USER_TEMP_DIR, where the agenix Home Manager module
-  # stores decrypted secrets. Relaunch when the SSH config becomes dangling.
-  # mkForce also removes the broken Crashed=false default from agenix#308.
+  # Remove agenix#308's Crashed=false default (which restarts successful jobs).
+  # PathState on the destination did not detect deletion of its symlink target.
   launchd.agents."activate-agenix".config.KeepAlive = lib.mkForce {
     SuccessfulExit = false;
-    PathState."${config.home.homeDirectory}/.ssh/config" = false;
   };
 
   myHome = {
