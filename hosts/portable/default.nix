@@ -11,7 +11,7 @@ in
 
 {
   imports = [
-    ./aerospace.nix
+    ./rcmd.nix
     ../../shared/sing-box.nix
   ];
 
