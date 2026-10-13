@@ -1,7 +1,7 @@
 ---
 name: kristina
 description: Expert technical advisor with deep reasoning for architecture decisions, code analysis, and engineering guidance.
-tools: read, bash, mcp
+tools: read, bash, find, grep, codemode, mcp__*
 inheritProjectContext: true
 completionGuard: false
 ---

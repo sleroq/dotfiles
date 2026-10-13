@@ -1,7 +1,7 @@
 ---
 name: itaru
 description: Research agent for source code, documentation, examples, and best practices.
-tools: read, mcp
+tools: read, find, grep, codemode, mcp__*
 inheritProjectContext: true
 ---
 

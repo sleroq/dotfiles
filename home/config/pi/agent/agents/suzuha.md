@@ -1,7 +1,7 @@
 ---
 name: suzuha
 description: Implementation agent for bounded code changes, fixes, and verification.
-tools: read, bash, edit, write, mcp
+tools: read, bash, edit, write, find, grep, codemode, mcp__*
 inheritProjectContext: true
 inheritSkills: true
 completionGuard: false
