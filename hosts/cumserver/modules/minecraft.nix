@@ -1,28 +1,44 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 
 let
   cfg = config.cumserver.minecraft;
 in
 {
   options.cumserver.minecraft = {
-      cum.enable = lib.mkEnableOption "cum.army minecraft server";
-      forever-chu.enable = lib.mkEnableOption "Forever Chu minecraft server";
-      backup.enable = lib.mkEnableOption "backups" // { default = true; };
+    cum.enable = lib.mkEnableOption "cum.army minecraft server";
+    forever-chu.enable = lib.mkEnableOption "Forever Chu minecraft server";
+    backup.enable = lib.mkEnableOption "backups" // {
+      default = true;
+    };
   };
 
   config = lib.mkMerge [
     {
+      environment.etc."systemd/system.control/firewall.service".source = "${
+        config.systemd.units."firewall.service".unit
+      }/firewall.service";
+
+      networking.firewall.allowedTCPPorts = lib.mapAttrsToList (
+        _: server: server.serverProperties.server-port
+      ) (lib.filterAttrs (_: server: server.enable) config.services.minecraft-servers.servers);
+
       services.minecraft-servers = {
         enable = true;
         eula = true;
-        openFirewall = true;
+        # Upstream opens RCON too; explicitly expose only enabled servers' game ports.
+        openFirewall = false;
 
         servers = lib.mkMerge [
           (lib.mkIf cfg.cum.enable {
             cum = {
               enable = true;
               autoStart = true;
-              jvmOpts = "-Xms2G -Xmx4G -XX:MaxDirectMemorySize=1G -XX:MaxMetaspaceSize=512M"; #  -XX:+UseZGC
+              jvmOpts = "-Xms2G -Xmx4G -XX:MaxDirectMemorySize=1G -XX:MaxMetaspaceSize=512M"; # -XX:+UseZGC
               package = pkgs.fabricServers.fabric-26_2.override {
                 jre_headless = pkgs.jdk25_headless;
               };
@@ -41,15 +57,15 @@ in
                 allow-flight = true;
                 sync-chunk-writes = false;
                 enable-rcon = true;
-                rcon-password = "localbackup";
-                rcon-port = 25576;
+                "rcon.password" = "localbackup";
+                "rcon.port" = 25576;
               };
             };
 
             cum-creative = {
               enable = false;
               autoStart = true;
-              jvmOpts = "-Xmx2G -XX:MaxDirectMemorySize=1G -XX:MaxMetaspaceSize=512M"; #  -XX:+UseZGC
+              jvmOpts = "-Xmx2G -XX:MaxDirectMemorySize=1G -XX:MaxMetaspaceSize=512M"; # -XX:+UseZGC
               package = pkgs.fabricServers.fabric-26_2.override {
                 jre_headless = pkgs.jdk25_headless;
               };
@@ -69,8 +85,8 @@ in
                 allow-flight = true;
                 sync-chunk-writes = false;
                 enable-rcon = true;
-                rcon-password = "localbackup";
-                rcon-port = 25576;
+                "rcon.password" = "localbackup";
+                "rcon.port" = 25576;
               };
             };
           })
@@ -96,8 +112,8 @@ in
                 allow-flight = true;
                 sync-chunk-writes = false;
                 enable-rcon = true;
-                rcon-password = "localbackup";
-                rcon-port = 25575;
+                "rcon.password" = "localbackup";
+                "rcon.port" = 25575;
               };
             };
           })
@@ -105,14 +121,20 @@ in
       };
     }
     (lib.mkIf cfg.cum.enable {
-      systemd.services.minecraft-server-cum.path = [ pkgs.git pkgs.git-lfs];
+      systemd.services.minecraft-server-cum.path = [
+        pkgs.git
+        pkgs.git-lfs
+      ];
       systemd.services.minecraft-server-forever-chu.serviceConfig = {
         MemoryHigh = "4G";
         MemoryMax = "5G";
       };
     })
     (lib.mkIf cfg.forever-chu.enable {
-      systemd.services.minecraft-server-forever-chu.path = [ pkgs.git pkgs.git-lfs];
+      systemd.services.minecraft-server-forever-chu.path = [
+        pkgs.git
+        pkgs.git-lfs
+      ];
       systemd.services.minecraft-server-forever-chu.serviceConfig = {
         MemoryHigh = "4G";
         MemoryMax = "5G";
@@ -135,8 +157,9 @@ in
         repository = "/srv/backups/minecraft";
         passwordFile = config.age.secrets.resticMinecraftPassword.path;
         initialize = true;
-        paths = (lib.optionals cfg.cum.enable [ "/srv/minecraft/cum" ])
-              ++ (lib.optionals cfg.forever-chu.enable [ "/srv/minecraft/forever-chu" ]);
+        paths =
+          (lib.optionals cfg.cum.enable [ "/srv/minecraft/cum" ])
+          ++ (lib.optionals cfg.forever-chu.enable [ "/srv/minecraft/forever-chu" ]);
         exclude = [
           "logs"
           "crash-reports"
