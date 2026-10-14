@@ -54,6 +54,7 @@ in
     programs = {
       remmina.enable = false;
       pi.enable = true;
+      pi.cloudflare.enable = true;
       kitty.enable = true;
       obs.enable = true;
       chromium.enable = true;
@@ -62,6 +63,7 @@ in
       mangohud.enable = true;
       extraPackages = with pkgs; [
         obsidian
+        inputs'.llm-agents.packages.paseo-desktop
         # ollama-rocm
         # chatbox
         scrcpy

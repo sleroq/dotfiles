@@ -10,6 +10,7 @@ let
 in
 {
   imports = [
+    ../../modules/paseo.nix
     ./hardware-configuration.nix
   ];
 
@@ -147,6 +148,13 @@ in
   # Add any missing dynamic libraries for unpackaged programs
   # here, NOT in environment.systemPackages
   # ];
+
+  services.paseo = {
+    enable = true;
+    pi.cloudflare.enable = true;
+    relay.enable = true;
+    authorizedKeys = config.users.users.${username}.openssh.authorizedKeys.keys;
+  };
 
   services.openssh = {
     enable = true;

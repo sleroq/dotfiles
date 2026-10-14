@@ -17,6 +17,7 @@
     ../../modules/cloudflared.nix
     ../../modules/feishin.nix
     ../../modules/navidrome.nix
+    ../../modules/paseo.nix
     ../../modules/sftpgo.nix
     ../../modules/slusha.nix
     ../../modules/tuwunel.nix
@@ -84,6 +85,12 @@
   };
 
   services.qemuGuest.enable = true;
+
+  services.paseo = {
+    enable = true;
+    relay.enable = true;
+    authorizedKeys = config.users.users.root.openssh.authorizedKeys.keys;
+  };
 
   sleroq.cloudflared = {
     enable = true;

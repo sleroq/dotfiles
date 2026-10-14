@@ -15,6 +15,7 @@ in
   imports = [
     ./hammerspoon.nix
     ./opencode.nix
+    ./paseo.nix
     ./pi.nix
   ];
 

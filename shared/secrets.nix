@@ -4,17 +4,51 @@ let
   idk = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA9Y+/pLBhAfjo/qKZqn7rTl4X3MBMdOuwW4sYo9pNi0 cantundo@pm.me";
   idk2 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFmP6jhiag3zlSEVPemBEyXop/39WHGNnad53NH7LCtb";
   div = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKqaD8lUj2IoSXbd+ZngR3w+7rKxS7DU/3CPo4jd9SE9 root@shared";
-  commonPublicKeys = [ interplanetary interplanetaryStateKey idk idk2 ];
+  cumserver = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGNy4lHOvczy/vR4hf+uk6ciJGpkw5mqu3oC+9hTDbqf root@cumserver";
+  work = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEHHbpg1BNB38XjKohJvWrWoTfj5hOteC14JpDsBBx9M kolomiets@frankrg.com";
+  commonPublicKeys = [
+    interplanetary
+    interplanetaryStateKey
+    idk
+    idk2
+  ];
 in
 {
-  "secrets/sing-box-outbounds.jsonc" = { publicKeys = commonPublicKeys; };
-  "secrets/sing-box-subscription-main" = { publicKeys = commonPublicKeys; };
-  "secrets/sing-box-subscription-cw" = { publicKeys = commonPublicKeys; };
-  "secrets/webdav-cert.pem" = { publicKeys = commonPublicKeys; };
-  "secrets/webdav-key.pem" = { publicKeys = commonPublicKeys; };
-  "secrets/work-vpn/ca.crt" = { publicKeys = commonPublicKeys; };
-  "secrets/work-vpn/cert.crt" = { publicKeys = commonPublicKeys; };
-  "secrets/work-vpn/private.key" = { publicKeys = commonPublicKeys; };
-  "secrets/work-vpn/tls_auth.key" = { publicKeys = commonPublicKeys; };
-  "secrets/cloudflared-div.json" = { publicKeys = commonPublicKeys ++ [ div ]; };
+  "secrets/sing-box-outbounds.jsonc" = {
+    publicKeys = commonPublicKeys;
+  };
+  "secrets/sing-box-subscription-main" = {
+    publicKeys = commonPublicKeys;
+  };
+  "secrets/sing-box-subscription-cw" = {
+    publicKeys = commonPublicKeys;
+  };
+  "secrets/webdav-cert.pem" = {
+    publicKeys = commonPublicKeys;
+  };
+  "secrets/webdav-key.pem" = {
+    publicKeys = commonPublicKeys;
+  };
+  "secrets/work-vpn/ca.crt" = {
+    publicKeys = commonPublicKeys;
+  };
+  "secrets/work-vpn/cert.crt" = {
+    publicKeys = commonPublicKeys;
+  };
+  "secrets/work-vpn/private.key" = {
+    publicKeys = commonPublicKeys;
+  };
+  "secrets/work-vpn/tls_auth.key" = {
+    publicKeys = commonPublicKeys;
+  };
+  "secrets/exa-env" = {
+    publicKeys = commonPublicKeys ++ [
+      cumserver
+      div
+      work
+    ];
+  };
+  "secrets/cloudflared-div.json" = {
+    publicKeys = commonPublicKeys ++ [ div ];
+  };
 }

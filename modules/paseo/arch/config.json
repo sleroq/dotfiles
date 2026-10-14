@@ -1,0 +1,32 @@
+{
+  "daemon": {
+    "listen": "@HOME@/.paseo/paseo.sock"
+  },
+  "agents": {
+    "metadataGeneration": {
+      "providers": [
+        {
+          "provider": "pi",
+          "model": "FrankAI/FrankAI"
+        }
+      ]
+    },
+    "providers": {
+      "pi": {
+        "command": [
+          "@HOME@/.local/bin/pi-direnv"
+        ]
+      },
+      "opencode": {
+        "command": [
+          "@HOME@/.bun/bin/opencode"
+        ]
+      },
+      "codex": {
+        "command": [
+          "/usr/bin/codex"
+        ]
+      }
+    }
+  }
+}

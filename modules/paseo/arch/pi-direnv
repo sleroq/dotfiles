@@ -1,0 +1,3 @@
+#!/bin/sh
+export PI_FFF_MODE=override
+exec /usr/bin/direnv exec "$PWD" /usr/bin/pi "$@"

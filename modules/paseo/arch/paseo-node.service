@@ -1,0 +1,19 @@
+[Unit]
+Description=Private Paseo coding daemon
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/develop
+EnvironmentFile=%h/.config/pi/exa.env
+Environment=PASEO_HOME=%h/.paseo
+Environment=PI_FFF_MODE=override
+Environment=PATH=%h/.local/bin:%h/.bun/bin:%h/.npm/bin:%h/develop/go/bin:/usr/local/bin:/usr/bin
+ExecStart=/opt/Paseo/resources/bin/paseo daemon run
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

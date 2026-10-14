@@ -12,4 +12,4 @@
 /home/config/opencode/* filter=git-crypt diff=git-crypt
 /home/config/opencode/README.org !filter !diff
 /.gitattributes !filter !diff
-/.beans/dotfiles-d1bx--prepare-nixos-vps-and-migrate-roundy-mongodb-and-c.md filter=git-crypt diff=git-crypt
+/.beans/** filter=git-crypt diff=git-crypt

@@ -50,6 +50,9 @@
     home-manager-cumserver.url = "github:nix-community/home-manager/f3a30376bb9eb2f6f61816be7d6ed954b6d2a3b9";
     home-manager-cumserver.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
+    pi.url = "github:earendil-works/pi/main";
+    llm-agents.url = "github:numtide/llm-agents.nix";
+
     cliamp.url = "github:bjarneo/cliamp";
     cliamp.inputs.nixpkgs.follows = "nixpkgs-portable";
 
