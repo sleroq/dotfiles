@@ -81,7 +81,12 @@ in
     ];
 
     services.matrix-tuwunel = {
-      package = inputs.tuwunel.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      # Match upstream's release archive, which builds without Git revision metadata.
+      package = inputs.tuwunel.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
+        env = old.env // {
+          TUWUNEL_VERSION_EXTRA = "";
+        };
+      });
       stateDirectory = "matrix-conduit";
 
       # https://matrix-construct.github.io/tuwunel/configuration/examples.html
@@ -99,6 +104,7 @@ in
           brotli_compression = false;
 
           ip_range_denylist = [
+            "0.0.0.0/8"
             "127.0.0.0/8"
             "10.0.0.0/8"
             "172.16.0.0/12"
@@ -112,6 +118,7 @@ in
             "198.51.100.0/24"
             "203.0.113.0/24"
             "224.0.0.0/4"
+            "::/128"
             "::1/128"
             "fe80::/10"
             "fc00::/7"
@@ -217,11 +224,15 @@ in
       ];
     };
 
-    systemd.services.tuwunel.serviceConfig.LoadCredential = [
-      "registration-token:${cfg.registrationTokenFile}"
-    ]
-    ++ lib.optionals cfg.turn.enable [
-      "turn-secret:${cfg.turn.secretFile}"
-    ];
+    systemd.services.tuwunel.serviceConfig = {
+      # Startup migrations stop at safe boundaries; a forced kill can corrupt the database.
+      TimeoutStopSec = "infinity";
+      LoadCredential = [
+        "registration-token:${cfg.registrationTokenFile}"
+      ]
+      ++ lib.optionals cfg.turn.enable [
+        "turn-secret:${cfg.turn.secretFile}"
+      ];
+    };
   };
 }

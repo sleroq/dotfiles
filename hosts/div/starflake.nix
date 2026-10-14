@@ -1,27 +1,11 @@
 {
   config,
   inputs,
-  lib,
   pkgs,
   ...
 }:
 {
   system.extraDependencies = [ inputs.starflake.outPath ];
-
-  # Keep Matrix's existing compiled code/dependency versions during this
-  # unrelated migration. Nix re-addressed its closure without rebuilding it.
-  # Replace this transitional snapshot only during an explicit Matrix upgrade.
-  services.matrix-tuwunel.package = lib.mkForce (
-    pkgs.symlinkJoin {
-      name = "tuwunel-preserved-1.9.0";
-      paths = [
-        (builtins.appendContext "/nix/store/lidz5s063hlxs0g2a762dv1yzrc8qm74-tuwunel-1.9.0" {
-          "/nix/store/lidz5s063hlxs0g2a762dv1yzrc8qm74-tuwunel-1.9.0".path = true;
-        })
-      ];
-      meta.mainProgram = "tuwunel";
-    }
-  );
 
   services.starflake = {
     enable = true;
