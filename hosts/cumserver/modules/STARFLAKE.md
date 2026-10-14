@@ -16,7 +16,7 @@ All three poll every 10 minutes and have host-owned initial packages. Initial pa
 
 The **current** controller input is an unpublished immutable source snapshot pinned in `flake.nix`/`flake.lock`, not a permanent distribution requirement. `system.extraDependencies` retains its source on cumserver for future evaluations. On a fresh machine, copy the pinned source from cumserver before evaluating the host configuration, for example `nix copy --from ssh://cumserver PINNED_SOURCE_STORE_PATH`, using the path in the current lock file.
 
-To update from a local Starflake checkout, run its Go/static checks and Linux VM check, then archive it with `nix flake archive --json path:$HOME/develop/starflake`. Set `inputs.starflake.url` to the returned immutable `path` and update only that input's lock (`nix flake update starflake`). Build/deploy with `--build-host cumserver --target-host cumserver`; do not build the full server locally. Replace this snapshot workflow with a published Git revision when the controller has a remote repository.
+To update from a local Starflake checkout, run its Go/static checks and Linux VM check, then archive it with `nix flake archive --json path:$HOME/develop/starflake`. Set `inputs.starflake.url` to the returned immutable `path` and update only that input's lock (`nix flake update starflake`). Select the builder using the root `AGENTS.md`: normally `--build-host cumserver --target-host cumserver`; offload large uncached builds to interplanetary. Replace this snapshot workflow with a published Git revision when the controller has a remote repository.
 
 Application releases require neither a dotfiles lock update nor a NixOS rebuild. Runtime configuration and secret changes still require a host deployment.
 

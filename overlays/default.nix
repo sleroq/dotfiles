@@ -40,7 +40,6 @@ rec {
     sb.overlays.default
     rust-overlay.overlays.default
     code-cursor
-    # opencode
     broadcast-box
     obsidian-neovide
     sing-box-subscribe-cli
