@@ -43,7 +43,7 @@ function resourceName(path: string) {
   if (["modules/paseo/pi-profile.mjs", "modules/paseo/install-profile.ts"].includes(path)) return path;
 }
 
-export async function exportProfile(ref?: string, directory = root): Promise<ProfileBundle> {
+export async function exportProfile(ref?: string, directory = root, host?: string): Promise<ProfileBundle> {
   directory = realpathSync(directory);
   const commit = (await git(directory, "rev-parse", "--verify", `${ref ?? "HEAD"}^{commit}`)).toString().trim();
   const paths = (ref
@@ -70,6 +70,11 @@ export async function exportProfile(ref?: string, directory = root): Promise<Pro
       }
       data = readFileSync(source);
       executable = Boolean(stat.mode & 0o111);
+    }
+    if (name === "pi/settings.json" && host === "work") {
+      const settings = JSON.parse(data.toString());
+      settings.httpProxy = "http://127.0.0.1:2080";
+      data = Buffer.from(`${JSON.stringify(settings, null, 2)}\n`);
     }
     if (name === "pi/mcp.json") {
       const mcp = JSON.parse(data.toString());
@@ -120,8 +125,11 @@ async function deployHost(host: string, bundle: ProfileBundle, options: Deployme
   const release = 'release="$HOME/.local/share/pi-profile/releases/"' + quote(bundle.metadata.contentDigest) + '; ';
   const prepare = options.check ? '[ -f "$release/modules/paseo/install-profile.ts" ] || exit 1; '
     : 'umask 077; mkdir -p "$release" || exit; tar -xmf - -C "$release" || exit; ';
+  const workRuntime = host !== "work" ? "" : options.check
+    ? `zsh -lic 'test "$(readlink -f "$(command -v pi)")" = "$(readlink -f /usr/bin/pi)"' || exit 1; `
+    : 'mkdir -p "$HOME/.local/bin" || exit; ln -sfn /usr/bin/pi "$HOME/.local/bin/pi" || exit; ';
   const remote = 'export PATH="$HOME/.local/bin:$HOME/.bun/bin:$HOME/.npm/bin:$HOME/.nix-profile/bin:/run/current-system/sw/bin:/etc/profiles/per-user/$(id -un)/bin:$PATH"; '
-    + release + prepare + 'exec bun "$release/modules/paseo/install-profile.ts" ' + args.map(quote).join(" ");
+    + release + prepare + workRuntime + 'exec bun "$release/modules/paseo/install-profile.ts" ' + args.map(quote).join(" ");
   const result = options.check
     ? await $`ssh -n ${target} ${remote}`.nothrow()
     : await $`ssh ${target} ${remote} < ${bundle.archive}`.nothrow();
@@ -140,10 +148,10 @@ async function main() {
     console.log("Usage: bun scripts/deploy-pi-profile.ts [--check] [--ref REV] [--skip-packages] [HOST ...] (default: work)");
     return;
   }
-  const bundle = await exportProfile(values.ref);
   let success = true;
   for (const host of positionals.length ? positionals : ["work"]) {
     try {
+      const bundle = await exportProfile(values.ref, root, host);
       success = await deployHost(host, bundle, values) && success;
     } catch (error) {
       console.error(`${host}: FAILED:`, error);

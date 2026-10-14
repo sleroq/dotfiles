@@ -13,3 +13,4 @@
 /home/config/opencode/README.org !filter !diff
 /.gitattributes !filter !diff
 /.beans/** filter=git-crypt diff=git-crypt
+/scripts/work/** filter=git-crypt diff=git-crypt
