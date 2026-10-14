@@ -94,6 +94,7 @@ in
     };
 
     programs = {
+      lf.enable = true;
       hammerspoon.enable = true;
       pi.enable = true;
       paseo.enable = true;
