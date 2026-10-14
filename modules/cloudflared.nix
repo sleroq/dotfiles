@@ -1,7 +1,13 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  options,
+  ...
+}:
 
 let
   cfg = config.sleroq.cloudflared;
+  hasProtocolOption = (options.services.cloudflared.tunnels.type.getSubOptions [ ]) ? protocol;
 in
 {
   options.sleroq.cloudflared = {
@@ -61,19 +67,26 @@ in
       enable = true;
       tunnels = lib.mapAttrs' (
         _: tunnel:
-        lib.nameValuePair tunnel.id {
-          inherit (tunnel) credentialsFile default;
-          ingress = tunnel.routes;
-        }
+        lib.nameValuePair tunnel.id (
+          {
+            inherit (tunnel) credentialsFile default;
+            ingress = tunnel.routes;
+          }
+          // lib.optionalAttrs hasProtocolOption { protocol = cfg.protocol; }
+        )
       ) cfg.tunnels;
     };
 
     systemd.services = lib.mapAttrs' (
       _: tunnel:
-      lib.nameValuePair "cloudflared-tunnel-${tunnel.id}" {
-        inherit (tunnel) restartTriggers;
-        environment.TUNNEL_TRANSPORT_PROTOCOL = cfg.protocol;
-      }
+      lib.nameValuePair "cloudflared-tunnel-${tunnel.id}" (
+        {
+          inherit (tunnel) restartTriggers;
+        }
+        // lib.optionalAttrs (!hasProtocolOption) {
+          environment.TUNNEL_TRANSPORT_PROTOCOL = cfg.protocol;
+        }
+      )
     ) cfg.tunnels;
   };
 }
