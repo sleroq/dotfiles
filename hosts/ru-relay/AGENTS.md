@@ -1,8 +1,8 @@
 # ru-relay deployment
 
-Do not build on ru-relay: its ~1 GB of RAM is insufficient for the Broadcast Box frontend build and the host can become unresponsive. Build the **ru-relay system closure** on cumserver, copy it, then activate the prebuilt closure on ru-relay. Do not run `nixos-rebuild switch --flake` on ru-relay: it can start another local build.
+Never build on ru-relay. Select a builder using the root `AGENTS.md`, copy the system closure, then activate it here. Do not run `nixos-rebuild switch --flake` without a remote build host: it can start a local build.
 
-From a local machine, connect with SSH agent forwarding (`ssh -A cumserver`). On cumserver, use a clean, synced copy of this flake containing the intended changes and lock file; do not accidentally deploy unrelated dirty changes. The key authorized for ru-relay is listed in `hosts/ru-relay/default.nix`. For example, if that key is loaded in the forwarded agent:
+On the selected Linux builder (use `ssh -A <builder>` for SSH agent forwarding), use a clean, synced copy of this flake containing the intended changes and lock file; do not accidentally deploy unrelated dirty changes. The key authorized for ru-relay is listed in `hosts/ru-relay/default.nix`. For example, if that key is loaded in the forwarded agent:
 
 ```sh
 cd /path/to/synced/dotfiles
