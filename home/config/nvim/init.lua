@@ -204,6 +204,20 @@ require("flash").setup({})
 
 require("supermaven-nvim").setup({ keymaps = { accept_suggestion = "<C-l>" } })
 
+-- agent-workbench registers BufModifiedSet, which Neovim does not support.
+-- Refresh on edits and writes instead so the sidebar's modified markers stay current.
+local workspace_sidebar = require("agent-workbench.ui.workspace_sidebar")
+workspace_sidebar.setup = function()
+    vim.api.nvim_create_autocmd({
+        "BufAdd", "BufDelete", "BufEnter", "BufWipeout",
+        "TextChanged", "TextChangedI", "BufWritePost",
+        "TabEnter", "TabClosed", "DirChanged", "VimResized",
+    }, {
+        group = vim.api.nvim_create_augroup("PiWorkspaceSidebar", { clear = true }),
+        callback = workspace_sidebar.request_refresh,
+    })
+end
+
 require("agent-workbench").setup({
     -- Apply each workspace's direnv environment only to its Pi process.
     cli = { bin = "direnv", args = { "exec", ".", "pi" } },
