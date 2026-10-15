@@ -1,0 +1,13 @@
+[Unit]
+Description=Sing-box user HTTP proxy
+
+[Service]
+ExecStartPre=%h/.local/lib/sing-box/sing-box check -c %h/.config/sing-box/config.json
+ExecStart=%h/.local/lib/sing-box/sing-box run -c %h/.config/sing-box/config.json
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target
