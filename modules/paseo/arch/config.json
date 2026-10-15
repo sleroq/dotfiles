@@ -7,7 +7,8 @@
       "providers": [
         {
           "provider": "pi",
-          "model": "FrankAI/FrankAI"
+          "model": "FrankAI/FrankAI",
+          "thinkingOptionId": "low"
         }
       ]
     },

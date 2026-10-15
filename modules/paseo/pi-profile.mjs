@@ -48,7 +48,9 @@ function mergeMcp(defaults, current, managed) {
     }
     if (existing.env) {
       servers[name].env = { ...existing.env, ...definition.env };
-      if (Object.hasOwn(existing.env, "EXA_API_KEY")) servers[name].env.EXA_API_KEY = existing.env.EXA_API_KEY;
+      if (Object.hasOwn(existing.env, "EXA_API_KEY") && existing.env.EXA_API_KEY !== "${EXA_API_KEY}") {
+        servers[name].env.EXA_API_KEY = existing.env.EXA_API_KEY;
+      }
     }
   }
   return { ...defaults, ...current, mcpServers: servers };

@@ -2,7 +2,7 @@
 import { $ } from "bun";
 import { createHash } from "node:crypto";
 import { lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import type { ProfileMetadata } from "../modules/paseo/install-profile.ts";
@@ -79,6 +79,16 @@ export async function exportProfile(ref?: string, directory = root, host?: strin
     if (name === "pi/mcp.json") {
       const mcp = JSON.parse(data.toString());
       for (const server of ["cloudflare", "cloudflare-docs"]) delete mcp.mcpServers[server];
+      if (host === "work") {
+        mcp.mcpServers.exa.env = {
+          ...mcp.mcpServers.exa.env,
+          EXA_API_KEY: '!. "$HOME/.config/pi/exa.env" && printf %s "$EXA_API_KEY"',
+          HTTP_PROXY: "http://127.0.0.1:2080",
+          HTTPS_PROXY: "http://127.0.0.1:2080",
+          NO_PROXY: "",
+          NODE_USE_ENV_PROXY: "1",
+        };
+      }
       data = Buffer.from(`${JSON.stringify(mcp, null, 2)}\n`);
     }
     files.set(name, { data, mode: executable ? 0o700 : 0o600 });
@@ -118,9 +128,25 @@ function quote(value: string) {
   return `'${value.replaceAll("'", "'\\''")}'`;
 }
 
+async function syncExaEnv(target: string, check: boolean) {
+  const identity = join(homedir(), ".ssh/id_ed25519");
+  const source = join(root, "shared/secrets/exa-env");
+  const secret = (await $`age --decrypt -i ${identity} ${source}`.quiet()).stdout;
+  const digest = createHash("sha256").update(secret).digest("hex");
+  const remote = check
+    ? 'test "$(sha256sum "$HOME/.config/pi/exa.env" | cut -d " " -f 1)" = ' + quote(digest)
+      + ' && test "$(stat -c %a "$HOME/.config/pi/exa.env")" = 600'
+    : 'umask 077; install -d -m 700 "$HOME/.config/pi" && install -m 600 /dev/stdin "$HOME/.config/pi/exa.env"';
+  const result = check
+    ? await $`ssh -n ${target} ${remote}`.quiet().nothrow()
+    : await $`ssh ${target} ${remote} < ${secret}`.quiet();
+  return result.exitCode === 0;
+}
+
 async function deployHost(host: string, bundle: ProfileBundle, options: DeploymentOptions) {
   const target = aliases.get(host) ?? host;
   if (target.startsWith("-")) throw new Error("SSH target cannot start with '-'");
+  const secretsCurrent = host !== "work" || await syncExaEnv(target, options.check ?? false);
   const args = [JSON.stringify(bundle.metadata), options.check ? "check" : "apply", String(options["skip-packages"] ?? false)];
   const release = 'release="$HOME/.local/share/pi-profile/releases/"' + quote(bundle.metadata.contentDigest) + '; ';
   const prepare = options.check ? '[ -f "$release/modules/paseo/install-profile.ts" ] || exit 1; '
@@ -133,7 +159,7 @@ async function deployHost(host: string, bundle: ProfileBundle, options: Deployme
   const result = options.check
     ? await $`ssh -n ${target} ${remote}`.nothrow()
     : await $`ssh ${target} ${remote} < ${bundle.archive}`.nothrow();
-  const success = result.exitCode === 0;
+  const success = result.exitCode === 0 && secretsCurrent;
   const state = success ? (options.check ? "current" : "applied") : (options.check ? "outdated/unreachable" : "FAILED");
   const { sourceCommit, contentDigest, dirty } = bundle.metadata;
   console.log(`${host}: ${state} commit=${sourceCommit} digest=${contentDigest} dirty=${dirty}`);
