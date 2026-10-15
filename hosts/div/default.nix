@@ -122,6 +122,7 @@
 
   sleroq.feishin = {
     enable = true;
+    image = "ghcr.io/jeffvli/feishin:1.17.0";
     # The Web Audio processing path can be silent even when the browser has
     # successfully fetched the stream. Use the native media element instead.
     webAudio = false;
@@ -152,7 +153,7 @@
     };
     oci-containers.backend = "podman";
     oci-containers.containers.prometheus-podman-exporter = {
-      image = "quay.io/navidys/prometheus-podman-exporter:v1.21.0";
+      image = "quay.io/navidys/prometheus-podman-exporter:v1.21.2";
       autoStart = true;
       ports = [ "0.0.0.0:9882:9882" ];
       volumes = [

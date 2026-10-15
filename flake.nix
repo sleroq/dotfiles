@@ -37,7 +37,7 @@
     nixpkgs-interplanetary.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-cumserver.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-roundy.url = "github:NixOS/nixpkgs/nixos-26.05";
-    nixpkgs-div.url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-26.05&rev=b3fe9581c9061c749abef42b6d4ee7b7c05c33fa&shallow=1";
+    nixpkgs-div.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-portable.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
 
     # Interplanetary flakes
