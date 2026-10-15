@@ -47,7 +47,13 @@
       }
     },
     "metadataGeneration": {
-      "providers": []
+      "providers": [
+        {
+          "provider": "pi",
+          "model": "opencode/gpt-6-luna",
+          "thinkingOptionId": "low"
+        }
+      ]
     }
   }
 }
