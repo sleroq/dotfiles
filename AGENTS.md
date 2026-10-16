@@ -11,8 +11,3 @@
 - Build `div` on itself by default; this is allowed and preferred, including when deploying from `portable`. Do not default to `interplanetary` or `cumserver` for `div` builds.
 - For other Linux systems, build locally on a capable Linux host; from `portable`, use a capable Linux server.
 - Distinguish build and deployment host options: `--build-host` selects the builder, `--target-host` selects the deployment target. They may be the same host (preferred for `div`). Copy and activate prebuilt closures on weak hosts (`ru-relay` and `warsaw`); do not trigger target-side builds there.
-
-# Paseo schedules
-
-- For these dotfiles hosts, ALWAYS create/edit/remove schedule definitions in `services.paseo.schedules` in host Nix configuration and associated prompt files, never through the GUI/CLI/MCP. Read the current repository: Nix is authoritative even before deployment; do not overwrite it from runtime state.
-- Pause/resume, run-now, and log inspection are allowed operational actions. The reconciler leaves unmanaged existing schedules untouched, but declare all new schedules in Nix. Adoption via `adoptId` preserves the stable schedule ID and run history. Heartbeats remain outside Nix schedule ownership.
