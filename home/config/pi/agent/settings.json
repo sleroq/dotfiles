@@ -2,7 +2,7 @@
   "lastChangelogVersion": "1.2.0",
   "defaultThinkingLevel": "low",
   "packages": [
-    "npm:@gotgenes/pi-subagents@23.4.0",
+    "npm:@gotgenes/pi-subagents@23.4.2",
     "npm:pi-worktree-extension@2.0.3",
     "npm:@ff-labs/pi-fff@0.11.0",
     "npm:pi-compact-transcript@0.11.1",
