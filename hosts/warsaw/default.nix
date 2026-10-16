@@ -73,6 +73,8 @@ let
   '';
 in
 {
+  boot.tmp.cleanOnBoot = true;
+
   imports = [
     ../relay-common.nix
     ./disk-config.nix

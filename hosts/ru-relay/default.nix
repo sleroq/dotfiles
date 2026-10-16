@@ -15,6 +15,8 @@ let
   divBackendPort = 2081;
 in
 {
+  boot.tmp.cleanOnBoot = true;
+
   imports = [
     ../relay-common.nix
     ./disk-config.nix
