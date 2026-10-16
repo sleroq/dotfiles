@@ -48,6 +48,12 @@ in
       work
     ];
   };
+  "secrets/metricsRemoteWritePassword" = {
+    publicKeys = commonPublicKeys;
+  };
+  "secrets/metricsRemoteWriteCaddyAuth" = {
+    publicKeys = commonPublicKeys ++ [ cumserver ];
+  };
   "secrets/cloudflared-div.json" = {
     publicKeys = commonPublicKeys ++ [ div ];
   };

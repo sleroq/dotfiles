@@ -82,6 +82,61 @@ in
     loader.efi.canTouchEfiVariables = true;
   };
 
+  # Push desktop metrics over public HTTPS; no exporter port is exposed.
+  services.alloy = {
+    enable = true;
+    extraFlags = [
+      "--server.http.listen-addr=127.0.0.1:12345"
+      "--disable-reporting"
+    ];
+  };
+  age.secrets.metricsRemoteWritePassword.file = ../../shared/secrets/metricsRemoteWritePassword;
+  systemd.services.alloy.serviceConfig.LoadCredential = [
+    "metrics-password:${config.age.secrets.metricsRemoteWritePassword.path}"
+  ];
+  environment.etc."alloy/config.alloy".text = ''
+    prometheus.exporter.unix "desktop" {
+      enable_collectors = ["systemd", "processes"]
+    }
+
+    discovery.relabel "desktop" {
+      targets = prometheus.exporter.unix.desktop.targets
+
+      rule {
+        target_label = "job"
+        replacement = "node"
+      }
+      rule {
+        target_label = "instance"
+        replacement = "Interplanetary"
+      }
+      rule {
+        target_label = "node_name"
+        replacement = "Interplanetary"
+      }
+      rule {
+        target_label = "node_type"
+        replacement = "remote"
+      }
+    }
+
+    prometheus.scrape "desktop" {
+      targets = discovery.relabel.desktop.output
+      scrape_interval = "60s"
+      forward_to = [prometheus.remote_write.cumserver.receiver]
+    }
+
+    prometheus.remote_write "cumserver" {
+      endpoint {
+        url = "https://cum.army/api/v1/write"
+        basic_auth {
+          username = "interplanetary"
+          password_file = sys.env("CREDENTIALS_DIRECTORY") + "/metrics-password"
+        }
+      }
+    }
+  '';
+
   services.system76-scheduler.enable = true;
 
   services.logind.settings.Login = {

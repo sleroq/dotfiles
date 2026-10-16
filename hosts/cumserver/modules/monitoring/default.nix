@@ -142,8 +142,10 @@ in
       };
       prometheus = {
         enable = true;
+        listenAddress = "127.0.0.1";
         # Keep enough history for troubleshooting without filling the root disk.
         extraFlags = [
+          "--web.enable-remote-write-receiver"
           "--storage.tsdb.retention.time=90d"
           "--storage.tsdb.retention.size=24GB"
         ];
@@ -385,6 +387,19 @@ in
         virtualHosts = {
           "cum.army" = {
             extraConfig = ''
+              handle /api/v1/write {
+                route {
+                  @unsupportedMethod not method POST
+                  header @unsupportedMethod Allow POST
+                  respond @unsupportedMethod 405
+                  basic_auth {
+                    import {$CREDENTIALS_DIRECTORY}/metrics-auth
+                  }
+                  reverse_proxy 127.0.0.1:${toString config.services.prometheus.port} {
+                    header_up -Authorization
+                  }
+                }
+              }
               handle_path /grafana/* {
                   reverse_proxy 127.0.0.1:3200
               }
@@ -393,6 +408,11 @@ in
         };
       };
     };
+
+    age.secrets.metricsRemoteWriteCaddyAuth.file = ../../../../shared/secrets/metricsRemoteWriteCaddyAuth;
+    systemd.services.caddy.serviceConfig.LoadCredential = [
+      "metrics-auth:${config.age.secrets.metricsRemoteWriteCaddyAuth.path}"
+    ];
 
     environment.etc."alloy/config.alloy".text = ''
       logging {
