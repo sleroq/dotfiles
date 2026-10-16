@@ -4,15 +4,20 @@
   ast-grep,
 }:
 
+let
+  pin = builtins.fromJSON (builtins.readFile ../home/config/ast-grep/svelte-parser.json);
+in
 stdenv.mkDerivation {
   pname = "tree-sitter-htmlx-svelte";
-  version = "0.1.16";
+  inherit (pin) version;
 
   src = fetchFromGitHub {
-    owner = "themixednuts";
-    repo = "tree-sitter-htmlx";
-    rev = "c9b9cc35709fff494a3a9e41cd9471b633649e45";
-    hash = "sha256-qEzK2sPmSFYBNMeLR7KNwReOkx3LIytUFbuF1BMFZsw=";
+    inherit (pin)
+      owner
+      repo
+      rev
+      hash
+      ;
   };
 
   sourceRoot = "source/crates/tree-sitter-svelte";

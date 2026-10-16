@@ -9,6 +9,7 @@ import type { ProfileMetadata } from "../modules/paseo/install-profile.ts";
 
 const root = resolve(import.meta.dir, "..");
 const aliases = new Map([["work", "work"], ["cumserver", "paseo@cumserver"], ["desktop", "paseo@desktop"]]);
+const installerFiles = ["modules/paseo/pi-profile.mjs", "modules/paseo/install-profile.ts", "modules/paseo/ast-grep.ts"];
 
 interface ProfileBundle {
   metadata: ProfileMetadata;
@@ -37,10 +38,12 @@ function resourceName(path: string) {
     if (["AGENTS.md", "models.json", "settings.json", "mcp.json"].includes(name)
       || ["agents", "extensions", "prompts", "sounds"].includes(name.split("/")[0] ?? "")) return `pi/${name}`;
   }
-  for (const [prefix, target] of [["home/config/agents/skills/", "skills/"], ["home/config/ast-grep/rules/", "ast-grep/rules/"]]) {
+  for (const [prefix, target] of [["home/config/agents/skills/", "skills/"], ["home/config/ast-grep/", "ast-grep/"]]) {
     if (prefix && path.startsWith(prefix)) return target + path.slice(prefix.length);
   }
-  if (["modules/paseo/pi-profile.mjs", "modules/paseo/install-profile.ts"].includes(path)) return path;
+  if (installerFiles.includes(path)) {
+    return path;
+  }
 }
 
 export async function exportProfile(ref?: string, directory = root, host?: string): Promise<ProfileBundle> {
@@ -49,7 +52,9 @@ export async function exportProfile(ref?: string, directory = root, host?: strin
   const paths = (ref
     ? await git(directory, "ls-tree", "-r", "--name-only", "-z", commit)
     : await git(directory, "ls-files", "-z")).toString().split("\0");
-  if (!ref) paths.push("modules/paseo/install-profile.ts");
+  if (!ref) {
+    paths.push(...installerFiles, "home/config/ast-grep/svelte-parser.json");
+  }
   const files = new Map<string, ArchiveEntry>();
   for (const path of new Set(paths)) {
     const name = resourceName(path);
@@ -70,6 +75,9 @@ export async function exportProfile(ref?: string, directory = root, host?: strin
       }
       data = readFileSync(source);
       executable = Boolean(stat.mode & 0o111);
+    }
+    if (name === "ast-grep/sgconfig.yml" && host === "work") {
+      data = Buffer.from(data.toString().replace("  - rules/common", "  - rules"));
     }
     if (name === "pi/settings.json" && host === "work") {
       const settings = JSON.parse(data.toString());

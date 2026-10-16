@@ -1,2 +1,18 @@
 ruleDirs:
-  - rules
+  - rules/common
+testConfigs:
+  - testDir: tests
+customLanguages:
+  svelte:
+    libraryPath: parsers/tree-sitter-svelte
+    extensions: [svelte]
+    languageSymbol: tree_sitter_svelte
+languageInjections:
+  - hostLanguage: svelte
+    rule:
+      pattern: <script>$CONTENT</script>
+    injected: javascript
+  - hostLanguage: svelte
+    rule:
+      pattern: '<script lang="ts">$CONTENT</script>'
+    injected: typescript

@@ -2,6 +2,7 @@ import { $ } from "bun";
 import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, readlinkSync, renameSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join, relative, resolve } from "node:path";
+import { installAstGrep } from "./ast-grep";
 
 export interface ProfileMetadata {
   sourceCommit: string;
@@ -63,8 +64,9 @@ function linkProfileResources(release: string, agent: string, home: string, back
   }
   mkdirSync(join(release, "skills"), { recursive: true });
   linkResource(join(home, ".agents/skills"), join(release, "skills"), home, backup);
-  writeFileSync(join(release, "sgconfig.yml"), `ruleDirs:\n  - ${JSON.stringify(join(release, "ast-grep/rules"))}\n`);
+  linkResource(join(home, ".config/ast-grep"), join(release, "ast-grep"), home, backup);
   linkResource(join(home, "sgconfig.yml"), join(release, "sgconfig.yml"), home, backup);
+  linkResource(join(home, "develop/frg/sgconfig.yml"), join(release, "sgconfig-frg.yml"), home, backup);
 }
 
 function prepareRemoteMcp(release: string) {
@@ -92,12 +94,12 @@ export async function installProfile(metadata: ProfileMetadata, skipPackages: bo
   mkdirSync(agent, { recursive: true });
   if (!existsSync(record)) backUpMutableProfile(agent, backup);
   if (existsSync(record)) unlinkSync(record);
-  linkProfileResources(release, agent, home, backup);
-  prepareRemoteMcp(release);
-
   const env: NodeJS.ProcessEnv = { ...process.env, NPM_CONFIG_REGISTRY: "https://registry.npmjs.org" };
   env.PATH = [".local/bin", ".bun/bin", ".npm/bin", ".nix-profile/bin"].map(p => join(home, p))
     .concat(["/run/current-system/sw/bin", `/etc/profiles/per-user/${basename(home)}/bin`, env.PATH ?? ""]).join(":");
+  await installAstGrep(release, env);
+  linkProfileResources(release, agent, home, backup);
+  prepareRemoteMcp(release);
   await syncProfile(release, agent, home, env);
   if (!skipPackages) {
     const pi = Bun.which("pi", { PATH: env.PATH });
