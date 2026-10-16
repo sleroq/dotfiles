@@ -51,6 +51,9 @@ in
   system.activationScripts.extraActivation.text = ''
     install -d -m 0755 /etc/ssl/certs
     cat ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt ${frgCert} > ${curlCaBundle}
+
+    # Disable Spotlight indexing on all mounted volumes, not filesystem events.
+    /usr/bin/mdutil -a -i off
   '';
 
   system.defaults.NSGlobalDomain = {
