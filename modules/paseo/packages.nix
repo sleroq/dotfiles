@@ -30,6 +30,7 @@ let
     opencode2
     opencodePaseo
     codex
+    (pkgs.callPackage ../../packages/rift.nix { })
   ]
   ++ (with pkgs; [
     bashInteractive

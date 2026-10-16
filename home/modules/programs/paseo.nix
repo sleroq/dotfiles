@@ -30,6 +30,7 @@ in
   config = lib.mkIf config.myHome.programs.paseo.enable {
     home.packages = [
       piDirenv
+      (pkgs.callPackage ../../../packages/rift.nix { })
       self.inputs.llm-agents.packages.${system}.codex
     ];
     home.activation.paseoConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
