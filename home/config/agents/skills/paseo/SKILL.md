@@ -94,7 +94,13 @@ Only set feature IDs returned by `inspect_provider`. For Codex fast mode, look f
 
 ## Schedules and heartbeats
 
-**`create_schedule`** — starts a new agent on a cron cadence. Required: `prompt`, `cron`, `provider`. Optional: `timezone`, `name`, `cwd`, `maxRuns`, `expiresIn`. Use when the recurring work should live in fresh agents.
+### Dotfiles schedule ownership
+
+For hosts managed by these dotfiles, ALWAYS create, edit, and remove schedule definitions in `services.paseo.schedules` in the host's Nix configuration and associated prompt files. Never mutate schedule definitions through the GUI, CLI, or MCP. Read the current repository first: Nix is the source of truth even before deployment; never overwrite it from runtime state.
+
+Pause/resume, run-now, and log inspection are allowed operational actions. The reconciler leaves existing unmanaged schedules untouched, but agents must declare new schedules in Nix. When adopting an existing schedule, `adoptId` keeps its stable ID and preserves its run history. Heartbeats remain outside Nix schedule ownership.
+
+**`create_schedule`** — for daemons outside this dotfiles policy, starts a new agent on a cron cadence. Required: `prompt`, `cron`, `provider`. Optional: `timezone`, `name`, `cwd`, `maxRuns`, `expiresIn`. Use when the recurring work should live in fresh agents.
 
 **`create_heartbeat`** — sends you a prompt on a cron cadence. Required: `prompt`, `cron`. Optional: `timezone`, `name`, `maxRuns`, `expiresIn`. Use for reminders, PR/build babysitting, and status checks that should return to this conversation.
 
@@ -122,7 +128,6 @@ paseo run --provider codex/gpt-5.4 --mode full-access --workspace <workspace-id>
 paseo run --provider codex/gpt-5.4 --mode full-access --new-workspace worktree --worktree-mode branch-off --new-branch fix-x --base origin/main "<prompt>"
 paseo send <agent-id> "<follow-up>"
 paseo ls
-paseo schedule create --cron "*/15 * * * *" "ping main build"
 paseo heartbeat create --cron "*/15 * * * *" "check the build"
 ```
 

@@ -88,6 +88,7 @@
 
   services.paseo = {
     enable = true;
+    schedules = import ./paseo-schedules.nix;
     relay.enable = true;
     authorizedKeys = config.users.users.root.openssh.authorizedKeys.keys;
   };

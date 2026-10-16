@@ -61,6 +61,7 @@ in
     ./paseo/workspace.nix
     ./paseo/pi.nix
     ./paseo/opencode.nix
+    ./paseo/schedules.nix
   ];
 
   options.services.paseo = {
