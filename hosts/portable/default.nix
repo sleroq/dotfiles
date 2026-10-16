@@ -24,6 +24,12 @@ in
   nix.enable = false; # Disabled nix in preference to determinate-nix
   determinateNix = {
     enable = true;
+    customSettings = {
+      extra-substituters = [ "https://cache.numtide.com" ];
+      extra-trusted-public-keys = [
+        "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+      ];
+    };
     determinateNixd.builder.state = "enabled";
   };
 
