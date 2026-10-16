@@ -50,7 +50,7 @@
       "providers": [
         {
           "provider": "pi",
-          "model": "opencode/gpt-6-luna",
+          "model": "openai-codex/gpt-6-luna",
           "thinkingOptionId": "low"
         }
       ]
