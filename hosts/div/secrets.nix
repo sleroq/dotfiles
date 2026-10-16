@@ -11,6 +11,7 @@ in
 {
   "secrets/githubRunnerCumbanToken".publicKeys = publicKeys;
   "secrets/navidromeEnv".publicKeys = publicKeys;
+  "secrets/resticHtpasswd".publicKeys = publicKeys;
   "secrets/remnawaveNodeEnv".publicKeys = publicKeys;
   "secrets/sftpgoAdminEnv".publicKeys = publicKeys;
   "secrets/sftpgoUsers".publicKeys = publicKeys;

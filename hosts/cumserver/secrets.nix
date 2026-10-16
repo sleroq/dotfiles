@@ -75,6 +75,9 @@ let
       publicKeys = commonPublicKeys;
     };
     "secrets/resticMinecraftPassword" = {
+      publicKeys = commonPublicKeys ++ [ div ];
+    };
+    "secrets/resticMinecraftRestEnv" = {
       publicKeys = commonPublicKeys;
     };
     "secrets/resticMailPassword" = {

@@ -148,14 +148,13 @@ in
         file = ../secrets/resticMinecraftPassword;
       };
 
-      systemd.tmpfiles.rules = [
-        "d /srv/backups/minecraft 0750 minecraft minecraft -"
-      ];
+      age.secrets.resticMinecraftRestEnv.file = ../secrets/resticMinecraftRestEnv;
 
       services.restic.backups.minecraft = {
         user = "minecraft";
-        repository = "/srv/backups/minecraft";
+        repository = "rest:http://div.capybara-menkent.ts.net:8040/minecraft/";
         passwordFile = config.age.secrets.resticMinecraftPassword.path;
+        environmentFile = config.age.secrets.resticMinecraftRestEnv.path;
         initialize = true;
         paths =
           (lib.optionals cfg.cum.enable [ "/srv/minecraft/cum" ])
@@ -166,11 +165,7 @@ in
           "hs_err_pid*.log"
           "**/DistantHorizons.sqlite"
         ];
-        pruneOpts = [
-          "--keep-daily 1"
-          "--keep-weekly 1"
-          "--keep-monthly 2"
-        ];
+        # The append-only endpoint cannot prune; div owns retention.
         timerConfig = {
           OnCalendar = "03:30";
           Persistent = true;
