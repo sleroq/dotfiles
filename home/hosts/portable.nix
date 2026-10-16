@@ -39,6 +39,11 @@ in
     inherit (opts) username;
     homeDirectory = "/Users/${opts.username}"; # TODO: is this needed?
     stateVersion = "25.05";
+    packages = [
+      (pkgs.writeShellScriptBin "tailscale" ''
+        exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
+      '')
+    ];
     sessionPath = [
       "$HOME/.orbstack/bin"
       "/Applications/Obsidian.app/Contents/MacOS"
