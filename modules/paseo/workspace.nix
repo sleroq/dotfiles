@@ -61,7 +61,7 @@ in
       inherit home;
       homeMode = "0700";
       shell = pkgs.bashInteractive;
-      packages = tools ++ [ pkgs.nixos-rebuild ];
+      packages = tools;
       openssh.authorizedKeys.keys = cfg.authorizedKeys;
     };
     programs.bash.interactiveShellInit = ''
