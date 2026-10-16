@@ -38,6 +38,13 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
+    age.secrets.paseo-git-crypt-key = {
+      file = ../../shared/secrets/dotfiles-git-crypt-key;
+      path = "${home}/.config/git/dotfiles.key";
+      owner = cfg.user;
+      group = "users";
+      mode = "0600";
+    };
     age.secrets.paseo-exa-env = {
       file = ../../shared/secrets/exa-env;
       path = "${home}/.config/pi/exa.env";
@@ -54,7 +61,7 @@ in
       inherit home;
       homeMode = "0700";
       shell = pkgs.bashInteractive;
-      packages = tools;
+      packages = tools ++ [ pkgs.nixos-rebuild ];
       openssh.authorizedKeys.keys = cfg.authorizedKeys;
     };
     programs.bash.interactiveShellInit = ''
@@ -85,6 +92,7 @@ in
       "d ${home}/projects 0700 ${cfg.user} users -"
       "d ${home}/.config 0700 ${cfg.user} users -"
       "d ${home}/.config/pi 0700 ${cfg.user} users -"
+      "d ${home}/.config/git 0700 ${cfg.user} users -"
       "d ${home}/.ssh 0700 ${cfg.user} users -"
       "L+ ${home}/.ssh/config - - - - /etc/paseo/ssh-config"
       "L+ ${home}/.gitconfig - - - - ${gitConfig}"

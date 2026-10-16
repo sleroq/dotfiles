@@ -41,6 +41,12 @@ in
   "secrets/work-vpn/tls_auth.key" = {
     publicKeys = commonPublicKeys;
   };
+  "secrets/dotfiles-git-crypt-key" = {
+    publicKeys = commonPublicKeys ++ [
+      cumserver
+      div
+    ];
+  };
   "secrets/exa-env" = {
     publicKeys = commonPublicKeys ++ [
       cumserver
