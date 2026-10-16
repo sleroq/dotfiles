@@ -1,0 +1,1 @@
+Paseo schedules are declared in host Nix configuration under `services.paseo.schedules`; div's definitions and prompts live in `hosts/div/paseo-schedules.nix`. Always edit schedules in Nix rather than through the apps, CLI, or MCP: the repository is the source of truth even when changes have not yet been deployed.
