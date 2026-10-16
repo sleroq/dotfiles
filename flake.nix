@@ -53,9 +53,6 @@
     pi.url = "github:earendil-works/pi/main";
     llm-agents.url = "github:numtide/llm-agents.nix";
 
-    cliamp.url = "github:bjarneo/cliamp";
-    cliamp.inputs.nixpkgs.follows = "nixpkgs-portable";
-
     # HM-related inputs used by home modules
     nix-gaming.url = "github:fufexan/nix-gaming";
 
