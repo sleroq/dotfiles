@@ -1,0 +1,27 @@
+{
+  bump-paseo-stack = {
+    adoptId = "1c817bdf";
+    name = "Dotfiles: bump Paseo stack";
+    cron = "0 6 */3 * *";
+    timezone = "UTC";
+    provider = "pi";
+    model = "openai/gpt-6.1-sol";
+    thinkingOptionId = "low";
+    cwd = "/home/paseo/projects/dotfiles";
+    prompt = ''
+      Maintain the Paseo stack in sleroq/dotfiles. This recurring task is explicitly authorized by the user to commit, push, force-push its own automation branch, and create/update a pull request. Do not merge or deploy.
+
+      Repository: /home/paseo/projects/dotfiles on div, running as paseo. Fetch origin and discover the remote default branch before doing any work; the shared checkout can be stale. Read the current repository instructions and stack configuration from the fetched base. Work in a dedicated clean git worktree, never modifying the shared checkout, unrelated work, or someone else's branch. Use the stable branch automation/bump-paseo-stack and reconstruct the proposed update on the latest remote default branch each run.
+
+      Scope: update the complete Paseo-specific stack to current upstream releases/revisions: Paseo itself, Pi, Codex/OpenCode and other configured agent runtimes, the pi-subagents package and other configured Pi extension package versions, Paseo relay source/version/dependency hashes, and dedicated related flake inputs. Inspect the actual current ownership first (modules/paseo*, home/modules/programs/paseo.nix, packages/paseo-relay.nix, Pi settings/extension manifests and relevant overlays; paths may evolve). Use published versions and compatible pins, not invented versions. Do not change agent model choices, prompts, skills, or unrelated development tools merely because this is an update run. Do not update runtime bookkeeping such as lastChangelogVersion.
+
+      Flake updates MUST be targeted, never a blanket nix flake update. Expected allowed root inputs are pi, llm-agents, nixpkgs-master, and any dedicated Paseo input actually present on the latest base, plus their necessary transitive dependencies. nixpkgs-master is allowed because it supplies Paseo. Leave every OTHER root nixpkgs input exactly unchanged, including nixpkgs, nixpkgs-div, nixpkgs-cumserver, nixpkgs-interplanetary, nixpkgs-portable, nixpkgs-roundy and any future host pins. Leave unrelated flake roots and their independent dependency locks unchanged. Compare the lock graph against the base to verify this before publishing; undo incidental churn. If an upgrade requires unrelated host nixpkgs changes, leave that upgrade out and report the blocker.
+
+      Validation must stay small: format/lint changed files, run focused affected tests and narrow package evaluation or a package-only build if necessary. NEVER build/rebuild/test entire NixOS, Darwin, or Home Manager host configurations; NEVER run nix flake check or any all-host/all-package build, even with --no-build. Do not deploy or activate anything. Honor repository build-host rules for any narrow build. After edits, run the required shared ast-grep scan from the worktree root: ast-grep scan --config "$HOME/sgconfig.yml" --no-ignore hidden .; understand findings, fix newly introduced issues, and report unrelated pre-existing blockers without broad cleanup. Follow the Nix skill checks for edited Nix files. These restrictions apply to every delegated agent too; explicitly pass them on.
+
+      Publication: query GitHub for an OPEN PR from automation/bump-paseo-stack before creating anything. If one exists, keep its number/URL and update its branch with git push --force-with-lease (not an unconditional force push); never create a duplicate. Reconstruct the complete candidate update against the latest base, preserving the outstanding upgrade scope rather than accidentally discarding it. Compare with the existing remote branch so an identical result does not produce another commit/push. If no open PR exists (the last was merged or closed), create a new PR only when the candidate has an actual stack diff versus the current default branch. If there is no actual update, do not commit/push or create a PR; leave any existing PR alone and report no change. Never create empty commits or force-push any other branch. Use title "chore: update Paseo stack" and a SUPER SHORT PR body: one sentence, at most two short lines, e.g. "Update Paseo, agents, and related dependencies." Keep check details in the agent's final report, not the PR body. Update the existing PR's title/body to this format when publishing new changes. Report the PR URL, concise changed versions, and any validation limitations. If blocked, report honestly rather than claiming success or expanding scope.
+    '';
+    archiveOnFinish = true;
+    isolation = "local";
+  };
+}
