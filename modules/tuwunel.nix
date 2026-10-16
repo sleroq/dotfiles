@@ -190,19 +190,7 @@ in
           log = "info";
           new_user_displayname_suffix = "";
 
-          # Keep federation and database maintenance from saturating this host.
-          # sender_timeout also controls request duration, so increasing it to
-          # force hourly retries would leave federation requests stalled longer.
-          sender_retry_grace = 0;
-          fetch_fanout_max_width = 1;
-          rocksdb_parallelism_threads = 2;
-          rocksdb_compaction_prio_idle = true;
-
-          stream_width_scale = 0.5;
-          stream_width_default = 16;
-          db_pool_workers = 8;
           db_cache_capacity_mb = 1024.0;
-          # stream_amplification = 256;
 
           allow_local_presence = true;
           allow_incoming_presence = true;
