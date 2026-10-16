@@ -36,6 +36,7 @@ let
     bashInteractive
     git
     gh
+    git-crypt
     git-lfs
     curl
     wget
