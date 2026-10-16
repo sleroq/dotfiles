@@ -45,12 +45,6 @@ Apply later checks to the daemon runtime, not automatically to the client device
 - A standalone daemon follows its own CLI/npm lifecycle and may use a different `PASEO_HOME` or listen address.
 - A Docker daemon uses container paths, volumes, user permissions, image versions, and container lifecycle commands.
 
-## Dotfiles schedule ownership
-
-For hosts managed by these dotfiles, ALWAYS create, edit, and remove schedule definitions in `services.paseo.schedules` in the host's Nix configuration and associated prompt files. Never mutate schedule definitions through the GUI, CLI, or MCP. Read the current repository first: Nix is the source of truth even before deployment; never overwrite it from runtime state.
-
-Pause/resume, run-now, and log inspection are allowed operational actions. The reconciler leaves existing unmanaged schedules untouched, but agents must declare new schedules in Nix. When adopting an existing schedule, `adoptId` keeps its stable ID and preserves its run history. Heartbeats remain outside Nix schedule ownership.
-
 ## Diagnose before changing state
 
 After identifying the affected host, compare that daemon's version with the client app version. Ask the user to update both through the correct topology-specific update path. Old versions and app/daemon version skew cause many apparent bugs, and fixes ship frequently. Use the Updates page and the installation-specific docs for current instructions.
