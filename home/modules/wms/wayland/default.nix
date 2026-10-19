@@ -34,6 +34,18 @@ in
 
   config = lib.mkMerge [
     (lib.mkIf cfg.enable {
+      xdg.configFile."uwsm/env".text = ''
+        export GDK_BACKEND='wayland,x11,*'
+        export QT_QPA_PLATFORM='wayland;xcb'
+        export MOZ_ENABLE_WAYLAND=1
+        export NIXOS_OZONE_WL=1
+        export SDL_VIDEODRIVER='wayland,x11'
+      '';
+      xdg.dataFile."flatpak/overrides/global".text = ''
+        [Context]
+        sockets=!x11;fallback-x11;
+      '';
+
       services.kanshi.enable = true;
 
       # TODO: remove tofi?

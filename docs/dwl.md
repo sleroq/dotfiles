@@ -67,6 +67,22 @@ There is deliberately **no Super+Tab**.
 
 ## Session policy
 
+Shared UWSM environment settings prefer native Wayland with X11 toolkit fallbacks,
+scoped to Wayland logins. Flatpak apps advertising Wayland lose X11 access;
+X11-only apps retain `fallback-x11`, without a blanket Wayland socket grant.
+Rebuild and start a new login to apply these settings. Before Home Manager
+activation, back up/move the existing `~/.local/share/flatpak/overrides/global`
+imperative file (which grants Wayland globally); the declarative file replaces
+that grant, while `MOZ_ENABLE_WAYLAND` moves to the shared UWSM environment.
+
+The DWL UWSM service raises `LimitNOFILE` from the default soft limit of 1024
+to 524288. An isolated low-limit session reproduced Xwayland disconnecting with
+`invalid arguments` after a buffer FD could not be received. This mitigates
+that failure boundary; descriptor exhaustion during the original DMA-BUF crash
+was not captured, so its historical cause remains unconfirmed. Rebuild and log
+out/in to replace the current stalled Xwayland session; no live desktop restart
+is performed by this change.
+
 UWSM owns environment publication, startup, and teardown. The DWL desktop entry
 runs `dwl -s "uwsm finalize"`. `dwl-noctalia.service`, Kitty, and Kanshi are
 conditioned on `XDG_CURRENT_DESKTOP=dwl` and stop with the graphical session.

@@ -47,10 +47,8 @@ in
 
     environment.etc."xdg/uwsm/env-dwl".text = ''
       export QT_AUTO_SCREEN_SCALE_FACTOR=1
-      export QT_QPA_PLATFORM='wayland;xcb'
       export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
       export QT_QPA_PLATFORMTHEME=gtk
-      export NIXOS_OZONE_WL=1
       export _JAVA_AWT_WM_NONREPARENTING=1
     '';
   };
