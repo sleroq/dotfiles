@@ -40,7 +40,7 @@ All shortcuts below use Super unless otherwise specified.
 - `X`: show/hide the floating overlay; `Shift+X`: send/return selected window.
   Membership changes do not retag on entry. Return uses the current workspace.
   Show/hide preserves rectangles and stacking and restores remembered focus.
-  While open, only special-workspace clients can receive focus on that monitor;
+  While open, only special-workspace managed clients can receive focus on that monitor;
   the ordinary desktop remains visible under a 35% dark-gray scrim.
   An empty special workspace does not fall back to ordinary focus.
   New managed windows spawn floating in the special workspace when it is open
@@ -72,7 +72,10 @@ center once on first map: in the work area, or relative to their transient paren
 before saving a pre-map maximize restore rectangle. Existing clients are never
 recentered. Transient dialogs inherit overlay membership and do not cancel an
 underlying fullscreen client. Fullscreen special clients and their transients stack above
-ordinary special floaters, even after focus raises or hide/reopen, below shell overlays.
+ordinary special floaters, even after focus raises or hide/reopen. Keyboard-interactive
+TOP layer-shell utilities and unmanaged X11 tools remain above the special workspace,
+including special fullscreen, but below shell overlays and the lock screen.
+Noninteractive TOP panels retain ordinary stacking below native fullscreen.
 Pointer hit-testing uses the new position after movement, so edge entry and
 leave are delivered on the same event rather than one motion late.
 Grouped arranged panes reserve a compositor-owned 26px Cairo/Pango title row,

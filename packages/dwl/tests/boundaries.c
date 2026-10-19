@@ -59,6 +59,43 @@ special_fullscreen(void)
 }
 
 static void
+shell_stacking(void)
+{
+	struct wlr_layer_surface_v1_state state = {.layer = ZWLR_LAYER_SHELL_V1_LAYER_TOP};
+	struct wlr_scene_rect *nodes[NUM_LAYERS];
+	static const float color[4] = {1, 1, 1, 1};
+	/* Ascending scene order, including the ordinary panel/fullscreen boundary. */
+	const int order[] = {LyrTop, LyrFS, LyrSpecial, LyrSpecialFS,
+		LyrShell, LyrUnmanaged, LyrOverlay, LyrBlock};
+	size_t i;
+	assert(shell_layer(&state) == LyrTop);
+	state.keyboard_interactive = ZWLR_LAYER_SURFACE_V1_KEYBOARD_INTERACTIVITY_EXCLUSIVE;
+	assert(shell_layer(&state) == LyrShell);
+	state.keyboard_interactive = ZWLR_LAYER_SURFACE_V1_KEYBOARD_INTERACTIVITY_ON_DEMAND;
+	assert(shell_layer(&state) == LyrShell);
+	state.layer = ZWLR_LAYER_SHELL_V1_LAYER_OVERLAY;
+	assert(shell_layer(&state) == LyrOverlay);
+	state.layer = ZWLR_LAYER_SHELL_V1_LAYER_BOTTOM;
+	assert(shell_layer(&state) == LyrBottom);
+	state.layer = ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND;
+	assert(shell_layer(&state) == LyrBg);
+	scene = wlr_scene_create();
+	for (i = 0; i < NUM_LAYERS; i++)
+		layers[i] = wlr_scene_tree_create(&scene->tree);
+	for (i = 0; i < LENGTH(order); i++) {
+		nodes[i] = wlr_scene_rect_create(layers[order[i]], 100, 100, color);
+		wlr_scene_node_raise_to_top(&nodes[0]->node);
+		assert(wlr_scene_node_at(&scene->tree.node, 50, 50, NULL, NULL) == &nodes[i]->node);
+	}
+	/* Removing each higher layer exposes exactly its predecessor. */
+	for (i = LENGTH(order); i > 1; i--) {
+		wlr_scene_node_set_enabled(&nodes[i - 1]->node, 0);
+		assert(wlr_scene_node_at(&scene->tree.node, 50, 50, NULL, NULL) == &nodes[i - 2]->node);
+	}
+	wlr_scene_node_destroy(&scene->tree.node);
+}
+
+static void
 initial_maximize_request(void)
 {
 	struct wlr_surface surface = {0};
@@ -191,6 +228,7 @@ main(void)
 	size_t i, j;
 	special_scrim();
 	special_fullscreen();
+	shell_stacking();
 	/* Workspace and utility shortcuts must never shadow one another. */
 	for (i = 0; i < LENGTH(keys); i++)
 		for (j = i + 1; j < LENGTH(keys); j++)
