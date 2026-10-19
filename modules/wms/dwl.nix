@@ -27,7 +27,10 @@ in
   config = lib.mkIf cfg.enable {
     programs.dwl.package = pkgs.callPackage ../../packages/dwl { src = inputs.dwl; };
     programs.uwsm.enable = true;
-    environment.systemPackages = [ config.programs.dwl.package ];
+    environment.systemPackages = [
+      config.programs.dwl.package
+      pkgs.wl-clipboard
+    ];
     services.displayManager.sessionPackages = [ session ];
 
     xdg.portal = {
