@@ -48,6 +48,14 @@ in
       };
     };
 
+    # DMA-BUF transfers need a descriptor per buffer; the default soft limit is 1024.
+    systemd.user.services."wayland-wm@dwl.desktop" = {
+      overrideStrategy = "asDropin";
+      restartIfChanged = false;
+      enableDefaultPath = false;
+      serviceConfig.LimitNOFILE = 524288;
+    };
+
     environment.etc."xdg/uwsm/env-dwl".text = ''
       export QT_AUTO_SCREEN_SCALE_FACTOR=1
       export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
