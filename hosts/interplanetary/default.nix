@@ -96,7 +96,7 @@ in
   ];
   environment.etc."alloy/config.alloy".text = ''
     prometheus.exporter.unix "desktop" {
-      enable_collectors = ["systemd", "processes"]
+      enable_collectors = ["systemd", "processes", "drm"]
     }
 
     discovery.relabel "desktop" {

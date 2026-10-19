@@ -42,6 +42,15 @@
       "title": "Grafana",
       "type": "link",
       "url": "https://grafana.com/grafana/dashboards/1860"
+    },
+    {
+      "icon": "dashboard",
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "GPU metrics",
+      "type": "link",
+      "url": "/grafana/d/amd-gpu/amd-gpu?var-instance=${node:percentencode}"
     }
   ],
   "panels": [
