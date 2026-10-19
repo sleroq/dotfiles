@@ -71,9 +71,6 @@ let
     "secrets/zefxiEnv" = {
       publicKeys = commonPublicKeys;
     };
-    "secrets/nodeExporter3Password" = {
-      publicKeys = commonPublicKeys;
-    };
     "secrets/ziplineEnv" = {
       publicKeys = commonPublicKeys;
     };
