@@ -44,6 +44,9 @@ let
     "secrets/grafanaPassword" = {
       publicKeys = commonPublicKeys;
     };
+    "secrets/grafanaTelegramBotToken" = {
+      publicKeys = commonPublicKeys;
+    };
     "secrets/bayanEnv" = {
       publicKeys = commonPublicKeys;
     };

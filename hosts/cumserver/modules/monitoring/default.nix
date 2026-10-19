@@ -3,6 +3,8 @@ let
   cfg = config.cumserver.monitoring;
 in
 {
+  imports = [ ./alerts.nix ];
+
   options.cumserver.monitoring = {
     enable = lib.mkEnableOption "Monitoring";
     grafanaPasswordPath = lib.mkOption {
