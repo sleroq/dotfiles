@@ -130,6 +130,16 @@ in
                   settings = {
                     bottoken = "$__file{${config.age.secrets.grafanaTelegramBotToken.path}}";
                     chatid = "-1004350530001";
+                    parse_mode = "HTML";
+                    disable_web_page_preview = true;
+                    message = ''
+                      {{ range .Alerts -}}
+                      {{ if eq .Status "firing" }}🔴 <b>FIRING</b>{{ else }}🟢 <b>RESOLVED</b>{{ end }}{{ with .Labels.severity }} · {{ . | html }}{{ end }}
+                      <b>{{ or .Annotations.summary .Labels.alertname | html }}</b>
+                      {{ with .GeneratorURL }}<a href="{{ . | html }}">View alert</a>{{ end }}{{ if eq .Status "firing" }}{{ with .SilenceURL }} · <a href="{{ . | html }}">Silence</a>{{ end }}{{ end }}
+
+                      {{ end -}}
+                    '';
                   };
                 }
               ];
