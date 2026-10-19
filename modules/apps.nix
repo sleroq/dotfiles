@@ -58,8 +58,28 @@ in
       gamemode.enable = true;
       dconf.enable = true; # required by easyeffects and some other stuff
       fuse.userAllowOther = true; # why do I need this
-      noisetorch.enable = true;
+      noisetorch = {
+        enable = true;
+        # TODO: On nixpkgs bumps, check for the PipeWire LADSPA fix and remove this
+        # override AND the LADSPA_PATH setting below once fixed upstream:
+        # https://github.com/noisetorch/NoiseTorch/issues/467
+        package = pkgs.noisetorch.overrideAttrs (old: {
+          postPatch = (old.postPatch or "") + ''
+            substituteInPlace main.go --replace-fail \
+              'f, err := ioutil.TempFile("", "librnnoise-*.so")' \
+              'dir := os.Getenv("XDG_RUNTIME_DIR") + "/noisetorch"
+            if err := os.MkdirAll(dir, 0700); err != nil {
+              log.Fatalf("Could not create librnnoise directory: %v", err)
+            }
+            f, err := ioutil.TempFile(dir, "librnnoise-*.so")'
+          '';
+        });
+      };
     };
+
+    # Keep PipeWire's default LADSPA search paths while allowing NoiseTorch's runtime library.
+    systemd.user.services.pipewire-pulse.environment.LADSPA_PATH =
+      "%t/noisetorch:/usr/lib64/ladspa:/usr/lib/ladspa:${lib.getLib pkgs.pipewire}/lib";
 
     # services.ananicy = {
     #   enable = true;
