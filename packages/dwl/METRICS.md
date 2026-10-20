@@ -142,6 +142,10 @@ identities across sessions. Per-app totals and the size distribution remain.
 - Durations use `CLOCK_MONOTONIC`, not wall-clock deltas or assumed timer ticks.
   A delayed callback splits time at the exact idle deadline. Suspend time is
   not included. Realtime is used only for start/freshness metadata.
+- Input/focus accounting touches only session state and the focused window.
+  Mapped lifetime derives from a mapping timestamp; size residency is settled
+  per window before its geometry changes, at unmap, and at export. Application
+  window counts derive from `opened - closed`, without per-application client scans.
 - **Locked overrides idle, which overrides active**. A locker crash that leaves
   DWL locked continues accumulating locked time. Idle inhibitors do not convert
   inactivity into activity. This differs intentionally from shell idle policy.
@@ -238,11 +242,14 @@ nix-shell -p python3 wtype gtk3 pkg-config gcc wayland wayland-scanner prometheu
 ```
 
 The C boundary fixture checks exact idle-deadline splitting, mutually exclusive
-lock accounting, completed dwell buckets, size-change versus grab counts,
+lock accounting, completed dwell buckets, input accounting independent of the
+client list, timestamp-derived lifetimes, exact size residency across geometry/
+export/unmap boundaries, unsigned lifecycle counts, size-change versus grab counts,
 singleton versus real pane splits, and label escaping. The isolated real GTK /
 headless compositor fixture checks live counts, privacy defaults, titles with
 quotes/backslashes/newlines, tags, hidden tabs, special membership, fullscreen,
 pane events, unchanged arrangements, active/idle focus accounting, closed-window
-totals, file permissions, publication failure, clean shutdown, and exposition
+totals, lifetime/residency consistency, file permissions, preserved publication
+errors (including EACCES when run unprivileged), clean shutdown, and exposition
 with `promtool check metrics` when available. It never connects to a physical
 seat or restarts the current desktop.

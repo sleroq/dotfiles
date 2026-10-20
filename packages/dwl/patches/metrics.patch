@@ -21,7 +21,7 @@ index 7732c58..7bb5106 100644
  	tar -caf dwl-$(VERSION).tar.gz dwl-$(VERSION)
  	rm -rf dwl-$(VERSION)
 diff --git a/dwl.c b/dwl.c
-index 2921113..1a88401 100644
+index 2921113..4e9abd8 100644
 --- a/dwl.c
 +++ b/dwl.c
 @@ -164,6 +164,13 @@ typedef struct {
@@ -32,7 +32,7 @@ index 2921113..1a88401 100644
 +		struct MetricsApp *app;
 +		uint64_t id, focuses, resizes[2], gestures, splits, pane_moves;
 +		uint64_t dwell[8], dwell_count;
-+		double focus[3], mapped, dwell_sum;
++		double focus[3], mapped_at, size_at, dwell_sum;
 +		int grab_changed;
 +	} metrics;
  } Client;
@@ -139,7 +139,7 @@ index 2921113..1a88401 100644
  
  	bbox = interact ? &sgeom : &c->mon->w;
  
-+	metrics_account();
++	metrics_size(c);
  	client_set_bounds(c, geo.width, geo.height);
  	c->geom = geo;
  	applybounds(c, bbox);
@@ -165,10 +165,10 @@ index 2921113..1a88401 100644
  		cursor_mode = CurNormal;
 diff --git a/metrics.h b/metrics.h
 new file mode 100644
-index 0000000..3f84235
+index 0000000..a40fffd
 --- /dev/null
 +++ b/metrics.h
-@@ -0,0 +1,463 @@
+@@ -0,0 +1,475 @@
 +/* Optional Prometheus textfile collector. No sockets, threads or dependencies.
 + * Set DWL_METRICS_FILE to a private, local .prom path before starting dwl. */
 +#include <errno.h>
@@ -212,9 +212,8 @@ index 0000000..3f84235
 +static void
 +metrics_account_at(double now)
 +{
-+	Client *c;
 +	double dt, active, elapsed[3] = {0};
-+	int i, width, height;
++	int i;
 +	if (!metrics.path) return;
 +	dt = now - metrics.last;
 +	active = MAX(0.0, MIN(now, metrics.input + metrics.idle_after) - metrics.last);
@@ -231,14 +230,25 @@ index 0000000..3f84235
 +	/* Retention means uninterrupted active keyboard focus; idle/lock ends
 +	 * a dwell even if the same surface remains selected. */
 +	metrics.dwell += metrics.focus ? elapsed[0] : 0;
-+	wl_list_for_each(c, &clients, link) {
-+		if (!c->metrics.app) continue;
-+		c->metrics.mapped += dt;
-+		width = MIN(16, MAX(0, c->geom.width - 1) / 256);
-+		height = MIN(16, MAX(0, c->geom.height - 1) / 256);
-+		metrics.sizes[width][height] += dt;
-+	}
 +	metrics.last = now;
++}
++
++/* Size residency belongs to this window's geometry, not input/focus events. */
++static void
++metrics_size_at(Client *c, double now)
++{
++	int width, height;
++	if (!metrics.path || !c->metrics.app) return;
++	width = MIN(16, MAX(0, c->geom.width - 1) / 256);
++	height = MIN(16, MAX(0, c->geom.height - 1) / 256);
++	metrics.sizes[width][height] += now - c->metrics.size_at;
++	c->metrics.size_at = now;
++}
++
++static void
++metrics_size(Client *c)
++{
++	if (metrics.path && c->metrics.app) metrics_size_at(c, metrics_now());
 +}
 +
 +static void
@@ -368,6 +378,7 @@ index 0000000..3f84235
 +	memset(&c->metrics, 0, sizeof(c->metrics));
 +	c->metrics.app = a;
 +	c->metrics.id = ++metrics.next_id;
++	c->metrics.mapped_at = c->metrics.size_at = metrics.last;
 +	a->opened++;
 +}
 +
@@ -375,8 +386,9 @@ index 0000000..3f84235
 +metrics_unmap(Client *c)
 +{
 +	if (!metrics.path || !c->metrics.app) return;
-+	metrics_account();
 +	if (metrics.focus == c) metrics_focus(NULL);
++	else metrics_account();
++	metrics_size_at(c, metrics.last);
 +	c->metrics.app->closed++;
 +	c->metrics.app = NULL;
 +}
@@ -449,6 +461,7 @@ index 0000000..3f84235
 +			i == (locked ? 2 : metrics.last >= metrics.input + metrics.idle_after ? 1 : 0));
 +
 +	wl_list_for_each(c, &clients, link) {
++		metrics_size_at(c, metrics.last);
 +		total++;
 +		fullscreen += !!c->isfullscreen;
 +		special += !!c->overlay;
@@ -501,9 +514,8 @@ index 0000000..3f84235
 +	metrics_type(f, "app_events_total", "counter", "Window lifecycle focus size-change and pane events; survives window close.");
 +	metrics_type(f, "app_focus_retention_seconds", "histogram", "Completed uninterrupted active focus dwells; focus loss idle or lock ends a dwell.");
 +	for (a = metrics.apps; a; a = a->next) {
-+		count = 0;
-+		wl_list_for_each(c, &clients, link) count += c->metrics.app == a;
-+		fputs("dwl_app_windows{", f); metrics_app_labels(f, a); fprintf(f, "} %d\n", count);
++		fputs("dwl_app_windows{", f); metrics_app_labels(f, a);
++		fprintf(f, "} %llu\n", (unsigned long long)(a->opened - a->closed));
 +		for (i = 0; i < 3; i++) {
 +			fputs("dwl_app_focus_seconds_total{", f); metrics_app_labels(f, a);
 +			fprintf(f, ",state=\"%s\"} %.9f\n", metrics_states[i], a->focus[i]);
@@ -555,8 +567,8 @@ index 0000000..3f84235
 +		fprintf(f, "dwl_window_focused{window=\"%llu\"} %d\n", (unsigned long long)c->metrics.id, metrics.focus == c);
 +		for (i = 0; i < 3; i++)
 +			fprintf(f, "dwl_window_focus_seconds_total{window=\"%llu\",state=\"%s\"} %.9f\n", (unsigned long long)c->metrics.id, metrics_states[i], c->metrics.focus[i]);
-+		values[0] = c->geom.width; values[1] = c->geom.height; values[2] = c->metrics.mapped;
-+		values[3] = c->metrics.mapped - c->metrics.focus[0] - c->metrics.focus[1] - c->metrics.focus[2];
++		values[0] = c->geom.width; values[1] = c->geom.height; values[2] = metrics.last - c->metrics.mapped_at;
++		values[3] = values[2] - c->metrics.focus[0] - c->metrics.focus[1] - c->metrics.focus[2];
 +		values[4] = c->metrics.focuses; values[5] = c->metrics.resizes[0]; values[6] = c->metrics.resizes[1];
 +		values[7] = c->metrics.gestures; values[8] = c->metrics.splits; values[9] = c->metrics.pane_moves;
 +		for (i = 0; i < 10; i++)
@@ -569,7 +581,7 @@ index 0000000..3f84235
 +{
 +	FILE *f;
 +	char *temporary;
-+	int fd, failed;
++	int fd, error;
 +	metrics_account();
 +	/* mkstemp gives mode 0600; the trusted destination directory must exist.
 +	 * A local runtime filesystem keeps this small synchronous write off disk.
@@ -578,18 +590,18 @@ index 0000000..3f84235
 +	sprintf(temporary, "%s.tmp.XXXXXX", metrics.path);
 +	fd = mkstemp(temporary);
 +	f = fd < 0 ? NULL : fdopen(fd, "w");
-+	failed = !f;
++	error = f ? 0 : errno;
 +	if (f) {
 +		metrics_write(f);
-+		failed = ferror(f);
-+		if (fclose(f)) failed = 1;
-+		if (!failed && rename(temporary, metrics.path)) failed = 1;
++		if (ferror(f)) error = errno;
++		if (fclose(f) && !error) error = errno;
++		if (!error && rename(temporary, metrics.path)) error = errno;
 +	} else if (fd >= 0) close(fd);
 +	unlink(temporary);
 +	free(temporary);
-+	if (failed && !metrics.failed)
-+		wlr_log(WLR_ERROR, "metrics: cannot publish %s: %s", metrics.path, strerror(errno));
-+	metrics.failed = failed;
++	if (error && !metrics.failed)
++		wlr_log(WLR_ERROR, "metrics: cannot publish %s: %s", metrics.path, strerror(error));
++	metrics.failed = error != 0;
 +	wl_event_source_timer_update(metrics.timer, 1000);
 +	return 0;
 +}

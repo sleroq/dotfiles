@@ -215,6 +215,10 @@ def run():
                 assert 0 <= total(s, 'dwl_app_focus_seconds_total', state='active') - active <= 1.1
                 assert total(s, 'dwl_app_focus_seconds_total', state='idle') > idle + 1
                 assert total(s, 'dwl_app_focus_seconds_total', state='active') > 0
+                mapped = total(s, 'dwl_window_mapped_seconds_total')
+                assert math.isclose(total(s, 'dwl_window_size_seconds_total'), mapped, abs_tol=1e-6)
+                assert math.isclose(total(s, 'dwl_window_unfocused_seconds_total') +
+                                    total(s, 'dwl_window_focus_seconds_total'), mapped, abs_tol=1e-6)
                 for process in (first, second):
                     process.terminate()
                     process.wait(timeout=5)
@@ -223,6 +227,10 @@ def run():
                 assert total(s, 'dwl_app_events_total', event='opened') == 2
                 assert total(s, 'dwl_app_windows') == 0
                 assert not any('window' in tags for _, tags, _ in s)
+                size_seconds = total(s, 'dwl_window_size_seconds_total')
+                assert size_seconds >= mapped
+                s = fresh()
+                assert total(s, 'dwl_window_size_seconds_total') == size_seconds
                 check_prometheus()
                 stop()
                 # Defaults must not expose live identities/titles, even with clients.
@@ -246,7 +254,21 @@ def run():
                 assert compositor.poll() is None, 'publication failure killed dwl'
                 compositor.terminate()
                 compositor.wait(timeout=5)
-                print('PASS: metrics lifecycle, privacy, text format, workspace/pane events and idle accounting')
+                # Cleanup's unlink must not replace mkstemp's EACCES with ENOENT.
+                # Root bypasses directory write permissions, so it cannot reproduce this case.
+                if os.geteuid() != 0:
+                    blocked = root / 'blocked'
+                    blocked.mkdir(mode=0o500)
+                    env['DWL_METRICS_FILE'] = str(blocked / 'snapshot.prom')
+                    env['LC_ALL'] = 'C'
+                    compositor = start('dwl')
+                    wait(lambda: (root / 'wayland-0').exists())
+                    expected = f"cannot publish {env['DWL_METRICS_FILE']}: Permission denied"
+                    wait(lambda: expected in (root / 'session.log').read_text())
+                    assert compositor.poll() is None, 'publication failure killed dwl'
+                    compositor.terminate()
+                    compositor.wait(timeout=5)
+                print('PASS: metrics lifecycle, privacy, text format, workspace/pane events, idle accounting and publication errors')
             finally:
                 for process in reversed(processes):
                     if process.poll() is None:
