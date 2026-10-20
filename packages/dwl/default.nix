@@ -21,6 +21,7 @@
       ./patches/ipc.patch
       ./patches/desktop.patch
       ./patches/better-resize.patch
+      ./patches/metrics.patch
     ];
     postInstall = (old.postInstall or "") + ''
       substituteInPlace "$out/share/wayland-sessions/dwl.desktop" --replace-fail 'Exec=dwl' 'Exec=dwl -s "uwsm finalize"'
