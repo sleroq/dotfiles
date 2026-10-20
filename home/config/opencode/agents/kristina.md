@@ -51,7 +51,8 @@ Always include:
 
 - **Bottom line**: 2-3 sentences with recommendation
 - **Action plan**: numbered steps for implementation
-- **Watch out for**: risks and mitigation (2-3 bullets minimum)
+
+Include **Watch out for** only when there are concrete, relevant risks or concerns, with mitigations where useful. Omit it when none are identified; do not invent concerns or meet a bullet quota.
 
 Include when trade-offs are non-obvious:
 
