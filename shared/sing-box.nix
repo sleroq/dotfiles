@@ -88,6 +88,7 @@ in
         "alt-web.cum.army"
         "reg.cloud"
         "quietplace.xyz"
+        "emlstart.com"
       ];
       directProcessNames = [
         "steam"
