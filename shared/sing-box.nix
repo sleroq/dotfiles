@@ -110,10 +110,9 @@ in
       mode = "0600";
     };
 
-    services.sb = {
+    services.ph = {
       enable = true;
       refreshUser = username;
-      converterPackage = pkgs.sing-box-subscribe-cli;
       routingMark = if isLinux then 21314 else 0;
       extraCapabilities = lib.optionals (isLinux && policy.directProcessNames != [ ]) [
         "CAP_SYS_PTRACE"

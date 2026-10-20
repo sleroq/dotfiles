@@ -28,10 +28,6 @@ rec {
     obsidian-neovide = final.callPackage ../packages/obsidian-neovide.nix { };
   };
 
-  sing-box-subscribe-cli = final: _prev: {
-    sing-box-subscribe-cli = final.callPackage ../packages/sing-box-subscribe-cli.nix { };
-  };
-
   trusttunnel-client = final: _prev: {
     trusttunnel-client = final.callPackage ../packages/trusttunnel-client.nix { };
   };
@@ -42,7 +38,6 @@ rec {
     code-cursor
     broadcast-box
     obsidian-neovide
-    sing-box-subscribe-cli
     trusttunnel-client
   ];
 }

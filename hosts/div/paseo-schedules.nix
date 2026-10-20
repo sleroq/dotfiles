@@ -84,7 +84,7 @@ in
     branch = "automation/bump-maintained-packages";
     title = "chore: update maintained packages";
     scope = ''
-      Update only TrustTunnel client, OBS MoQ, Broadcast Box, the Svelte tree-sitter parser, Rift, and Paseo relay to current upstream releases/revisions. This job exclusively owns Rift and Paseo relay package updates; the Paseo stack job must not update those pins. Helium, DWL, sing-box-subscribe-cli, and all other packages are out of scope.
+      Update only TrustTunnel client, OBS MoQ, Broadcast Box, the Svelte tree-sitter parser, Rift, and Paseo relay to current upstream releases/revisions. This job exclusively owns Rift and Paseo relay package updates; the Paseo stack job must not update those pins. Helium, DWL, proxy-helper, and all other packages are out of scope.
 
       - TrustTunnel: packages/trusttunnel-client.nix; update the version and hashes for every supported platform, keeping the macOS universal asset hashes consistent.
       - OBS MoQ: packages/obs-moq.nix; update the matching source tag and libmoq release binary together, including both hashes. Check OBS/plugin compatibility with a focused Linux package build.

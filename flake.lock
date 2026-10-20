@@ -2810,11 +2810,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790266378,
-        "narHash": "sha256-xWkBWz720dXFu/HD1SEShvcnlVpH6sDwvW0B1vo3/k4=",
+        "lastModified": 1792534230,
+        "narHash": "sha256-EEcD/6iQZoPi+EAbB0pqogsPr9qfU5wjbDO2POAau8k=",
         "owner": "sleroq",
         "repo": "proxy-helper",
-        "rev": "743bb4c00f9c6e62044e947b18496b1729f05ef1",
+        "rev": "e0e229d044e30a4c74a4ce4f21cae347e997b2dc",
         "type": "github"
       },
       "original": {
