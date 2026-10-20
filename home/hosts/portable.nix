@@ -111,6 +111,7 @@ in
         nerd-fonts.jetbrains-mono
         inputs'.agenix.packages.default
         ffmpeg
+        rsync
         wget
         uv
         dust
