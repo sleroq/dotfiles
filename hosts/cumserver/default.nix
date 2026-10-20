@@ -56,8 +56,9 @@
   services.fail2ban.enable = true;
   services.paseo = {
     enable = true;
+    user = config.cumserver.dev-env.user;
+    manageUser = false;
     relay.enable = true;
-    authorizedKeys = config.users.users.root.openssh.authorizedKeys.keys;
   };
 
   services.openssh = {
@@ -68,7 +69,6 @@
       X11Forwarding = false;
       AllowUsers = [
         "root"
-        config.services.paseo.user
         config.cumserver.dev-env.user
       ];
     };

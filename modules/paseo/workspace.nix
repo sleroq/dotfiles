@@ -22,7 +22,7 @@ let
   };
   path =
     lib.makeBinPath (tools ++ [ pkgs.coreutils ])
-    + ":/run/current-system/sw/bin:/etc/profiles/per-user/${cfg.user}/bin:${home}/.local/bin:${home}/.deno/bin:${home}/.bun/bin:${home}/.npm/bin:${environment.GOBIN}:${environment.PNPM_HOME}";
+    + ":${home}/.nix-profile/bin:/run/current-system/sw/bin:/etc/profiles/per-user/${cfg.user}/bin:${home}/.local/bin:${home}/.deno/bin:${home}/.bun/bin:${home}/.npm/bin:${environment.GOBIN}:${environment.PNPM_HOME}";
   gitConfig = pkgs.writeText "paseo-gitconfig" ''
     [user]
       name = Sleroq
@@ -57,11 +57,13 @@ in
       nix-direnv.enable = true;
     };
     users.users.${cfg.user} = {
+      packages = tools;
+    }
+    // lib.optionalAttrs cfg.manageUser {
       isNormalUser = true;
       inherit home;
       homeMode = "0700";
       shell = pkgs.bashInteractive;
-      packages = tools;
       openssh.authorizedKeys.keys = cfg.authorizedKeys;
     };
     programs.bash.interactiveShellInit = ''
@@ -89,10 +91,12 @@ in
         IdentitiesOnly yes
     '';
     systemd.tmpfiles.rules = [
-      "d ${home}/projects 0700 ${cfg.user} users -"
       "d ${home}/.config 0700 ${cfg.user} users -"
       "d ${home}/.config/pi 0700 ${cfg.user} users -"
       "d ${home}/.config/git 0700 ${cfg.user} users -"
+    ]
+    ++ lib.optionals cfg.manageUser [
+      "d ${home}/projects 0700 ${cfg.user} users -"
       "d ${home}/.ssh 0700 ${cfg.user} users -"
       "L+ ${home}/.ssh/config - - - - /etc/paseo/ssh-config"
       "L+ ${home}/.gitconfig - - - - ${gitConfig}"

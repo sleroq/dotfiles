@@ -76,7 +76,12 @@ in
     user = lib.mkOption {
       type = lib.types.str;
       default = "paseo";
-      description = "Dedicated unprivileged Paseo account.";
+      description = "Account running the Paseo daemon.";
+    };
+    manageUser = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Provision a dedicated account and its baseline Git/SSH configuration.";
     };
     authorizedKeys = lib.mkOption {
       type = lib.types.listOf lib.types.str;

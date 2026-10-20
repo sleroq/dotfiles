@@ -14,6 +14,7 @@
       git
       jq
       nil
+      neovim
       nixfmt
       podman-compose
       ripgrep
@@ -53,18 +54,30 @@
         init.defaultBranch = "main";
         pull.rebase = true;
       };
+      includes = [
+        {
+          condition = "gitdir:~/projects/sleroq/";
+          contents.user = {
+            name = "Sleroq";
+            email = "hireme@sleroq.link";
+          };
+        }
+        {
+          condition = "gitdir:~/projects/santakameow/";
+          contents.user = {
+            name = "santakameow";
+            email = "sakanai@cum.army";
+          };
+        }
+      ];
     };
 
     home-manager.enable = true;
 
-    neovim = {
-      enable = true;
-      # defaultEditor = true;
-    };
-
     ssh = {
       enable = true;
       enableDefaultConfig = false;
+      includes = [ "/etc/paseo/ssh-config" ];
     };
 
     tmux = {
