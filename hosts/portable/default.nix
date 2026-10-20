@@ -37,6 +37,7 @@ in
     nh
     git-crypt # Required to build this nix repo...
     sshfs
+    nushell # nu is here, so it's in/run/current-system/sw/bin and path is matching the nixos hosts
   ];
   environment.variables = {
     NH_OS_FLAKE = flakeRoot;
