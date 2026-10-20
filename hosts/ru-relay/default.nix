@@ -19,6 +19,7 @@ in
 
   imports = [
     ../relay-common.nix
+    ./reverse-tunnel.nix
     ./disk-config.nix
     ./coturn.nix
     ./warsaw-tunnels.nix
@@ -34,10 +35,12 @@ in
         mainRelayPort
         divRelayPort
         directWarsawPort
+        2083 # Independent Warsaw reverse bridge
         2080 # Legacy Warsaw host via Germany's Remnawave relay
       ];
       # Metrics are scraped only by cumserver, never exposed to clients.
       extraInputRules = ''
+        ip saddr ${warsawAddress} tcp dport 7443 accept
         ip saddr ${backendAddress} tcp dport 9100 accept
       '';
     };
@@ -141,6 +144,14 @@ in
           option tcp-check
           default-server inter 5s fastinter 1s downinter 1s rise 2 fall 3
           server warsaw ${warsawAddress}:2084 check
+
+        frontend warsaw_reverse_ingress
+          bind 0.0.0.0:2083
+          no log
+          default_backend warsaw_reverse
+
+        backend warsaw_reverse
+          server warsaw 127.0.0.1:12085 check
 
         frontend div_ingress
           bind 0.0.0.0:${toString divRelayPort}

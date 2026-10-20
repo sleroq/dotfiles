@@ -77,6 +77,7 @@ in
 
   imports = [
     ../relay-common.nix
+    ./reverse-tunnel.nix
     ./disk-config.nix
   ];
 
