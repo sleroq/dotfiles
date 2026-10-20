@@ -34,6 +34,7 @@
     caelestia_shell-interplanetary.inputs.quickshell.url = "git+https://git.outfoxxed.me/quickshell/quickshell?ref=refs/tags/v0.3.2";
 
     # Per-host nixpkgs pins
+    nixpkgs-warsaw.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-interplanetary.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-cumserver.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-roundy.url = "github:NixOS/nixpkgs/nixos-26.05";
