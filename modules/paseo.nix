@@ -39,7 +39,7 @@ let
   baseline = (pkgs.formats.json { }).generate "paseo-config.json" (
     import ./paseo/config.nix {
       inherit lib;
-      listen = "${home}/.paseo/paseo.sock";
+      listen = "127.0.0.1:6767";
       commands = {
         pi = [ "${userBin}/pi-direnv" ];
         opencode = [ "${userBin}/opencode" ];
