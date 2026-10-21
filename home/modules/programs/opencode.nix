@@ -32,6 +32,8 @@ in
 
       $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
           ${opts.realConfigs}/opencode/* $HOME/.config/opencode/
+      $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+          ${opts.realConfigs}/agents/AGENTS.md "$HOME/.config/opencode/AGENTS.md"
 
       if [ -z "$DRY_RUN_CMD" ]; then
         ${pkgs.bun}/bin/bun install --frozen-lockfile \

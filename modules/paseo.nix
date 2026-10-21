@@ -22,7 +22,7 @@ let
       "sgconfig.yml" = "/etc/paseo/sgconfig.yml";
     };
     links = {
-      ".pi/agent/AGENTS.md" = "${../home/config/pi/agent/AGENTS.md}";
+      ".pi/agent/AGENTS.md" = "${../home/config/agents/AGENTS.md}";
       ".pi/agent/extensions" = "${../home/config/pi/agent/extensions}";
       ".pi/agent/agents" = "${../home/config/pi/agent/agents}";
       ".pi/agent/prompts" = "${../home/config/pi/agent/prompts}";
@@ -30,9 +30,9 @@ let
       ".agents/skills" = "${../home/config/agents/skills}";
       ".config/ast-grep/rules" = "${../home/config/ast-grep/rules}";
       ".config/opencode/plugins/direnv.js" = "${./paseo/opencode2-direnv.js}";
-      ".config/opencode/AGENTS.md" = "${../home/config/opencode/AGENTS.md}";
+      ".config/opencode/AGENTS.md" = "${../home/config/agents/AGENTS.md}";
       ".config/paseo-opencode2/plugins/direnv.js" = "${./paseo/opencode2-direnv.js}";
-      ".config/paseo-opencode2/AGENTS.md" = "${../home/config/opencode/AGENTS.md}";
+      ".config/paseo-opencode2/AGENTS.md" = "${../home/config/agents/AGENTS.md}";
       ".config/paseo-opencode2/agents" = "${../home/config/opencode/agents}";
       ".config/paseo-opencode2/commands" = "${../home/config/opencode/commands}";
       ".config/paseo-opencode2/tui.json" = "${../home/config/opencode/tui.json}";

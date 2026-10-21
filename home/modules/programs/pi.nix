@@ -83,6 +83,9 @@ in
         "$HOME/.pi/agent" \
         ${opts.realConfigs}/pi/agent/models.json
 
+      $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+        ${opts.realConfigs}/agents/AGENTS.md "$HOME/.pi/agent/AGENTS.md"
+
       for path in ${opts.realConfigs}/pi/agent/*; do
         case "$path" in
           */auth.json|*/mcp-auth.json|*/settings.json|*/mcp.json|*/models.json) continue ;;

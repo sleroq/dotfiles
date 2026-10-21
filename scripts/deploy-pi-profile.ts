@@ -31,6 +31,7 @@ async function git(directory: string, ...args: string[]) {
 }
 
 function resourceName(path: string) {
+  if (path === "home/config/agents/AGENTS.md") return "pi/AGENTS.md";
   if (path.split("/").some(part => ["auth.json", "mcp-auth.json", "sessions", "provider-keys"].includes(part))) return;
   const prefix = "home/config/pi/agent/";
   if (path.startsWith(prefix)) {
@@ -53,7 +54,7 @@ export async function exportProfile(ref?: string, directory = root, host?: strin
     ? await git(directory, "ls-tree", "-r", "--name-only", "-z", commit)
     : await git(directory, "ls-files", "-z")).toString().split("\0");
   if (!ref) {
-    paths.push(...installerFiles, "home/config/ast-grep/svelte-parser.json");
+    paths.push(...installerFiles, "home/config/agents/AGENTS.md", "home/config/ast-grep/svelte-parser.json");
   }
   const files = new Map<string, ArchiveEntry>();
   for (const path of new Set(paths)) {

@@ -11,6 +11,8 @@ const root = resolve(import.meta.dir, "..");
 
 test("only the work profile proxies Pi and Exa and uses the private Exa file", async () => {
   const shared = await exportProfile(undefined, root);
+  const instructions = (await $`tar -xOf - ./pi/AGENTS.md < ${shared.archive}`.quiet()).stdout.toString();
+  expect(instructions).toBe(readFileSync(join(root, "home/config/agents/AGENTS.md"), "utf8"));
   const work = await exportProfile(undefined, root, "work");
   const desktop = await exportProfile(undefined, root, "desktop");
   const sharedSettings = JSON.parse((await $`tar -xOf - ./pi/settings.json < ${shared.archive}`.quiet()).stdout.toString());
@@ -56,6 +58,9 @@ test.each(["work", "desktop"])("deployment scopes rules and scans Svelte on %s",
     await $`tar -xf - -C ${release} < ${bundle.archive}`.quiet();
     await installProfile(bundle.metadata, true, release, home);
     expect(profileIsCurrent(bundle.metadata, true, home)).toBe(true);
+    expect(readlinkSync(join(home, ".pi/agent/AGENTS.md"))).toBe(join(release, "pi/AGENTS.md"));
+    expect(readFileSync(join(home, ".pi/agent/AGENTS.md"), "utf8"))
+      .toBe(readFileSync(join(root, "home/config/agents/AGENTS.md"), "utf8"));
     expect(readlinkSync(join(home, ".config/ast-grep"))).toBe(join(release, "ast-grep"));
     expect(readlinkSync(join(home, "develop/frg/sgconfig.yml"))).toBe(join(release, "sgconfig-frg.yml"));
 
