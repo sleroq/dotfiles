@@ -1,5 +1,6 @@
-import { readFile, writeFile, chmod, mkdir, rename } from "node:fs/promises";
+import { readFile, writeFile, chmod, mkdir, rename, realpath } from "node:fs/promises";
 import { join } from "node:path";
+import { homedir } from "node:os";
 
 async function readState(path) {
   try {
@@ -63,10 +64,17 @@ async function writeState(path, state) {
   await rename(temporary, path);
 }
 
-export async function syncProfile(settingsPath, mcpPath, directory, modelsPath) {
+export async function syncProfile(settingsPath, mcpPath, directory, modelsPath, home = homedir()) {
   const settingsDefaults = JSON.parse(await readFile(settingsPath, "utf8"));
   const mcpDefaults = JSON.parse(await readFile(mcpPath, "utf8"));
   await mkdir(directory, { recursive: true, mode: 0o700 });
+  const paseoDirectory = join(home, ".paseo");
+  await mkdir(paseoDirectory, { recursive: true });
+  const trustPath = join(directory, "trust.json");
+  await writeState(trustPath, {
+    ...await readState(trustPath),
+    [await realpath(paseoDirectory)]: true,
+  });
   const settingsTarget = join(directory, "settings.json");
   const mcpTarget = join(directory, "mcp.json");
   const managedPath = join(directory, ".profile-managed.json");
