@@ -9,7 +9,11 @@
 
 let
   cfg = config.myHome.programs.opencode;
-  opencode2 = self.inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode2;
+  opencode = pkgs.writeShellScriptBin "opencode" ''
+    exec ${
+      self.inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode2
+    }/bin/opencode2 "$@"
+  '';
 in
 {
   options.myHome.programs.opencode.enable = lib.mkEnableOption "OpenCode AI coding assistant";
@@ -17,14 +21,11 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = [
       pkgs.beans
-      opencode2
-      (pkgs.writeShellScriptBin "opencode" ''
-        exec ${opencode2}/bin/opencode2 "$@"
-      '')
+      opencode
     ];
 
     home.activation.removeLegacyOpencode = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      run rm -f "$HOME/.bun/bin/opencode" "$HOME/.bun/bin/opencode2"
+      run rm -f "$HOME/.bun/bin/opencode"
     '';
 
     home.activation.opencodeConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

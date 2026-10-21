@@ -13,11 +13,8 @@ let
       };
   pi = inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.default;
   codex = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex;
-  opencode2 = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode2;
-  opencodePaseo = pkgs.writeShellScriptBin "opencode-paseo" ''
-    export OPENCODE_DB="paseo-opencode2.db"
-    export OPENCODE_CONFIG_DIR="$HOME/.config/paseo-opencode2"
-    exec ${opencode2}/bin/opencode2 "$@"
+  opencode = pkgs.writeShellScriptBin "opencode" ''
+    exec ${inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode2}/bin/opencode2 "$@"
   '';
   piDirenv = pkgs.writeShellScriptBin "pi-direnv" ''
     export PI_FFF_MODE=override
@@ -27,8 +24,7 @@ let
     paseo
     pi
     piDirenv
-    opencode2
-    opencodePaseo
+    opencode
     codex
     (pkgs.callPackage ../../packages/rift.nix { })
   ]
@@ -98,7 +94,6 @@ in
   inherit
     paseo
     piDirenv
-    opencodePaseo
     codex
     tools
     ;

@@ -18,7 +18,7 @@ let
       ".pi/agent/settings.json" = "/etc/paseo/pi-settings.json";
       ".pi/agent/mcp.json" = "/etc/paseo/pi-mcp.json";
       ".pi/agent/models.json" = "${../home/config/pi/agent/models.json}";
-      ".config/paseo-opencode2/opencode.json" = "/etc/paseo/opencode.json";
+      ".config/opencode/opencode.json" = "/etc/paseo/opencode.json";
       "sgconfig.yml" = "/etc/paseo/sgconfig.yml";
     };
     links = {
@@ -29,13 +29,11 @@ let
       ".pi/agent/sounds" = "${../home/config/pi/agent/sounds}";
       ".agents/skills" = "${../home/config/agents/skills}";
       ".config/ast-grep/rules" = "${../home/config/ast-grep/rules}";
-      ".config/opencode/plugins/direnv.js" = "${./paseo/opencode2-direnv.js}";
+      ".config/opencode/plugins/direnv.js" = "${./paseo/opencode-direnv.js}";
       ".config/opencode/AGENTS.md" = "${../home/config/agents/AGENTS.md}";
-      ".config/paseo-opencode2/plugins/direnv.js" = "${./paseo/opencode2-direnv.js}";
-      ".config/paseo-opencode2/AGENTS.md" = "${../home/config/agents/AGENTS.md}";
-      ".config/paseo-opencode2/agents" = "${../home/config/opencode/agents}";
-      ".config/paseo-opencode2/commands" = "${../home/config/opencode/commands}";
-      ".config/paseo-opencode2/tui.json" = "${../home/config/opencode/tui.json}";
+      ".config/opencode/agents" = "${../home/config/opencode/agents}";
+      ".config/opencode/commands" = "${../home/config/opencode/commands}";
+      ".config/opencode/tui.json" = "${../home/config/opencode/tui.json}";
     };
   };
   baseline = (pkgs.formats.json { }).generate "paseo-config.json" (
@@ -44,7 +42,7 @@ let
       listen = "${home}/.paseo/paseo.sock";
       commands = {
         pi = [ "${userBin}/pi-direnv" ];
-        opencode = [ "${userBin}/opencode-paseo" ];
+        opencode = [ "${userBin}/opencode" ];
         codex = [ "${userBin}/codex" ];
       };
       relay = {
