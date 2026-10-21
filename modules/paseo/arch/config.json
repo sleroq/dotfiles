@@ -1,4 +1,11 @@
 {
+  "plugins": {
+    "worktree-direnv": {
+      "source": "directory",
+      "path": "@HOME@/.config/paseo/plugins/worktree-direnv",
+      "enabled": true
+    }
+  },
   "daemon": {
     "listen": "@HOME@/.paseo/paseo.sock"
   },

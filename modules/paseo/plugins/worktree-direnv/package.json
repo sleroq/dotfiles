@@ -1,0 +1,15 @@
+{
+  "name": "paseo-worktree-direnv",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test server/*.test.*"
+  },
+  "devDependencies": {
+    "@getpaseo/plugin": "0.11.4",
+    "@getpaseo/client": "0.11.4",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}

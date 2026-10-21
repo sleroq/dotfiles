@@ -54,6 +54,7 @@ in
     programs = {
       remmina.enable = false;
       pi.enable = true;
+      paseo.enable = true;
       pi.cloudflare.enable = true;
       kitty.enable = true;
       obs.enable = true;

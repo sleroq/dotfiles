@@ -1,0 +1,7 @@
+{
+  "id": "worktree-direnv",
+  "description": "Source ignored repository .envrc files in Paseo worktrees.",
+  "requirements": {
+    "paseo": ">=0.11.4 <0.13.0"
+  }
+}
