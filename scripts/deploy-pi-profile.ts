@@ -152,19 +152,25 @@ async function syncExaEnv(target: string, check: boolean) {
   return result.exitCode === 0;
 }
 
-async function deployHost(host: string, bundle: ProfileBundle, options: DeploymentOptions) {
+export function resolveHost(host: string) {
   const target = aliases.get(host) ?? host;
   if (target.startsWith("-")) throw new Error("SSH target cannot start with '-'");
-  const secretsCurrent = host !== "work" || await syncExaEnv(target, options.check ?? false);
+  return target;
+}
+
+export const remoteEnvironment = 'export PATH="$HOME/.local/bin:$HOME/.bun/bin:$HOME/.npm/bin:$HOME/.nix-profile/bin:/run/current-system/sw/bin:/etc/profiles/per-user/$(id -un)/bin:$PATH"; ';
+
+export async function deployHost(host: string, bundle: ProfileBundle, options: DeploymentOptions, profile = host) {
+  const target = resolveHost(host);
+  const secretsCurrent = profile !== "work" || await syncExaEnv(target, options.check ?? false);
   const args = [JSON.stringify(bundle.metadata), options.check ? "check" : "apply", String(options["skip-packages"] ?? false)];
   const release = 'release="$HOME/.local/share/pi-profile/releases/"' + quote(bundle.metadata.contentDigest) + '; ';
   const prepare = options.check ? '[ -f "$release/modules/paseo/install-profile.ts" ] || exit 1; '
     : 'umask 077; mkdir -p "$release" || exit; tar -xmf - -C "$release" || exit; ';
-  const workRuntime = host !== "work" ? "" : options.check
+  const workRuntime = profile !== "work" ? "" : options.check
     ? `zsh -lic 'test "$(readlink -f "$(command -v pi)")" = "$(readlink -f /usr/bin/pi)"' || exit 1; `
     : 'mkdir -p "$HOME/.local/bin" || exit; ln -sfn /usr/bin/pi "$HOME/.local/bin/pi" || exit; ';
-  const remote = 'export PATH="$HOME/.local/bin:$HOME/.bun/bin:$HOME/.npm/bin:$HOME/.nix-profile/bin:/run/current-system/sw/bin:/etc/profiles/per-user/$(id -un)/bin:$PATH"; '
-    + release + prepare + workRuntime + 'exec bun "$release/modules/paseo/install-profile.ts" ' + args.map(quote).join(" ");
+  const remote = remoteEnvironment + release + prepare + workRuntime + 'exec bun "$release/modules/paseo/install-profile.ts" ' + args.map(quote).join(" ");
   const result = options.check
     ? await $`ssh -n ${target} ${remote}`.nothrow()
     : await $`ssh ${target} ${remote} < ${bundle.archive}`.nothrow();
