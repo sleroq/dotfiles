@@ -10,6 +10,7 @@ let
 in
 {
   "secrets/githubRunnerCumbanToken".publicKeys = publicKeys;
+  "secrets/kopokaEnv".publicKeys = publicKeys;
   "secrets/navidromeEnv".publicKeys = publicKeys;
   "secrets/resticHtpasswd".publicKeys = publicKeys;
   "secrets/remnawaveNodeEnv".publicKeys = publicKeys;

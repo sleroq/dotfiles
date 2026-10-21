@@ -11,6 +11,7 @@
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
     ./github-runner.nix
+    ./kopoka.nix
     ./remnanode.nix
     ./restic.nix
     ./starflake.nix

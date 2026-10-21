@@ -50,9 +50,6 @@ let
     "secrets/bayanEnv" = {
       publicKeys = commonPublicKeys;
     };
-    "secrets/kopokaEnv" = {
-      publicKeys = commonPublicKeys;
-    };
     "secrets/reactorEnv" = {
       publicKeys = commonPublicKeys;
     };

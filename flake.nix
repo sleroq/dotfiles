@@ -102,6 +102,9 @@
 
     bayan.url = "github:sleroq/bayan";
 
+    kopoka.url = "git+ssh://git@github.com/sleroq/kopoka";
+    kopoka.inputs.nixpkgs.follows = "nixpkgs-div";
+
     spoiler-images.url = "github:sleroq/spoiler-images";
     spoiler-images.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
