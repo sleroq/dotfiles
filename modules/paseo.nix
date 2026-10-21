@@ -100,7 +100,7 @@ in
     environment.etc."paseo-config.json".source = baseline;
     environment.etc."paseo/config.mjs".source = ./paseo/config.mjs;
     environment.etc."paseo/profile.json".source = profile;
-    environment.etc."paseo/seed-profile.mjs".source = ./paseo/seed-profile.mjs;
+    environment.etc."paseo/seed-profile.mjs".source = ../lib/seed-profile.mjs;
     environment.etc."systemd/system.control/paseo-tailnet.service".source = "/dev/null";
     environment.etc."systemd/system.control/paseo.service.d/90-paseo-config.conf".text = ''
       [Service]

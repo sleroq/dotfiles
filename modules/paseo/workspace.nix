@@ -21,7 +21,7 @@ let
     AGENT_BROWSER_EXECUTABLE_PATH = "${pkgs.chromium}/bin/chromium";
   };
   path =
-    lib.makeBinPath (tools ++ [ pkgs.coreutils ])
+    lib.makeBinPath (config.users.users.${cfg.user}.packages ++ [ pkgs.coreutils ])
     + ":${home}/.nix-profile/bin:/run/current-system/sw/bin:/etc/profiles/per-user/${cfg.user}/bin:${home}/.local/bin:${home}/.deno/bin:${home}/.bun/bin:${home}/.npm/bin:${environment.GOBIN}:${environment.PNPM_HOME}";
   gitConfig = pkgs.writeText "paseo-gitconfig" ''
     [user]
@@ -58,6 +58,7 @@ in
     };
     users.users.${cfg.user} = {
       packages = tools;
+      sleroq.neovim.enable = lib.mkDefault true;
     }
     // lib.optionalAttrs cfg.manageUser {
       isNormalUser = true;

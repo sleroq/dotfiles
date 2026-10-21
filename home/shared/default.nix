@@ -37,19 +37,16 @@
     path = ".ssh/config";
   };
 
+  sleroq.neovim = {
+    enable = true;
+    enableNeovide = true;
+    default = true;
+  };
+
   myHome = {
     wms.wayland = {
       enable = true;
       hyprland.enable = true;
-    };
-
-    editors = {
-      # vscode.enable = true;
-      neovim = {
-        enable = true;
-        enableNeovide = true;
-        default = true;
-      };
     };
 
     programs = {

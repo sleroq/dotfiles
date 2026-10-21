@@ -14,7 +14,6 @@
       git
       jq
       nil
-      neovim
       nixfmt
       podman-compose
       ripgrep

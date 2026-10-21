@@ -1,69 +1,52 @@
 {
+  config,
   pkgs,
   opts,
   lib,
-  inputs',
+  self,
   ...
 }:
-
+let
+  cfg = config.sleroq.neovim;
+  neovim = import ../../../lib/neovim.nix {
+    inherit pkgs;
+    inputs = self.inputs;
+  };
+in
 {
-  programs.neovim = {
-    enable = true;
-    package = inputs'.neovim-nightly-overlay.packages.default;
-    extraWrapperArgs = [
-      "--set"
-      "FFF_NVIM"
-      "${pkgs.vimPlugins.fff-nvim}"
-      "--prefix"
-      "PATH"
-      ":"
-      "${lib.makeBinPath [
-        pkgs.imagemagick
-        pkgs.mermaid-cli
-      ]}"
-    ];
-    withRuby = false;
-    withPython3 = false;
-    sideloadInitLua = true;
+  options.sleroq.neovim = {
+    enable = lib.mkEnableOption "the shared Neovim environment";
+    enableNeovide = lib.mkEnableOption "Neovide";
+    default = lib.mkEnableOption "Neovim as the default editor";
   };
 
-  home.activation.neovim = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    if [ -L "$HOME/.config/nvim/init.lua" ]; then
-      case "$(readlink "$HOME/.config/nvim/init.lua")" in
-        /nix/store/*-home-manager-files/.config/nvim/init.lua)
-          $DRY_RUN_CMD rm $VERBOSE_ARG "$HOME/.config/nvim/init.lua"
-          ;;
-      esac
-    fi
+  config = lib.mkIf cfg.enable {
+    home.packages = neovim.packages ++ [ pkgs.obsidian-neovide ];
 
-    if [ -d "$HOME/.config/nvim" ] && [ ! -L "$HOME/.config/nvim" ]; then
-      $DRY_RUN_CMD rmdir $VERBOSE_ARG "$HOME/.config/nvim"
-    fi
+    home.sessionVariables = lib.mkIf cfg.default {
+      EDITOR = "nvim";
+    };
 
-    $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
-        ${opts.realConfigs}/nvim "$HOME/.config/nvim"
-  '';
+    programs.neovide = lib.mkIf cfg.enableNeovide {
+      enable = true;
+      settings = { };
+    };
 
-  home.packages = with pkgs; [
-    ripgrep
-    fd
-    lazygit
-    obsidian-neovide
-    imagemagick # image.nvim's magick_cli processor
-    mermaid-cli # diagram.nvim's Mermaid renderer (mmdc)
+    home.activation.neovim = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      if [ -L "$HOME/.config/nvim/init.lua" ]; then
+        case "$(readlink "$HOME/.config/nvim/init.lua")" in
+          /nix/store/*-home-manager-files/.config/nvim/init.lua)
+            $DRY_RUN_CMD rm $VERBOSE_ARG "$HOME/.config/nvim/init.lua"
+            ;;
+        esac
+      fi
 
-    htmx-lsp
-    svelte-language-server
-    vscode-langservers-extracted
+      if [ -d "$HOME/.config/nvim" ] && [ ! -L "$HOME/.config/nvim" ]; then
+        $DRY_RUN_CMD rmdir $VERBOSE_ARG "$HOME/.config/nvim"
+      fi
 
-    nodejs
-    shellcheck
-    stylua
-    tree-sitter
-    luajitPackages.luarocks
-    luajitPackages.jsregexp
-    tailwindcss-language-server
-    sqlite
-    lua
-  ];
+      $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+          ${opts.realConfigs}/nvim "$HOME/.config/nvim"
+    '';
+  };
 }

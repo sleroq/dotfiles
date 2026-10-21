@@ -77,6 +77,11 @@ in
     SuccessfulExit = false;
   };
 
+  sleroq.neovim = {
+    enable = true;
+    default = true;
+  };
+
   myHome = {
     astGrep.enable = true;
 
@@ -85,10 +90,6 @@ in
       zed = {
         enable = true;
         package = null;
-      };
-      neovim = {
-        enable = true;
-        default = true;
       };
     };
 

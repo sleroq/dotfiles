@@ -349,6 +349,7 @@
               ])
               (nixpkgs.lib.optionals (tag != "macos") [
                 inputs.agenix.nixosModules.default
+                ./modules/neovim.nix
               ])
             ];
 
