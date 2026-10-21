@@ -10,5 +10,7 @@ rule:
         kind: identifier
     - not:
         inside:
-          pattern: import type { $$$SPECS } from "$MOD"
+          any:
+            - pattern: import type { $$$SPECS } from "$MOD"
+            - pattern: import type { $$$SPECS } from '$MOD'
           stopBy: end

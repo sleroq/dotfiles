@@ -1,0 +1,42 @@
+id: no-import-alias
+snapshots:
+  import { Payload as BoomPayload } from "@hapi/boom";:
+    labels:
+    - source: Payload as BoomPayload
+      style: primary
+      start: 9
+      end: 31
+    - source: BoomPayload
+      style: secondary
+      start: 20
+      end: 31
+  import { Payload as BoomPayload } from '@hapi/boom';:
+    labels:
+    - source: Payload as BoomPayload
+      style: primary
+      start: 9
+      end: 31
+    - source: BoomPayload
+      style: secondary
+      start: 20
+      end: 31
+  import { type Payload as BoomPayload } from '@hapi/boom';:
+    labels:
+    - source: type Payload as BoomPayload
+      style: primary
+      start: 9
+      end: 36
+    - source: BoomPayload
+      style: secondary
+      start: 25
+      end: 36
+  import { type Payload as BoomPayload, boomify as wrapError } from '@hapi/boom';:
+    labels:
+    - source: type Payload as BoomPayload
+      style: primary
+      start: 9
+      end: 36
+    - source: BoomPayload
+      style: secondary
+      start: 25
+      end: 36

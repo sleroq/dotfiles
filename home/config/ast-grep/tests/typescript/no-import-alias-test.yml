@@ -1,0 +1,22 @@
+id: no-import-alias
+valid:
+  - |-
+      import { Payload } from '@hapi/boom';
+  - |-
+      import type { Payload as BoomPayload } from '@hapi/boom';
+  - |-
+      import type { Payload as BoomPayload } from "@hapi/boom";
+  - |-
+      import type {
+        Payload as BoomPayload,
+        Boom as BoomError,
+      } from '@hapi/boom';
+invalid:
+  - |-
+      import { Payload as BoomPayload } from '@hapi/boom';
+  - |-
+      import { Payload as BoomPayload } from "@hapi/boom";
+  - |-
+      import { type Payload as BoomPayload } from '@hapi/boom';
+  - |-
+      import { type Payload as BoomPayload, boomify as wrapError } from '@hapi/boom';
