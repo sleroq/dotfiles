@@ -5,7 +5,7 @@ tools: read, bash, edit, write, find, grep, codemode, mcp__*
 inheritProjectContext: true
 inheritSkills: true
 completionGuard: false
-model: openai-codex/gpt-6.1
+model: openai/gpt-6.1
 thinking: low
 ---
 

@@ -51,7 +51,7 @@
       "providers": [
         {
           "provider": "pi",
-          "model": "openai-codex/gpt-6-luna",
+          "model": "openai/gpt-6-luna",
           "thinkingOptionId": "low"
         }
       ]

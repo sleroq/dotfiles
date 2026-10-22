@@ -14,12 +14,12 @@
     "mermaid": "final"
   },
   "theme": "dark",
-  "defaultProvider": "openai-codex",
+  "defaultProvider": "openai",
   "defaultModel": "gpt-6.1-sol",
   "enabledModels": [
     "FrankAI/FrankAI",
-    "openai-codex/gpt-6-astra",
-    "openai-codex/gpt-6.1-sol"
+    "openai/gpt-6-astra",
+    "openai/gpt-6.1-sol"
   ],
   "outputPad": 0
 }
