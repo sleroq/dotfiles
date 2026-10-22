@@ -2,7 +2,7 @@
 
 Applies to upstream **v0.9, revision 98bea2c**, with wlroots **0.20** and
 XWayland. Apply `patches/ipc.patch`, then `patches/desktop.patch`, then
-`patches/better-resize.patch`, and copy
+`patches/better-resize.patch`, then `patches/metrics.patch`, and copy
 `config.h` into the source. The Nix expression owns source selection and session
 entry installation; these patches do not change the pin or IPC XML.
 
@@ -18,6 +18,15 @@ warping or locking (`warp_cursor=0`, `lock_cursor=0`).
 Inactive tabs stay in the client list and workspace counts, but are absent from
 scene traversal, pointer hit testing, and focus enumeration. Overlay members
 are independent of tags and excluded from ordinary workspace counts.
+
+## Prometheus metrics
+
+`metrics.patch` adds an opt-in atomic textfile exporter, suitable for a same-user
+node_exporter and the existing Alloy remote-write pipeline. It tracks window/tag/
+special/pane counts, active/idle/locked time, application focus retention, size
+popularity, and real resize/split operations. Per-window series, titles, and
+executable paths are separate opt-ins. See [metrics setup, catalogue, and queries](METRICS.md).
+No collection or new network listener is enabled by the package itself.
 
 ## Controls
 
