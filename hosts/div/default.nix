@@ -179,6 +179,7 @@
     enableDelete = true;
     enableGarbageCollect = true;
   };
+  systemd.services.docker-registry.environment.OTEL_TRACES_EXPORTER = "none";
 
   sleroq.slusha = {
     enable = true;
