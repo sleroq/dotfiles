@@ -88,6 +88,11 @@ in
         encode zstd gzip
 
         route {
+          # Prometheus scrapes Navidrome directly over Tailscale, not this public route.
+          handle ${cfg.metrics.path} {
+            respond 404
+          }
+
           # Native capability URLs bypass music-link so Navidrome retains range
           # requests, expiration, revocation, and download enforcement.
           @navidrome path_regexp ^/share/(?:s/.*|img/.*|d/.*|[A-Za-z0-9_-]{1,128}/m3u/?$)
