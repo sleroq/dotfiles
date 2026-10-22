@@ -4,13 +4,54 @@ let
     (pkgs.callPackage "${inputs.nixpkgs-master}/pkgs/by-name/pa/paseo/package.nix" {
       nodejs_22 = pkgs.nodejs_24;
     }).overrideAttrs
-      {
-        # Build with upstream's npm 10; npm 11 re-resolves locked React peers offline.
-        # The installed wrappers and node-pty headers still use Node 24.
-        prePatch = ''
-          export PATH="${pkgs.nodejs_22}/bin:$PATH"
+      (
+        finalAttrs: _oldAttrs: {
+          version = "0.13.0-beta.1";
+          src = pkgs.fetchFromGitHub {
+            owner = "getpaseo";
+            repo = "paseo";
+            tag = "v${finalAttrs.version}";
+            hash = "sha256-Z/Banm3O1Bxtk9ShA3uJrftRvX5bvTex9Ng2IWvAAE0=";
+          };
+          npmDeps = pkgs.fetchNpmDeps {
+            inherit (finalAttrs) src;
+            name = "paseo-${finalAttrs.version}-npm-deps";
+            hash = "sha256-La6xekVRQ9F6UulA6OHX5SzaXv6L0qZ2KpGkRScFd8Q=";
+          };
+
+          # Build with upstream's npm 10; npm 11 re-resolves locked React peers offline.
+          # The installed wrappers and node-pty headers still use Node 24.
+          prePatch = ''
+            export PATH="${pkgs.nodejs_22}/bin:$PATH"
+          '';
+          postInstall = ''
+            patchShebangs --build "$out/lib/paseo"
+          '';
+        }
+      );
+  desktop =
+    inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.paseo-desktop.overrideAttrs
+      (oldAttrs: {
+        inherit (paseo)
+          version
+          src
+          npmDeps
+          prePatch
+          ;
+        env = oldAttrs.env // {
+          NIX_NPM_FETCHER_VERSION = 1;
+        };
+        installPhase =
+          builtins.replaceStrings
+            [ "node scripts/trace-daemon.mjs" ]
+            [
+              "PASEO_TRACE_DESKTOP=1 node scripts/trace-daemon.mjs"
+            ]
+            oldAttrs.installPhase;
+        postInstall = ''
+          patchShebangs --build "$out/share/paseo-desktop"
         '';
-      };
+      });
   pi = inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.default;
   codex = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex;
   opencode = pkgs.writeShellScriptBin "opencode" ''
@@ -93,6 +134,7 @@ in
 {
   inherit
     paseo
+    desktop
     piDirenv
     codex
     tools

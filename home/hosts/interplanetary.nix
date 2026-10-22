@@ -1,11 +1,16 @@
 {
   pkgs,
   inputs',
+  self,
   lib,
   ...
 }:
 
 let
+  paseoPackages = import ../../modules/paseo/packages.nix {
+    inherit pkgs;
+    inputs = self.inputs;
+  };
   bottles = pkgs.bottles.override {
     bottles-unwrapped = pkgs.bottles-unwrapped.override {
       python3Packages = pkgs.python3Packages.overrideScope (
@@ -64,7 +69,7 @@ in
       mangohud.enable = true;
       extraPackages = with pkgs; [
         obsidian
-        inputs'.llm-agents.packages.paseo-desktop
+        paseoPackages.desktop
         # ollama-rocm
         # chatbox
         scrcpy
