@@ -111,11 +111,6 @@
     initialize = true;
     paths = [ "/var/lib/bayan" ];
     exclude = [ "**/*.log" ];
-    pruneOpts = [
-      "--keep-daily 7"
-      "--keep-weekly 5"
-      "--keep-monthly 12"
-    ];
     timerConfig = {
       OnCalendar = "03:35";
       Persistent = true;

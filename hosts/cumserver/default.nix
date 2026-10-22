@@ -29,8 +29,6 @@
     ./modules/remnawave.nix
     ./modules/remnawave-relays.nix
     ./modules/traggo.nix
-    ./modules/slusha.nix
-    ./modules/n8n.nix
     ./modules/minecraft.nix
     ./modules/frp.nix
     ./modules/restic.nix
@@ -248,10 +246,7 @@
     };
   };
 
-  # cumserver.n8n.enable = true;
-
   cumserver.minecraft.cum.enable = true;
-  # cumserver.minecraft.forever-chu.enable = true;
 
   # Keep the legacy Sieve binary across system switches and garbage collection.
   # The imported module is pinned, but its bot-split package is NOT deployed.
@@ -296,6 +291,7 @@
       "**/log-*.jsonl"
       "**/*.log"
     ];
+    # Reactor deliberately owns repository-wide retention for bots-backups.
     pruneOpts = [
       "--keep-daily 7"
       "--keep-weekly 5"
@@ -318,11 +314,6 @@
     exclude = [
       "**/log-*.jsonl"
       "**/*.log"
-    ];
-    pruneOpts = [
-      "--keep-daily 1"
-      "--keep-weekly 3"
-      "--keep-monthly 5"
     ];
     timerConfig = {
       OnCalendar = "03:35";
@@ -351,15 +342,6 @@
     enable = true;
     port = 8089;
     environmentFile = config.age.secrets.sieveEnv.path;
-  };
-
-  age.secrets.slushaEnv = {
-    file = ./secrets/slushaEnv;
-  };
-  cumserver.slusha = {
-    enable = false;
-    image = "localhost:5000/slusha:edge-cumming-beta";
-    environmentFile = config.age.secrets.slushaEnv.path;
   };
 
   nixpkgs.config.allowUnfreePredicate =

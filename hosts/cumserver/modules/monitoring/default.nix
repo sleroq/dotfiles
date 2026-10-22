@@ -203,13 +203,6 @@ in
             static_configs = [ { targets = [ "127.0.0.1:${toString config.cumserver.restic.port}" ]; } ];
           }
         ]
-        ++ lib.optionals (config.cumserver.slusha.enable or false) [
-          {
-            job_name = "slusha";
-            metrics_path = "/metrics";
-            static_configs = [ { targets = [ "127.0.0.1:${toString config.cumserver.slusha.webPort}" ]; } ];
-          }
-        ]
         ++ lib.optionals (cfg.navidrome.address != null) [
           {
             job_name = "navidrome";

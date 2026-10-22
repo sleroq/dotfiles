@@ -11,7 +11,6 @@ in
 {
   options.cumserver.minecraft = {
     cum.enable = lib.mkEnableOption "cum.army minecraft server";
-    forever-chu.enable = lib.mkEnableOption "Forever Chu minecraft server";
     backup.enable = lib.mkEnableOption "backups" // {
       default = true;
     };
@@ -90,33 +89,6 @@ in
               };
             };
           })
-
-          (lib.mkIf cfg.forever-chu.enable {
-            forever-chu = {
-              enable = true;
-              autoStart = true;
-              jvmOpts = "-Xms2G -Xmx5G -XX:+UseZGC -XX:MaxDirectMemorySize=1G -XX:MaxMetaspaceSize=512M";
-              package = pkgs.fabricServers.fabric-1_21_5.override {
-                loaderVersion = "0.16.14";
-              };
-
-              serverProperties = {
-                spawn-protection = 0;
-                server-port = 25565;
-                motd = "cum.army";
-                online-mode = false;
-                max-players = 10;
-                white-list = true;
-                enable-status = false;
-                hide-online-players = true;
-                allow-flight = true;
-                sync-chunk-writes = false;
-                enable-rcon = true;
-                "rcon.password" = "localbackup";
-                "rcon.port" = 25575;
-              };
-            };
-          })
         ];
       };
     }
@@ -125,23 +97,9 @@ in
         pkgs.git
         pkgs.git-lfs
       ];
-      systemd.services.minecraft-server-forever-chu.serviceConfig = {
-        MemoryHigh = "4G";
-        MemoryMax = "5G";
-      };
-    })
-    (lib.mkIf cfg.forever-chu.enable {
-      systemd.services.minecraft-server-forever-chu.path = [
-        pkgs.git
-        pkgs.git-lfs
-      ];
-      systemd.services.minecraft-server-forever-chu.serviceConfig = {
-        MemoryHigh = "4G";
-        MemoryMax = "5G";
-      };
     })
 
-    (lib.mkIf ((cfg.cum.enable || cfg.forever-chu.enable) && cfg.backup.enable) {
+    (lib.mkIf (cfg.cum.enable && cfg.backup.enable) {
       age.secrets.resticMinecraftPassword = {
         owner = "minecraft";
         group = "minecraft";
@@ -156,9 +114,7 @@ in
         passwordFile = config.age.secrets.resticMinecraftPassword.path;
         environmentFile = config.age.secrets.resticMinecraftRestEnv.path;
         initialize = true;
-        paths =
-          (lib.optionals cfg.cum.enable [ "/srv/minecraft/cum" ])
-          ++ (lib.optionals cfg.forever-chu.enable [ "/srv/minecraft/forever-chu" ]);
+        paths = [ "/srv/minecraft/cum" ];
         exclude = [
           "logs"
           "crash-reports"
@@ -177,18 +133,11 @@ in
             ${pkgs.mcrcon}/bin/mcrcon -H 127.0.0.1 -P 25576 -p localbackup "save-off" || true
             ${pkgs.mcrcon}/bin/mcrcon -H 127.0.0.1 -P 25576 -p localbackup "save-all flush" || true
           fi
-          if systemctl is-active --quiet minecraft-server-forever-chu.service; then
-            ${pkgs.mcrcon}/bin/mcrcon -H 127.0.0.1 -P 25575 -p localbackup "save-off" || true
-            ${pkgs.mcrcon}/bin/mcrcon -H 127.0.0.1 -P 25575 -p localbackup "save-all flush" || true
-          fi
         '';
         backupCleanupCommand = ''
           set +e
           if systemctl is-active --quiet minecraft-server-cum.service; then
             ${pkgs.mcrcon}/bin/mcrcon -H 127.0.0.1 -P 25576 -p localbackup "save-on" || true
-          fi
-          if systemctl is-active --quiet minecraft-server-forever-chu.service; then
-            ${pkgs.mcrcon}/bin/mcrcon -H 127.0.0.1 -P 25575 -p localbackup "save-on" || true
           fi
         '';
       };

@@ -344,11 +344,6 @@ in
         environmentFile = config.age.secrets.resticS3Keys.path;
         initialize = true;
         paths = [ cfg.dataDir ];
-        pruneOpts = [
-          "--keep-daily 1"
-          "--keep-weekly 5"
-          "--keep-monthly 12"
-        ];
         timerConfig = {
           OnCalendar = "04:35";
           Persistent = true;

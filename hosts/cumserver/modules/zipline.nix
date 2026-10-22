@@ -7,14 +7,16 @@ in
   options.cumserver.zipline = {
     enable = lib.mkEnableOption "Zipline file sharing server";
 
-    backup.enable = lib.mkEnableOption "backups" // { default = true; };
-    
+    backup.enable = lib.mkEnableOption "backups" // {
+      default = true;
+    };
+
     domain = lib.mkOption {
       type = lib.types.str;
       default = "share.cum.army";
       description = "Domain name for Zipline";
     };
-    
+
     port = lib.mkOption {
       type = lib.types.port;
       default = 3000;
@@ -38,14 +40,14 @@ in
 
       services.zipline = {
         enable = true;
-        
+
         environmentFiles = [ cfg.environmentFile ];
-        
+
         settings = {
           CORE_PORT = cfg.port;
           CORE_TEMP_DIRECTORY = "/var/lib/zipline/tmp";
         };
-        
+
         database.createLocally = true;
       };
 
@@ -54,7 +56,7 @@ in
           extraConfig = ''
             reverse_proxy localhost:${toString cfg.port}
             encode zstd gzip
-            
+
             header {
               X-Content-Type-Options nosniff
               X-Frame-Options SAMEORIGIN
@@ -84,7 +86,6 @@ in
         '';
 
         paths = [ "/var/lib/private/zipline" ];
-        pruneOpts = [ "--keep-weekly 2" "--keep-monthly 4" ];
         timerConfig = {
           OnCalendar = "weekly";
           Persistent = true;
@@ -93,4 +94,4 @@ in
       };
     })
   ];
-} 
+}
