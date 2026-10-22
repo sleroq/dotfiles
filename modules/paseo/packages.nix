@@ -16,7 +16,7 @@ let
           npmDeps = pkgs.fetchNpmDeps {
             inherit (finalAttrs) src;
             name = "paseo-${finalAttrs.version}-npm-deps";
-            hash = "sha256-La6xekVRQ9F6UulA6OHX5SzaXv6L0qZ2KpGkRScFd8Q=";
+            hash = "sha256-DkB70/NH4SriKZ6hMDhI7XfwkqjGfb9e1zC3dxjBaTg=";
           };
 
           # Build with upstream's npm 10; npm 11 re-resolves locked React peers offline.
