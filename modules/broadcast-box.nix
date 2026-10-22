@@ -181,11 +181,6 @@ let
     environmentFile = config.age.secrets.resticS3Keys.path;
     initialize = true;
     paths = [ "/var/lib/redis-broadcast-box-${name}" ];
-    pruneOpts = [
-      "--keep-daily 1"
-      "--keep-weekly 5"
-      "--keep-monthly 12"
-    ];
     timerConfig = {
       OnCalendar = "04:40";
       Persistent = true;
