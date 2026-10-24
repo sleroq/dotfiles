@@ -138,7 +138,9 @@
     roboto
     noto-fonts
     noto-fonts-color-emoji
-    twemoji-color-font
+    # CBDT color glyphs work in Chromium/Helium as well as other Linux apps;
+    # twemoji-color-font uses SVGinOT, which Chromium renders in monochrome.
+    twitter-color-emoji
   ];
 
   fonts.fontconfig.localConf = ''
