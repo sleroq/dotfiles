@@ -31,6 +31,11 @@ let
       action = "route";
       outbound = "direct";
     }
+    {
+      rule_set = [ "steam" ];
+      action = "route";
+      outbound = "direct";
+    }
   ]
   ++ lib.optional (policy.directProcessNames != [ ]) {
     process_name = policy.directProcessNames;
@@ -76,14 +81,6 @@ in
         "nelocal"
         "frg"
         "frankrg.com"
-        "steampowered.com"
-        "steamcommunity.com"
-        "steamstatic.com"
-        "steamcontent.com"
-        "steamserver.net"
-        "steamusercontent.com"
-        "steam-chat.com"
-        "valvesoftware.com"
         "energotransbank.com"
         "alt-web.cum.army"
         "reg.cloud"
@@ -158,19 +155,26 @@ in
               tag = "local-dns";
             }
           ];
-          rules =
-            lib.optional (policy.directProcessNames != [ ]) {
-              process_name = policy.directProcessNames;
+          rules = [
+            {
+              rule_set = [ "steam" ];
               action = "route";
               server = "local-dns";
               strategy = "ipv4_only";
             }
-            ++ lib.optional (policy.directDomains != [ ]) {
-              domain_suffix = policy.directDomains;
-              action = "route";
-              server = "local-dns";
-              strategy = "ipv4_only";
-            };
+          ]
+          ++ lib.optional (policy.directProcessNames != [ ]) {
+            process_name = policy.directProcessNames;
+            action = "route";
+            server = "local-dns";
+            strategy = "ipv4_only";
+          }
+          ++ lib.optional (policy.directDomains != [ ]) {
+            domain_suffix = policy.directDomains;
+            action = "route";
+            server = "local-dns";
+            strategy = "ipv4_only";
+          };
           strategy = "ipv4_only";
           final = "remote-dns";
         };
@@ -197,13 +201,23 @@ in
           }
         ];
         route = {
+          rule_set = [
+            {
+              type = "remote";
+              tag = "steam";
+              format = "binary";
+              url = "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/steam.srs";
+              http_client.detour = "proxy";
+              update_interval = "1d";
+            }
+          ];
           rules = routeRules;
           final = "proxy";
           auto_detect_interface = true;
           default_domain_resolver = "bootstrap-dns";
         };
         experimental.cache_file = {
-          enabled = false;
+          enabled = true;
           path = "/var/lib/sing-box/clash.db";
         };
       };
