@@ -2,11 +2,11 @@
   "lastChangelogVersion": "1.2.0",
   "defaultThinkingLevel": "low",
   "packages": [
-    "npm:@gotgenes/pi-subagents@25.0.1",
-    "npm:pi-worktree-extension@2.0.3",
+    "npm:@gotgenes/pi-subagents@25.0.4",
+    "npm:pi-worktree-extension@2.0.4",
     "npm:@ff-labs/pi-fff@0.11.0",
-    "npm:pi-compact-transcript@0.11.1",
-    "npm:@narumitw/pi-btw@0.62.0"
+    "npm:pi-compact-transcript@0.12.0",
+    "npm:@narumitw/pi-btw@0.63.0"
   ],
   "hideThinkingBlock": true,
   "showCacheMissNotices": true,

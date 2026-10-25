@@ -6,17 +6,17 @@ let
     }).overrideAttrs
       (
         finalAttrs: _oldAttrs: {
-          version = "0.13.0-beta.1";
+          version = "0.13.0";
           src = pkgs.fetchFromGitHub {
             owner = "getpaseo";
             repo = "paseo";
             tag = "v${finalAttrs.version}";
-            hash = "sha256-Z/Banm3O1Bxtk9ShA3uJrftRvX5bvTex9Ng2IWvAAE0=";
+            hash = "sha256-f3hXjwjenlXr8c8FmXMnz6PZ8QGyeyouJ/CtRwO8OdM=";
           };
           npmDeps = pkgs.fetchNpmDeps {
             inherit (finalAttrs) src;
             name = "paseo-${finalAttrs.version}-npm-deps";
-            hash = "sha256-DkB70/NH4SriKZ6hMDhI7XfwkqjGfb9e1zC3dxjBaTg=";
+            hash = "sha256-DZOPOf81PkUxdD65BrfkTZhs6/DkfDWCFZ/SU+QrZbg=";
           };
 
           # Build with upstream's npm 10; npm 11 re-resolves locked React peers offline.
