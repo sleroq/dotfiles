@@ -62,6 +62,7 @@ in
       "${config.home.homeDirectory}/.local/bin"
       "${config.home.homeDirectory}/.deno/bin"
       "${config.home.homeDirectory}/.bun/bin"
+      "${config.home.homeDirectory}/.cargo/bin"
       "${config.home.homeDirectory}/.npm/bin"
       "${config.home.homeDirectory}/develop/go/bin"
       "${config.home.homeDirectory}/.local/share/pnpm"
