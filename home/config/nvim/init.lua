@@ -549,6 +549,7 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 })
 
 require("obsidian").setup({
+    legacy_commands = false,
     workspaces = {
         {
             name = "vault",
@@ -560,7 +561,7 @@ require("obsidian").setup({
 vim.api.nvim_create_autocmd("FileType", {
     pattern = "markdown",
     callback = function(args)
-        map("n", "gd", "<Cmd>ObsidianFollowLink<CR>", {
+        map("n", "gd", "<Cmd>Obsidian follow_link<CR>", {
             buffer = args.buf,
             desc = "Follow Obsidian link",
         })

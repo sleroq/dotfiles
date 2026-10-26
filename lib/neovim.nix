@@ -1,5 +1,8 @@
 { pkgs, inputs }:
 let
+  pkgsMaster = import inputs.nixpkgs-master {
+    system = pkgs.stdenv.hostPlatform.system;
+  };
   package =
     pkgs.wrapNeovimUnstable
       inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default
@@ -10,7 +13,7 @@ let
         wrapperArgs = [
           "--set"
           "FFF_NVIM"
-          "${pkgs.vimPlugins.fff-nvim}"
+          "${pkgsMaster.vimPlugins.fff-nvim}"
           "--prefix"
           "PATH"
           ":"
