@@ -48,6 +48,9 @@ in
       };
     };
 
+    # Remember explicitly selected monitors when apps request persistent capture.
+    systemd.user.services.xdg-desktop-portal-wlr.environment.XDPW_PERSIST_MODE = "permanent";
+
     # DMA-BUF transfers need a descriptor per buffer; the default soft limit is 1024.
     systemd.user.services."wayland-wm@dwl.desktop" = {
       overrideStrategy = "asDropin";
