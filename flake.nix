@@ -48,7 +48,7 @@
     home-manager-interplanetary.url = "github:nix-community/home-manager";
     home-manager-interplanetary.inputs.nixpkgs.follows = "nixpkgs-interplanetary";
 
-    home-manager-cumserver.url = "github:nix-community/home-manager/f3a30376bb9eb2f6f61816be7d6ed954b6d2a3b9";
+    home-manager-cumserver.url = "github:nix-community/home-manager";
     home-manager-cumserver.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     pi.url = "github:earendil-works/pi/main";
@@ -67,7 +67,8 @@
     nixpkgs-master.url = "github:nixos/nixpkgs/master";
 
     # Single-quality MoQ pilot; release source is copied to the build host.
-    moq-box.url = "path:/nix/store/ylvjypxd1ajx918qk694wsdqff922asb-source";
+    moq-box.url = "path:/nix/store/d9ynfnm6b7ghwm3ldnkzb0yvbbqwbmq1-source";
+    moq-box.inputs.nixpkgs.follows = "nixpkgs";
 
     # Cumserver flakes
     disko.url = "github:nix-community/disko";

@@ -1,6 +1,7 @@
 {
   lib,
   modulesPath,
+  options,
   pkgs,
   ...
 }:
@@ -37,9 +38,11 @@
         "processes"
       ];
     };
-    journald.extraConfig = ''
-      SystemMaxUse=100M
-    '';
+    journald =
+      if options.services.journald ? settings then
+        { settings.Journal.SystemMaxUse = "100M"; }
+      else
+        { extraConfig = "SystemMaxUse=100M"; };
     openssh = {
       enable = true;
       openFirewall = false;

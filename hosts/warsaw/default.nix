@@ -109,6 +109,9 @@ in
   # its waw.cum.army certificate after nginx takes over the HTTP-01 listener.
   users.users.nginx.extraGroups = [ "acme" ];
 
+  # Changing the D-Bus implementation requires a reboot, not a live switch.
+  services.dbus.implementation = "dbus";
+
   services.nginx = {
     enable = true;
     virtualHosts = {
@@ -151,8 +154,8 @@ in
     oci-containers.backend = "podman";
     oci-containers.containers.feishin = {
       autoStart = true;
-      image = "ghcr.io/jeffvli/feishin:latest";
-      pull = "newer";
+      # Feishin 1.17.0
+      image = "ghcr.io/jeffvli/feishin@sha256:6c75a4d3b99065ac245e2eb2b693fde3e5f2a6fe41c9e255da4fcb8948071965";
       ports = [ "127.0.0.1:9180:9180" ];
       environment = {
         SERVER_NAME = "sleroq";
@@ -164,7 +167,8 @@ in
     };
     oci-containers.containers.remnanode = {
       autoStart = true;
-      image = "docker.io/remnawave/node:2.8.0";
+      # Remnawave Node 3.4.3
+      image = "docker.io/remnawave/node@sha256:793f4ac52289f680ea2b12be8047e93f68b710c22ca93b52b9448a6fef7eaaa6";
       environmentFiles = [ config.age.secrets.remnawaveNodeEnv.path ];
       extraOptions = [
         "--network=host"

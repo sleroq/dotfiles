@@ -9,7 +9,7 @@ in
 
   virtualisation.oci-containers.containers.remnanode = {
     autoStart = true;
-    image = "docker.io/remnawave/node:3.4.2";
+    image = "docker.io/remnawave/node:3.4.3";
     environmentFiles = [ config.age.secrets.remnawaveNodeEnv.path ];
     extraOptions = [
       "--network=host"

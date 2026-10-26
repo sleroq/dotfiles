@@ -16,19 +16,19 @@ in
 
     image = lib.mkOption {
       type = lib.types.str;
-      default = "docker.io/remnawave/backend:3.3.2";
+      default = "docker.io/remnawave/backend:3.4.7@sha256:5c26c0314be896dfac82020b693c50a73d2f18ef593da2ef97244330ac032bcf";
       description = "Docker image to use for Remnawave backend";
     };
 
     postgresImage = lib.mkOption {
       type = lib.types.str;
-      default = "docker.io/library/postgres:17.9";
+      default = "docker.io/library/postgres:17.11@sha256:b8faeff7712663c2773a190181e1246e37e364b887611c04658c28b44e2408fe";
       description = "Docker image to use for Remnawave PostgreSQL";
     };
 
     redisImage = lib.mkOption {
       type = lib.types.str;
-      default = "docker.io/valkey/valkey:9.0.3-alpine";
+      default = "docker.io/valkey/valkey:9.1.2-alpine@sha256:48332870af354a799964c0012ae1194a0bf2bf894eb508f945810596dc2d8d11";
       description = "Docker image to use for Remnawave Redis/Valkey";
     };
 
@@ -85,7 +85,7 @@ in
 
       image = lib.mkOption {
         type = lib.types.str;
-        default = "docker.io/remnawave/subscription-page:8.0.0";
+        default = "docker.io/remnawave/subscription-page:8.0.1@sha256:ba8445b1e0d1c170cf314686ef638b73cabf42a0c6217d027e6cb958ca161ca6";
         description = "Docker image to use for Remnawave subscription page";
       };
 
@@ -113,7 +113,7 @@ in
 
       image = lib.mkOption {
         type = lib.types.str;
-        default = "docker.io/remnawave/node:2.8.0";
+        default = "docker.io/remnawave/node:3.4.3@sha256:793f4ac52289f680ea2b12be8047e93f68b710c22ca93b52b9448a6fef7eaaa6";
         description = "Docker image to use for the local Remnawave node";
       };
 
@@ -343,7 +343,19 @@ in
         passwordFile = config.age.secrets.resticBackupsPassword.path;
         environmentFile = config.age.secrets.resticS3Keys.path;
         initialize = true;
+        # Keep globals and all databases together; live PGDATA is not a safe backup.
+        backupPrepareCommand = ''
+          set -euo pipefail
+          umask 077
+          install -d -m 0700 "${cfg.dataDir}/backup"
+          dump=$(mktemp "${cfg.dataDir}/backup/.postgres.sql.XXXXXX")
+          trap 'rm -f "$dump"' EXIT
+          ${lib.getExe config.virtualisation.podman.package} exec remnawave-db \
+            sh -c 'exec pg_dumpall --username="$POSTGRES_USER"' > "$dump"
+          mv "$dump" "${cfg.dataDir}/backup/postgres.sql"
+        '';
         paths = [ cfg.dataDir ];
+        exclude = [ "${cfg.dataDir}/postgres17" ];
         timerConfig = {
           OnCalendar = "04:35";
           Persistent = true;

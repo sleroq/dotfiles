@@ -2,6 +2,8 @@
 
 Never build on ru-relay. Select a builder using the root `AGENTS.md`, copy the system closure, then activate it here. Do not run `nixos-rebuild switch --flake` without a remote build host: it can start a local build.
 
+The relay has only 1 GiB RAM. Use one transfer/import at a time; never parallelize cache copies or overlap them with another closure copy. Check available memory and swap before copying and activating, and pause if memory pressure grows. Parallel copies during the 2026-10-23 update exhausted swap and OOM-killed sing-box; serial copying and activation completed successfully.
+
 On the selected Linux builder (use `ssh -A <builder>` for SSH agent forwarding), use a clean, synced copy of this flake containing the intended changes and lock file; do not accidentally deploy unrelated dirty changes. The key authorized for ru-relay is listed in `hosts/ru-relay/default.nix`. For example, if that key is loaded in the forwarded agent:
 
 ```sh

@@ -1,6 +1,5 @@
 {
   config,
-  pkgs,
   secrets,
   ...
 }:
@@ -56,11 +55,6 @@ in
       redisPort = 6379;
       redisDb = 0;
       stateDirectory = "broadcast-box";
-      package = pkgs.broadcast-box.override {
-        version = "unstable-2026-09-28";
-        rev = "f4b084b86b5397dfcd41641aec0f3bf953acac31";
-        hash = "sha256-3uabwwnLs2hCfKk7cUw5ZCN9Ig39lU0pl28NYOlSYqU=";
-      };
       backup.enable = false;
     };
   };
@@ -72,6 +66,9 @@ in
   };
 
   services = {
+    # Preserve the running bus backend so updates can be switched without a reboot.
+    dbus.implementation = "dbus";
+
     caddy = {
       enable = true;
       email = "sleroq@cum.army";
@@ -114,16 +111,15 @@ in
           tcp-request content accept if { req.ssl_hello_type 1 }
           use_backend moq_https if { req.ssl_sni -i moq-relay.cum.army }
           use_backend broadcast_box_https if { req.ssl_sni -i alt-web.cum.army moq.cum.army }
-          default_backend warsaw_beats_tunnel
+          # RU-initiated connections to Warsaw are dropped upstream; reuse
+          # the Warsaw-initiated bridge without changing client settings.
+          default_backend warsaw_reverse
 
         backend moq_https
           server relay 127.0.0.1:${toString config.services.moq-box.httpsPort} check
 
         backend broadcast_box_https
           server caddy 127.0.0.1:8443 check
-
-        backend warsaw_beats_tunnel
-          server local_tunnel 127.0.0.1:12084 check
 
         frontend warsaw_germany_ingress
           bind 0.0.0.0:2080
@@ -169,6 +165,7 @@ in
 
   # Apply routing changes with HAProxy's graceful reload, preserving proxy connections.
   systemd.services.haproxy.reloadIfChanged = true;
+  systemd.services.haproxy.restartTriggers = [ config.environment.etc."haproxy.cfg".source ];
   systemd.services.haproxy.serviceConfig = {
     LimitNOFILE = 65536;
     OOMScoreAdjust = -500;

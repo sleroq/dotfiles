@@ -3,14 +3,14 @@
   fetchFromGitHub,
   buildGoModule,
   buildNpmPackage,
-  version ? "unstable-2026-09-13",
+  version ? "unstable-2026-10-21",
   owner ? "Glimesh",
   repo ? "broadcast-box",
-  rev ? "eacabc0737d5fba61f57999462df5906cec0a5e3",
-  hash ? "sha256-97TOeEJlWlXrWK3IQ1s9Uylcx+D/E50DsHx0mPM1TDs=",
-  vendorHash ? "sha256-YHFPZuZlgPrYo072pBU47vfGKwjr62YPCT5S3gAjhuI=",
+  rev ? "d37c9bbfb115562f80d94c5e867f3a4055febb4d",
+  hash ? "sha256-EKaQfcim4q/+GHvY4dhuh/gZfiZaUAcMYRAu8U6LiBQ=",
+  vendorHash ? "sha256-lgm6xrcBX4gxEfYasmeFbO/nVTcV0r4WPObw1wt8Ahg=",
   frontendLock ? null,
-  frontendNpmDepsHash ? "sha256-wIEsiJI9SVwMEIAOW5Mubg8yyPXlwTEKNQGmSvey4MY=",
+  frontendNpmDepsHash ? "sha256-eDbq/jhbPq98TmfYuh6rBid+HG7NxkPVufWC7YFtcKo=",
 }:
 let
   src = fetchFromGitHub {

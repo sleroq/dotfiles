@@ -92,6 +92,8 @@ in
     # destinations, link-local IPv6, and multicast traffic.
     routeExcludeAddresses = [
       "45.144.51.81/32" # node1.yamarkov.ru, selected proxy endpoint.
+      "83.69.209.222/32"
+      "176.74.10.190/32"
       "10.0.0.0/8"
       "172.16.0.0/12"
       "192.168.0.0/16"
