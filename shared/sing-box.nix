@@ -86,6 +86,7 @@ in
         "reg.cloud"
         "quietplace.xyz"
         "emlstart.com"
+        "ggsel.net"
       ];
       directProcessNames = [
         "steam"
