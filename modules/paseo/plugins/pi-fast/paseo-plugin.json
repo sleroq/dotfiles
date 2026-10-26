@@ -1,0 +1,7 @@
+{
+  "id": "pi-fast",
+  "description": "Control the local Pi Fast extension from the composer.",
+  "requirements": {
+    "paseo": ">=0.13.0-beta.2 <0.14.0"
+  }
+}
