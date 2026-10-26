@@ -1,3 +1,4 @@
 /.direnv/
 **/.cache/
 /home/config/pi/agent/auth.json
+node_modules/
