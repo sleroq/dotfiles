@@ -28,6 +28,13 @@ in
   sleroq.wms.dwl.enable = true;
   programs.hyprland.enable = lib.mkForce false;
 
+  # Remote Play needs portal capture when the game's Vulkan capture is unavailable.
+  programs.steam.package = pkgs.steam.override {
+    extraArgs = "-pipewire";
+    # The current Steam client is 64-bit; NixOS still preloads 32-bit extest.
+    extraEnv.LD_PRELOAD = "${pkgs.extest}/lib/libextest.so";
+  };
+
   services.sunshine = {
     enable = true;
     autoStart = true;
