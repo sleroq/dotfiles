@@ -20,6 +20,14 @@ rec {
       code-cursor = pkgsMaster.code-cursor;
     };
 
+  sing-box = final: prev: {
+    sing-box =
+      (import nixpkgs-master {
+        system = final.stdenv.hostPlatform.system;
+        config = prev.config or { };
+      }).sing-box;
+  };
+
   broadcast-box = final: _prev: {
     broadcast-box = final.callPackage ../packages/broadcast-box.nix { };
   };
@@ -36,6 +44,7 @@ rec {
     sb.overlays.default
     rust-overlay.overlays.default
     code-cursor
+    sing-box
     broadcast-box
     obsidian-neovide
     trusttunnel-client
