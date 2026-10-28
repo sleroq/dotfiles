@@ -5,6 +5,6 @@
   "type": "module",
   "exports": "./src/index.ts",
   "dependencies": {
-    "@opencode/plugin": "2.0.30"
+    "@opencode/plugin": "2.2.0"
   }
 }
