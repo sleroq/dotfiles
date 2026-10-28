@@ -388,7 +388,7 @@ in
                   header @unsupportedMethod Allow POST
                   respond @unsupportedMethod 405
                   basic_auth {
-                    import {$CREDENTIALS_DIRECTORY}/metrics-auth
+                    import {$METRICS_AUTH_FILE}
                   }
                   reverse_proxy 127.0.0.1:${toString config.services.prometheus.port} {
                     header_up -Authorization
@@ -405,6 +405,8 @@ in
     };
 
     age.secrets.metricsRemoteWriteCaddyAuth.file = ../../../../shared/secrets/metricsRemoteWriteCaddyAuth;
+    # systemd only sets CREDENTIALS_DIRECTORY for ExecStart* commands, not ExecReload.
+    systemd.services.caddy.environment.METRICS_AUTH_FILE = "%d/metrics-auth";
     systemd.services.caddy.serviceConfig.LoadCredential = [
       "metrics-auth:${config.age.secrets.metricsRemoteWriteCaddyAuth.path}"
     ];
