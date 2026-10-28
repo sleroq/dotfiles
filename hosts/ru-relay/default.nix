@@ -7,7 +7,6 @@
 let
   mainRelayPort = 443;
   divRelayPort = 2081;
-  directWarsawPort = 2082;
   backendAddress = secrets.cumserverAddress;
   warsawAddress = secrets.warsawAddress;
   warsawBackendPort = 2082;
@@ -33,8 +32,7 @@ in
         80
         mainRelayPort
         divRelayPort
-        directWarsawPort
-        2083 # Independent Warsaw reverse bridge
+        2083 # Alternate ingress to the shared Warsaw reverse bridge
         2080 # Legacy Warsaw host via Germany's Remnawave relay
       ];
       # Metrics are scraped only by cumserver, never exposed to clients.
@@ -130,16 +128,6 @@ in
           option tcp-check
           default-server inter 5s fastinter 1s downinter 1s rise 2 fall 3
           server cumserver ${backendAddress}:${toString warsawBackendPort} check
-
-        frontend warsaw_direct_ingress
-          bind 0.0.0.0:${toString directWarsawPort}
-          no log
-          default_backend warsaw_direct
-
-        backend warsaw_direct
-          option tcp-check
-          default-server inter 5s fastinter 1s downinter 1s rise 2 fall 3
-          server warsaw ${warsawAddress}:2084 check
 
         frontend warsaw_reverse_ingress
           bind 0.0.0.0:2083

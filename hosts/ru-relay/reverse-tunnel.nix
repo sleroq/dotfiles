@@ -26,7 +26,7 @@
         };
       };
       transport = {
-        tcpMux = false;
+        tcpMux = true;
         maxPoolCount = 16;
         tcpKeepalive = 30;
         tls = {

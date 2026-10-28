@@ -27,7 +27,7 @@
       };
       transport = {
         protocol = "tcp";
-        tcpMux = false;
+        tcpMux = true;
         poolCount = 16;
         # Keep idle work connections alive through the inter-server path.
         dialServerKeepalive = 30;

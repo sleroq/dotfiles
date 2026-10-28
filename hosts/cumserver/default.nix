@@ -150,6 +150,41 @@
     };
   };
 
+  # Hysteria2 is direct; the panel owns activation of this inbound and its host.
+  environment.etc."remnawave/hysteria2-inbound.json".text = builtins.toJSON {
+    tag = "HYSTERIA2_CUMSERVER_DIRECT";
+    listen = (builtins.head config.networking.interfaces.ens3.ipv4.addresses).address;
+    # UDP 8443 is filtered before reaching ens3; 9443 is reachable.
+    port = 9443;
+    protocol = "hysteria";
+    settings = {
+      version = 2;
+      clients = [ ];
+    };
+    streamSettings = {
+      network = "hysteria";
+      security = "tls";
+      tlsSettings = {
+        alpn = [ "h3" ];
+        certificates = [
+          {
+            certificateFile = "/etc/remnanode/tls/${config.cumserver.trusttunnel.domain}.crt";
+            keyFile = "/etc/remnanode/tls/${config.cumserver.trusttunnel.domain}.key";
+            oneTimeLoading = false;
+          }
+        ];
+      };
+    };
+  };
+  virtualisation.oci-containers.containers.remnanode.volumes = [
+    # Mount the directory so Caddy's renewed files remain visible to Xray.
+    "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${config.cumserver.trusttunnel.domain}:/etc/remnanode/tls:ro"
+  ];
+  systemd.services.podman-remnanode = {
+    after = [ "caddy.service" ];
+    wants = [ "caddy.service" ];
+  };
+
   cumserver.remnawaveRelays.enable = true;
 
   cumserver.traggo.enable = true;
@@ -380,7 +415,10 @@
   networking.firewall = {
     enable = true;
     trustedInterfaces = [ "tailscale0" ];
-    allowedUDPPorts = [ config.services.tailscale.port ];
+    allowedUDPPorts = [
+      config.services.tailscale.port
+      9443 # Direct Remnawave Hysteria2
+    ];
   };
 
   networking = {

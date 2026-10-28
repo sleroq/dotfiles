@@ -89,6 +89,7 @@ in
         80 # nginx serves ACME HTTP-01 challenges
         443 # Remnawave Reality; nginx only listens on loopback for TLS
       ];
+      allowedUDPPorts = [ 8443 ]; # Direct Remnawave Hysteria2
       extraInputRules = ''
         ip saddr ${secrets.cumserverAddress} tcp dport { 2080, 62052, 9100 } accept
         ip saddr ${secrets.ruRelayAddress} tcp dport { 2080, 2084, 2443 } accept
@@ -144,6 +145,32 @@ in
     };
   };
 
+  # Append this fragment to the existing profile through the panel API.
+  environment.etc."remnawave/hysteria2-inbound.json".text = builtins.toJSON {
+    tag = "HYSTERIA2_WARSAW_DIRECT";
+    listen = "0.0.0.0";
+    port = 8443;
+    protocol = "hysteria";
+    settings = {
+      version = 2;
+      clients = [ ];
+    };
+    streamSettings = {
+      network = "hysteria";
+      security = "tls";
+      tlsSettings = {
+        alpn = [ "h3" ];
+        certificates = [
+          {
+            certificateFile = "/etc/remnanode/tls/fullchain.pem";
+            keyFile = "/etc/remnanode/tls/key.pem";
+            oneTimeLoading = false;
+          }
+        ];
+      };
+    };
+  };
+
   age.secrets = {
     remnawaveNodeEnv.file = ./secrets/remnawaveNodeEnv.age;
     warsawTunnelAuth.file = ./secrets/warsawTunnelAuth.age;
@@ -175,12 +202,19 @@ in
         "--cap-add=NET_ADMIN"
         "--ulimit=nofile=1048576:1048576"
       ];
-      volumes = [ "/var/log/remnanode:/var/log/remnanode" ];
+      volumes = [
+        "/var/log/remnanode:/var/log/remnanode"
+        "/var/lib/acme/${domain}:/etc/remnanode/tls:ro"
+      ];
     };
   };
   systemd.tmpfiles.rules = [ "d /var/log/remnanode 0750 root root -" ];
   systemd.services = {
-    podman-remnanode.restartTriggers = [ config.age.secrets.remnawaveNodeEnv.file ];
+    podman-remnanode = {
+      restartTriggers = [ config.age.secrets.remnawaveNodeEnv.file ];
+      after = [ "acme-${domain}.service" ];
+      wants = [ "acme-${domain}.service" ];
+    };
     warsaw-tunnels = {
       description = "RU-only multiplexed VLESS tunnel to local Remnawave node";
       wantedBy = [ "multi-user.target" ];
