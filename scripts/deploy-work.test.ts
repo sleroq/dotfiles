@@ -72,6 +72,9 @@ test("Paseo archive contains current runtime files without secrets, dependencies
   const files = (await $`tar -tf - < ${archive}`.quiet()).stdout.toString().trim().split("\n");
   expect(files).toContain("scripts/work/setup-paseo-arch.ts");
   expect(files).toContain("modules/paseo/plugins/worktree-direnv/server/direnv.ts");
+  for (const file of ["paseo-plugin.json", "index.client.ts", "OVERVIEW.md"]) {
+    expect(files).toContain(`modules/paseo/plugins/pi-fast/${file}`);
+  }
   expect(files.some(path => /secrets|node_modules|\.test\.|package-lock/.test(path))).toBe(false);
   expect((await $`tar -xOf - scripts/work/setup-paseo-arch.ts < ${archive}`.quiet()).stdout.toString())
     .toBe(readFileSync(join(root, "scripts/work/setup-paseo-arch.ts"), "utf8"));
@@ -91,6 +94,13 @@ test("syncs Pi and Paseo to an arbitrary SSH host without a checkout or service 
     const config = JSON.parse(readFileSync(join(home, ".paseo/config.json"), "utf8"));
     expect(config.pluginsEnabled).toBe(true);
     expect(config.plugins["worktree-direnv"].path).toBe(join(home, ".config/paseo/plugins/worktree-direnv"));
+    expect(config.plugins["pi-fast"]).toEqual({
+      source: "directory", path: join(home, ".config/paseo/plugins/pi-fast"), enabled: true,
+    });
+    for (const file of ["paseo-plugin.json", "index.client.ts", "OVERVIEW.md"]) {
+      expect(readFileSync(join(home, ".config/paseo/plugins/pi-fast", file), "utf8"))
+        .toBe(readFileSync(join(root, "modules/paseo/plugins/pi-fast", file), "utf8"));
+    }
     expect(readlinkSync(join(home, ".local/bin/pi"))).toBe("/usr/bin/pi");
     expect(readdirSync(join(home, ".config/paseo/plugins/worktree-direnv/server"))).toEqual(["direnv.ts"]);
     expect(result.stdout.toString()).toContain("Paseo: updated");

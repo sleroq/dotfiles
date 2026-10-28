@@ -1,15 +1,13 @@
 {
   pkgs,
   inputs',
-  self,
   lib,
   ...
 }:
 
 let
   paseoPackages = import ../../modules/paseo/packages.nix {
-    inherit pkgs;
-    inputs = self.inputs;
+    inherit pkgs inputs';
   };
   bottles = pkgs.bottles.override {
     bottles-unwrapped = pkgs.bottles-unwrapped.override {

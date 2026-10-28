@@ -2,12 +2,11 @@
   config,
   lib,
   pkgs,
-  self,
+  inputs',
   ...
 }:
 let
-  system = pkgs.stdenv.hostPlatform.system;
-  pi = self.inputs.pi.packages.${system}.default;
+  pi = inputs'.pi.packages.default;
   bin = "${config.home.profileDirectory}/bin";
   baseline = (pkgs.formats.json { }).generate "paseo-config.json" (
     import ../../../modules/paseo/config.nix {
@@ -31,7 +30,7 @@ in
     home.packages = [
       piDirenv
       (pkgs.callPackage ../../../packages/rift.nix { })
-      self.inputs.llm-agents.packages.${system}.codex
+      inputs'.llm-agents.packages.codex
     ];
     home.activation.paseoConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       run ${pkgs.nodejs_24}/bin/node ${../../../modules/paseo/config.mjs} ${baseline} "$HOME/.paseo/config.json"

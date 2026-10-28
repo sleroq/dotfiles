@@ -17,6 +17,9 @@ const paseoFiles = [
   "modules/paseo/plugins/worktree-direnv/index.server.ts",
   "modules/paseo/plugins/worktree-direnv/server/direnv.ts",
   "modules/paseo/plugins/worktree-direnv/OVERVIEW.md",
+  "modules/paseo/plugins/pi-fast/paseo-plugin.json",
+  "modules/paseo/plugins/pi-fast/index.client.ts",
+  "modules/paseo/plugins/pi-fast/OVERVIEW.md",
 ];
 
 export async function exportPaseo(directory = root) {

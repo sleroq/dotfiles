@@ -1,61 +1,11 @@
-{ pkgs, inputs }:
+{ pkgs, inputs' }:
 let
-  paseo =
-    (pkgs.callPackage "${inputs.nixpkgs-master}/pkgs/by-name/pa/paseo/package.nix" {
-      nodejs_22 = pkgs.nodejs_24;
-    }).overrideAttrs
-      (
-        finalAttrs: _oldAttrs: {
-          version = "0.13.0";
-          src = pkgs.fetchFromGitHub {
-            owner = "getpaseo";
-            repo = "paseo";
-            tag = "v${finalAttrs.version}";
-            hash = "sha256-f3hXjwjenlXr8c8FmXMnz6PZ8QGyeyouJ/CtRwO8OdM=";
-          };
-          npmDeps = pkgs.fetchNpmDeps {
-            inherit (finalAttrs) src;
-            name = "paseo-${finalAttrs.version}-npm-deps";
-            hash = "sha256-DZOPOf81PkUxdD65BrfkTZhs6/DkfDWCFZ/SU+QrZbg=";
-          };
-
-          # Build with upstream's npm 10; npm 11 re-resolves locked React peers offline.
-          # The installed wrappers and node-pty headers still use Node 24.
-          prePatch = ''
-            export PATH="${pkgs.nodejs_22}/bin:$PATH"
-          '';
-          postInstall = ''
-            patchShebangs --build "$out/lib/paseo"
-          '';
-        }
-      );
-  desktop =
-    inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.paseo-desktop.overrideAttrs
-      (oldAttrs: {
-        inherit (paseo)
-          version
-          src
-          npmDeps
-          prePatch
-          ;
-        env = oldAttrs.env // {
-          NIX_NPM_FETCHER_VERSION = 1;
-        };
-        installPhase =
-          builtins.replaceStrings
-            [ "node scripts/trace-daemon.mjs" ]
-            [
-              "PASEO_TRACE_DESKTOP=1 node scripts/trace-daemon.mjs"
-            ]
-            oldAttrs.installPhase;
-        postInstall = ''
-          patchShebangs --build "$out/share/paseo-desktop"
-        '';
-      });
-  pi = inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.default;
-  codex = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex;
+  paseo = inputs'.llm-agents-paseo.packages.paseo;
+  desktop = inputs'.llm-agents.packages.paseo-desktop;
+  pi = inputs'.pi.packages.default;
+  codex = inputs'.llm-agents.packages.codex;
   opencode = pkgs.writeShellScriptBin "opencode" ''
-    exec ${inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode2}/bin/opencode2 "$@"
+    exec ${inputs'.llm-agents.packages.opencode2}/bin/opencode2 "$@"
   '';
   piDirenv = pkgs.writeShellScriptBin "pi-direnv" ''
     export PI_FFF_MODE=override
@@ -99,8 +49,8 @@ let
     deno
     typescript
     typescript-language-server
-    inputs.zig.packages.${pkgs.stdenv.hostPlatform.system}."0.17.0"
-    inputs.zls.packages.${pkgs.stdenv.hostPlatform.system}.default
+    inputs'.zig.packages."0.17.0"
+    inputs'.zls.packages.default
     go
     gopls
     golangci-lint

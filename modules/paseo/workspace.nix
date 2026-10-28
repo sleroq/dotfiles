@@ -2,13 +2,13 @@
   config,
   lib,
   pkgs,
-  inputs,
+  inputs',
   ...
 }:
 let
   cfg = config.services.paseo;
   home = "/home/${cfg.user}";
-  inherit (import ./packages.nix { inherit pkgs inputs; }) tools;
+  inherit (import ./packages.nix { inherit pkgs inputs'; }) tools;
   environment = {
     HOME = home;
     PI_FFF_MODE = "override";

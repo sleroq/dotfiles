@@ -34,6 +34,13 @@
       "pi": {
         "command": [
           "pi-direnv"
+        ],
+        "additionalModels": [
+          {
+            "id": "cumserver/gpt-6.1-sol",
+            "label": "GPT-6.1 Sol · cumserver",
+            "isDefault": true
+          }
         ]
       },
       "opencode": {

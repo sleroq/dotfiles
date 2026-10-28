@@ -2,12 +2,12 @@
   config,
   lib,
   pkgs,
-  inputs,
+  inputs',
   ...
 }:
 let
   cfg = config.services.paseo;
-  inherit (import ./packages.nix { inherit pkgs inputs; }) paseo;
+  inherit (import ./packages.nix { inherit pkgs inputs'; }) paseo;
   optionalString =
     description:
     lib.mkOption {
@@ -105,7 +105,7 @@ in
         UMask = "0077";
         Restart = "on-failure";
         RestartSec = 5;
-        ExecStart = "${pkgs.nodejs_24}/bin/node ${./schedules.mjs} ${definitions} /var/lib/paseo-schedules/managed.json ${paseo}/lib/paseo/packages/cli/dist/utils/client.js /home/${cfg.user}/.paseo";
+        ExecStart = "${pkgs.nodejs_24}/bin/node ${./schedules.mjs} ${definitions} /var/lib/paseo-schedules/managed.json ${paseo}/libexec/paseo/packages/cli/dist/utils/client.js /home/${cfg.user}/.paseo";
       };
     };
   };

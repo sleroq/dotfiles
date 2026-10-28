@@ -53,6 +53,7 @@
 
     pi.url = "github:earendil-works/pi/main";
     llm-agents.url = "github:numtide/llm-agents.nix";
+    llm-agents-paseo.url = "https://github.com/sleroq/llm-agents.nix/archive/refs/heads/feat/paseo-daemon.tar.gz";
 
     # HM-related inputs used by home modules
     nix-gaming.url = "github:fufexan/nix-gaming";

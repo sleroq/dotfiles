@@ -1,5 +1,10 @@
 {
   "plugins": {
+    "pi-fast": {
+      "source": "directory",
+      "path": "@HOME@/.config/paseo/plugins/pi-fast",
+      "enabled": true
+    },
     "worktree-direnv": {
       "source": "directory",
       "path": "@HOME@/.config/paseo/plugins/worktree-direnv",

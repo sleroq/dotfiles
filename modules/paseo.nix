@@ -2,13 +2,13 @@
   config,
   lib,
   pkgs,
-  inputs,
+  inputs',
   ...
 }:
 let
   cfg = config.services.paseo;
   home = "/home/${cfg.user}";
-  inherit (import ./paseo/packages.nix { inherit pkgs inputs; }) paseo;
+  inherit (import ./paseo/packages.nix { inherit pkgs inputs'; }) paseo;
   userBin = "/etc/profiles/per-user/${cfg.user}/bin";
   seedCommand = "${pkgs.nodejs_24}/bin/node /etc/paseo/seed-profile.mjs /etc/paseo/profile.json ${home}";
   syncCommand = "${pkgs.nodejs_24}/bin/node /etc/paseo/pi-profile.mjs /etc/paseo/pi-settings.json /etc/paseo/pi-mcp.json ${home}/.pi/agent ${../home/config/pi/agent/models.json}";
@@ -99,6 +99,15 @@ in
     environment.etc."paseo/config.mjs".source = ./paseo/config.mjs;
     environment.etc."paseo/profile.json".source = profile;
     environment.etc."paseo/seed-profile.mjs".source = ../lib/seed-profile.mjs;
+    system.activationScripts.paseo-profile = {
+      deps = [
+        "users"
+        "etc"
+      ];
+      text = ''
+        ${pkgs.util-linux}/bin/runuser -u ${lib.escapeShellArg cfg.user} -- ${seedCommand}
+      '';
+    };
     environment.etc."systemd/system.control/paseo-tailnet.service".source = "/dev/null";
     environment.etc."systemd/system.control/paseo.service.d/90-paseo-config.conf".text = ''
       [Service]
