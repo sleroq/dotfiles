@@ -1,6 +1,7 @@
 {
   config,
   inputs,
+  inputs',
   lib,
   pkgs,
   secrets,
@@ -40,7 +41,7 @@ in
     deployments.roundy = {
       # Immutable, rooted initial release; publish packaging before enabling updates.
       source.url = "path:${inputs.roundy.outPath}";
-      initialPackage = inputs.roundy.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      initialPackage = inputs'.roundy.packages.default;
       runtime = {
         exec = [ "bin/roundy" ];
         user = "roundy";

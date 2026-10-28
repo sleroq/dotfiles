@@ -287,7 +287,7 @@
   # The imported module is pinned, but its bot-split package is NOT deployed.
   # Future deployment: remove this override only after configuring the bot token,
   # staging channel, and permissions; the input's default package then takes over.
-  # services.sieve.package = inputs.sieve.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  # services.sieve.package = inputs'.sieve.packages.default;
   services.sieve.package = pkgs.symlinkJoin {
     name = "sieve-known-good-0.1.0";
     paths = [

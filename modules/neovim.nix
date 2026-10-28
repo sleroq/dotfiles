@@ -2,11 +2,11 @@
   config,
   lib,
   pkgs,
-  inputs,
+  inputs',
   ...
 }:
 let
-  neovim = import ../lib/neovim.nix { inherit pkgs inputs; };
+  neovim = import ../lib/neovim.nix { inherit pkgs inputs'; };
   users = lib.filterAttrs (_: user: user.sleroq.neovim.enable) config.users.users;
   profile = (pkgs.formats.json { }).generate "neovim-profile.json" {
     files.".config/nvim" = "${../home/config/nvim}";

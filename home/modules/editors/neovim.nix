@@ -3,14 +3,13 @@
   pkgs,
   opts,
   lib,
-  self,
+  inputs',
   ...
 }:
 let
   cfg = config.sleroq.neovim;
   neovim = import ../../../lib/neovim.nix {
-    inherit pkgs;
-    inputs = self.inputs;
+    inherit pkgs inputs';
   };
 in
 {

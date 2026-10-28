@@ -1,8 +1,7 @@
 {
   config,
-  inputs,
+  inputs',
   lib,
-  pkgs,
   ...
 }:
 
@@ -82,7 +81,7 @@ in
 
     services.matrix-tuwunel = {
       # Match upstream's release archive, which builds without Git revision metadata.
-      package = inputs.tuwunel.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
+      package = inputs'.tuwunel.packages.default.overrideAttrs (old: {
         env = old.env // {
           TUWUNEL_VERSION_EXTRA = "";
         };

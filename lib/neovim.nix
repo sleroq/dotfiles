@@ -1,28 +1,23 @@
-{ pkgs, inputs }:
+{ pkgs, inputs' }:
 let
-  pkgsMaster = import inputs.nixpkgs-master {
-    system = pkgs.stdenv.hostPlatform.system;
+  pkgsMaster = inputs'.nixpkgs-master.legacyPackages;
+  package = pkgs.wrapNeovimUnstable inputs'.neovim-nightly-overlay.packages.default {
+    wrapRc = false;
+    withRuby = false;
+    withPython3 = false;
+    wrapperArgs = [
+      "--set"
+      "FFF_NVIM"
+      "${pkgsMaster.vimPlugins.fff-nvim}"
+      "--prefix"
+      "PATH"
+      ":"
+      "${pkgs.lib.makeBinPath [
+        pkgs.imagemagick
+        pkgs.mermaid-cli
+      ]}"
+    ];
   };
-  package =
-    pkgs.wrapNeovimUnstable
-      inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default
-      {
-        wrapRc = false;
-        withRuby = false;
-        withPython3 = false;
-        wrapperArgs = [
-          "--set"
-          "FFF_NVIM"
-          "${pkgsMaster.vimPlugins.fff-nvim}"
-          "--prefix"
-          "PATH"
-          ":"
-          "${pkgs.lib.makeBinPath [
-            pkgs.imagemagick
-            pkgs.mermaid-cli
-          ]}"
-        ];
-      };
 in
 {
   packages = [

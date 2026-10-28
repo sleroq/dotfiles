@@ -3,7 +3,7 @@
   config,
   opts,
   pkgs,
-  self,
+  inputs',
   ...
 }:
 
@@ -38,7 +38,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = [ self.inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.default ];
+    home.packages = [ inputs'.pi.packages.default ];
 
     home.activation.removeLegacyPi = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       run rm -f "${config.xdg.cacheHome}/.bun/bin/pi" "$HOME/.bun/bin/pi"

@@ -3,16 +3,14 @@
   lib,
   config,
   opts,
-  self,
+  inputs',
   ...
 }:
 
 let
   cfg = config.myHome.programs.opencode;
   opencode = pkgs.writeShellScriptBin "opencode" ''
-    exec ${
-      self.inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode2
-    }/bin/opencode2 "$@"
+    exec ${inputs'.llm-agents.packages.opencode2}/bin/opencode2 "$@"
   '';
 in
 {
