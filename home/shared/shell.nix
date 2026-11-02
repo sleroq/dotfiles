@@ -4,7 +4,6 @@
   config,
   enableSshAuthSocket ? true,
   extraAliases ? { },
-  systemVars ? { },
   ...
 }:
 
@@ -64,7 +63,6 @@ in
         config
         aliases
         vars
-        systemVars
         ;
     };
 

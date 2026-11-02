@@ -27,11 +27,6 @@ in
         ;
       enableSshAuthSocket = false;
       extraAliases = darwin-aliases;
-      systemVars = {
-        CURL_CA_BUNDLE = curlCaBundle;
-        SSL_CERT_FILE = curlCaBundle;
-        NH_OS_FLAKE = opts.flakeRoot;
-      };
     })
   ];
 
@@ -56,6 +51,7 @@ in
 
   # TODO: Move to the system config?
   home.sessionVariables = {
+    SSL_CERT_FILE = curlCaBundle;
     NH_DARWIN_FLAKE = opts.flakeRoot;
     DOCKER_DEFAULT_PLATFORM = "linux/amd64";
   };

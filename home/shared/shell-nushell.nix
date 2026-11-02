@@ -3,43 +3,10 @@
   config,
   aliases,
   vars,
-  systemVars,
   ...
 }:
 
 let
-  # Home Manager does not wire home.sessionVariables/home.sessionPath into Nushell
-  # the same way it does for POSIX shells, so we bridge that here explicitly.
-  exportToNuEnv =
-    envVars:
-    lib.concatStringsSep "\n" (
-      lib.mapAttrsToList (
-        n: v:
-        let
-          replaceVars =
-            varsIn: varsOut: value:
-            "$env.${n} = ${
-              if builtins.typeOf value == "string" then
-                "\"${builtins.replaceStrings varsIn varsOut value}\""
-              else
-                toString value
-            }";
-          replaceVarPresets =
-            value:
-            builtins.replaceStrings
-              [ "$\\{${n}:+:$${n}}\"" ]
-              [
-                ''" + (do { let x = ($env.${n}? | default ""); if $x == "" { "" } else { ":" + $x } }) | split row (char esep) | uniq''
-              ]
-              value;
-        in
-        lib.pipe v [
-          (replaceVars [ "$HOME" "$USER" ] [ config.home.homeDirectory config.home.username ])
-          replaceVarPresets
-        ]
-      ) envVars
-    );
-
   esepDirListToList = var: ''
     "${var}" :{
       from_string: { |s|
@@ -81,11 +48,9 @@ let
 in
 {
   enable = true;
+  loadSessionVariables = true;
   shellAliases = aliases;
   environmentVariables = vars;
-  extraEnv = lib.mkBefore ''
-    ${exportToNuEnv (systemVars // config.home.sessionVariables)}
-  '';
   extraConfig = lib.mkMerge [
     (lib.mkBefore ''
       $env.ENV_CONVERSIONS = {
