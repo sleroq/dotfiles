@@ -148,6 +148,11 @@ in
       marksman
       hadolint
 
+      # Required by the [Nix skill](../config/agents/skills/nix/SKILL.md).
+      nixfmt
+      deadnix
+      nixf # Provides nixf-tidy
+
       nixd # Nix language server
       nil # Another nix language server? (zed needs it)
       nix-for-nil
