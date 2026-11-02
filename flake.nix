@@ -264,7 +264,7 @@
               specialArgs.secrets = import ./hosts/ru-relay/secrets/default.nix;
               modules = [
                 inputs.disko.nixosModules.disko
-                inputs.moq-box.nixosModules.default
+                ./hosts/ru-relay/moq.nix
               ];
             };
 

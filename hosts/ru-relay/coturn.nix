@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 let
   domain = "turn-ru.cum.army";
   publicIPv4 = "185.147.26.212";
@@ -32,6 +32,21 @@ in
     respond 404
   '';
 
+  # Nixpkgs still carries 4.17.2; keep the release override scoped to this host.
+  nixpkgs.overlays = [
+    (_final: prev: {
+      coturn = prev.coturn.overrideAttrs {
+        version = "4.18.0";
+        src = pkgs.fetchFromGitHub {
+          owner = "coturn";
+          repo = "coturn";
+          tag = "4.18.0";
+          hash = "sha256-SaY7WI3JvLjfIlYUJxv9QI4g8LVUArjN8i7qsxa7Ty4=";
+        };
+      };
+    })
+  ];
+
   services.coturn = {
     enable = true;
     realm = "cum.army";
@@ -44,7 +59,6 @@ in
     cert = "${acmeDir}/fullchain.pem";
     pkey = "${acmeDir}/key.pem";
     no-tcp-relay = true;
-    no-cli = true;
     extraConfig = ''
       relay-threads=2
     '';

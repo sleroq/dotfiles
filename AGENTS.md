@@ -1,3 +1,8 @@
+# Documentation privacy
+
+Keep VM IP addresses out of `AGENTS.md` and all other documentation. Use
+hostnames or SSH aliases instead; configure address mappings privately.
+
 # Deployments
 
 Read the target's `AGENTS.md` before deploying. Use the current checkout and
