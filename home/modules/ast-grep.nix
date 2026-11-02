@@ -12,10 +12,18 @@ let
   yaml = pkgs.formats.yaml { };
   configFor = ruleDirs: {
     inherit ruleDirs;
-    customLanguages.svelte = {
-      libraryPath = "${svelteParser}/lib/tree-sitter-svelte";
-      extensions = [ "svelte" ];
-      languageSymbol = "tree_sitter_svelte";
+    customLanguages = {
+      svelte = {
+        libraryPath = "${svelteParser}/lib/tree-sitter-svelte";
+        extensions = [ "svelte" ];
+        languageSymbol = "tree_sitter_svelte";
+      };
+      zig = {
+        libraryPath = "${pkgs.tree-sitter-grammars.tree-sitter-zig}/parser";
+        extensions = [ "zig" ];
+        languageSymbol = "tree_sitter_zig";
+        expandoChar = "_";
+      };
     };
     languageInjections = [
       {
