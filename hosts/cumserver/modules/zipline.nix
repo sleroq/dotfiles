@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.cumserver.zipline;
@@ -38,6 +43,8 @@ in
         }
       ];
 
+      services.postgresql.package = pkgs.postgresql_18;
+
       services.zipline = {
         enable = true;
 
@@ -45,6 +52,9 @@ in
 
         settings = {
           CORE_PORT = cfg.port;
+          # Zipline 4.8 requires an explicit allowlist for Caddy forwarded headers.
+          CORE_TRUST_PROXY = "true";
+          CORE_TRUSTED_PROXIES = "127.0.0.1,::1";
           CORE_TEMP_DIRECTORY = "/var/lib/zipline/tmp";
         };
 

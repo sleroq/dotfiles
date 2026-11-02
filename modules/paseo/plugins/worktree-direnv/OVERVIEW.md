@@ -1,13 +1,27 @@
-# Worktree direnv
+# Worktree local files
 
-Makes an ignored repository `.envrc` available in Paseo-managed worktrees on this daemon. Supports Paseo 0.11.4 and 0.12.
+Copies selected Git-ignored files from the source checkout into new Paseo worktrees before setup scripts, terminals, and agents start. Requires Paseo 0.15.0-beta.1 or later in the 0.15 series.
 
-When a workspace is created, or before an interactive agent session opens, the plugin creates a missing worktree `.envrc` containing `source_env '/path/to/repository/.envrc'`. It uses the workspace's configured project root as the source checkout. Paseo does not retain the exact source checkout when branching from another worktree.
+The shared policy lives in `server/copy-policy.json`. By default it includes all ignored files except `node_modules` and `.direnv` at every depth:
 
-Only existing, Git-ignored source files are imported. Tracked source files, tracked target paths, existing worktree files and symlinks are left alone. No secret values are copied or logged.
+```json
+{
+  "include": ["**/*"],
+  "exclude": [
+    "**/node_modules",
+    "**/node_modules/**",
+    "**/.direnv",
+    "**/.direnv/**"
+  ]
+}
+```
 
-Review the generated file and run `direnv allow` inside each worktree. The plugin never approves or evaluates environment files. Direnv's shell hook or an agent's direnv launcher must still load the environment.
+Patterns are repository-relative Git glob pathspecs: `*` matches within one directory, `**` matches across directories, and dotfiles are included. Includes are combined; exclusions always win. An empty include list copies nothing. For a whitelist, replace `include` with patterns such as `["**/.env", "**/.env.*", "**/.envrc", "config/*.local.json"]`. Edit the tracked policy and deploy the host configuration to distribute it through NixOS, Home Manager, and Arch setup. No `.worktreeinclude` is needed.
 
-The original script runs in its original directory, including its `source_up` and relative file imports. This also means project-specific tool paths can refer to the original checkout. Once the bridge is approved, `source_env` does not separately check approval of the original script.
+The source is the checkout used to create the worktree, including when it is another worktree. Git's repository, local, and global ignore rules apply. Tracked and unignored source files are not copied. Existing destination files and symlinks are left alone. This plugin's exclusions do not override Paseo's independent `.worktreeinclude` copier; do not explicitly include excluded directories there.
 
-Workspace events are asynchronous: this is not a barrier before worktree setup scripts or a terminal's first prompt. Agent session opening waits for the bridge check. Existing terminal-only workspaces receive a bridge when an agent session next opens; existing processes do not refresh their environments automatically.
+Secrets and build caches are copied unless excluded. Copies use copy-on-write when the filesystem supports it, and symlinks retain their original link text. Ignored nested repositories cannot be copied. Copy failures, destination parent conflicts, or Paseo's 30-second hook timeout abort worktree creation.
+
+An ignored `.envrc` is copied verbatim, not bridged to the original checkout. Its relative imports and `source_up` now run from the new worktree. Review it and run `direnv allow` there; the plugin never approves or evaluates environment files. An agent's direnv launcher or the shell hook must still load the environment.
+
+Only new worktrees are prepared. Existing workspaces, agent resumes, and restored archived worktrees are not changed. The installation ID remains `worktree-direnv` so existing shared host configuration continues to enable it.

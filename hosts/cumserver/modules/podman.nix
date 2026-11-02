@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   cfg = config.cumserver.podman;
 in
@@ -18,7 +23,7 @@ in
         enable = true;
         dockerCompat = true;
         defaultNetwork.settings.dns_enabled = true;
-        
+
         autoPrune = {
           enable = true;
           dates = "weekly";
@@ -31,7 +36,7 @@ in
 
         containers = {
           prometheus-podman-exporter = lib.mkIf config.cumserver.monitoring.enable {
-            image = "quay.io/navidys/prometheus-podman-exporter:v1.21.0";
+            image = "quay.io/navidys/prometheus-podman-exporter:v2.0.0@sha256:ddaa9003e86f435f2d958ab68041959e4d2bb290a350a2649a123c449db032db";
             autoStart = true;
             ports = [ "127.0.0.1:9882:9882" ];
             volumes = [
@@ -59,13 +64,15 @@ in
     services.prometheus.scrapeConfigs = lib.mkIf config.cumserver.monitoring.enable [
       {
         job_name = "podman";
-        static_configs = [{
-          targets = [ "127.0.0.1:9882" ];
-          labels = {
-            node_name = config.cumserver.monitoring.localNodeName;
-            node_type = "local";
-          };
-        }];
+        static_configs = [
+          {
+            targets = [ "127.0.0.1:9882" ];
+            labels = {
+              node_name = config.cumserver.monitoring.localNodeName;
+              node_type = "local";
+            };
+          }
+        ];
         relabel_configs = [
           {
             target_label = "instance";
@@ -75,4 +82,4 @@ in
       }
     ];
   };
-} 
+}

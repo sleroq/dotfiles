@@ -1,6 +1,22 @@
 { pkgs, inputs' }:
 let
-  paseo = inputs'.llm-agents.packages.paseo;
+  # The shared worktree plugin uses the 0.15 worktree.create.after hook.
+  paseo = inputs'.llm-agents.packages.paseo.overrideAttrs (
+    finalAttrs: _: {
+      version = "0.15.0-beta.1";
+      src = pkgs.fetchFromGitHub {
+        owner = "getpaseo";
+        repo = "paseo";
+        tag = "v${finalAttrs.version}";
+        hash = "sha256-2hWEcv+qTI/tT1Vf7+ee/CRr/c0kpq7vYwxr1obyNLo=";
+      };
+      npmDeps = pkgs.fetchNpmDeps {
+        inherit (finalAttrs) src;
+        hash = "sha256-WN+HGCypFxhw09qfb+EGanbm+NcRtwPerD5w0XC3rXs=";
+        fetcherVersion = 2;
+      };
+    }
+  );
   desktop = inputs'.llm-agents.packages.paseo-desktop;
   pi = inputs'.pi.packages.default;
   codex = inputs'.llm-agents.packages.codex;

@@ -1,7 +1,7 @@
 {
   "id": "worktree-direnv",
-  "description": "Source ignored repository .envrc files in Paseo worktrees.",
+  "description": "Copy selected Git-ignored files into new Paseo worktrees.",
   "requirements": {
-    "paseo": ">=0.13.0 <0.14.0"
+    "paseo": ">=0.15.0-beta.1 <0.16.0"
   }
 }

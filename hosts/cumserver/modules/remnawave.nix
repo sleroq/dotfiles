@@ -22,13 +22,13 @@ in
 
     postgresImage = lib.mkOption {
       type = lib.types.str;
-      default = "docker.io/library/postgres:17.11@sha256:b8faeff7712663c2773a190181e1246e37e364b887611c04658c28b44e2408fe";
+      default = "docker.io/library/postgres:18.6@sha256:3a4264520e121176619f54ff867d12774bc81e95e7b84db58d63bccdb6144b81";
       description = "Docker image to use for Remnawave PostgreSQL";
     };
 
     redisImage = lib.mkOption {
       type = lib.types.str;
-      default = "docker.io/valkey/valkey:9.1.2-alpine@sha256:48332870af354a799964c0012ae1194a0bf2bf894eb508f945810596dc2d8d11";
+      default = "docker.io/valkey/valkey:9.1.3-alpine@sha256:bf09d58e96d6b4524a15396b65b242bbe18beebbcc15a04d8ee75ddac62fae0b";
       description = "Docker image to use for Remnawave Redis/Valkey";
     };
 
@@ -181,7 +181,7 @@ in
           environment.TZ = "UTC";
           extraOptions = cfg.extraOptions ++ [ "--shm-size=512m" ];
           volumes = [
-            "${cfg.dataDir}/postgres17:/var/lib/postgresql/data"
+            "${cfg.dataDir}/postgres18:/var/lib/postgresql"
           ];
         };
 
@@ -296,7 +296,7 @@ in
 
       systemd.tmpfiles.rules = [
         "d ${cfg.dataDir} 0755 root root -"
-        "d ${cfg.dataDir}/postgres17 0700 999 999 -"
+        "d ${cfg.dataDir}/postgres18 0700 999 999 -"
       ]
       ++ lib.optional cfg.node.enable "d ${cfg.node.logDir} 0750 root root -";
 
@@ -355,7 +355,10 @@ in
           mv "$dump" "${cfg.dataDir}/backup/postgres.sql"
         '';
         paths = [ cfg.dataDir ];
-        exclude = [ "${cfg.dataDir}/postgres17" ];
+        exclude = [
+          "${cfg.dataDir}/postgres17"
+          "${cfg.dataDir}/postgres18"
+        ];
         timerConfig = {
           OnCalendar = "04:35";
           Persistent = true;
