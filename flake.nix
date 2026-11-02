@@ -136,7 +136,10 @@
             packages = with pkgs; [
               age
               coreutils
+              # Required by the [Nix skill](home/config/agents/skills/nix/SKILL.md).
               nixfmt
+              deadnix
+              nixf # Provides nixf-tidy
               python3
             ];
           };
