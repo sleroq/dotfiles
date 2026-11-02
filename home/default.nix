@@ -1,5 +1,6 @@
 {
   agenixModule,
+  inputs,
   inputs',
   realConfigs,
   flakeRoot,
@@ -22,7 +23,12 @@
     ];
 
     extraSpecialArgs = {
-      inherit inputs' self flakeRoot;
+      inherit
+        inputs
+        inputs'
+        self
+        flakeRoot
+        ;
       secrets = import ./secrets/default.nix;
       opts = {
         inherit realConfigs flakeRoot;

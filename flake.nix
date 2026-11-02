@@ -71,6 +71,8 @@
     moq-box.url = "path:/nix/store/d9ynfnm6b7ghwm3ldnkzb0yvbbqwbmq1-source";
     moq-box.inputs.nixpkgs.follows = "nixpkgs";
 
+    fumo-gateway.url = "github:sleroq/fumo-gateway";
+
     # Cumserver flakes
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs-cumserver";
@@ -306,7 +308,7 @@
                         users.${username}.imports = [ ./home/hosts/portable.nix ];
 
                         extraSpecialArgs = {
-                          inherit self;
+                          inherit self inputs;
                           inputs' = inputsResolved';
                           opts = rec {
                             inherit username;

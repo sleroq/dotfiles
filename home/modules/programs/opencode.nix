@@ -9,6 +9,19 @@
 
 let
   cfg = config.myHome.programs.opencode;
+  settingsDefaults = builtins.fromJSON (builtins.readFile ../../config/opencode/opencode.json);
+  settings = (pkgs.formats.json { }).generate "opencode.json" (
+    settingsDefaults
+    // {
+      plugins = map (
+        plugin:
+        if builtins.isString plugin && lib.hasPrefix "./" plugin then
+          "${opts.realConfigs}/opencode/${lib.removePrefix "./" plugin}"
+        else
+          plugin
+      ) settingsDefaults.plugins;
+    }
+  );
   opencode = pkgs.writeShellScriptBin "opencode" ''
     exec ${inputs'.llm-agents.packages.opencode2}/bin/opencode2 "$@"
   '';
@@ -29,8 +42,13 @@ in
     home.activation.opencodeConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       mkdir -p $HOME/.config/opencode
 
-      $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
-          ${opts.realConfigs}/opencode/* $HOME/.config/opencode/
+      for path in ${opts.realConfigs}/opencode/*; do
+        case "$path" in
+          */opencode.json) continue ;;
+        esac
+        $DRY_RUN_CMD ln -sfn $VERBOSE_ARG "$path" "$HOME/.config/opencode/"
+      done
+      $DRY_RUN_CMD ln -sfn $VERBOSE_ARG ${settings} "$HOME/.config/opencode/opencode.json"
       $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
           ${opts.realConfigs}/agents/AGENTS.md "$HOME/.config/opencode/AGENTS.md"
 

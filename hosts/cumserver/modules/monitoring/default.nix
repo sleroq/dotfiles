@@ -405,11 +405,12 @@ in
     };
 
     age.secrets.metricsRemoteWriteCaddyAuth.file = ../../../../shared/secrets/metricsRemoteWriteCaddyAuth;
-    # systemd only sets CREDENTIALS_DIRECTORY for ExecStart* commands, not ExecReload.
+    # ExecReload needs both a stable credential path and a refreshed credential mount.
     systemd.services.caddy.environment.METRICS_AUTH_FILE = "%d/metrics-auth";
-    systemd.services.caddy.serviceConfig.LoadCredential = [
-      "metrics-auth:${config.age.secrets.metricsRemoteWriteCaddyAuth.path}"
-    ];
+    systemd.services.caddy.serviceConfig = {
+      LoadCredential = [ "metrics-auth:${config.age.secrets.metricsRemoteWriteCaddyAuth.path}" ];
+      RefreshOnReload = "extensions credentials";
+    };
 
     environment.etc."alloy/config.alloy".text = ''
       logging {

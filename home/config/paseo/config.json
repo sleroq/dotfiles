@@ -37,8 +37,8 @@
         ],
         "additionalModels": [
           {
-            "id": "cumserver/gpt-6.1-sol",
-            "label": "GPT-6.1 Sol · cumserver",
+            "id": "fumo/codex/gpt-6.1-sol",
+            "label": "GPT-6.1 Sol · Fumo",
             "isDefault": true
           }
         ]
@@ -58,7 +58,7 @@
       "providers": [
         {
           "provider": "pi",
-          "model": "openai/gpt-6-luna",
+          "model": "fumo/codex/gpt-6-luna",
           "thinkingOptionId": "low"
         }
       ]

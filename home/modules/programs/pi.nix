@@ -9,6 +9,7 @@
 
 let
   cfg = config.myHome.programs.pi;
+  settings = ../../config/pi/agent/settings.json;
   sharedMcp = builtins.fromJSON (builtins.readFile ../../config/pi/agent/mcp.json);
   mcpDefaults = (pkgs.formats.json { }).generate "pi-mcp.json" (
     sharedMcp
@@ -17,7 +18,7 @@ let
         if cfg.cloudflare.enable then
           sharedMcp.mcpServers
         else
-          builtins.removeAttrs sharedMcp.mcpServers [
+          removeAttrs sharedMcp.mcpServers [
             "cloudflare"
             "cloudflare-docs"
           ];
@@ -59,6 +60,7 @@ in
     '';
 
     home.sessionVariables = {
+      FUMO_BASE_URL = "https://fumo.cum.army/v1";
       PI_FFF_MODE = "override";
     }
     // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
@@ -78,7 +80,7 @@ in
       done
 
       run ${pkgs.nodejs_24}/bin/node ${../../../modules/paseo/pi-profile.mjs} \
-        ${opts.realConfigs}/pi/agent/settings.json \
+        ${settings} \
         ${mcpDefaults} \
         "$HOME/.pi/agent" \
         ${opts.realConfigs}/pi/agent/models.json

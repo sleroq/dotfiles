@@ -1,6 +1,6 @@
 { pkgs, inputs' }:
 let
-  paseo = inputs'.llm-agents-paseo.packages.paseo;
+  paseo = inputs'.llm-agents.packages.paseo;
   desktop = inputs'.llm-agents.packages.paseo-desktop;
   pi = inputs'.pi.packages.default;
   codex = inputs'.llm-agents.packages.codex;

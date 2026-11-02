@@ -37,7 +37,7 @@ test("only the work profile proxies Pi and Exa and uses the private Exa file", a
   const entries = (await $`tar -tf - < ${work.archive}`.quiet()).stdout.toString();
   expect(entries).not.toContain("exa.env");
   expect(entries).not.toContain("shared/secrets");
-  for (const name of ["sgconfig.yml", "svelte-parser.json", "README.md", "tests/", "rules/common/", "rules/frg/"]) {
+  for (const name of ["sgconfig.yml", "svelte-parser.json", "zig-parser.json", "README.md", "tests/", "rules/common/", "rules/frg/"]) {
     expect(entries).toContain(`./ast-grep/${name}`);
   }
   const sharedConfig = Bun.YAML.parse((await $`tar -xOf - ./ast-grep/sgconfig.yml < ${shared.archive}`.quiet()).stdout.toString());
@@ -46,7 +46,7 @@ test("only the work profile proxies Pi and Exa and uses the private Exa file", a
   expect(workConfig).toEqual({ ...sharedConfig, ruleDirs: ["rules"] });
 });
 
-test.each(["work", "desktop"])("deployment scopes rules and scans Svelte on %s", async (host) => {
+test.each(["work", "desktop"])("deployment scopes rules and scans Svelte and Zig on %s", async (host) => {
   const directory = mkdtempSync(join(tmpdir(), "pi ast-grep deployment "));
   try {
     const home = join(directory, "home");
@@ -69,6 +69,14 @@ test.each(["work", "desktop"])("deployment scopes rules and scans Svelte on %s",
     writeFileSync(join(project, "Plain.svelte"), '<script>const result = ready ? Reflect.get(value, "key") : null;</script>');
     writeFileSync(join(project, "Typed.svelte"), '<script lang="ts">const result = ready ? Reflect.get(value, "key") : null;</script>');
     writeFileSync(join(project, "plain.ts"), 'const result = ready ? Reflect.get(value, "key") : null;');
+    writeFileSync(join(project, "ownership.zig"), `
+const a = try std.json.parseFromSliceLeaky(T, std.testing.allocator, input, .{});
+const b = try std.json.parseFromTokenSourceLeaky(T, std.heap.page_allocator, &reader, .{});
+const c = try std.json.parseFromValueLeaky(T, std.heap.c_allocator, value, .{});
+const d = (try std.json.parseFromSlice(T, arena_allocator, input, .{})).value;
+const e = (try std.json.parseFromTokenSource(T, arena.allocator(), &reader, .{})).value;
+const f = (try std.json.parseFromValue(T, self.request_arena.allocator(), value, .{})).value;
+`);
     // Exercise ancestor config discovery, not just an explicitly supplied config.
     const scan = await $`ast-grep scan --json`.cwd(project).quiet().nothrow();
     let expectedExit = 0;
@@ -91,7 +99,7 @@ test.each(["work", "desktop"])("deployment scopes rules and scans Svelte on %s",
     }
     const frgProject = join(home, "develop/frg/example");
     mkdirSync(frgProject);
-    for (const file of ["Plain.svelte", "Typed.svelte", "plain.ts"]) {
+    for (const file of ["Plain.svelte", "Typed.svelte", "plain.ts", "ownership.zig"]) {
       writeFileSync(join(frgProject, file), readFileSync(join(project, file)));
     }
     const frgScan = await $`ast-grep scan --json`.cwd(frgProject).quiet().nothrow();
@@ -100,6 +108,14 @@ test.each(["work", "desktop"])("deployment scopes rules and scans Svelte on %s",
     for (const [file, language] of [["Plain.svelte", "javascript"], ["Typed.svelte", "typescript"], ["plain.ts", "typescript"]]) {
       expect(frgFindings.filter(finding => finding.file.endsWith(file)).map(finding => finding.ruleId))
         .toContain(`no-ternary-in-${language}`);
+    }
+    for (const scanFindings of [findings, frgFindings]) {
+      const zigRules = scanFindings.filter(finding => finding.file.endsWith("ownership.zig")).map(finding => finding.ruleId);
+      for (const source of ["slice", "token-source", "value"]) {
+        expect(zigRules).toContain(`no-json-parse-from-${source}-leaky-with-general-allocator-zig`);
+        expect(zigRules).toContain(`prefer-json-parse-from-${source}-leaky-for-arena-value-zig`);
+      }
+      expect(zigRules).toHaveLength(6);
     }
     // The shared suite has valid/invalid cases for all rules, but only eight snapshot baselines.
     await $`ast-grep test --skip-snapshot-tests --config ${join(home, "sgconfig.yml")}`.cwd(project).quiet();

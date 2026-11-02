@@ -12,7 +12,9 @@ let
     sharedOpencode
     // {
       shell = "/etc/profiles/per-user/${cfg.user}/bin/bash";
-      plugins = [ ];
+      plugins = builtins.filter (
+        plugin: !(builtins.isString plugin && lib.hasPrefix "./" plugin)
+      ) sharedOpencode.plugins;
       permissions =
         sharedOpencode.permissions
         ++

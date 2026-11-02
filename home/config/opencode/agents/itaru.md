@@ -2,7 +2,7 @@
 description: "Research agent for source code, documentation, examples, and best practices."
 mode: subagent
 # model: opencode-go/kimi-k2.7-code
-model: openai/gpt-5.6-luna#high
+model: fumo/codex/gpt-6.1-sol#high
 color: "#355C63"
 permissions:
   - action: edit

@@ -13,6 +13,7 @@
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
     ./modules/caddy.nix
+    ./modules/fumo-gateway.nix
     ./modules/attic.nix
     ./modules/dev-env.nix
     ./modules/matterbridge.nix
@@ -456,7 +457,7 @@
     };
 
     defaultGateway6 = {
-      address = "2a0d:d940:11:3f8::1";
+      address = "2a12:bec4:1bb0:b23::1";
       interface = "ens3";
     };
 

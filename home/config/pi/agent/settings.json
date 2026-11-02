@@ -2,6 +2,7 @@
   "lastChangelogVersion": "1.2.0",
   "defaultThinkingLevel": "low",
   "packages": [
+    "npm:@fumo-gateway/pi@1.0.0",
     "npm:@gotgenes/pi-subagents@25.0.4",
     "npm:pi-worktree-extension@2.0.4",
     "npm:@ff-labs/pi-fff@0.11.0",
@@ -14,10 +15,11 @@
     "mermaid": "final"
   },
   "theme": "dark",
-  "defaultProvider": "openai",
-  "defaultModel": "gpt-6.1-sol",
+  "defaultProvider": "fumo",
+  "defaultModel": "codex/gpt-6.1-sol",
   "enabledModels": [
     "FrankAI/FrankAI",
+    "fumo/*",
     "openai/gpt-6-astra",
     "openai/gpt-6.1-sol"
   ],

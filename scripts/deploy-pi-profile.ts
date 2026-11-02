@@ -183,7 +183,8 @@ export async function deployHost(host: string, bundle: ProfileBundle, options: D
 
 async function main() {
   const { values, positionals } = parseArgs({ allowPositionals: true, options: {
-    check: { type: "boolean" }, ref: { type: "string" }, "skip-packages": { type: "boolean" }, help: { type: "boolean" },
+    check: { type: "boolean" }, ref: { type: "string" }, "skip-packages": { type: "boolean" },
+    help: { type: "boolean" },
   } });
   if (values.help) {
     console.log("Usage: bun scripts/deploy-pi-profile.ts [--check] [--ref REV] [--skip-packages] [HOST ...] (default: work)");

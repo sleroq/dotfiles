@@ -56,6 +56,9 @@ let
     "secrets/atticServerToken" = {
       publicKeys = commonPublicKeys;
     };
+    "secrets/fumoGatewayEnv" = {
+      publicKeys = commonPublicKeys;
+    };
     "secrets/sieveEnv" = {
       publicKeys = commonPublicKeys;
     };
