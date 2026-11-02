@@ -4,6 +4,8 @@
 
 # Build host selection
 
+- Prefer running `nixos-rebuild` from the current checkout with `--build-host <builder> --target-host <target>` for remote deployments, using the host selection rules below. Do not replace it with manual SSH/staging/copy/activation plumbing unless a demonstrated limitation requires it or the prebuilt-closure workflow below applies.
+
 - `portable` is Darwin/macOS. Never build Linux systems on Darwin; use a Linux build host.
 - Never build on `ru-relay` or `warsaw` (swarsaw): too little RAM/CPU. Build their systems locally on a capable Linux host; from `portable`, use `interplanetary` if reachable over SSH, otherwise `cumserver`.
 - Build `cumserver` on itself by default. Offload large uncached builds (e.g. Rust/C++) to `interplanetary`, then copy the finished outputs to `cumserver`.
