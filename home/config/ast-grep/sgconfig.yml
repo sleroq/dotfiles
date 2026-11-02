@@ -7,6 +7,11 @@ customLanguages:
     libraryPath: parsers/tree-sitter-svelte
     extensions: [svelte]
     languageSymbol: tree_sitter_svelte
+  zig:
+    libraryPath: parsers/tree-sitter-zig
+    extensions: [zig]
+    languageSymbol: tree_sitter_zig
+    expandoChar: _
 languageInjections:
   - hostLanguage: svelte
     rule:

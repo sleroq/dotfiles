@@ -1,0 +1,35 @@
+id: prefer-json-parse-from-token-source-leaky-for-arena-value-zig
+valid:
+  - |
+      const result = try std.json.parseFromTokenSourceLeaky(T, arena_allocator, &reader, .{});
+  - |
+      const result = try std.json.parseFromTokenSource(T, arena_allocator, &reader, .{});
+      defer result.deinit();
+      use(result.value);
+  - |
+      const result = (try std.json.parseFromTokenSource(T, gpa, &reader, .{})).value;
+  - |
+      const result = (try std.json.parseFromTokenSource(T, allocator, &reader, .{})).value;
+  - |
+      const result = (try other.parseFromTokenSource(T, arena_allocator, &reader, .{})).value;
+  - |
+      // (try std.json.parseFromTokenSource(T, arena_allocator, &reader, .{})).value
+      const example = "(try std.json.parseFromTokenSource(T, arena_allocator, input, .{})).value";
+invalid:
+  - |
+      const result = (try std.json.parseFromTokenSource(T, arena_allocator, &reader, .{})).value;
+  - |
+      const result = (try std.json.parseFromTokenSource(T, arena.allocator(), &reader, .{})).value;
+  - |
+      const result = (try std.json.parseFromTokenSource(T, self.request_arena.allocator(), &reader, .{})).value;
+  - |
+      const result = (try std.json.parseFromTokenSource(T, self.arena_allocator, &reader, .{})).value;
+  - |
+      const result = (std.json.parseFromTokenSource(T, arena_allocator, &reader, .{}) catch return error.InvalidJson).value;
+  - |
+      const result = (try std.json.parseFromTokenSource(
+          T,
+          arena_allocator,
+          &reader,
+          .{ .ignore_unknown_fields = true },
+      )).value;

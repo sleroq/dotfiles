@@ -1,0 +1,30 @@
+id: no-json-parse-from-token-source-leaky-with-general-allocator-zig
+valid:
+  - |
+      const result = try std.json.parseFromTokenSourceLeaky(T, arena_allocator, &reader, .{});
+  - |
+      const result = try std.json.parseFromTokenSourceLeaky(T, arena.allocator(), &reader, .{});
+  - |
+      const result = try std.json.parseFromTokenSourceLeaky(T, allocator, &reader, .{});
+  - |
+      const result = try std.json.parseFromTokenSource(T, std.testing.allocator, &reader, .{});
+      defer result.deinit();
+  - |
+      const result = try other.parseFromTokenSourceLeaky(T, std.testing.allocator, &reader, .{});
+  - |
+      // std.json.parseFromTokenSourceLeaky(T, std.testing.allocator, &reader, .{})
+      const example = "std.json.parseFromTokenSourceLeaky(T, std.heap.page_allocator, input, .{})";
+invalid:
+  - |
+      const result = try std.json.parseFromTokenSourceLeaky(T, std.testing.allocator, &reader, .{});
+  - |
+      const result = try std.json.parseFromTokenSourceLeaky(T, std.heap.page_allocator, &reader, .{});
+  - |
+      const result = std.json.parseFromTokenSourceLeaky(T, std.heap.c_allocator, &reader, .{}) catch return error.InvalidJson;
+  - |
+      const result = try std.json.parseFromTokenSourceLeaky(
+          T,
+          std.heap.smp_allocator,
+          &reader,
+          .{ .ignore_unknown_fields = true },
+      );

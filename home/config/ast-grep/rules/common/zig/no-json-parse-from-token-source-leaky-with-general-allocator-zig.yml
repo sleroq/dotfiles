@@ -1,0 +1,13 @@
+id: no-json-parse-from-token-source-leaky-with-general-allocator-zig
+language: zig
+severity: warning
+message: >-
+  parseFromTokenSourceLeaky does not track allocations for individual cleanup.
+  With this general-purpose allocator, use std.json.parseFromTokenSource,
+  retain its Parsed(T) wrapper, and call deinit() after use. If bulk
+  reclamation is intended, pass an explicitly arena-backed allocator instead.
+rule:
+  pattern: std.json.parseFromTokenSourceLeaky($T, $ALLOC, $INPUT, $OPTIONS)
+constraints:
+  ALLOC:
+    regex: '^std\.(testing\.allocator|heap\.(page_allocator|c_allocator|smp_allocator))$'

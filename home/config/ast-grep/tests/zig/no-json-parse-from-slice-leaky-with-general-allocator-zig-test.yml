@@ -1,0 +1,30 @@
+id: no-json-parse-from-slice-leaky-with-general-allocator-zig
+valid:
+  - |
+      const result = try std.json.parseFromSliceLeaky(T, arena_allocator, input, .{});
+  - |
+      const result = try std.json.parseFromSliceLeaky(T, arena.allocator(), input, .{});
+  - |
+      const result = try std.json.parseFromSliceLeaky(T, allocator, input, .{});
+  - |
+      const result = try std.json.parseFromSlice(T, std.testing.allocator, input, .{});
+      defer result.deinit();
+  - |
+      const result = try other.parseFromSliceLeaky(T, std.testing.allocator, input, .{});
+  - |
+      // std.json.parseFromSliceLeaky(T, std.testing.allocator, input, .{})
+      const example = "std.json.parseFromSliceLeaky(T, std.heap.page_allocator, input, .{})";
+invalid:
+  - |
+      const result = try std.json.parseFromSliceLeaky(T, std.testing.allocator, input, .{});
+  - |
+      const result = try std.json.parseFromSliceLeaky(T, std.heap.page_allocator, input, .{});
+  - |
+      const result = std.json.parseFromSliceLeaky(T, std.heap.c_allocator, input, .{}) catch return error.InvalidJson;
+  - |
+      const result = try std.json.parseFromSliceLeaky(
+          T,
+          std.heap.smp_allocator,
+          input,
+          .{ .ignore_unknown_fields = true },
+      );

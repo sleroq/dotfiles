@@ -1,0 +1,35 @@
+id: prefer-json-parse-from-value-leaky-for-arena-value-zig
+valid:
+  - |
+      const result = try std.json.parseFromValueLeaky(T, arena_allocator, value, .{});
+  - |
+      const result = try std.json.parseFromValue(T, arena_allocator, value, .{});
+      defer result.deinit();
+      use(result.value);
+  - |
+      const result = (try std.json.parseFromValue(T, gpa, value, .{})).value;
+  - |
+      const result = (try std.json.parseFromValue(T, allocator, value, .{})).value;
+  - |
+      const result = (try other.parseFromValue(T, arena_allocator, value, .{})).value;
+  - |
+      // (try std.json.parseFromValue(T, arena_allocator, value, .{})).value
+      const example = "(try std.json.parseFromValue(T, arena_allocator, input, .{})).value";
+invalid:
+  - |
+      const result = (try std.json.parseFromValue(T, arena_allocator, value, .{})).value;
+  - |
+      const result = (try std.json.parseFromValue(T, arena.allocator(), value, .{})).value;
+  - |
+      const result = (try std.json.parseFromValue(T, self.request_arena.allocator(), value, .{})).value;
+  - |
+      const result = (try std.json.parseFromValue(T, self.arena_allocator, value, .{})).value;
+  - |
+      const result = (std.json.parseFromValue(T, arena_allocator, value, .{}) catch return error.InvalidJson).value;
+  - |
+      const result = (try std.json.parseFromValue(
+          T,
+          arena_allocator,
+          value,
+          .{ .ignore_unknown_fields = true },
+      )).value;

@@ -1,0 +1,16 @@
+id: prefer-json-parse-from-token-source-leaky-for-arena-value-zig
+language: zig
+severity: warning
+message: >-
+  This extracts .value and discards the Parsed(T) ownership wrapper while
+  using an explicitly arena-backed allocator. Prefer std.json.parseFromTokenSourceLeaky
+  and let the caller reclaim the arena, including on error.
+  Keep parseFromTokenSource when retaining and deinitializing the wrapper
+  for a separate, shorter parsing lifetime.
+rule:
+  any:
+    - pattern: (try std.json.parseFromTokenSource($T, $ALLOC, $INPUT, $OPTIONS)).value
+    - pattern: (std.json.parseFromTokenSource($T, $ALLOC, $INPUT, $OPTIONS) catch $HANDLER).value
+constraints:
+  ALLOC:
+    regex: '^([A-Za-z_][A-Za-z0-9_]*\.)*(arena_allocator|([A-Za-z_][A-Za-z0-9_]*_)?arena\.allocator\(\))$'

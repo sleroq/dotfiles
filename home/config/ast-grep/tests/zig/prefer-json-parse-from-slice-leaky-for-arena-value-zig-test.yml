@@ -1,0 +1,35 @@
+id: prefer-json-parse-from-slice-leaky-for-arena-value-zig
+valid:
+  - |
+      const result = try std.json.parseFromSliceLeaky(T, arena_allocator, input, .{});
+  - |
+      const result = try std.json.parseFromSlice(T, arena_allocator, input, .{});
+      defer result.deinit();
+      use(result.value);
+  - |
+      const result = (try std.json.parseFromSlice(T, gpa, input, .{})).value;
+  - |
+      const result = (try std.json.parseFromSlice(T, allocator, input, .{})).value;
+  - |
+      const result = (try other.parseFromSlice(T, arena_allocator, input, .{})).value;
+  - |
+      // (try std.json.parseFromSlice(T, arena_allocator, input, .{})).value
+      const example = "(try std.json.parseFromSlice(T, arena_allocator, input, .{})).value";
+invalid:
+  - |
+      const result = (try std.json.parseFromSlice(T, arena_allocator, input, .{})).value;
+  - |
+      const result = (try std.json.parseFromSlice(T, arena.allocator(), input, .{})).value;
+  - |
+      const result = (try std.json.parseFromSlice(T, self.request_arena.allocator(), input, .{})).value;
+  - |
+      const result = (try std.json.parseFromSlice(T, self.arena_allocator, input, .{})).value;
+  - |
+      const result = (std.json.parseFromSlice(T, arena_allocator, input, .{}) catch return error.InvalidJson).value;
+  - |
+      const result = (try std.json.parseFromSlice(
+          T,
+          arena_allocator,
+          input,
+          .{ .ignore_unknown_fields = true },
+      )).value;
