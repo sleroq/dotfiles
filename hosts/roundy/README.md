@@ -1,104 +1,77 @@
-# Roundy migration staging
+# Roundy deployment and cutover
 
-**Production cutover is not authorized.** The bot and production Countly unit
-must stay disabled until the owner explicitly approves the low-traffic window.
+**Production cutover is not authorized.** Old production, DNS and payment callbacks
+remain unchanged. Build/deploy rules are in [AGENTS.md](AGENTS.md).
 
-## Current preparation
+## Current state
 
-- NixOS 26.05, installation `stateVersion = "25.11"`, kernel 6.18.54.
-- `/dev/sda1` is **virtio-scsi**. Keep `virtio_scsi` in the initrd; its omission
-  caused the first reboot failure. The UUID is verified against the live disk.
-- SSH keys/host keys retained; password and keyboard-interactive SSH disabled.
-- Native Roundy 3.8.2: Node 22.23.3, ffmpeg 8.1.2, pinned payment CA.
-  Supplied checkout matches all 64 compared running-image source/package files.
-- Separate Mongo 4.4.29 containers on localhost 27017/27018, initial logical
-  restores completed. Countly retains its exact 19.08.1 image, Node 8.16.1 and
-  Mongo 3.6.14; restored data is in `/var/lib/countly/data`.
-- Bot dependencies/database reads, H.264/HEVC conversion and payment CA tested
-  without starting the bot. Countly's isolated, network-disabled UI test passed;
-  the temporary container was stopped.
-- Grafana's existing Prometheus datasource sees `instance="Roundy"` for node
-  metrics and `instance="roundy"` for Starflake. Both scrape targets are UP.
-- Native Timeweb Zabbix settings retained. No provider installer was run.
-- Daily encrypted R2 backups of `/var/backups/roundy`; Mongo dumps refreshed
-  first, Countly refreshed when its production marker exists. First backup was
-  read-checked, restored and SHA256-matched. Use `restic-roundy` as root.
+- Mongo main/log data is a live-copy rehearsal, not a consistent final migration.
+  Countly retains its initial staging snapshot. Never merge test writes back.
+- `roundy.sleroq.link` and `countly.sleroq.link` have HTTPS; `/healthz` returns 200,
+  other routes return 503. Keep application/payment routes blocked during rehearsal.
+- `roundy-test` is deployed but stopped. Production app/reconcile and Countly are
+  inactive; Starflake is paused. Production markers are absent:
+  `/var/lib/roundy/production-enabled`, `/var/lib/countly/production-enabled`.
+- Daily R2 backups refresh Mongo dumps and include Countly when its marker exists.
+  Use `restic-roundy` as root; verify restore/read-data before cutover.
 
-These are **initial staging snapshots**, not a final migration of current live
-writes. No polling, production DNS or payment callbacks have been switched.
-
-## Public hostnames — DNS created, HTTPS deployment pending
-
-Cloudflare DNS-only A records for `roundy.sleroq.link` and
-`countly.sleroq.link` point to the `roundy` SSH target (address in encrypted
-`secrets/default.nix`; TTL 300 seconds).
-Existing production DNS and payment callbacks are unchanged.
-
-Caddy's HTTPS staging declarations are ready: `/healthz` returns 200 and all
-other requests return 503, without forwarding to either application. They have
-**not been deployed**: `cumserver` SSH authentication currently fails, so the
-remote dry activation stopped before building or activating the new system.
-Restore builder access, review the dry activation, deploy and verify both TLS
-certificates before treating these hostnames as ready.
-
-## Deployment and boot verification
-
-Use `nixos-rebuild` with `--build-host cumserver --target-host roundy`.
-Never build on this 4 GB VPS (`max-jobs = 0`). On Darwin, use
-`nixos-rebuild-ng` and `--no-reexec` so the Linux rebuild executable is not run
-locally. New host files must be Git-visible for `--flake .#roundy`.
+## Deployment and recovery
 
 ```sh
-nixos-rebuild build --flake .#roundy --build-host cumserver --target-host roundy --no-reexec
-nixos-rebuild boot --flake .#roundy --build-host cumserver --target-host roundy --no-reexec
+nixos-rebuild dry-activate --flake .#roundy --build-host cumserver --target-host roundy --no-reexec
+nixos-rebuild switch --flake .#roundy --build-host cumserver --target-host roundy --no-reexec
 ```
 
-`build` copies the closure without activating. `boot` only prepares the next
-boot. After changing boot-critical configuration, run `check-initrd.sh` on
-cumserver with the actual built kernel/initrd and the root UUID; provide
-`QEMU=/path/to/qemu-system-x86_64`. It mounts a dummy virtio-scsi root disk,
-**not a full NixOS system**. Broken and fixed artifacts were compared.
+Review dry activation against the intended scope; do not blindly activate unrelated
+lockfile updates. Use `boot` instead of `switch` when preparing the next boot.
+Before boot-critical changes, run `check-initrd.sh SYSTEM UUID LOG` on cumserver
+with `QEMU` set to its executable. It tests the built kernel/initrd's virtio-scsi
+root mount, not full OS startup. Retain a verified working rollback generation.
 
-For the recovery trial, GRUB used the original 25.11 generation as its saved
-fallback and booted the repaired system once via `grub-reboot 0`. The trial
-passed; the normal default now points to the repaired 26.05 system. Keep the
-working 25.11 generations; older 26.05 generations lack the disk driver.
+Private immutable sources are preserved by `system.extraDependencies`. A fresh
+operator can retrieve paths from `flake.lock` with `nix copy --from ssh://roundy`.
+Restore repository access before enabling automatic application updates.
 
-Roundy and Starflake sources are immutable store inputs and preserved by
-`system.extraDependencies`. A fresh operator machine without those private
-snapshots can retrieve them with `nix copy --from ssh://roundy` using the paths
-in `flake.lock`. Publish/restore private repository access before enabling
-automatic application updates; polling and local application builds are off.
+## Rehearsal gate
 
-## Cutover prerequisites — separate owner approval required
+A **fresh production-artifact comparison is required before starting `roundy-test`**.
+The preserved source export matches the packaged original source, but lacks current
+production compiled output/dependencies. Request private CapRover or read-only Docker
+access; a matching `/v` response alone is insufficient.
 
-1. Finish HTTPS staging deployment on the confirmed hostnames; prepare the
-   approved proxy/callback transition and encrypt the new `TINKOFF_WEBHOOK`.
-   Old in-flight payment notifications need an explicit forwarding/reconciliation
-   plan. Do not assume CryptoCloud callbacks follow
-   that environment variable.
-2. Quiesce the old writers and acquire fresh logical dumps, including accounts,
-   roles, other databases and indexes. Restore into staging before enabling it.
-   Restoring admin accounts can invalidate an existing restore session: restore
-   application namespaces/indexes separately from the final admin-account step.
-3. Verify the refreshed data and backup, then activate Countly deliberately.
-4. Only after approval and stopping the old poller, create Roundy's production
-   marker, unpause Starflake and explicitly start the reconcile service.
-   Never run old and new bot pollers together. Verify health/payments promptly;
-   rollback requires stopping the new poller first and accounting for new writes.
+Use the approved tester-restricted mode and encrypted test environment, not just a
+replacement bot token: ordinary startup can message copied users and create payments.
+The test mode disables broadcasts, payments/callbacks and analytics, restricts incoming
+updates/outgoing recipients to the tester, and uses target-local copied databases.
 
-The guards are `/var/lib/roundy/production-enabled` and
-`/var/lib/countly/production-enabled`; both are absent. Starflake is paused,
-its reconcile service has no automatic startup, and the Countly container has
-`autoStart = false`. The public staging endpoint only offers `/healthz`; other
-requests return 503.
+After artifact verification, explicitly start `roundy-test`; ask the owner to `/start`
+and exercise menus/media conversion. This does not test payment settlement or production
+channel permissions. Stop it before replacing rehearsal data. Require owner-confirmed
+success before seeking separate low-traffic cutover approval.
 
-## Repository privacy
+## Cutover checklist — separate approval required
 
-Git-crypt protects `secrets/*.nix` and the private migration bean in public Git;
-Roundy's runtime credential files remain agenix-encrypted. Unlock git-crypt
-before evaluation, and verify staged Git ciphertext after adding attribute rules.
+1. Preserve the exact old artifact/configuration and verified rollback backups.
+   Review callback authentication/fulfillment with the owner (`dotfiles-095a`).
+2. Plan old in-flight payment forwarding/reconciliation before changing
+   `TINKOFF_WEBHOOK`; it affects new payments only. CryptoCloud changes are out of scope
+   unless separately approved. Preserve callback bodies, paths and status codes.
+3. Quiesce old bot/background/payment writers. Take fresh logical dumps including
+   accounts, roles, databases and indexes; back up target data before replacing it.
+4. Restore application namespaces/indexes first (`--nsExclude='admin.*'`), then admin
+   accounts separately (`--nsInclude='admin.*' --numParallelCollections=1`); restoring
+   accounts mid-import can invalidate authentication. Verify counts, indexes and access,
+   refresh the backup and run `restic-roundy check --read-data`.
+5. Activate Countly deliberately. With the old poller stopped and approval confirmed,
+   create the production marker, unpause Starflake and explicitly start reconciliation.
+   Never run both production pollers together.
+6. Verify Telegram, media, payments/credit granting, callbacks, Countly and load/headroom.
+   Keep old services recoverable and callback forwarding until outstanding payments settle.
+   Rollback must stop the new poller and account for new writes; binary rollback is not data rollback.
 
-This does not hide addresses from public DNS or remove previously committed
-plaintext from Git history. Evaluation metadata can enter `/nix/store`; keep
-actual passwords and tokens in agenix files, not `secrets/default.nix`.
+## Privacy
+
+Unlock git-crypt before evaluation. Inventory and private task notes stay git-crypt
+protected; passwords/tokens stay in agenix, never Nix expressions or the store.
+Encryption does not erase Git history or hide public DNS. Verify staged ciphertext
+when changing attribute rules.

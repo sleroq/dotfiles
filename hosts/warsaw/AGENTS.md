@@ -1,5 +1,13 @@
-# Warsaw deployment notes
+# Warsaw deployment
 
-Never build on warsaw (swarsaw); select a builder using the root `AGENTS.md`. Its small RAM cannot hold nixos-anywhere's disko closure in the kexec installer's tmpfs. For reinstall, use a small kexec image (the 24.11 image fits), partition and mount the disk with the installer tools, then run nixos-anywhere's `--phases install` with prebuilt `--store-paths` so the system closure is copied directly to `/mnt`. Temporary swap on the mounted disk may be needed during transfer. Verify the disk by-id path before partitioning.
+Never build here; follow root builder selection and copy a prebuilt closure.
 
-Preserve the existing SSH host ed25519 key with `--extra-files` during reinstall: it is also the age identity needed to decrypt this host's credentials. nginx owns port 80 continuously for HTTP-01 challenges for `waw.cum.army` and `beats.sleroq.link`. It serves Feishin over TLS on loopback port 9443; Remnawave Reality owns public port 443 and forwards unauthenticated `beats.sleroq.link` handshakes to nginx. Keep nginx in the `acme` group for the tunnel certificate, and verify both ACME renewal timers and nginx/tunnel reloads. RU's HAProxy sends primary port 443 traffic through the Warsaw-initiated FRP reverse bridge (RU loopback port 12085) to Warsaw's dedicated Reality inbound on port 443; the separate RU port 2080 remains the fallback through cumserver. The old RU-initiated sing-box path on Warsaw port 2443 is not the primary route: paired captures on 2026-10-23 showed its SYNs leaving RU but never reaching Warsaw. Its local health check cannot detect remote TLS or authentication failures; verify both cover and a real client connection.
+- Reinstall: use a small kexec image (24.11 fits), partition/mount with installer
+  tools, then `nixos-anywhere --phases install --store-paths ...` directly to `/mnt`.
+  The default disko closure exceeds installer tmpfs RAM; temporary disk swap may be
+  needed. Verify disk by-id before partitioning.
+- Preserve the SSH ed25519 host key via `--extra-files`: it is also the age identity.
+- Keep nginx in `acme`; verify certificate renewal and nginx/tunnel reloads.
+- RU primary 443 and reverse 2083 share the Warsaw-initiated FRP bridge: they are
+  not independent fallbacks. RU 2080 uses cumserver instead. Verify cover traffic
+  **and authenticated client traffic**; a local listener check is insufficient.

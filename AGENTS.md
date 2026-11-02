@@ -1,23 +1,40 @@
-# Host access
+# Deployments
 
-- Remote access to `div`, `interplanetary` (`desktop`), and `portable` requires Tailscale. If connection fails, first check Tailscale is running; if not, stop and ask the user. Then check the selected Tailscale network: `a9d4` for `div`, `6678` for `portable`/`desktop`. Switching networks to complete the task is allowed.
+Read the target's `AGENTS.md` before deploying. Use the current checkout and
+`nixos-rebuild <action> --flake .#<target> --build-host <builder> --target-host <target>`
+(`--no-reexec` on Darwin). Prefer this over manual staging/activation except for
+the weak-host prebuilt-closure workflow or a demonstrated tool limitation.
 
-# Build host selection
+| Target | Builder |
+| --- | --- |
+| `div` | `div` |
+| `interplanetary` (`desktop`) | itself only |
+| `cumserver` | itself; offload large uncached builds to `interplanetary` |
+| `ru-relay`, `warsaw` (`swarsaw`) | capable Linux host; from Darwin prefer `interplanetary`, otherwise `cumserver` |
+| `roundy` | `cumserver` |
 
-- Prefer running `nixos-rebuild` from the current checkout with `--build-host <builder> --target-host <target>` for remote deployments, using the host selection rules below. Do not replace it with manual SSH/staging/copy/activation plumbing unless a demonstrated limitation requires it or the prebuilt-closure workflow below applies.
+Never build Linux on `portable` (Darwin), or build on `ru-relay`/`warsaw`/`roundy`.
+Other Linux targets need a capable Linux builder. Copy and activate prebuilt
+closures on `ru-relay`/`warsaw`.
 
-- `portable` is Darwin/macOS. Never build Linux systems on Darwin; use a Linux build host.
-- Never build on `ru-relay` or `warsaw` (swarsaw): too little RAM/CPU. Build their systems locally on a capable Linux host; from `portable`, use `interplanetary` if reachable over SSH, otherwise `cumserver`.
-- Build `cumserver` on itself by default. Offload large uncached builds (e.g. Rust/C++) to `interplanetary`, then copy the finished outputs to `cumserver`.
-- Build `interplanetary` only on itself.
-- Build `div` on itself by default; this is allowed and preferred, including when deploying from `portable`. Do not default to `interplanetary` or `cumserver` for `div` builds.
-- For other Linux systems, build locally on a capable Linux host; from `portable`, use a capable Linux server.
-- Distinguish build and deployment host options: `--build-host` selects the builder, `--target-host` selects the deployment target. They may be the same host (preferred for `div`). Copy and activate prebuilt closures on weak hosts (`ru-relay` and `warsaw`); do not trigger target-side builds there.
+- Keep deployments scoped; do not activate unrelated dirty changes. Review
+  dry activation, then verify affected services and effective runtime versions.
+- System, standalone Home Manager (`dev@cumserver`), and Starflake releases are
+  separate deployments. See [Starflake operations](hosts/cumserver/modules/STARFLAKE.md).
+- Keep large builds off production when they exceed its resources; never
+  throttle administrative SSH. Use scoped diagnostics, not broad argv/env dumps.
 
-# Paseo schedule ownership
+## Access
 
-- For hosts managed by these dotfiles, always create, edit, and remove schedule definitions through `services.paseo.schedules` in the host's Nix configuration and associated prompt files, never through the GUI, CLI, or MCP. Div's definitions and prompts live in `hosts/div/paseo-schedules.nix`.
-- Read the current repository first: Nix is the source of truth even before deployment. Never overwrite it from runtime state.
-- Pause/resume, run-now, and log inspection are allowed operational actions.
-- The reconciler leaves existing unmanaged schedules untouched, but new schedules must be declared in Nix. When adopting an existing schedule, `adoptId` keeps its stable ID and preserves its run history.
-- Heartbeats remain outside Nix schedule ownership.
+`div`, `interplanetary`, and `portable` require Tailscale. On connection failure,
+check it is running; if stopped, ask the user. Select `a9d4` for `div`, `6678` for
+`desktop`/`portable`. Switching is allowed, but coordinate with other deployment
+sessions: the laptop's selected network is shared.
+
+## Paseo schedules
+
+Manage definitions through `services.paseo.schedules` and prompt files in host Nix,
+never GUI/CLI/MCP. Div uses `hosts/div/paseo-schedules.nix`. Repository state wins
+over runtime state, including undeployed changes. Use `adoptId` to retain an
+existing schedule's ID/history; the reconciler leaves unmanaged schedules alone.
+Pause/resume, run-now, and log inspection are allowed. Heartbeats are outside Nix ownership.

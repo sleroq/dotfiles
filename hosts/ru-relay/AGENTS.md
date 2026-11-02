@@ -1,22 +1,13 @@
 # ru-relay deployment
 
-Never build on ru-relay. Select a builder using the root `AGENTS.md`, copy the system closure, then activate it here. Do not run `nixos-rebuild switch --flake` without a remote build host: it can start a local build.
+Never build here; follow root builder selection and use a prebuilt system closure.
 
-The relay has only 1 GiB RAM. Use one transfer/import at a time; never parallelize cache copies or overlap them with another closure copy. Check available memory and swap before copying and activating, and pause if memory pressure grows. Parallel copies during the 2026-10-23 update exhausted swap and OOM-killed sing-box; serial copying and activation completed successfully.
-
-On the selected Linux builder (use `ssh -A <builder>` for SSH agent forwarding), use a clean, synced copy of this flake containing the intended changes and lock file; do not accidentally deploy unrelated dirty changes. The key authorized for ru-relay is listed in `hosts/ru-relay/default.nix`. For example, if that key is loaded in the forwarded agent:
-
-```sh
-cd /path/to/synced/dotfiles
-system=$(nix build --no-link --print-out-paths .#nixosConfigurations.ru-relay.config.system.build.toplevel)
-pub=$(mktemp)
-ssh-add -L | grep 'cantundo@pm.me warsaw' > "$pub"
-export NIX_SSHOPTS="-o BatchMode=yes -o IdentitiesOnly=yes -i $pub"
-nix copy --no-check-sigs --to ssh-ng://root@ip "$system"
-ssh -o BatchMode=yes -o IdentitiesOnly=yes -i "$pub" root@ip "$system/bin/switch-to-configuration dry-activate"
-# Review the units affected by dry-activate before switching:
-ssh -o BatchMode=yes -o IdentitiesOnly=yes -i "$pub" root@ip "nix-env -p /nix/var/nix/profiles/system --set '$system' && '$system/bin/switch-to-configuration' switch"
-rm -f "$pub"
-```
-
-`--no-check-sigs` is needed when copying locally built, unsigned paths; use it only for a builder you trust. Verify `/run/current-system`, the affected systemd services, and the public endpoint after switching.
+- Only 1 GiB RAM: check memory/swap, serialize transfers/imports, and pause under
+  pressure. Never overlap cache copies with another closure transfer.
+- Build the intended flake/lock on the selected Linux builder. Use the target's
+  authorized SSH identity (see `default.nix`), forwarding the agent if needed.
+- Copy the closure with `nix copy`. Use `--no-check-sigs` only for unsigned outputs
+  from a trusted builder. Dry-activate its exact `switch-to-configuration` path.
+- After review, set `/nix/var/nix/profiles/system` to that exact store path with
+  `nix-env -p ... --set`, then run its `switch-to-configuration switch`.
+  Verify `/run/current-system`, affected services and a real public client connection.
