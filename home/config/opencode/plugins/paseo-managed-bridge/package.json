@@ -1,0 +1,1 @@
+{"name":"paseo-managed-bridge","private":true,"type":"module","exports":{"./server":"./server.js"}}
