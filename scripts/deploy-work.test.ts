@@ -71,7 +71,9 @@ test("Paseo archive contains current runtime files without secrets, dependencies
   const archive = await exportPaseo();
   const files = (await $`tar -tf - < ${archive}`.quiet()).stdout.toString().trim().split("\n");
   expect(files).toContain("scripts/work/setup-paseo-arch.ts");
-  expect(files).toContain("modules/paseo/plugins/worktree-direnv/server/direnv.ts");
+  expect(files).toContain("modules/paseo/plugins/worktree-direnv/server/ignored-files.ts");
+  expect(files).toContain("modules/paseo/plugins/worktree-direnv/server/copy-policy.json");
+  expect(files).toContain("modules/paseo/plugins/pi-cache-miss/server/monitor.ts");
   for (const file of ["paseo-plugin.json", "index.client.ts", "OVERVIEW.md"]) {
     expect(files).toContain(`modules/paseo/plugins/pi-fast/${file}`);
   }
@@ -102,7 +104,9 @@ test("syncs Pi and Paseo to an arbitrary SSH host without a checkout or service 
         .toBe(readFileSync(join(root, "modules/paseo/plugins/pi-fast", file), "utf8"));
     }
     expect(readlinkSync(join(home, ".local/bin/pi"))).toBe("/usr/bin/pi");
-    expect(readdirSync(join(home, ".config/paseo/plugins/worktree-direnv/server"))).toEqual(["direnv.ts"]);
+    expect(readdirSync(join(home, ".config/paseo/plugins/worktree-direnv/server")).sort()).toEqual(["copy-policy.json", "ignored-files.ts"]);
+    expect(readFileSync(join(home, ".config/paseo/plugins/pi-cache-miss/server/monitor.ts"), "utf8"))
+      .toBe(readFileSync(join(root, "modules/paseo/plugins/pi-cache-miss/server/monitor.ts"), "utf8"));
     expect(result.stdout.toString()).toContain("Paseo: updated");
     expect(result.stdout.toString()).toContain("oleg@arch-example: sync complete");
     expect(result.stdout.toString()).not.toContain("systemctl");

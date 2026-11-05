@@ -15,11 +15,20 @@ const paseoFiles = [
   "modules/paseo/arch/paseo-node.service",
   "modules/paseo/plugins/worktree-direnv/paseo-plugin.json",
   "modules/paseo/plugins/worktree-direnv/index.server.ts",
-  "modules/paseo/plugins/worktree-direnv/server/direnv.ts",
+  "modules/paseo/plugins/worktree-direnv/server/ignored-files.ts",
+  "modules/paseo/plugins/worktree-direnv/server/copy-policy.json",
   "modules/paseo/plugins/worktree-direnv/OVERVIEW.md",
   "modules/paseo/plugins/pi-fast/paseo-plugin.json",
   "modules/paseo/plugins/pi-fast/index.client.ts",
   "modules/paseo/plugins/pi-fast/OVERVIEW.md",
+  "modules/paseo/plugins/pi-cache-miss/paseo-plugin.json",
+  "modules/paseo/plugins/pi-cache-miss/OVERVIEW.md",
+  "modules/paseo/plugins/pi-cache-miss/index.client.tsx",
+  "modules/paseo/plugins/pi-cache-miss/index.server.ts",
+  "modules/paseo/plugins/pi-cache-miss/client/cache-miss.tsx",
+  "modules/paseo/plugins/pi-cache-miss/server/monitor.ts",
+  "modules/paseo/plugins/pi-cache-miss/server/transcript.ts",
+  "modules/paseo/plugins/pi-cache-miss/shared/cache-miss.ts",
 ];
 
 export async function exportPaseo(directory = root) {
