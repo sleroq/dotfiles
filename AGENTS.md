@@ -1,3 +1,11 @@
+# Flake inputs
+
+Keep exact commit revisions in `flake.lock`, not in `flake.nix` URLs. Use
+upstream URLs without commit pins (for example, `github:earendil-works/pi`).
+Release tags and explicit branch refs are allowed when they select the intended
+update track instead of following the default branch. Local directory inputs
+are also allowed; `flake.lock` still owns exact revisions for remote inputs.
+
 # Documentation privacy
 
 Keep VM IP addresses out of `AGENTS.md` and all other documentation. Use
