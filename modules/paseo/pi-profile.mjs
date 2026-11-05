@@ -12,7 +12,7 @@ async function readState(path) {
 }
 
 const hostLocal = new Set([
-  "defaultThinkingLevel", "theme", "lastChangelogVersion", "deviceId",
+  "theme", "lastChangelogVersion", "deviceId",
 ]);
 
 function packageIdentity(entry) {

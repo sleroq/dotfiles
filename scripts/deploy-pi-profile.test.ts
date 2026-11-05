@@ -124,6 +124,28 @@ const f = (try std.json.parseFromValue(T, self.request_arena.allocator(), value,
   }
 }, 120_000);
 
+test("syncs model and thinking defaults over host-local settings", async () => {
+  const home = mkdtempSync(join(tmpdir(), "pi-model-sync-"));
+  try {
+    const directory = join(home, ".pi/agent");
+    mkdirSync(directory, { recursive: true });
+    const mcp = join(home, "mcp.json");
+    writeFileSync(mcp, JSON.stringify({ mcpServers: {} }));
+    writeFileSync(join(directory, "settings.json"), JSON.stringify({
+      defaultProvider: "fumo", defaultModel: "codex/gpt-6.1-sol", defaultThinkingLevel: "low", theme: "light",
+    }));
+
+    await syncProfile(join(root, "home/config/pi/agent/settings.json"), mcp, directory, undefined, home);
+    const actual = JSON.parse(readFileSync(join(directory, "settings.json"), "utf8"));
+    expect(actual.defaultProvider).toBe("fumo");
+    expect(actual.defaultModel).toBe("codex/gpt-6.1-terra");
+    expect(actual.defaultThinkingLevel).toBe("high");
+    expect(actual.theme).toBe("light");
+  } finally {
+    rmSync(home, { recursive: true, force: true });
+  }
+});
+
 test.each(["${EXA_API_KEY}", "host-local-test-key"])("migrates the old Exa placeholder but preserves explicit host keys: %s", async (key) => {
   const directory = mkdtempSync(join(tmpdir(), "pi-exa-sync-"));
   try {
