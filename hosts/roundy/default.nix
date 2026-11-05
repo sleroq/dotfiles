@@ -10,6 +10,7 @@
     ./hardware-configuration.nix
     ./applications.nix
     ./backups.nix
+    ./test.nix
   ];
 
   boot = {
