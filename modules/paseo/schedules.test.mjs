@@ -3,7 +3,42 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { syncSchedules } from "./schedules.mjs";
+import { connectWhenReady, syncSchedules } from "./schedules.mjs";
+
+test("waits for the daemon to become ready", async () => {
+  let attempts = 0;
+  const client = {};
+  const result = await connectWhenReady(async () => {
+    if (++attempts < 3) throw { code: "DAEMON_NOT_RUNNING" };
+    return client;
+  }, { timeoutMs: 1000, intervalMs: 1 });
+  assert.equal(result, client);
+  assert.equal(attempts, 3);
+});
+
+test("fails when the daemon does not become ready", async () => {
+  let attempts = 0;
+  const error = { code: "DAEMON_NOT_RUNNING" };
+  await assert.rejects(connectWhenReady(async () => {
+    attempts++;
+    throw error;
+  }, { timeoutMs: 5, intervalMs: 1 }), failure => {
+    assert.match(failure.message, /not ready within 5ms/);
+    assert.equal(failure.cause, error);
+    return true;
+  });
+  assert.ok(attempts > 1);
+});
+
+test("does not retry other connection errors", async () => {
+  let attempts = 0;
+  const error = new Error("authentication failed");
+  await assert.rejects(connectWhenReady(async () => {
+    attempts++;
+    throw error;
+  }), failure => failure === error);
+  assert.equal(attempts, 1);
+});
 
 const definition = {
   adoptId: null,

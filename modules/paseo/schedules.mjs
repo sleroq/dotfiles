@@ -1,6 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { pathToFileURL } from "node:url";
+import { setTimeout as sleep } from "node:timers/promises";
 import { isDeepStrictEqual } from "node:util";
 
 function scheduleDefinition(definition) {
@@ -72,6 +73,22 @@ async function saveOwnership(statePath, owned) {
   await rename(temporary, statePath);
 }
 
+export async function connectWhenReady(connect, { timeoutMs = 30_000, intervalMs = 1_000 } = {}) {
+  const deadline = Date.now() + timeoutMs;
+  while (true) {
+    try {
+      return await connect();
+    } catch (error) {
+      if (error.code !== "DAEMON_NOT_RUNNING") throw error;
+      const remaining = deadline - Date.now();
+      if (remaining <= 0) {
+        throw new Error(`Paseo daemon was not ready within ${timeoutMs}ms`, { cause: error });
+      }
+      await sleep(Math.min(intervalMs, remaining));
+    }
+  }
+}
+
 export async function syncSchedules(definitions, statePath, client) {
   const owned = await readOwnership(statePath);
   const { schedules } = await response(client.scheduleList());
@@ -129,7 +146,7 @@ if (import.meta.main) {
   // facade does not expose schedules; keep this version-coupled boundary here.
   const { connectToDaemon } = await import(pathToFileURL(clientModule).href);
   const definitions = JSON.parse(await readFile(definitionsPath, "utf8"));
-  const client = await connectToDaemon({ target: { kind: "instance", home } });
+  const client = await connectWhenReady(() => connectToDaemon({ target: { kind: "instance", home } }));
   try {
     await syncSchedules(definitions, statePath, client);
   } finally {
