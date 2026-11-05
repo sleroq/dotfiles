@@ -5,7 +5,6 @@
   pkgs,
   ...
 }:
-
 {
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
@@ -24,6 +23,9 @@
     ../../modules/slusha.nix
     ../../modules/tuwunel.nix
   ];
+
+  # Kopoka runs locally for now; keep its account and secret on div.
+  systemd.services.kopoka.enable = false;
 
   boot.loader.systemd-boot = {
     enable = true;
