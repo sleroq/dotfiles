@@ -3,11 +3,11 @@
   "defaultThinkingLevel": "high",
   "packages": [
     "npm:@fumo-gateway/pi@1.0.0",
-    "npm:@gotgenes/pi-subagents@25.0.4",
-    "npm:pi-worktree-extension@2.0.4",
+    "npm:@gotgenes/pi-subagents@25.0.5",
+    "npm:pi-worktree-extension@2.0.5",
     "npm:@ff-labs/pi-fff@0.11.0",
     "npm:pi-compact-transcript@0.12.0",
-    "npm:@narumitw/pi-btw@0.63.0"
+    "npm:@narumitw/pi-btw@0.63.4"
   ],
   "hideThinkingBlock": true,
   "showCacheMissNotices": true,

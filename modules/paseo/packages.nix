@@ -3,16 +3,16 @@ let
   # The shared worktree plugin uses the 0.15 worktree.create.after hook.
   paseo = inputs'.llm-agents.packages.paseo.overrideAttrs (
     finalAttrs: _: {
-      version = "0.15.0-beta.1";
+      version = "0.15.2";
       src = pkgs.fetchFromGitHub {
         owner = "getpaseo";
         repo = "paseo";
         tag = "v${finalAttrs.version}";
-        hash = "sha256-2hWEcv+qTI/tT1Vf7+ee/CRr/c0kpq7vYwxr1obyNLo=";
+        hash = "sha256-wcV2Wv/mLqjtl4+DfyM/yjOyApJbtEs6OgcvoE65mkA=";
       };
       npmDeps = pkgs.fetchNpmDeps {
         inherit (finalAttrs) src;
-        hash = "sha256-WN+HGCypFxhw09qfb+EGanbm+NcRtwPerD5w0XC3rXs=";
+        hash = "sha256-3qI79nfKHgqRbeUjomK1f8Qae7a4vZaNh4xtUDYAs40=";
         fetcherVersion = 2;
       };
     }
