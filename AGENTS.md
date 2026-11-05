@@ -23,7 +23,7 @@ the weak-host prebuilt-closure workflow or a demonstrated tool limitation.
 | `div` | `div` |
 | `interplanetary` (`desktop`) | itself only |
 | `cumserver` | itself; offload large uncached builds to `interplanetary` |
-| `ru-relay`, `warsaw` (`swarsaw`) | capable Linux host; from Darwin prefer `interplanetary`, otherwise `cumserver` |
+| `ru-relay`, `warsaw` | capable Linux host; from Darwin prefer `interplanetary`, otherwise `cumserver` |
 | `roundy` | `cumserver` |
 
 Never build Linux on `portable` (Darwin), or build on `ru-relay`/`warsaw`/`roundy`.
