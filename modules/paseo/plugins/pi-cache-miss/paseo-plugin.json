@@ -1,0 +1,6 @@
+{
+  "id": "pi-cache-miss",
+  "name": "Pi cache misses",
+  "description": "Warns when a Pi request loses a previously cached prompt prefix.",
+  "requirements": { "paseo": ">=0.15.1" }
+}

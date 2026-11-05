@@ -1,5 +1,10 @@
 {
   "plugins": {
+    "pi-cache-miss": {
+      "source": "directory",
+      "path": "@HOME@/.config/paseo/plugins/pi-cache-miss",
+      "enabled": true
+    },
     "pi-fast": {
       "source": "directory",
       "path": "@HOME@/.config/paseo/plugins/pi-fast",

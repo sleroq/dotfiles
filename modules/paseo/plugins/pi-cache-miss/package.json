@@ -1,0 +1,19 @@
+{
+  "name": "paseo-pi-cache-miss",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test server/*.test.mjs"
+  },
+  "devDependencies": {
+    "@getpaseo/client": "0.15.1",
+    "@getpaseo/plugin": "0.15.1",
+    "@types/node": "^24.0.0",
+    "@types/react": "~19.2.0",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "typescript": "^5.9.3",
+    "zod": "^4.3.6"
+  }
+}

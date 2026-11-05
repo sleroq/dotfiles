@@ -14,5 +14,10 @@ lib.recursiveUpdate shared {
     path = "${./plugins/worktree-direnv}";
     enabled = true;
   };
+  plugins.pi-cache-miss = {
+    source = "directory";
+    path = "${./plugins/pi-cache-miss}";
+    enabled = true;
+  };
   agents.providers = lib.mapAttrs (_: command: { inherit command; }) commands;
 }
