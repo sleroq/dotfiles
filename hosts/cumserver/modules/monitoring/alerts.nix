@@ -258,6 +258,57 @@ in
                   description = "Systemd reports this service failed for 5 minutes. Inspect its status and journal. Includes failed backup units where the systemd collector is enabled.";
                 }
                 {
+                  uid = "paseo-schedule-failed";
+                  title = "Paseo schedule failed or blocked";
+                  expr = ''paseo_schedule_run_outcome{instance="Div",outcome=~"failed|blocked|missing"}'';
+                  threshold = 0.5;
+                  duration = "0s";
+                  severity = "critical";
+                  summary = "{{ $labels.name }}: schedule result {{ $labels.outcome }}";
+                  description = "Run {{ $labels.run }} failed, was blocked, or did not report a valid result. Inspect the schedule run in Paseo for details.";
+                }
+                {
+                  uid = "paseo-checker-failed";
+                  title = "Paseo schedule checker failed";
+                  expr = ''1 - paseo_schedule_checker_success{instance="Div"}'';
+                  threshold = 0.5;
+                  duration = "5m";
+                  severity = "critical";
+                  summary = "Div: Paseo schedule checker failed";
+                  description = "The checker could not inspect Paseo. Check the paseo-schedule-checker service journal and the Paseo daemon.";
+                }
+                {
+                  uid = "paseo-checker-stale";
+                  title = "Paseo schedule checker metrics stale";
+                  expr = ''(time() - paseo_schedule_checker_timestamp_seconds{instance="Div"} > bool 900) or (absent(paseo_schedule_checker_timestamp_seconds{instance="Div"}) and on(instance) (up{job="node",instance="Div"} == 1))'';
+                  threshold = 0.5;
+                  duration = "5m";
+                  severity = "critical";
+                  summary = "Div: Paseo schedule checker metrics missing or stale";
+                  description = "The checker has not produced fresh metrics for 15 minutes, or its metrics are missing while the node exporter is reachable.";
+                }
+                {
+                  uid = "paseo-schedule-stuck";
+                  title = "Paseo schedule run stuck";
+                  expr = ''time() - paseo_schedule_run_started_timestamp_seconds{instance="Div"}'';
+                  threshold = 86400;
+                  duration = "5m";
+                  severity = "critical";
+                  summary = "{{ $labels.name }}: schedule run has not finished";
+                  description = "Run {{ $labels.run }} has been running for more than 24 hours. Inspect it in Paseo.";
+                }
+                {
+                  uid = "paseo-schedule-overdue";
+                  title = "Paseo schedule overdue";
+                  # Compare with the previous cursor: Paseo advances missed schedules on daemon startup.
+                  expr = ''(time() - paseo_schedule_next_run_timestamp_seconds{instance="Div"} offset 1h > 3600) and on(instance,schedule,name) (paseo_schedule_last_run_timestamp_seconds{instance="Div"} < on(instance,schedule,name) paseo_schedule_next_run_timestamp_seconds{instance="Div"} offset 1h) and on(instance,schedule,name) (paseo_schedule_active{instance="Div"} == 1) and on(instance,schedule,name) (paseo_schedule_active{instance="Div"} offset 1h == 1) unless on(instance,schedule,name) paseo_schedule_run_started_timestamp_seconds{instance="Div"}'';
+                  threshold = 0;
+                  duration = "0s";
+                  severity = "critical";
+                  summary = "{{ $labels.name }}: scheduled run did not start";
+                  description = "The schedule was due over an hour ago but no run was recorded. Check Paseo's schedule history and daemon journal.";
+                }
+                {
                   uid = "host-oom-kills";
                   title = "OOM kill detected";
                   expr = ''increase(node_vmstat_oom_kill{job="node"}[10m])'';

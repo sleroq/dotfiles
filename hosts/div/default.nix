@@ -11,6 +11,7 @@
     ./disk-config.nix
     ./github-runner.nix
     ./kopoka.nix
+    ./paseo-monitor.nix
     ./remnanode.nix
     ./restic.nix
     ./starflake.nix
