@@ -7,7 +7,10 @@ let
   cfg = config.services.fumo-gateway;
 in
 {
-  imports = [ inputs.fumo-gateway.nixosModules.default ];
+  imports = [ inputs.fumo-gateway-local.nixosModules.default ];
+
+  # Reconciliation must be able to read the unpublished source on the host.
+  system.extraDependencies = [ inputs.fumo-gateway-local.outPath ];
 
   age.secrets.fumoGatewayEnv.file = ../secrets/fumoGatewayEnv;
 
@@ -29,7 +32,7 @@ in
   # Reuse upstream configuration, user, and state; Starflake owns the process.
   systemd.services.fumo-gateway.enable = false;
   services.starflake.deployments.fumo-gateway = {
-    source.url = "github:sleroq/fumo-gateway";
+    source.url = "path:${inputs.fumo-gateway-local.outPath}";
     initialPackage = cfg.package;
     runtime = {
       exec = [

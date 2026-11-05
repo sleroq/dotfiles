@@ -8,8 +8,8 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
-    sb.url = "github:sleroq/proxy-helper";
-    sb.inputs.nixpkgs.follows = "nixpkgs";
+    # sb.url = "github:sleroq/proxy-helper";
+    sb.url = "path:/Users/sleroq/develop/proxy-helper";
 
     easy-hosts.url = "github:tgirlcloud/easy-hosts";
 
@@ -71,6 +71,8 @@
     moq-box.inputs.nixpkgs.follows = "nixpkgs";
 
     fumo-gateway.url = "github:sleroq/fumo-gateway";
+    # Unpublished Rust rewrite; keep the upstream input for the eventual switch back.
+    fumo-gateway-local.url = "path:/nix/store/6fl7lp61b5jfyvk5q8iclghpwyp8ma1j-fumo-gateway-rust-source";
 
     # Cumserver flakes
     disko.url = "github:nix-community/disko";
@@ -94,6 +96,10 @@
     # Initial Roundy release until its native package is published upstream.
     roundy.url = "path:/nix/store/6g2pvnd4rqc1rjm9v2fli1clx5lg6h91-source";
     roundy.inputs.nixpkgs-stable.follows = "nixpkgs-roundy";
+
+    # Opt-in rehearsal build; never replace the guarded production release with it.
+    roundy-test.url = "path:/nix/store/sdhin9fkr9q2l4c03swchl1066zgzrlc-roundy-test-source";
+    roundy-test.inputs.nixpkgs-stable.follows = "nixpkgs-roundy";
 
     music-link.url = "github:sleroq/music-link";
     # music-link.url = "path:/Users/sleroq/develop/music-link";
