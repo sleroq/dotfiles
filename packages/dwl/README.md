@@ -2,7 +2,7 @@
 
 Applies to upstream **v0.9, revision 98bea2c**, with wlroots **0.20** and
 XWayland. Apply `patches/ipc.patch`, then `patches/desktop.patch`, then
-`patches/better-resize.patch`, and copy
+`patches/better-resize.patch`, then `patches/gpu-reset.patch`, and copy
 `config.h` into the source. The Nix expression owns source selection and session
 entry installation; these patches do not change the pin or IPC XML.
 
@@ -15,6 +15,9 @@ with pane decoration in `group-tabs.h`.
 (commit `5fab55803d009d400f6c3fcbe6a0fc807431bbe7`, originally for v0.7).
 Our `config.h` selects the nearest corner (`resize_corner=4`), without cursor
 warping or locking (`warp_cursor=0`, `lock_cursor=0`).
+`gpu-reset.patch` defers renderer-loss recovery to event-loop idle so the lost
+signal emission and render stack unwind before destruction. It reinitializes
+output rendering and schedules a fresh frame after recovery.
 Inactive tabs stay in the client list and workspace counts, but are absent from
 scene traversal, pointer hit testing, and focus enumeration. Overlay members
 are independent of tags and excluded from ordinary workspace counts.
@@ -108,7 +111,13 @@ visibility overriding sticky, workspace changes beneath an overlay, empty-pane
 collapse with stable ratio, saved-pointer cleanup, directional splitting/crossing/collapse, exact gap
 geometry, unique keybindings, initial maximize requests before surface initialization,
 first-map floating placement/maximize restore, and real XKB layout restore.
-It never opens a backend or graphical session.
+A final isolated headless/pixman test emits the real renderer-lost signal twice
+before idle, verifies deferred destruction and renderer/allocator/compositor/output
+replacement, then repeats recovery to check listener reattachment. It also checks
+that recovery requests a frame and that rendering/commit still work. Without
+`gpu-reset.patch`, the test reproduces wlroots' nonempty lost-listener assertion;
+without its frame scheduling, the `needs_frame` assertion fails. No physical
+backend, graphical session, or actual GPU reset is used.
 
 `tests/noctalia.py` runs the current native shell in an isolated headless DWL
 and DBus session. It checks all three compiled app shortcuts using a disposable

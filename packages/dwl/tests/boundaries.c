@@ -1,9 +1,11 @@
-/* Compile against the patched source: exercise real feature predicates without
- * starting a backend, creating an output, or disturbing an existing session. */
+/* Compile against the patched source: exercise real feature predicates and
+ * headless renderer recovery without disturbing an existing session. */
 #define main dwl_main
 #include "dwl.c"
 #undef main
 #include <assert.h>
+#include <wlr/backend/headless.h>
+#include <wlr/render/pass.h>
 
 static void
 special_scrim(void)
@@ -217,6 +219,98 @@ floating_bounds(void)
 	assert(c.geom.x == -1099 && c.geom.y == -849);
 }
 
+static int destroyed_renderers;
+
+static void
+count_renderer_destroy(struct wl_listener *listener, void *data)
+{
+	wl_list_remove(&listener->link);
+	destroyed_renderers++;
+}
+
+static void
+deferred_gpu_reset(void)
+{
+	Monitor m = {0};
+	struct wl_event_loop *loop;
+	struct wl_listener destroy = {.notify = count_renderer_destroy};
+	struct wlr_output_state state;
+	struct wlr_render_pass *pass;
+	const char *renderer_env = getenv("WLR_RENDERER");
+	char *saved_renderer = renderer_env ? strdup(renderer_env) : NULL;
+	int i;
+
+	assert(setenv("WLR_RENDERER", "pixman", 1) == 0);
+	dpy = wl_display_create();
+	assert(dpy);
+	loop = wl_display_get_event_loop(dpy);
+	backend = wlr_headless_backend_create(loop);
+	assert(backend);
+	drw = wlr_renderer_autocreate(backend);
+	assert(drw);
+	alloc = wlr_allocator_autocreate(backend, drw);
+	assert(alloc);
+	compositor = wlr_compositor_create(dpy, 6, drw);
+	assert(compositor);
+	wl_signal_add(&drw->events.lost, &gpu_reset);
+	wl_list_init(&mons);
+	m.wlr_output = wlr_headless_add_output(backend, 64, 64);
+	assert(m.wlr_output);
+	wl_list_insert(&mons, &m.link);
+	assert(wlr_output_init_render(m.wlr_output, alloc, drw));
+	wlr_output_state_init(&state);
+	wlr_output_state_set_enabled(&state, true);
+	assert(wlr_output_commit_state(m.wlr_output, &state));
+	wlr_output_state_finish(&state);
+	assert(!m.wlr_output->needs_frame);
+
+	for (i = 0; i < 2; i++) {
+		struct wlr_renderer *old_drw = drw;
+		struct wlr_allocator *old_alloc = alloc;
+		wl_signal_add(&old_drw->events.destroy, &destroy);
+		/* A second loss before idle must not queue another recovery. */
+		wl_signal_emit_mutable(&old_drw->events.lost, NULL);
+		wl_signal_emit_mutable(&old_drw->events.lost, NULL);
+		assert(drw == old_drw && alloc == old_alloc);
+		assert(compositor->renderer == old_drw);
+		assert(m.wlr_output->renderer == old_drw);
+		assert(m.wlr_output->allocator == old_alloc);
+		assert(destroyed_renderers == i);
+		assert(!wl_signal_get(&old_drw->events.lost, gpureset));
+		wl_event_loop_dispatch_idle(loop);
+		assert(drw != old_drw && alloc != old_alloc);
+		assert(compositor->renderer == drw);
+		assert(m.wlr_output->renderer == drw);
+		assert(m.wlr_output->allocator == alloc);
+		assert(destroyed_renderers == i + 1);
+		assert(wl_signal_get(&drw->events.lost, gpureset) == &gpu_reset);
+		assert(m.wlr_output->needs_frame);
+		wlr_output_state_init(&state);
+		pass = wlr_output_begin_render_pass(m.wlr_output, &state, NULL);
+		assert(pass);
+		wlr_render_pass_add_rect(pass, &(struct wlr_render_rect_options){
+			.box = {0, 0, 64, 64}, .color = {1, 0, 0, 1},
+		});
+		assert(wlr_render_pass_submit(pass));
+		assert(wlr_output_commit_state(m.wlr_output, &state));
+		wlr_output_state_finish(&state);
+		assert(!m.wlr_output->needs_frame);
+	}
+
+	wl_list_remove(&m.link);
+	wl_list_remove(&gpu_reset.link);
+	wlr_backend_destroy(backend);
+	wlr_allocator_destroy(alloc);
+	wlr_renderer_destroy(drw);
+	wl_display_destroy(dpy);
+	if (saved_renderer) {
+		assert(setenv("WLR_RENDERER", saved_renderer, 1) == 0);
+		free(saved_renderer);
+	} else {
+		assert(unsetenv("WLR_RENDERER") == 0);
+	}
+}
+
 int
 main(void)
 {
@@ -332,5 +426,6 @@ main(void)
 	directional_boundaries();
 	initial_maximize_request();
 	initial_floating_placement();
+	deferred_gpu_reset();
 	return 0;
 }

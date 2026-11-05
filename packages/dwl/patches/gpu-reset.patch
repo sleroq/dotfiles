@@ -1,0 +1,40 @@
+--- a/dwl.c
++++ b/dwl.c
+@@ -344,6 +344,7 @@
+ static Client *focustop(Monitor *m);
+ static void fullscreennotify(struct wl_listener *listener, void *data);
+ static void gpureset(struct wl_listener *listener, void *data);
++static void gpuresetidle(void *data);
+ static void handlesig(int signo);
+ static void incnmaster(const Arg *arg);
+ static void inputdevice(struct wl_listener *listener, void *data);
+@@ -1941,6 +1942,14 @@
+ void
+ gpureset(struct wl_listener *listener, void *data)
+ {
++	wl_list_remove(&gpu_reset.link);
++	/* Defer destruction until the lost signal and render stack have unwound. */
++	wl_event_loop_add_idle(wl_display_get_event_loop(dpy), gpuresetidle, NULL);
++}
++
++void
++gpuresetidle(void *data)
++{
+ 	struct wlr_renderer *old_drw = drw;
+ 	struct wlr_allocator *old_alloc = alloc;
+ 	struct Monitor *m;
+@@ -1950,13 +1959,13 @@
+ 	if (!(alloc = wlr_allocator_autocreate(backend, drw)))
+ 		die("couldn't recreate allocator");
+ 
+-	wl_list_remove(&gpu_reset.link);
+ 	wl_signal_add(&drw->events.lost, &gpu_reset);
+ 
+ 	wlr_compositor_set_renderer(compositor, drw);
+ 
+ 	wl_list_for_each(m, &mons, link) {
+ 		wlr_output_init_render(m->wlr_output, alloc, drw);
++		wlr_output_schedule_frame(m->wlr_output);
+ 	}
+ 
+ 	wlr_allocator_destroy(old_alloc);
