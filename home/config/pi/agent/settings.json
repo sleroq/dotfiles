@@ -1,6 +1,6 @@
 {
   "lastChangelogVersion": "1.2.0",
-  "defaultThinkingLevel": "low",
+  "defaultThinkingLevel": "high",
   "packages": [
     "npm:@fumo-gateway/pi@1.0.0",
     "npm:@gotgenes/pi-subagents@25.0.4",
@@ -16,12 +16,11 @@
   },
   "theme": "dark",
   "defaultProvider": "fumo",
-  "defaultModel": "codex/gpt-6.1-sol",
+  "defaultModel": "codex/gpt-6.1-terra",
   "enabledModels": [
     "FrankAI/FrankAI",
-    "fumo/*",
-    "openai/gpt-6-astra",
-    "openai/gpt-6.1-sol"
+    "fumo/codex/gpt-6.1-terra:high",
+    "fumo/codex/gpt-6.1-sol:high"
   ],
   "outputPad": 0
 }
