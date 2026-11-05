@@ -57,6 +57,12 @@ in
       };
     };
 
+    systemd.user.services.podman-restart = {
+      overrideStrategy = "asDropin";
+      wantedBy = [ "default.target" ];
+      unitConfig.ConditionUser = config.cumserver.dev-env.user;
+    };
+
     environment.systemPackages = with pkgs; [
       podman-compose
     ];
