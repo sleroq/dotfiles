@@ -12,13 +12,13 @@ let
 in
 beam.mixRelease (finalAttrs: {
   pname = "paseo-relay";
-  version = "0.1.0-unstable-2026-10-13";
+  version = "0.1.0-unstable-2026-10-28";
 
   src = fetchFromGitHub {
     owner = "getpaseo";
     repo = "paseo-relay";
-    rev = "3fc41c96c8c63f3a7109e832899cc57d473c4531";
-    hash = "sha256-53r3Mz1GCv5Vozbg02YfiGABn8HTvoao5R+4CxTKj3w=";
+    rev = "5f4b7636af41a85ef20200c0b7e99dd1ea2ee1f2";
+    hash = "sha256-F4PQg5vU9sI3d9XWukbINdBmhbfcehBzeUVxPKZ06Jg=";
   };
 
   mixFodDeps = beam.fetchMixDeps {
