@@ -194,8 +194,8 @@ in
     };
     oci-containers.containers.remnanode = {
       autoStart = true;
-      # Remnawave Node 3.4.4
-      image = "docker.io/remnawave/node@sha256:19ca38195f699f59c0e5978489a18173234aca4b1bd29bab495b16e9d6423f70";
+      # Remnawave Node 3.4.3
+      image = "docker.io/remnawave/node@sha256:793f4ac52289f680ea2b12be8047e93f68b710c22ca93b52b9448a6fef7eaaa6";
       environmentFiles = [ config.age.secrets.remnawaveNodeEnv.path ];
       extraOptions = [
         "--network=host"
