@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   inputs',
   secrets,
   ...
@@ -126,6 +127,23 @@ in
 
         x509.certificateFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.crt";
         x509.privateKeyFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.key";
+      };
+
+      # Run before personal filters, without replacing them or cancelling local delivery.
+      services.dovecot2.settings."sieve_script alias-forwards" = {
+        type = "before";
+        bin_path = "/tmp/sieve/common/";
+        path = pkgs.writeText "alias-forwards.sieve" ''
+          require ["copy", "envelope"];
+
+          # Cloudflare preserves the original recipient here, including Bcc.
+          if allof (
+            envelope :is "to" "sleroq@cum.army",
+            header :is "X-Forwarded-For" "anthropic@sleroq.link sleroq@cum.army"
+          ) {
+            redirect :copy "anthropic@ku.ni";
+          }
+        '';
       };
 
       # Wait for caddy, so certs are ready on first ever boot
