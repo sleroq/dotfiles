@@ -1,14 +1,8 @@
 {
   config,
   inputs',
-  pkgs,
   ...
 }:
-let
-  package = inputs'.kopoka.packages.default.overrideAttrs (_: {
-    nativeBuildInputs = [ pkgs.go ];
-  });
-in
 {
   age.secrets.kopokaEnv = {
     owner = "kopoka";
@@ -27,7 +21,7 @@ in
     wantedBy = [ "multi-user.target" ];
     after = [ "network.target" ];
     serviceConfig = {
-      ExecStart = "${package}/bin/kopoka";
+      ExecStart = "${inputs'.kopoka.packages.default}/bin/kopoka";
       User = "kopoka";
       Group = "kopoka";
       Restart = "always";

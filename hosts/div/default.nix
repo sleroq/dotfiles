@@ -25,9 +25,6 @@
     ../../modules/tuwunel.nix
   ];
 
-  # Kopoka runs locally for now; keep its account and secret on div.
-  systemd.services.kopoka.enable = false;
-
   boot.loader.systemd-boot = {
     enable = true;
     configurationLimit = 10;
