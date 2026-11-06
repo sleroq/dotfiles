@@ -8,8 +8,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
-    # sb.url = "github:sleroq/proxy-helper";
-    sb.url = "path:/Users/sleroq/develop/proxy-helper";
+    ph.url = "github:sleroq/proxy-helper";
 
     easy-hosts.url = "github:tgirlcloud/easy-hosts";
 
@@ -155,7 +154,7 @@
         inherit (inputs)
           nixpkgs-master
           rust-overlay
-          sb
+          ph
           ;
       };
 
@@ -203,7 +202,7 @@
               };
               modules = [
                 inputs.home-manager-interplanetary.nixosModules.home-manager
-                inputs.sb.nixosModules.default
+                inputs.ph.nixosModules.default
                 inputs.aagl.nixosModules.default
                 {
                   home-manager.sharedModules = [
@@ -297,7 +296,7 @@
                 modules = [
                   inputs.determinate.darwinModules.default
                   inputs.agenix.darwinModules.default
-                  inputs.sb.darwinModules.default
+                  inputs.ph.darwinModules.default
                   inputs.home-manager-portable.darwinModules.home-manager
                   (
                     { inputs, inputsResolved', ... }:

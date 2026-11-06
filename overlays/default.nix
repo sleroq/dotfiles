@@ -2,7 +2,7 @@
   nixpkgs-master,
   nixpkgs,
   rust-overlay,
-  sb,
+  ph,
 }:
 let
   inherit (nixpkgs.lib) composeManyExtensions;
@@ -41,7 +41,7 @@ rec {
   };
 
   default = composeManyExtensions [
-    sb.overlays.default
+    ph.overlays.default
     rust-overlay.overlays.default
     code-cursor
     sing-box
