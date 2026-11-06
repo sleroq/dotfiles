@@ -8,6 +8,7 @@
       "https://cache.cum.army/bayan"
       "https://cache.cum.army/sieve"
       "https://cache.cum.army/fumo-gateway"
+      "https://cache.cum.army/kopoka"
     ];
     extra-trusted-public-keys = [
       "music-link:agcaBqYuR+kFl8V9OS2P8nekfhTXYfg4i8bA/0+/yII="
@@ -15,6 +16,7 @@
       "bayan:YQMea+eOeAtGHW3Zljllru7AIKm7GSoPo2rDA0bGBR4="
       "sieve:UrgY6krg1isOiCkmz9Um9gyvyDaaMPRlyh0F+O4ov+U="
       "fumo-gateway:XQHLMyDoYCcsiVIdoAGf/B1HANxxTKR2wNr1SHL3WXw="
+      "kopoka:AhAzvs/u600OVl/wMujSPopaGhn840LGu1xPuBZJD9U="
     ];
   };
 }
