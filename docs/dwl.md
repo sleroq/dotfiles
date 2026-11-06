@@ -8,7 +8,7 @@ window policies are included.
 ## Ownership
 
 - `packages/dwl/`: pinned DWL v0.9 (`98bea2c`), wlroots 0.20, XWayland,
-  upstream IPC v2, then the local desktop patch, then `better-resize.patch`. Window/layout/input policy lives
+  upstream IPC v2, then the local desktop patch, then `better-resize.patch` and the opt-in `metrics.patch`. Window/layout/input policy lives
   in feature headers, including compositor-owned Cairo/Pango group tabs, not
   a daemon or plugin framework.
 - `home/config/noctalia-dwl/`: native Noctalia v5 shell defaults, installed as
@@ -111,6 +111,22 @@ Idle defaults are lock at 600 s, displays off at 800 s, and
 suspend-then-hibernate at 1200 s, with lock before sleep and displays restored
 after resume. These replace neither Caelestia's Hyprland idle policy nor its
 unresolved timeout-unit question.
+
+## Prometheus metrics
+
+The compiled compositor includes an optional atomic textfile exporter. It measures
+mapped windows by app/tag/special workspace, fullscreen/hidden tabs, pane occupancy,
+active/idle/locked time, keyboard-focus retention, time-weighted size popularity,
+and effective size changes versus actual resize gestures and pane splits.
+Application totals survive window close. Per-window IDs, current titles, and
+executable paths are opt-in; title changes never key cumulative app counters.
+
+Export is disabled unless `DWL_METRICS_FILE` is set before DWL starts. The file is
+private (0600), so a collector must run as the same user or have explicit access.
+A same-user node_exporter on loopback can feed the existing system Alloy remote
+write without granting Alloy access to private runtime files. This change does
+not enable that collector, alter the running session, or send desktop metadata
+upstream. See [metrics setup, semantics, catalogue, and PromQL](../packages/dwl/METRICS.md).
 
 ## Deployment and verification
 

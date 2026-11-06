@@ -1,0 +1,675 @@
+diff --git a/Makefile b/Makefile
+index 7732c58..7bb5106 100644
+--- a/Makefile
++++ b/Makefile
+@@ -17,7 +17,7 @@ DWLCFLAGS = `$(PKG_CONFIG) --cflags $(PKGS)` $(WLR_INCS) $(DWLCPPFLAGS) $(DWLDEV
+ LDLIBS    = `$(PKG_CONFIG) --libs $(PKGS)` $(WLR_LIBS) -lm $(LIBS)
+ 
+ all: dwl
+-dwl: dwl.c client.h config.h ime.h util.h workspaces.h window-state.h input-layout.h group-tabs.h config.mk cursor-shape-v1-protocol.h \
++dwl: dwl.c client.h config.h ime.h util.h workspaces.h window-state.h input-layout.h group-tabs.h metrics.h config.mk cursor-shape-v1-protocol.h \
+ 	ext-image-copy-capture-v1-protocol.h \
+ 	pointer-constraints-unstable-v1-protocol.h wlr-layer-shell-unstable-v1-protocol.h \
+ 	wlr-output-power-management-unstable-v1-protocol.h xdg-shell-protocol.h \
+@@ -63,7 +63,7 @@ clean:
+ dist: clean
+ 	mkdir -p dwl-$(VERSION)
+ 	cp -R LICENSE* Makefile CHANGELOG.md README.md client.h config.def.h \
+-		config.mk protocols dwl.1 dwl.c ime.h util.h workspaces.h window-state.h input-layout.h group-tabs.h dwl.desktop \
++		config.mk protocols dwl.1 dwl.c ime.h util.h workspaces.h window-state.h input-layout.h group-tabs.h metrics.h dwl.desktop \
+ 		dwl-$(VERSION)
+ 	tar -caf dwl-$(VERSION).tar.gz dwl-$(VERSION)
+ 	rm -rf dwl-$(VERSION)
+diff --git a/dwl.c b/dwl.c
+index 2921113..4e9abd8 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -164,6 +164,13 @@ typedef struct {
+ 	int floating_width, floating_height;
+ 	xkb_layout_index_t xkb_layout;
+ 	struct wlr_box maximize_restore;
++	struct {
++		struct MetricsApp *app;
++		uint64_t id, focuses, resizes[2], gestures, splits, pane_moves;
++		uint64_t dwell[8], dwell_count;
++		double focus[3], mapped_at, size_at, dwell_sum;
++		int grab_changed;
++	} metrics;
+ } Client;
+ 
+ typedef struct {
+@@ -531,6 +538,7 @@ static void overlaysend(const Arg *arg);
+ static void stickyToggle(const Arg *arg);
+ static void maximizetoggle(const Arg *arg);
+ static void focusfollowtoggle(const Arg *arg);
++static void metrics_pane(Client *c, int split);
+ 
+ /* configuration, allows nested code to access above variables */
+ #include "config.h"
+@@ -543,6 +551,7 @@ static void focusfollowtoggle(const Arg *arg);
+ #include "workspaces.h"
+ #include "window-state.h"
+ #include "input-layout.h"
++#include "metrics.h"
+ 
+ /* function implementations */
+ void
+@@ -734,6 +743,7 @@ axisnotify(struct wl_listener *listener, void *data)
+ 	struct wlr_keyboard *keyboard;
+ 	uint32_t mods;
+ 
++	metrics_activity();
+ 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+ 
+ 	if (event->orientation == WL_POINTER_AXIS_VERTICAL_SCROLL)
+@@ -766,6 +776,7 @@ buttonpress(struct wl_listener *listener, void *data)
+ 	const Button *b;
+ 	static uint32_t tab_button;
+ 
++	metrics_activity();
+ 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+ 
+ 	if (event->state == WL_POINTER_BUTTON_STATE_RELEASED && tab_button == event->button) {
+@@ -873,6 +884,7 @@ checkidleinhibitor(struct wlr_surface *exclude)
+ void
+ cleanup(void)
+ {
++	metrics_cleanup();
+ 	cleanuplisteners();
+ #ifdef XWAYLAND
+ 	wlr_xwayland_destroy(xwayland);
+@@ -1479,6 +1491,7 @@ destroylayersurfacenotify(struct wl_listener *listener, void *data)
+ void
+ destroylock(SessionLock *lock, int unlock)
+ {
++	metrics_account();
+ 	wlr_seat_keyboard_notify_clear_focus(seat);
+ 	if ((locked = !unlock))
+ 		goto destroy;
+@@ -2048,6 +2061,7 @@ keypress(struct wl_listener *listener, void *data)
+ 		group->keysyms[i] = keymap_get_one_sym_by_level(kb->keymap, keycode, layout, i);
+ 	group->mods = wlr_keyboard_get_modifiers(&group->wlr_group->keyboard);
+ 
++	metrics_activity();
+ 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+ 
+ 	/* On _press_ if there is no active screen locker,
+@@ -2145,6 +2159,7 @@ locksession(struct wl_listener *listener, void *data)
+ 
+ 	lock->scene = wlr_scene_tree_create(layers[LyrBlock]);
+ 	cur_lock = lock->lock = session_lock;
++	metrics_account();
+ 	locked = 1;
+ 
+ 	LISTEN(&session_lock->events.new_surface, &lock->new_surface, createlocksurface);
+@@ -2201,6 +2216,8 @@ mapnotify(struct wl_listener *listener, void *data)
+ 	c->geom.width += 2 * c->bw;
+ 	c->geom.height += 2 * c->bw;
+ 
++	metrics_map(c);
++
+ 	/* Insert this client into client lists. */
+ 	wl_list_insert(&clients, &c->link);
+ 	wl_list_insert(&fstack, &c->flink);
+@@ -2297,6 +2314,7 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
+ 
+ 	/* time is 0 in internal calls meant to restore pointer focus. */
+ 	if (time) {
++		metrics_activity();
+ 		wlr_relative_pointer_manager_v1_send_relative_motion(
+ 				relative_pointer_mgr, seat, (uint64_t)time * 1000,
+ 				dx, dy, dx_unaccel, dy_unaccel);
+@@ -2434,6 +2452,8 @@ moveresize(const Arg *arg)
+ 	case CurResize:
+ 		const char *cursors[] = { "nw-resize", "ne-resize", "sw-resize", "se-resize" };
+ 
++		grabc->metrics.grab_changed = 0;
++
+ 		rzcorner = resize_corner;
+ 		grabcx = (int)round(cursor->x);
+ 		grabcy = (int)round(cursor->y);
+@@ -2660,15 +2680,18 @@ resize(Client *c, struct wlr_box geo, int interact)
+ {
+ 	struct wlr_box *bbox;
+ 	struct wlr_box clip;
++	int width = c->geom.width, height = c->geom.height;
+ 
+ 	if (!c->mon || !client_surface(c)->mapped)
+ 		return;
+ 
+ 	bbox = interact ? &sgeom : &c->mon->w;
+ 
++	metrics_size(c);
+ 	client_set_bounds(c, geo.width, geo.height);
+ 	c->geom = geo;
+ 	applybounds(c, bbox);
++	metrics_resize(c, width, height, interact);
+ 
+ 	/* Update scene-graph, including borders */
+ 	wlr_scene_node_set_position(&c->scene->node, c->geom.x, c->geom.y);
+@@ -2694,6 +2717,7 @@ run(char *startup_cmd)
+ 	if (!socket)
+ 		die("startup: display_add_socket_auto");
+ 	setenv("WAYLAND_DISPLAY", socket, 1);
++	metrics_setup();
+ 
+ 	/* Start the backend. This will enumerate outputs and inputs, become the DRM
+ 	 * master, etc */
+@@ -3262,6 +3286,7 @@ unmapnotify(struct wl_listener *listener, void *data)
+ {
+ 	/* Called when the surface is unmapped, and should no longer be shown. */
+ 	Client *c = wl_container_of(listener, c, unmap);
++	metrics_unmap(c);
+ 	window_forget(c);
+ 	if (c == grabc) {
+ 		cursor_mode = CurNormal;
+diff --git a/metrics.h b/metrics.h
+new file mode 100644
+index 0000000..a40fffd
+--- /dev/null
++++ b/metrics.h
+@@ -0,0 +1,475 @@
++/* Optional Prometheus textfile collector. No sockets, threads or dependencies.
++ * Set DWL_METRICS_FILE to a private, local .prom path before starting dwl. */
++#include <errno.h>
++#include <string.h>
++
++/* Application identities are frozen at map; titles never key counters. */
++typedef struct MetricsApp MetricsApp;
++struct MetricsApp {
++	MetricsApp *next;
++	char *app_id, *class, *executable;
++	double focus[3], dwell_sum;
++	uint64_t opened, closed, focuses, resizes[2], gestures, splits, pane_moves;
++	uint64_t dwell[8], dwell_count;
++};
++
++static struct {
++	const char *path;
++	struct wl_event_source *timer;
++	struct wl_listener keyboard_focus;
++	MetricsApp *apps;
++	Client *focus;
++	double start, last, input, idle_after, state[3], dwell;
++	double sizes[17][17];
++	uint64_t next_id;
++	int titles, windows, executables, failed;
++} metrics;
++
++static const char *metrics_states[] = {"active", "idle", "locked"};
++static const double metrics_dwell_bounds[] = {1, 5, 15, 30, 60, 300, 1800};
++
++static double
++metrics_now(void)
++{
++	struct timespec ts;
++	clock_gettime(CLOCK_MONOTONIC, &ts);
++	return ts.tv_sec + ts.tv_nsec / 1e9;
++}
++
++/* Split at the exact idle deadline, not at the next export tick. Inhibitors
++ * deliberately do not change the meaning of physical/virtual input activity. */
++static void
++metrics_account_at(double now)
++{
++	double dt, active, elapsed[3] = {0};
++	int i;
++	if (!metrics.path) return;
++	dt = now - metrics.last;
++	active = MAX(0.0, MIN(now, metrics.input + metrics.idle_after) - metrics.last);
++	elapsed[0] = locked ? 0 : active;
++	elapsed[1] = locked ? 0 : dt - active;
++	elapsed[2] = locked ? dt : 0;
++	for (i = 0; i < 3; i++) {
++		metrics.state[i] += elapsed[i];
++		if (metrics.focus && metrics.focus->metrics.app) {
++			metrics.focus->metrics.focus[i] += elapsed[i];
++			metrics.focus->metrics.app->focus[i] += elapsed[i];
++		}
++	}
++	/* Retention means uninterrupted active keyboard focus; idle/lock ends
++	 * a dwell even if the same surface remains selected. */
++	metrics.dwell += metrics.focus ? elapsed[0] : 0;
++	metrics.last = now;
++}
++
++/* Size residency belongs to this window's geometry, not input/focus events. */
++static void
++metrics_size_at(Client *c, double now)
++{
++	int width, height;
++	if (!metrics.path || !c->metrics.app) return;
++	width = MIN(16, MAX(0, c->geom.width - 1) / 256);
++	height = MIN(16, MAX(0, c->geom.height - 1) / 256);
++	metrics.sizes[width][height] += now - c->metrics.size_at;
++	c->metrics.size_at = now;
++}
++
++static void
++metrics_size(Client *c)
++{
++	if (metrics.path && c->metrics.app) metrics_size_at(c, metrics_now());
++}
++
++static void
++metrics_end_dwell(void)
++{
++	MetricsApp *a = metrics.focus ? metrics.focus->metrics.app : NULL;
++	size_t i;
++	if (a && metrics.dwell > 0) {
++		a->dwell_sum += metrics.dwell;
++		a->dwell_count++;
++		metrics.focus->metrics.dwell_sum += metrics.dwell;
++		metrics.focus->metrics.dwell_count++;
++		for (i = 0; i < LENGTH(metrics_dwell_bounds); i++) {
++			if (metrics.dwell > metrics_dwell_bounds[i]) continue;
++			a->dwell[i]++;
++			metrics.focus->metrics.dwell[i]++;
++		}
++		a->dwell[7]++;
++		metrics.focus->metrics.dwell[7]++;
++	}
++	metrics.dwell = 0;
++}
++
++static void
++metrics_account(void)
++{
++	if (!metrics.path) return;
++	metrics_account_at(metrics_now());
++	if (locked || metrics.last >= metrics.input + metrics.idle_after)
++		metrics_end_dwell();
++}
++
++static void
++metrics_activity(void)
++{
++	if (!metrics.path) return;
++	metrics_account();
++	metrics.input = metrics.last;
++}
++
++static void
++metrics_focus(Client *c)
++{
++	if (!metrics.path) return;
++	if (c && !c->metrics.app) c = NULL;
++	if (metrics.focus == c) return;
++	metrics_account();
++	metrics_end_dwell();
++	metrics.focus = c;
++	if (c) {
++		c->metrics.focuses++;
++		c->metrics.app->focuses++;
++	}
++}
++
++static void
++metrics_keyboard_focus(struct wl_listener *listener, void *data)
++{
++	struct wlr_seat_keyboard_focus_change_event *event = data;
++	Client *c = NULL;
++	toplevel_from_wlr_surface(event->new_surface, &c, NULL);
++	metrics_focus(c);
++}
++
++/* Escape Prometheus label values, including titles with quotes/newlines. */
++static void
++metrics_label(FILE *f, const char *value)
++{
++	const unsigned char *p = (const unsigned char *)(value ? value : "");
++	fputc('"', f);
++	for (; *p; p++) {
++		switch (*p) {
++		case '\\': fputs("\\\\", f); break;
++		case '"': fputs("\\\"", f); break;
++		case '\n': fputs("\\n", f); break;
++		default: fputc(*p, f); break;
++		}
++	}
++	fputc('"', f);
++}
++
++static void
++metrics_app_labels(FILE *f, MetricsApp *a)
++{
++	fputs("app_id=", f); metrics_label(f, a->app_id);
++	fputs(",class=", f); metrics_label(f, a->class);
++	fputs(",executable=", f); metrics_label(f, a->executable);
++}
++
++static void
++metrics_map(Client *c)
++{
++	MetricsApp *a;
++	const char *app_id, *class = "";
++	char executable[PATH_MAX] = "", path[64];
++	pid_t pid = 0;
++	ssize_t length;
++	if (!metrics.path) return;
++	metrics_account();
++	app_id = client_get_appid(c);
++#ifdef XWAYLAND
++	if (client_is_x11(c)) {
++		class = c->surface.xwayland->class;
++		pid = c->surface.xwayland->pid;
++	} else
++#endif
++		wl_client_get_credentials(wl_resource_get_client(client_surface(c)->resource), &pid, NULL, NULL);
++	/* Read the executable, never cmdline (which can contain tokens). X11 PID
++	 * and app/class strings are client-reported, not trusted identities. */
++	if (metrics.executables && pid > 0) {
++		snprintf(path, sizeof(path), "/proc/%ld/exe", (long)pid);
++		length = readlink(path, executable, sizeof(executable) - 1);
++		if (length > 0) executable[length] = '\0';
++	}
++	if (!class) class = "";
++	for (a = metrics.apps; a; a = a->next)
++		if (!strcmp(a->app_id, app_id) && !strcmp(a->class, class) &&
++				!strcmp(a->executable, executable)) break;
++	if (!a) {
++		a = ecalloc(1, sizeof(*a));
++		a->app_id = strdup(app_id);
++		a->class = strdup(class);
++		a->executable = strdup(executable);
++		a->next = metrics.apps;
++		metrics.apps = a;
++	}
++	memset(&c->metrics, 0, sizeof(c->metrics));
++	c->metrics.app = a;
++	c->metrics.id = ++metrics.next_id;
++	c->metrics.mapped_at = c->metrics.size_at = metrics.last;
++	a->opened++;
++}
++
++static void
++metrics_unmap(Client *c)
++{
++	if (!metrics.path || !c->metrics.app) return;
++	if (metrics.focus == c) metrics_focus(NULL);
++	else metrics_account();
++	metrics_size_at(c, metrics.last);
++	c->metrics.app->closed++;
++	c->metrics.app = NULL;
++}
++
++static void
++metrics_resize(Client *c, int width, int height, int interact)
++{
++	int kind = interact != 0;
++	if (!metrics.path || !c->metrics.app ||
++			(width == c->geom.width && height == c->geom.height)) return;
++	c->metrics.resizes[kind]++;
++	c->metrics.app->resizes[kind]++;
++	if (interact && cursor_mode == CurResize && grabc == c && !c->metrics.grab_changed) {
++		c->metrics.grab_changed = 1;
++		c->metrics.gestures++;
++		c->metrics.app->gestures++;
++	}
++}
++
++static void
++metrics_pane(Client *c, int split)
++{
++	if (!metrics.path || !c->metrics.app) return;
++	c->metrics.pane_moves++;
++	c->metrics.app->pane_moves++;
++	if (split) {
++		c->metrics.splits++;
++		c->metrics.app->splits++;
++	}
++}
++
++static void
++metrics_type(FILE *f, const char *name, const char *type, const char *help)
++{
++	fprintf(f, "# HELP dwl_%s %s\n# TYPE dwl_%s %s\n", name, help, name, type);
++}
++
++static void
++metrics_write(FILE *f)
++{
++	Client *c;
++	Monitor *m;
++	MetricsApp *a;
++	unsigned int tag;
++	int i, j, count, total = 0, fullscreen = 0, special = 0, visible = 0, floating = 0, maximized = 0, urgent = 0, hidden_tabs = 0;
++	static const char *app_counters[] = {"opened", "closed", "focus_entries", "resize_layout", "resize_interactive", "resize_gestures", "splits", "pane_moves"};
++	static const char *window_metrics[] = {"width_pixels", "height_pixels", "mapped_seconds_total", "unfocused_seconds_total", "focus_entries_total", "layout_size_changes_total", "interactive_size_changes_total", "resize_gestures_total", "splits_total", "pane_moves_total"};
++	static const char *window_help[] = {
++		"Current outer width in logical pixels.", "Current outer height in logical pixels.",
++		"Mapped lifetime in seconds.", "Mapped time without keyboard focus in seconds.",
++		"Keyboard focus entries.", "Effective noninteractive size changes including arrangement and fullscreen.",
++		"Effective interactive size changes excluding position-only movement.",
++		"Resize grabs with at least one effective size change.",
++		"Second-pane creations initiated by this window.", "Successful pane crossings including split creation."
++	};
++	uint64_t counters[8];
++	double values[10];
++
++	metrics_type(f, "session_start_time_seconds", "gauge", "Unix time at metrics initialization.");
++	/* Realtime is only used for freshness/start metadata, never durations. */
++	fprintf(f, "dwl_session_start_time_seconds %.3f\n", metrics.start);
++	metrics_type(f, "metrics_snapshot_time_seconds", "gauge", "Unix time of this snapshot; alert on stale files after a crash.");
++	fprintf(f, "dwl_metrics_snapshot_time_seconds %ld\n", (long)time(NULL));
++	metrics_type(f, "session_seconds_total", "counter", "Monotonic session time partitioned into active idle and locked.");
++	for (i = 0; i < 3; i++)
++		fprintf(f, "dwl_session_seconds_total{state=\"%s\"} %.9f\n", metrics_states[i], metrics.state[i]);
++	metrics_type(f, "session_state", "gauge", "One-hot current activity state; idle ignores inhibitors.");
++	for (i = 0; i < 3; i++)
++		fprintf(f, "dwl_session_state{state=\"%s\"} %d\n", metrics_states[i],
++			i == (locked ? 2 : metrics.last >= metrics.input + metrics.idle_after ? 1 : 0));
++
++	wl_list_for_each(c, &clients, link) {
++		metrics_size_at(c, metrics.last);
++		total++;
++		fullscreen += !!c->isfullscreen;
++		special += !!c->overlay;
++		visible += !!client_visible(c, c->mon);
++		floating += !!c->isfloating;
++		maximized += !!c->maximized;
++		urgent += !!c->isurgent;
++		hidden_tabs += c->mon && workspace_member(c, c->mon) && !client_visible(c, c->mon);
++	}
++	metrics_type(f, "windows", "gauge", "Mapped managed windows; properties overlap. Visible means layout-visible not unoccluded.");
++	fprintf(f, "dwl_windows{kind=\"all\"} %d\ndwl_windows{kind=\"fullscreen\"} %d\n"
++		"dwl_windows{kind=\"special\"} %d\ndwl_windows{kind=\"visible\"} %d\n"
++		"dwl_windows{kind=\"floating\"} %d\ndwl_windows{kind=\"maximized\"} %d\n"
++		"dwl_windows{kind=\"urgent\"} %d\ndwl_windows{kind=\"hidden_tab\"} %d\n",
++		total, fullscreen, special, visible, floating, maximized, urgent, hidden_tabs);
++	metrics_type(f, "tag_windows", "gauge", "Tag membership per monitor; special excluded sticky not duplicated onto other tags.");
++	metrics_type(f, "tag_selected", "gauge", "Selected ordinary tags per monitor.");
++	metrics_type(f, "special_open", "gauge", "Special workspace open per monitor.");
++	metrics_type(f, "special_windows", "gauge", "Special workspace members per monitor including hidden.");
++	metrics_type(f, "pane_windows", "gauge", "Tiled members in each current workspace pane including inactive tabs.");
++	metrics_type(f, "pane_ratio", "gauge", "Current workspace divider ratio retained even after collapse.");
++	metrics_type(f, "grouped", "gauge", "Current workspace has tabbed pane mode enabled.");
++	wl_list_for_each(m, &mons, link) {
++		for (tag = 0; tag < TAGCOUNT; tag++) {
++			count = 0;
++			wl_list_for_each(c, &clients, link)
++				count += c->mon == m && !c->overlay && !!(c->tags & (1u << tag));
++			fputs("dwl_tag_windows{monitor=", f); metrics_label(f, m->wlr_output->name);
++			fprintf(f, ",tag=\"%u\"} %d\n", tag + 1, count);
++			fputs("dwl_tag_selected{monitor=", f); metrics_label(f, m->wlr_output->name);
++			fprintf(f, ",tag=\"%u\"} %d\n", tag + 1, !!(m->tagset[m->seltags] & (1u << tag)));
++		}
++		count = 0;
++		wl_list_for_each(c, &clients, link) count += c->mon == m && c->overlay;
++		fputs("dwl_special_windows{monitor=", f); metrics_label(f, m->wlr_output->name); fprintf(f, "} %d\n", count);
++		fputs("dwl_special_open{monitor=", f); metrics_label(f, m->wlr_output->name); fprintf(f, "} %d\n", !!m->overlay_open);
++		fputs("dwl_grouped{monitor=", f); metrics_label(f, m->wlr_output->name); fprintf(f, "} %d\n", !!m->grouped[workspace(m)]);
++		fputs("dwl_pane_ratio{monitor=", f); metrics_label(f, m->wlr_output->name);
++		fprintf(f, "} %.6f\n", m->ratio[workspace(m)] ? m->ratio[workspace(m)] : 0.55f);
++		for (i = 0; i < 2; i++) {
++			count = 0;
++			wl_list_for_each(c, &clients, link) count += !!pane_member(c, m, i);
++			fputs("dwl_pane_windows{monitor=", f); metrics_label(f, m->wlr_output->name);
++			fprintf(f, ",pane=\"%d\"} %d\n", i, count);
++		}
++	}
++
++	metrics_type(f, "app_windows", "gauge", "Currently mapped windows by map-time identity.");
++	metrics_type(f, "app_focus_seconds_total", "counter", "Keyboard focus duration by session activity state including closed windows.");
++	metrics_type(f, "app_events_total", "counter", "Window lifecycle focus size-change and pane events; survives window close.");
++	metrics_type(f, "app_focus_retention_seconds", "histogram", "Completed uninterrupted active focus dwells; focus loss idle or lock ends a dwell.");
++	for (a = metrics.apps; a; a = a->next) {
++		fputs("dwl_app_windows{", f); metrics_app_labels(f, a);
++		fprintf(f, "} %llu\n", (unsigned long long)(a->opened - a->closed));
++		for (i = 0; i < 3; i++) {
++			fputs("dwl_app_focus_seconds_total{", f); metrics_app_labels(f, a);
++			fprintf(f, ",state=\"%s\"} %.9f\n", metrics_states[i], a->focus[i]);
++		}
++		counters[0] = a->opened; counters[1] = a->closed; counters[2] = a->focuses;
++		counters[3] = a->resizes[0]; counters[4] = a->resizes[1]; counters[5] = a->gestures;
++		counters[6] = a->splits; counters[7] = a->pane_moves;
++		for (i = 0; i < 8; i++) {
++			fputs("dwl_app_events_total{", f); metrics_app_labels(f, a);
++			fprintf(f, ",event=\"%s\"} %llu\n", app_counters[i], (unsigned long long)counters[i]);
++		}
++		for (i = 0; i < 8; i++) {
++			fputs("dwl_app_focus_retention_seconds_bucket{", f); metrics_app_labels(f, a);
++			if (i == 7) fputs(",le=\"+Inf\"", f);
++			else fprintf(f, ",le=\"%.0f\"", metrics_dwell_bounds[i]);
++			fprintf(f, "} %llu\n", (unsigned long long)a->dwell[i]);
++		}
++		fputs("dwl_app_focus_retention_seconds_sum{", f); metrics_app_labels(f, a); fprintf(f, "} %.9f\n", a->dwell_sum);
++		fputs("dwl_app_focus_retention_seconds_count{", f); metrics_app_labels(f, a); fprintf(f, "} %llu\n", (unsigned long long)a->dwell_count);
++	}
++	metrics_type(f, "window_size_seconds_total", "counter", "Mapped window-seconds at each size rounded up to 256 logical pixels; 4352 denotes above 4096.");
++	for (i = 0; i < 17; i++) for (j = 0; j < 17; j++)
++		fprintf(f, "dwl_window_size_seconds_total{width=\"%d\",height=\"%d\"} %.9f\n", (i + 1) * 256, (j + 1) * 256, metrics.sizes[i][j]);
++
++	if (!metrics.windows) return;
++	metrics_type(f, "window_info", "gauge", "Live map-time identity; optional title is metadata only and may be sensitive.");
++	metrics_type(f, "window_focused", "gauge", "Actual managed keyboard focus; not workspace focus history.");
++	metrics_type(f, "window_focus_seconds_total", "counter", "Live window focus duration by activity state; removed at unmap.");
++	metrics_type(f, "window_focus_retention_seconds", "histogram", "Completed active focus dwells for this mapping; join window_info for current title.");
++	for (i = 0; i < 10; i++) {
++		char name[80];
++		snprintf(name, sizeof(name), "window_%s", window_metrics[i]);
++		metrics_type(f, name, i < 2 ? "gauge" : "counter", window_help[i]);
++	}
++	wl_list_for_each(c, &clients, link) {
++		if (!c->metrics.app) continue;
++		fprintf(f, "dwl_window_info{window=\"%llu\",", (unsigned long long)c->metrics.id);
++		metrics_app_labels(f, c->metrics.app);
++		if (metrics.titles) { fputs(",title=", f); metrics_label(f, client_get_title(c)); }
++		fputs("} 1\n", f);
++		for (i = 0; i < 8; i++) {
++			fprintf(f, "dwl_window_focus_retention_seconds_bucket{window=\"%llu\",le=\"", (unsigned long long)c->metrics.id);
++			if (i == 7) fputs("+Inf", f);
++			else fprintf(f, "%.0f", metrics_dwell_bounds[i]);
++			fprintf(f, "\"} %llu\n", (unsigned long long)c->metrics.dwell[i]);
++		}
++		fprintf(f, "dwl_window_focus_retention_seconds_sum{window=\"%llu\"} %.9f\n", (unsigned long long)c->metrics.id, c->metrics.dwell_sum);
++		fprintf(f, "dwl_window_focus_retention_seconds_count{window=\"%llu\"} %llu\n", (unsigned long long)c->metrics.id, (unsigned long long)c->metrics.dwell_count);
++		fprintf(f, "dwl_window_focused{window=\"%llu\"} %d\n", (unsigned long long)c->metrics.id, metrics.focus == c);
++		for (i = 0; i < 3; i++)
++			fprintf(f, "dwl_window_focus_seconds_total{window=\"%llu\",state=\"%s\"} %.9f\n", (unsigned long long)c->metrics.id, metrics_states[i], c->metrics.focus[i]);
++		values[0] = c->geom.width; values[1] = c->geom.height; values[2] = metrics.last - c->metrics.mapped_at;
++		values[3] = values[2] - c->metrics.focus[0] - c->metrics.focus[1] - c->metrics.focus[2];
++		values[4] = c->metrics.focuses; values[5] = c->metrics.resizes[0]; values[6] = c->metrics.resizes[1];
++		values[7] = c->metrics.gestures; values[8] = c->metrics.splits; values[9] = c->metrics.pane_moves;
++		for (i = 0; i < 10; i++)
++			fprintf(f, "dwl_window_%s{window=\"%llu\"} %.9f\n", window_metrics[i], (unsigned long long)c->metrics.id, MAX(0.0, values[i]));
++	}
++}
++
++static int
++metrics_tick(void *data)
++{
++	FILE *f;
++	char *temporary;
++	int fd, error;
++	metrics_account();
++	/* mkstemp gives mode 0600; the trusted destination directory must exist.
++	 * A local runtime filesystem keeps this small synchronous write off disk.
++	 * Rename ensures scrapes never see a partial snapshot. */
++	temporary = ecalloc(strlen(metrics.path) + 12, 1);
++	sprintf(temporary, "%s.tmp.XXXXXX", metrics.path);
++	fd = mkstemp(temporary);
++	f = fd < 0 ? NULL : fdopen(fd, "w");
++	error = f ? 0 : errno;
++	if (f) {
++		metrics_write(f);
++		if (ferror(f)) error = errno;
++		if (fclose(f) && !error) error = errno;
++		if (!error && rename(temporary, metrics.path)) error = errno;
++	} else if (fd >= 0) close(fd);
++	unlink(temporary);
++	free(temporary);
++	if (error && !metrics.failed)
++		wlr_log(WLR_ERROR, "metrics: cannot publish %s: %s", metrics.path, strerror(error));
++	metrics.failed = error != 0;
++	wl_event_source_timer_update(metrics.timer, 1000);
++	return 0;
++}
++
++static void
++metrics_setup(void)
++{
++	const char *idle = getenv("DWL_METRICS_IDLE_SECONDS"), *windows = getenv("DWL_METRICS_WINDOWS");
++	char *end;
++	metrics.path = getenv("DWL_METRICS_FILE");
++	if (!metrics.path || !*metrics.path) { metrics.path = NULL; return; }
++	metrics.idle_after = 60;
++	if (idle) {
++		metrics.idle_after = strtod(idle, &end);
++		if (*end || !isfinite(metrics.idle_after) || metrics.idle_after <= 0)
++			die("metrics: DWL_METRICS_IDLE_SECONDS must be positive and finite");
++	}
++	metrics.windows = windows && !strcmp(windows, "1");
++	metrics.executables = getenv("DWL_METRICS_EXECUTABLES") && !strcmp(getenv("DWL_METRICS_EXECUTABLES"), "1");
++	metrics.titles = getenv("DWL_METRICS_TITLES") && !strcmp(getenv("DWL_METRICS_TITLES"), "1");
++	metrics.start = time(NULL);
++	metrics.last = metrics.input = metrics_now();
++	LISTEN(&seat->keyboard_state.events.focus_change, &metrics.keyboard_focus, metrics_keyboard_focus);
++	metrics.timer = wl_event_loop_add_timer(event_loop, metrics_tick, NULL);
++	if (!metrics.timer) die("metrics: cannot create timer");
++	metrics_tick(NULL);
++}
++
++static void
++metrics_cleanup(void)
++{
++	MetricsApp *a, *next;
++	if (!metrics.path) return;
++	wl_event_source_remove(metrics.timer);
++	wl_list_remove(&metrics.keyboard_focus.link);
++	unlink(metrics.path);
++	for (a = metrics.apps; a; a = next) {
++		next = a->next;
++		free(a->app_id); free(a->class); free(a->executable); free(a);
++	}
++	metrics.path = NULL;
++}
+diff --git a/workspaces.h b/workspaces.h
+index 6ffd7cf..bef04a9 100644
+--- a/workspaces.h
++++ b/workspaces.h
+@@ -212,7 +212,15 @@ pane_cross(Client *sel, int direction)
+ 	Monitor *m = sel->mon;
+ 	Client *c, *edge = NULL;
+ 	unsigned int w = workspace(m);
+-	int next;
++	int next, split = 0;
++	if (!m->tabs[w][1]) {
++		wl_list_for_each(c, &clients, link) {
++			if (c != sel && pane_member(c, m, sel->pane)) {
++				split = 1;
++				break;
++			}
++		}
++	}
+ 	if (!m->tabs[w][1] && direction < 0) {
+ 		wl_list_for_each(c, &clients, link)
+ 			if (pane_member(c, m, 0)) c->pane = 1;
+@@ -235,6 +243,7 @@ pane_cross(Client *sel, int direction)
+ 		}
+ 		sel->pane = next;
+ 	}
++	metrics_pane(sel, split);
+ 	m->grouped[w] = 1;
+ 	m->tabs[w][sel->pane] = sel;
+ 	return 1;
