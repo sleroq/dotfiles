@@ -9,7 +9,7 @@ import { installProfile, profileIsCurrent } from "../modules/paseo/install-profi
 
 const root = resolve(import.meta.dir, "..");
 
-test("only the work profile proxies Pi and Exa and uses the private Exa file", async () => {
+test("the work profile uses the private Exa file without proxying Pi or Exa", async () => {
   const shared = await exportProfile(undefined, root);
   const instructions = (await $`tar -xOf - ./pi/AGENTS.md < ${shared.archive}`.quiet()).stdout.toString();
   expect(instructions).toBe(readFileSync(join(root, "home/config/agents/AGENTS.md"), "utf8"));
@@ -19,7 +19,7 @@ test("only the work profile proxies Pi and Exa and uses the private Exa file", a
   const workSettings = JSON.parse((await $`tar -xOf - ./pi/settings.json < ${work.archive}`.quiet()).stdout.toString());
 
   expect(sharedSettings.httpProxy).toBeUndefined();
-  expect(workSettings).toEqual({ ...sharedSettings, httpProxy: "http://127.0.0.1:2080" });
+  expect(workSettings).toEqual(sharedSettings);
   expect(work.metadata.contentDigest).not.toBe(shared.metadata.contentDigest);
   expect(desktop.metadata.contentDigest).toBe(shared.metadata.contentDigest);
 
@@ -29,10 +29,6 @@ test("only the work profile proxies Pi and Exa and uses the private Exa file", a
   expect(workMcp.mcpServers.exa.env).toEqual({
     ...sharedMcp.mcpServers.exa.env,
     EXA_API_KEY: '!. "$HOME/.config/pi/exa.env" && printf %s "$EXA_API_KEY"',
-    HTTP_PROXY: "http://127.0.0.1:2080",
-    HTTPS_PROXY: "http://127.0.0.1:2080",
-    NO_PROXY: "",
-    NODE_USE_ENV_PROXY: "1",
   });
   const entries = (await $`tar -tf - < ${work.archive}`.quiet()).stdout.toString();
   expect(entries).not.toContain("exa.env");

@@ -80,11 +80,6 @@ export async function exportProfile(ref?: string, directory = root, host?: strin
     if (name === "ast-grep/sgconfig.yml" && host === "work") {
       data = Buffer.from(data.toString().replace("  - rules/common", "  - rules"));
     }
-    if (name === "pi/settings.json" && host === "work") {
-      const settings = JSON.parse(data.toString());
-      settings.httpProxy = "http://127.0.0.1:2080";
-      data = Buffer.from(`${JSON.stringify(settings, null, 2)}\n`);
-    }
     if (name === "pi/mcp.json") {
       const mcp = JSON.parse(data.toString());
       for (const server of ["cloudflare", "cloudflare-docs"]) delete mcp.mcpServers[server];
@@ -92,10 +87,6 @@ export async function exportProfile(ref?: string, directory = root, host?: strin
         mcp.mcpServers.exa.env = {
           ...mcp.mcpServers.exa.env,
           EXA_API_KEY: '!. "$HOME/.config/pi/exa.env" && printf %s "$EXA_API_KEY"',
-          HTTP_PROXY: "http://127.0.0.1:2080",
-          HTTPS_PROXY: "http://127.0.0.1:2080",
-          NO_PROXY: "",
-          NODE_USE_ENV_PROXY: "1",
         };
       }
       data = Buffer.from(`${JSON.stringify(mcp, null, 2)}\n`);

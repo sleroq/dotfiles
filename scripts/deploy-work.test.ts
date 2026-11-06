@@ -91,7 +91,7 @@ test("syncs Pi and Paseo to an arbitrary SSH host without a checkout or service 
       expect(event.args.at(-2)).toBe("oleg@arch-example");
     }
     const pi = events.find(event => event.phase === "pi")!;
-    expect(pi.proxy).toBe("http://127.0.0.1:2080");
+    expect(pi.proxy).toBeUndefined();
     expect(pi.args.at(-1)).toEndWith("'apply' 'true'");
     const config = JSON.parse(readFileSync(join(home, ".paseo/config.json"), "utf8"));
     expect(config.pluginsEnabled).toBe(true);
