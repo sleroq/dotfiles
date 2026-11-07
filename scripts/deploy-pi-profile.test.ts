@@ -74,7 +74,9 @@ const e = (try std.json.parseFromTokenSource(T, arena.allocator(), &reader, .{})
 const f = (try std.json.parseFromValue(T, self.request_arena.allocator(), value, .{})).value;
 `);
     // Exercise ancestor config discovery, not just an explicitly supplied config.
-    const scan = await $`ast-grep scan --json`.cwd(project).quiet().nothrow();
+    const help = await $`ast-grep --help`.quiet();
+    const customLanguages = help.stdout.toString().includes("--custom-languages") ? ["--custom-languages", "allow"] : [];
+    const scan = await $`ast-grep ${customLanguages} scan --json`.cwd(project).quiet().nothrow();
     let expectedExit = 0;
     if (host === "work") {
       expectedExit = 1; // The FRG ternary rule has error severity.
@@ -98,7 +100,7 @@ const f = (try std.json.parseFromValue(T, self.request_arena.allocator(), value,
     for (const file of ["Plain.svelte", "Typed.svelte", "plain.ts", "ownership.zig"]) {
       writeFileSync(join(frgProject, file), readFileSync(join(project, file)));
     }
-    const frgScan = await $`ast-grep scan --json`.cwd(frgProject).quiet().nothrow();
+    const frgScan = await $`ast-grep ${customLanguages} scan --json`.cwd(frgProject).quiet().nothrow();
     expect(frgScan.exitCode).toBe(1);
     const frgFindings: { ruleId: string; file: string }[] = JSON.parse(frgScan.stdout.toString());
     for (const [file, language] of [["Plain.svelte", "javascript"], ["Typed.svelte", "typescript"], ["plain.ts", "typescript"]]) {
@@ -114,7 +116,7 @@ const f = (try std.json.parseFromValue(T, self.request_arena.allocator(), value,
       expect(zigRules).toHaveLength(6);
     }
     // The shared suite has valid/invalid cases for all rules, but only eight snapshot baselines.
-    await $`ast-grep test --skip-snapshot-tests --config ${join(home, "sgconfig.yml")}`.cwd(project).quiet();
+    await $`ast-grep ${customLanguages} test --skip-snapshot-tests --config ${join(home, "sgconfig.yml")}`.cwd(project).quiet();
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }

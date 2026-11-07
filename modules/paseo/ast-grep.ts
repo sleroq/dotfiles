@@ -46,8 +46,11 @@ export async function installAstGrep(release: string, env: NodeJS.ProcessEnv) {
   writeFileSync(join(release, "sgconfig-frg.yml"), config.replace(
     commonRules, `${commonRules}  - ${JSON.stringify(join(directory, "rules/frg"))}\n`,
   ));
+  // Newer ast-grep requires explicit consent before loading native parsers.
+  const help = await $`ast-grep --help`.env(env).quiet();
+  const customLanguages = help.stdout.toString().includes("--custom-languages") ? ["--custom-languages", "allow"] : [];
   // Load both custom parsers and compile the shared patterns before activation.
-  await $`ast-grep run --config ${path} --lang svelte --pattern '<script>$CONTENT</script>' --stdin < ${Buffer.from('<script>const value = 1;</script>')}`.env(env).quiet();
-  await $`ast-grep run --config ${path} --lang svelte --pattern '<script lang="ts">$CONTENT</script>' --stdin < ${Buffer.from('<script lang="ts">const value: number = 1;</script>')}`.env(env).quiet();
-  await $`ast-grep run --config ${path} --lang zig --pattern 'std.json.parseFromSliceLeaky($T, $ALLOC, $INPUT, $OPTIONS)' --stdin < ${Buffer.from('const value = try std.json.parseFromSliceLeaky(T, arena_allocator, input, .{});')}`.env(env).quiet();
+  await $`ast-grep ${customLanguages} run --config ${path} --lang svelte --pattern '<script>$CONTENT</script>' --stdin < ${Buffer.from('<script>const value = 1;</script>')}`.env(env).quiet();
+  await $`ast-grep ${customLanguages} run --config ${path} --lang svelte --pattern '<script lang="ts">$CONTENT</script>' --stdin < ${Buffer.from('<script lang="ts">const value: number = 1;</script>')}`.env(env).quiet();
+  await $`ast-grep ${customLanguages} run --config ${path} --lang zig --pattern 'std.json.parseFromSliceLeaky($T, $ALLOC, $INPUT, $OPTIONS)' --stdin < ${Buffer.from('const value = try std.json.parseFromSliceLeaky(T, arena_allocator, input, .{});')}`.env(env).quiet();
 }

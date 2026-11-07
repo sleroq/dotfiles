@@ -2,10 +2,12 @@
   stdenv,
   fetchFromGitHub,
   ast-grep,
+  lib,
 }:
 
 let
   pin = builtins.fromJSON (builtins.readFile ../home/config/ast-grep/svelte-parser.json);
+  customLanguages = lib.optionalString (lib.versionAtLeast ast-grep.version "0.51.0") "--custom-languages allow";
 in
 stdenv.mkDerivation {
   pname = "tree-sitter-htmlx-svelte";
@@ -51,9 +53,9 @@ stdenv.mkDerivation {
 
     # Compile the shared injection patterns and exercise scanner tag-stack growth.
     echo '<script>const value = 1;</script>' | \
-      ast-grep --custom-languages allow run --lang svelte --pattern '<script>$CONTENT</script>' --stdin
+      ast-grep ${customLanguages} run --lang svelte --pattern '<script>$CONTENT</script>' --stdin
     echo '<script lang="ts">const value: number = 1;</script>' | \
-      ast-grep --custom-languages allow run --lang svelte --pattern '<script lang="ts">$CONTENT</script>' --stdin
+      ast-grep ${customLanguages} run --lang svelte --pattern '<script lang="ts">$CONTENT</script>' --stdin
     runHook postInstallCheck
   '';
 }
