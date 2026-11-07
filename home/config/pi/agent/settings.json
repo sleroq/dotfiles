@@ -2,7 +2,7 @@
   "lastChangelogVersion": "1.2.0",
   "defaultThinkingLevel": "high",
   "packages": [
-    "npm:@fumo-gateway/pi@1.0.0",
+    "npm:@fumo-gateway/pi@1.0.1",
     "npm:@gotgenes/pi-subagents@25.0.5",
     "npm:pi-worktree-extension@2.0.5",
     "npm:@ff-labs/pi-fff@0.11.0",
