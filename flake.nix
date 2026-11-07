@@ -70,8 +70,6 @@
     moq-box.inputs.nixpkgs.follows = "nixpkgs";
 
     fumo-gateway.url = "github:sleroq/fumo-gateway";
-    # Unpublished Rust rewrite; keep the upstream input for the eventual switch back.
-    fumo-gateway-local.url = "path:/nix/store/6fl7lp61b5jfyvk5q8iclghpwyp8ma1j-fumo-gateway-rust-source";
 
     # Cumserver flakes
     disko.url = "github:nix-community/disko";
