@@ -7,7 +7,7 @@
     "npm:pi-worktree-extension@2.0.5",
     "npm:@ff-labs/pi-fff@0.11.0",
     "npm:pi-compact-transcript@0.12.0",
-    "npm:@narumitw/pi-btw@0.63.4"
+    "npm:@narumitw/pi-btw@0.63.5"
   ],
   "hideThinkingBlock": true,
   "showCacheMissNotices": true,
