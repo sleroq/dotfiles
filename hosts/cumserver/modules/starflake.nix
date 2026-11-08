@@ -12,6 +12,7 @@
   system.extraDependencies = [ inputs.starflake.outPath ];
 
   age.secrets = {
+    celineEnv.file = ../secrets/celineEnv;
     bayanEnv = {
       owner = "bayan";
       group = "bayan";
@@ -28,6 +29,20 @@
     enable = true;
 
     deployments = {
+      celine = {
+        source.url = "github:sleroq/celine/master";
+        build.allowLocalBuild = false;
+        runtime = {
+          exec = [ "bin/celine" ];
+          environment.CELINE_DATA_DIR = "/var/lib/celine";
+          environmentFiles = [ config.age.secrets.celineEnv.path ];
+        };
+        state.dataDir = "/var/lib/celine";
+        health.checks.http.url = "http://127.0.0.1:7766/api/state";
+        poll.interval = "10m";
+        update.retainGenerations = 3;
+      };
+
       reactor = {
         source = {
           url = "github:sleroq/reactor/main";

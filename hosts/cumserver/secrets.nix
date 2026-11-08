@@ -50,6 +50,9 @@ let
     "secrets/bayanEnv" = {
       publicKeys = commonPublicKeys;
     };
+    "secrets/celineEnv" = {
+      publicKeys = commonPublicKeys;
+    };
     "secrets/reactorEnv" = {
       publicKeys = commonPublicKeys;
     };
