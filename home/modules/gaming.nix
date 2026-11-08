@@ -52,7 +52,8 @@ in
       '';
 
       home.packages = [
-        pkgs.graalvmPackages.graalvm-oracle
+        # GraalVM 25's native-image install check segfaults, breaking the build.
+        # pkgs.graalvmPackages.graalvm-oracle
 
         (pkgs.prismlauncher.override {
           additionalLibs = with pkgs; [
@@ -99,7 +100,8 @@ in
           ];
           jdks = [
             pkgs.jdk21
-            pkgs.graalvmPackages.graalvm-oracle
+            # GraalVM 25's native-image install check segfaults, breaking the build.
+            # pkgs.graalvmPackages.graalvm-oracle
           ];
         })
       ];
