@@ -7,8 +7,8 @@
     "test": "node --test server/*.test.mjs"
   },
   "devDependencies": {
-    "@getpaseo/client": "0.15.1",
-    "@getpaseo/plugin": "0.15.1",
+    "@getpaseo/client": "0.15.3",
+    "@getpaseo/plugin": "0.15.3",
     "@types/node": "^24.0.0",
     "@types/react": "~19.2.0",
     "react": "19.1.0",
