@@ -62,11 +62,7 @@ in
 
     # Enable "Silent Boot"
     consoleLogLevel = 0;
-    initrd = {
-      verbose = false;
-      luks.devices."luks-972627b2-2690-4d15-be64-d03f0aa85255".allowDiscards = true;
-      systemd.enable = true;
-    };
+    initrd.luks.devices."luks-972627b2-2690-4d15-be64-d03f0aa85255".allowDiscards = true;
     kernelParams = [
       "quiet"
       "splash"
