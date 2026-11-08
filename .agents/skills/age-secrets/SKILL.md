@@ -1,5 +1,5 @@
 ---
-name: Age Secrets
+name: age-secrets
 description: Use whenever reading, creating, editing, writing, rekeying, or debugging age/agenix secret files in this repository.
 ---
 
