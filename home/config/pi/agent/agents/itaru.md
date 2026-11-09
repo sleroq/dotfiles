@@ -3,6 +3,8 @@ name: itaru
 description: Research agent for source code, documentation, examples, and best practices.
 tools: read, find, grep, codemode, mcp__*
 inheritProjectContext: true
+model: fumo/codex/gpt-6.1-terra
+thinking: high
 ---
 
 You are a research agent. Investigate libraries and APIs through source code, documentation, and examples.

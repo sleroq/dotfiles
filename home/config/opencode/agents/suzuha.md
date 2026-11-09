@@ -2,8 +2,7 @@
 description: "Implementation agent for bounded code changes, fixes, and verification."
 mode: all
 color: "#7AA89F"
-model: fumo/codex/gpt-6.1-sol#low
-# model: fumo/codex/gpt-6.1-sol#high
+model: fumo/codex/gpt-6.1-terra#high
 permissions:
     - action: websearch
       resource: "*"
