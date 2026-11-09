@@ -15,11 +15,9 @@
     "mermaid": "final"
   },
   "theme": "dark",
-  "defaultProvider": "fumo",
-  "defaultModel": "codex/gpt-6.1-terra",
   "enabledModels": [
-    "FrankAI/FrankAI",
     "fumo/codex/gpt-6.1-terra:high",
+    "FrankAI/FrankAI:xhigh",
     "fumo/codex/gpt-6.1-sol:high"
   ],
   "outputPad": 0
