@@ -571,6 +571,7 @@ vim.api.nvim_create_autocmd("FileType", {
 -- require("vague").setup({ transparent = true })
 -- require("vague").setup()
 -- vim.cmd("colorscheme vague")
-vim.cmd("colorscheme rose-pine")
+-- vim.cmd("colorscheme rose-pine")
+vim.cmd("colorscheme midnight-tundra")
 vim.api.nvim_set_hl(0, "ZenBg", { link = "Normal" })
 -- vim.cmd("colorscheme monochrome")
