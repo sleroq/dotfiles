@@ -18,4 +18,5 @@ in
   "secrets/sftpgoUsers".publicKeys = publicKeys;
   "secrets/tuwunelRegistrationToken".publicKeys = publicKeys;
   "secrets/tuwunelTurnSecret".publicKeys = publicKeys;
+  "secrets/zefxiEnv".publicKeys = publicKeys;
 }

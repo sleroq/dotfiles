@@ -16,7 +16,6 @@
     ./modules/fumo-gateway.nix
     ./modules/attic.nix
     ./modules/dev-env.nix
-    ./modules/matterbridge.nix
     ./modules/mailserver.nix
     ./modules/zipline.nix
     ./modules/radicale.nix
@@ -80,7 +79,6 @@
   cumserver.caddy.enable = true;
   cumserver.attic.enable = true;
   cumserver.dev-env.enable = true;
-  cumserver.matterbridge.enable = true;
   cumserver.mailserver.enable = true;
   cumserver.radicale.enable = true;
   cumserver.bore.enable = true;
@@ -357,17 +355,6 @@
       RandomizedDelaySec = "1h";
     };
   };
-
-  # age.secrets.zefxiEnv = {
-  #   owner = "zefxi";
-  #   group = "zefxi";
-  #   file = ./secrets/zefxiEnv;
-  # };
-  # services.zefxi = {
-  #   enable = false;
-  #   caddy.enable = true;
-  #   environmentFile = config.age.secrets.zefxiEnv.path;
-  # };
 
   age.secrets.sieveEnv = {
     owner = "sieve";

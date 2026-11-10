@@ -2818,6 +2818,7 @@
         "starflake": "starflake",
         "tuwunel": "tuwunel",
         "zed-interplanetary": "zed-interplanetary",
+        "zefxi": "zefxi",
         "zig": "zig",
         "zls": "zls"
       }
@@ -3399,6 +3400,26 @@
         "owner": "zed-industries",
         "ref": "nightly",
         "repo": "zed",
+        "type": "github"
+      }
+    },
+    "zefxi": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-div"
+        ]
+      },
+      "locked": {
+        "lastModified": 1794248771,
+        "narHash": "sha256-FDzUZ+SVhIBEcfVa+epDT2a/IIo9r1t2srWclt9psNc=",
+        "owner": "sleroq",
+        "repo": "zefxi",
+        "rev": "0c1279489150e4a34ecfcb000f92d47c96fc764a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sleroq",
+        "repo": "zefxi",
         "type": "github"
       }
     },

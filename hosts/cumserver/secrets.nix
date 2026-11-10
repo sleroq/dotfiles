@@ -29,9 +29,6 @@ let
   );
 
   staticEntries = {
-    "secrets/matterbridge.toml" = {
-      publicKeys = commonPublicKeys;
-    };
     "secrets/cf-fullchain.pem" = {
       publicKeys = commonPublicKeys;
     };
@@ -69,9 +66,6 @@ let
       publicKeys = commonPublicKeys ++ [ div ];
     };
     "secrets/spoilerImagesEnv" = {
-      publicKeys = commonPublicKeys;
-    };
-    "secrets/zefxiEnv" = {
       publicKeys = commonPublicKeys;
     };
     "secrets/ziplineEnv" = {

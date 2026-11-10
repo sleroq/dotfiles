@@ -7,8 +7,20 @@
 {
   system.extraDependencies = [ inputs.starflake.outPath ];
 
+  age.secrets.zefxiEnv.file = ./secrets/zefxiEnv;
+
   services.starflake = {
     enable = true;
+    deployments.zefxi = {
+      source.url = "github:sleroq/zefxi";
+      initialPackage = inputs.zefxi.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      runtime = {
+        exec = [ "bin/zefxi" ];
+        environmentFiles = [ config.age.secrets.zefxiEnv.path ];
+      };
+      state.dataDir = "/var/lib/zefxi";
+      poll.interval = "10m";
+    };
     deployments.music-link = {
       source = {
         url = "github:sleroq/music-link/main";
