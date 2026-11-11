@@ -1,7 +1,9 @@
 package jobs
 
 import (
+	"crypto/sha256"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -92,6 +94,73 @@ func TestViewer(t *testing.T) {
 		t.Fatal(w.Code)
 	}
 }
+func TestViewerLargeRawFiles(t *testing.T) {
+	s, h, run := fixture(t)
+	server := httptest.NewServer(h)
+	defer server.Close()
+
+	base := "/jobs/" + run.Job + "/runs/" + run.ID
+	const size = (64 << 20) + 123
+	for _, tc := range []struct {
+		name, path, contentType string
+	}{
+		{"stdout.log", "/artifacts/stdout.log", "text/plain; charset=utf-8"},
+		{"output/sessions/2025-01_test.jsonl", "/sessions/2025-01_test.jsonl", "application/x-ndjson; charset=utf-8"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			file, err := os.Create(filepath.Join(s.Directory, run.Job, run.ID, tc.name))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := file.Truncate(size); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := file.WriteAt([]byte("end"), size-3); err != nil {
+				t.Fatal(err)
+			}
+			if err := file.Close(); err != nil {
+				t.Fatal(err)
+			}
+
+			original, err := os.Open(filepath.Join(s.Directory, run.Job, run.ID, tc.name))
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer func() { _ = original.Close() }()
+			want := sha256.New()
+			if _, err := io.Copy(want, original); err != nil {
+				t.Fatal(err)
+			}
+
+			resp, err := http.Get(server.URL + "/api" + base + tc.path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer func() { _ = resp.Body.Close() }()
+			got := sha256.New()
+			n, err := io.Copy(got, resp.Body)
+			if err != nil || resp.StatusCode != http.StatusOK || n != size || string(got.Sum(nil)) != string(want.Sum(nil)) || resp.Header.Get("Content-Type") != tc.contentType {
+				t.Fatalf("GET: status=%d bytes=%d content-type=%q err=%v", resp.StatusCode, n, resp.Header.Get("Content-Type"), err)
+			}
+
+			head, err := http.Head(server.URL + "/api" + base + tc.path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer func() { _ = head.Body.Close() }()
+			body, err := io.ReadAll(head.Body)
+			if err != nil || head.StatusCode != http.StatusOK || head.ContentLength != size || len(body) != 0 || head.Header.Get("Content-Type") != tc.contentType {
+				t.Fatalf("HEAD: status=%d length=%d body=%d content-type=%q err=%v",
+					head.StatusCode, head.ContentLength, len(body), head.Header.Get("Content-Type"), err)
+			}
+
+			if w := request(h, http.MethodGet, base+tc.path); w.Code != http.StatusRequestEntityTooLarge {
+				t.Fatalf("HTML: status=%d body=%s", w.Code, w.Body.String())
+			}
+		})
+	}
+}
+
 func TestViewerRejectsSymlinks(t *testing.T) {
 	s, h, run := fixture(t)
 	dir := filepath.Join(s.Directory, run.Job, run.ID)

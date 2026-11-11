@@ -13,6 +13,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 //go:embed web/*
@@ -136,14 +137,13 @@ func (v *viewer) sessionRoute(w http.ResponseWriter, r *http.Request, run Run, p
 		http.Error(w, "invalid session name", http.StatusBadRequest)
 		return
 	}
+	if api {
+		v.serveFile(w, r, run, "output/sessions/"+name, "application/x-ndjson; charset=utf-8")
+		return
+	}
 	data, err := v.store.safeRead(run.Job, run.ID, "output/sessions/"+name)
 	if err != nil {
 		v.fail(w, err)
-		return
-	}
-	if api {
-		w.Header().Set("Content-Type", "application/x-ndjson; charset=utf-8")
-		_, _ = w.Write(data)
 		return
 	}
 	p := page{Title: name, Run: run, Session: name, Events: parseSession(data)}
@@ -156,19 +156,29 @@ func (v *viewer) artifactRoute(w http.ResponseWriter, r *http.Request, run Run, 
 		http.NotFound(w, r)
 		return
 	}
+	if api {
+		v.serveFile(w, r, run, name, "text/plain; charset=utf-8")
+		return
+	}
 	data, err := v.store.safeRead(run.Job, run.ID, name)
 	if err != nil {
 		v.fail(w, err)
 		return
 	}
-	if api {
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		_, _ = w.Write(data)
-		return
-	}
 	p := page{Title: name, Run: run, Artifact: name, Content: string(data)}
 	v.render(w, "artifact.html", p)
 }
+func (v *viewer) serveFile(w http.ResponseWriter, r *http.Request, run Run, name, contentType string) {
+	file, err := v.store.openFile(run.Job, run.ID, name)
+	if err != nil {
+		v.fail(w, err)
+		return
+	}
+	defer func() { _ = file.Close() }()
+	w.Header().Set("Content-Type", contentType)
+	http.ServeContent(w, r, name, time.Time{}, file)
+}
+
 func jobNames(runs []Run) []string {
 	m := map[string]bool{}
 	for _, r := range runs {

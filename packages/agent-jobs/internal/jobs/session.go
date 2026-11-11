@@ -109,7 +109,7 @@ func (s Store) checkFile(job, run, name string) error {
 	return root.Close()
 }
 
-func (s Store) safeRead(job, run, name string) ([]byte, error) {
+func (s Store) openFile(job, run, name string) (*os.File, error) {
 	root, base, err := s.fileRoot(job, run, name)
 	if err != nil {
 		return nil, err
@@ -119,13 +119,27 @@ func (s Store) safeRead(job, run, name string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	info, err := file.Stat()
+	if err != nil {
+		_ = file.Close()
+		return nil, err
+	}
+	if !info.Mode().IsRegular() {
+		_ = file.Close()
+		return nil, fs.ErrNotExist
+	}
+	return file, nil
+}
+
+func (s Store) safeRead(job, run, name string) ([]byte, error) {
+	file, err := s.openFile(job, run, name)
+	if err != nil {
+		return nil, err
+	}
 	defer func() { _ = file.Close() }()
 	info, err := file.Stat()
 	if err != nil {
 		return nil, err
-	}
-	if !info.Mode().IsRegular() {
-		return nil, fs.ErrNotExist
 	}
 	if info.Size() > 64<<20 {
 		return nil, errFileTooLarge
