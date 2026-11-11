@@ -60,7 +60,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - name: Build worker and NixOS VM test
         run: |
-          nix build --impure --no-link --expr '
+          nix build --print-build-logs --impure --no-link --expr '
             let
               lock = builtins.fromJSON (builtins.readFile ./flake.lock);
               nixpkgs = builtins.fetchTree lock.nodes.nixpkgs-div.locked;

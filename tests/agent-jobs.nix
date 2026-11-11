@@ -222,7 +222,7 @@ pkgs.testers.runNixOSTest {
                 print(content)
             raise Exception(f"{name}: {output}")
     def check_session_export(name, run_id):
-        base = f"http://127.0.0.1:8788"
+        base = "http://127.0.0.1:8788"
         machine.succeed(f"test -s /var/lib/agent-jobs/{name}/{run_id}/session-html/fixture.jsonl.html")
         machine.succeed(f"curl -fsS {base}/jobs/{name}/runs/{run_id}/sessions/fixture.jsonl | grep -F 'fixture exported session'")
         machine.succeed(f"curl -fsSI {base}/jobs/{name}/runs/{run_id}/sessions/fixture.jsonl | tr -d '\\r' | grep -Fx \"Content-Security-Policy: sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'\"")
