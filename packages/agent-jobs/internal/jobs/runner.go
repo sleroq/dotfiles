@@ -292,7 +292,7 @@ func (r *jobRun) publish(ctx context.Context) error {
 		return err
 	}
 	api := githubClient{baseURL: "https://api.github.com", client: &http.Client{Timeout: 30 * time.Second}}
-	pr, publication, err := r.git.publish(ctx, r.job, r.work, r.run.BaseCommit, r.defaultBranch, patch, body, api, *r.run)
+	pr, publication, err := r.git.publish(ctx, r.job, r.checkout, r.run.BaseCommit, r.defaultBranch, body, api, *r.run)
 	if err != nil {
 		return err
 	}

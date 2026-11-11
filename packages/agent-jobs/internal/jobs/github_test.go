@@ -13,7 +13,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -143,17 +145,51 @@ func TestPublishUsesStableBranchAndRevokesToken(t *testing.T) {
 		Name: "test", Repository: "owner/repo", CloneURL: bare, Branch: "automation/test",
 		Publish: Publication{AppID: "123", InstallationID: "42", PrivateKeyFile: keyFile, Title: "Update", Reviewer: "reviewer"},
 	}
-	work := t.TempDir()
+	checkout := filepath.Join(t.TempDir(), "checkout")
+	if _, err := g.checkout(ctx, job, checkout); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := g.applyCandidate(ctx, checkout, patchFile); err != nil {
+		t.Fatal(err)
+	}
 	branch, err := g.run(ctx, source, "symbolic-ref", "--short", "HEAD")
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// Publishing a prepared checkout must never clone or apply the patch again.
+	realGit, err := exec.LookPath("git")
+	if err != nil {
+		t.Fatal(err)
+	}
+	wrapperDir := t.TempDir()
+	marker := filepath.Join(wrapperDir, "failed-push")
+	wrapper := "#!/bin/sh\nfor arg do\n" +
+		"  case \"$arg\" in clone|apply) exit 99;;\n" +
+		"    push) if [ ! -e " + strconv.Quote(marker) + " ]; then touch " + strconv.Quote(marker) + "; echo 'connection reset' >&2; exit 1; fi;;\n" +
+		"  esac\ndone\nexec " + strconv.Quote(realGit) + " \"$@\"\n"
+	if err := os.WriteFile(filepath.Join(wrapperDir, "git"), []byte(wrapper), 0755); err != nil {
+		t.Fatal(err)
+	}
+	originalPath := os.Getenv("PATH")
+	t.Setenv("PATH", wrapperDir+string(os.PathListSeparator)+originalPath)
 	absent := ""
 	run := Run{ExpectedBranch: &absent}
-	pr, publication, err := g.publish(ctx, job, work, base, branch, patchFile, body, api, run)
+	pr, publication, err := g.publish(ctx, job, checkout, base, branch, body, api, run)
 	if err != nil || publication != "published" || pr != "https://example.test/pr/7" {
 		t.Fatalf("publish %q %q: %v", pr, publication, err)
+	}
+
+	if _, err := os.Stat(marker); err != nil {
+		t.Fatalf("transient push was not exercised: %v", err)
+	}
+	head, err := g.run(ctx, checkout, "rev-parse", "HEAD")
+	if err != nil || head != base {
+		t.Fatalf("checkout HEAD %q: %v", head, err)
+	}
+	staged, err := g.run(ctx, checkout, "diff", "--cached", "--name-only")
+	if err != nil || staged != "allowed.txt" {
+		t.Fatalf("staged changes %q: %v", staged, err)
 	}
 
 	first, err := g.run(ctx, bare, "rev-parse", "refs/heads/automation/test")
@@ -162,7 +198,7 @@ func TestPublishUsesStableBranchAndRevokesToken(t *testing.T) {
 	}
 
 	body = "Keep the fixture content current without another commit."
-	pr, publication, err = g.publish(ctx, job, work, base, "", patchFile, body, api, run)
+	pr, publication, err = g.publish(ctx, job, checkout, base, "", body, api, run)
 	if err != nil || publication != "unchanged" || pr == "" {
 		t.Fatalf("republish %q %q: %v", pr, publication, err)
 	}
@@ -171,12 +207,12 @@ func TestPublishUsesStableBranchAndRevokesToken(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if first != second || created != 1 || revoked != 2 || reviews != 2 {
+	if first != second || created != 1 || revoked != 3 || reviews != 2 {
 		t.Fatalf("first=%s second=%s created=%d revoked=%d reviews=%d", first, second, created, revoked, reviews)
 	}
 	// A retry may accept an already-published tree even when the branch moved.
 	stale := Run{ExistingPR: true, StartCommit: base}
-	_, publication, err = g.publish(ctx, job, work, base, branch, patchFile, body, api, stale)
+	_, publication, err = g.publish(ctx, job, checkout, base, branch, body, api, stale)
 	if err != nil || publication != "unchanged" {
 		t.Fatalf("retry identical tree: %q: %v", publication, err)
 	}
@@ -193,12 +229,25 @@ func TestPublishUsesStableBranchAndRevokesToken(t *testing.T) {
 	if err := os.WriteFile(patchFile, patch, 0644); err != nil {
 		t.Fatal(err)
 	}
-	if _, _, err := g.publish(ctx, job, work, base, branch, patchFile, body, api, stale); err == nil {
+	// Prepare a different candidate, then restore the no-clone/no-apply guard.
+	if _, err := g.run(ctx, checkout, "reset", "--hard", base); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Setenv("PATH", originalPath); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := g.applyCandidate(ctx, checkout, patchFile); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Setenv("PATH", wrapperDir+string(os.PathListSeparator)+originalPath); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := g.publish(ctx, job, checkout, base, branch, body, api, stale); err == nil {
 		t.Fatal("published over a moved branch")
 	}
 	// Both an absent snapshot and a different existing snapshot must reject a new tree.
 	for _, expected := range []string{"", base} {
-		if _, _, err := g.publish(ctx, job, work, base, branch, patchFile, body, api, Run{ExpectedBranch: &expected}); err == nil {
+		if _, _, err := g.publish(ctx, job, checkout, base, branch, body, api, Run{ExpectedBranch: &expected}); err == nil {
 			t.Fatalf("published over changed branch with snapshot %q", expected)
 		}
 		got, err := g.run(ctx, bare, "rev-parse", "refs/heads/automation/test")
@@ -210,7 +259,7 @@ func TestPublishUsesStableBranchAndRevokesToken(t *testing.T) {
 	if _, err := g.run(ctx, bare, "update-ref", "refs/heads/automation/test", base); err != nil {
 		t.Fatal(err)
 	}
-	_, publication, err = g.publish(ctx, job, work, base, branch, patchFile, body, api, Run{ExpectedBranch: &base})
+	_, publication, err = g.publish(ctx, job, checkout, base, branch, body, api, Run{ExpectedBranch: &base})
 	if err != nil || publication != "published" {
 		t.Fatalf("publish over unchanged old branch: %q: %v", publication, err)
 	}
