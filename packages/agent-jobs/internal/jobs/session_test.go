@@ -1,6 +1,9 @@
 package jobs
 
 import (
+	"bufio"
+	"errors"
+	"io"
 	"strings"
 	"testing"
 )
@@ -23,7 +26,7 @@ func TestSessionToolLabels(t *testing.T) {
 }
 
 func TestSessionEntryLimit(t *testing.T) {
-	events := parseSession(strings.NewReader(strings.Repeat("x", maxSessionEntry+1)), 0).Events
+	events := parseSession(strings.NewReader(strings.Repeat("x", (16<<20)+1)), 0).Events
 	if len(events) != 1 || !strings.Contains(events[0].Issue, "exceeds") {
 		t.Fatal(events)
 	}
@@ -92,5 +95,55 @@ func TestSessionPageByteLimitAndOversize(t *testing.T) {
 	firstOversize := parseSession(strings.NewReader(oversize+"\n{}\n"), 0)
 	if len(firstOversize.Events) != 2 || firstOversize.Next != 2 || firstOversize.Events[0].Detail != "" || !strings.Contains(firstOversize.Events[0].Issue, "Raw JSONL") {
 		t.Fatalf("oversize: %+v", firstOversize)
+	}
+}
+
+func TestSessionHugeLinePagination(t *testing.T) {
+	huge := strings.Repeat("x", (16<<20)+1)
+	for _, ending := range []string{"\n{}\n", ""} {
+		data := "{}\n" + huge + ending
+		first := parseSession(strings.NewReader(data), 0)
+		if len(first.Events) != 1 || first.Next != 1 || !first.HasNext {
+			t.Fatalf("first page: %+v", first)
+		}
+		second := parseSession(strings.NewReader(data), first.Next)
+		want := 1
+		if ending != "" {
+			want = 2
+		}
+		if len(second.Events) != want || second.Next != 1+want || second.HasNext || !strings.Contains(second.Events[0].Issue, "Line 2: entry exceeds") {
+			t.Fatalf("second page: %+v", second)
+		}
+		if ending != "" {
+			skipped := parseSession(strings.NewReader(data), 2)
+			if len(skipped.Events) != 1 || skipped.Next != 3 || skipped.Events[0].Detail != "{}" {
+				t.Fatalf("skipped page: %+v", skipped)
+			}
+		}
+		raw, oversized, err := readSessionLine(bufio.NewReader(strings.NewReader(huge + ending)))
+		if len(raw) != 0 || !oversized || (err != nil && !errors.Is(err, io.EOF)) {
+			t.Fatalf("oversized line retained %d bytes, oversized=%v err=%v", len(raw), oversized, err)
+		}
+	}
+}
+
+func TestSessionCRLFEntryLimit(t *testing.T) {
+	entry := `{"payload":"` + strings.Repeat("a", maxSessionPageBytes-len(`{"payload":""}`)) + `"}`
+	for _, suffix := range []string{"\r\n", "\n", "\r", ""} {
+		page := parseSession(strings.NewReader(entry+suffix), 0)
+		if len(page.Events) != 1 || page.Events[0].Detail != entry || page.Events[0].Issue != "" {
+			t.Fatalf("suffix %q: %+v", suffix, page.Events)
+		}
+	}
+}
+
+type failingSessionReader struct{}
+
+func (failingSessionReader) Read([]byte) (int, error) { return 0, errors.New("read failure") }
+
+func TestSessionReadError(t *testing.T) {
+	page := parseSession(failingSessionReader{}, 0)
+	if len(page.Events) != 1 || !strings.Contains(page.Events[0].Issue, "read failure") || strings.Contains(page.Events[0].Issue, "exceeds") {
+		t.Fatalf("page: %+v", page)
 	}
 }
