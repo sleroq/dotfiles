@@ -9,7 +9,7 @@ import (
 
 func TestViewerRefusesPublicBinding(t *testing.T) {
 	for _, address := range []string{"0.0.0.0:8787", "[::]:8787", ":8787", "example.com:8787"} {
-		err := serve(context.Background(), jobs.Store{Directory: t.TempDir()}, address)
+		err := serve(context.Background(), jobs.Store{Directory: t.TempDir()}, address, jobs.TimerInventory{})
 		if err == nil {
 			t.Errorf("serve %s: %v", address, err)
 		}

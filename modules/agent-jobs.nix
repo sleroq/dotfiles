@@ -472,7 +472,7 @@ in
           serviceConfig = {
             User = "agent-job-viewer";
             Group = "job-viewer";
-            ExecStart = "${cfg.package}/bin/agent-jobs serve -state ${cfg.stateDirectory} -listen 127.0.0.1:${toString cfg.viewer.port}";
+            ExecStart = "${cfg.package}/bin/agent-jobs serve -state ${cfg.stateDirectory} -listen 127.0.0.1:${toString cfg.viewer.port} -jobs ${json.generate "agent-jobs-inventory.json" (builtins.attrNames enabled)} -systemctl ${pkgs.systemd}/bin/systemctl";
             ProtectSystem = "strict";
             ProtectHome = true;
             NoNewPrivileges = true;
