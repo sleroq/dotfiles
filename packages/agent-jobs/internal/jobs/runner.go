@@ -161,6 +161,7 @@ func (r *jobRun) prepare(ctx context.Context) error {
 		return fmt.Errorf("parse clone URL: %w", err)
 	}
 	r.git = hostGit{home: home, credentialHost: remote.Host}
+
 	if r.job.ReadTokenFile != "" {
 		token, err := os.ReadFile(r.job.ReadTokenFile)
 		if err != nil {
@@ -168,6 +169,7 @@ func (r *jobRun) prepare(ctx context.Context) error {
 		}
 		r.git.token = strings.TrimSpace(string(token))
 	}
+
 	r.checkout = filepath.Join(r.work, "checkout")
 	base, err := r.git.checkoutWithDepth(ctx, r.job, r.checkout, !r.job.ReuseOpenPR)
 	if err != nil {
@@ -179,6 +181,14 @@ func (r *jobRun) prepare(ctx context.Context) error {
 		return err
 	}
 	r.defaultBranch = strings.TrimPrefix(branch, "origin/")
+
+	if r.job.Publish.Enabled {
+		tip, err := r.git.remoteBranch(ctx, r.checkout, r.job.Branch)
+		if err != nil {
+			return err
+		}
+		r.run.ExpectedBranch = &tip
+	}
 	if r.job.ReuseOpenPR {
 		api := githubClient{baseURL: "https://api.github.com", client: &http.Client{Timeout: 30 * time.Second}}
 		if err := r.prepareOpenPR(ctx, api); err != nil {
@@ -217,12 +227,7 @@ func (r *jobRun) prepareOpenPR(ctx context.Context, api githubClient) (resultErr
 	if err != nil {
 		return err
 	}
-	remoteRef := "refs/heads/" + r.job.Branch
-	remote, err := r.git.run(ctx, r.checkout, "ls-remote", "--heads", "origin", remoteRef)
-	if err != nil {
-		return err
-	}
-	if tip != pulls[0].Head.SHA || remote != tip+"\t"+remoteRef {
+	if tip != pulls[0].Head.SHA || r.run.ExpectedBranch == nil || tip != *r.run.ExpectedBranch {
 		return errors.New("open pull request does not match remote branch")
 	}
 	if _, err := r.git.run(ctx, r.checkout, "checkout", "--detach", tip, "--"); err != nil {

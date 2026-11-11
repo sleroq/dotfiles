@@ -419,7 +419,11 @@ func TestPrepareOpenPR(t *testing.T) {
 				}
 			}))
 			defer server.Close()
-			run := Run{BaseCommit: base}
+			snapshot := tip
+			if tc.move {
+				snapshot = base
+			}
+			run := Run{BaseCommit: base, ExpectedBranch: &snapshot}
 			r := jobRun{job: job, git: g, checkout: checkout, defaultBranch: "main", run: &run}
 			err := r.prepareOpenPR(ctx, githubClient{baseURL: server.URL, client: server.Client()})
 			if (err != nil) != tc.wantError {
@@ -536,5 +540,79 @@ func TestStageInputHistory(t *testing.T) {
 	cancel()
 	if _, err := stageInput(cancelled, t.TempDir(), source, "main", Job{ReuseOpenPR: true}, Run{}); err == nil {
 		t.Fatal("canceled bundle creation succeeded")
+	}
+}
+
+func TestPrepareCapturesPublicationBranch(t *testing.T) {
+	ctx := context.Background()
+	g, source := gitTestRepo(t)
+	base, err := g.run(ctx, source, "rev-parse", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	remote := filepath.Join(t.TempDir(), "remote.git")
+	if _, err := g.run(ctx, "", "clone", "--bare", source, remote); err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range []struct {
+		name            string
+		publish, exists bool
+	}{
+		{"absent", true, false}, {"old branch", true, true}, {"disabled", false, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ref := "refs/heads/automation/test"
+			if tc.exists {
+				if _, err := g.run(ctx, remote, "update-ref", ref, base); err != nil {
+					t.Fatal(err)
+				}
+			} else if _, err := g.run(ctx, remote, "update-ref", "-d", ref); err != nil {
+				t.Fatal(err)
+			}
+			store := Store{Directory: t.TempDir()}
+			credential := filepath.Join(t.TempDir(), "token")
+			if err := os.WriteFile(credential, []byte("private-token"), 0600); err != nil {
+				t.Fatal(err)
+			}
+			job := Job{
+				Name: "fixture", CloneURL: remote, Branch: "automation/test", ReadTokenFile: credential,
+				Publish: Publication{Enabled: tc.publish},
+			}
+			run, err := store.Create(job)
+			if err != nil {
+				t.Fatal(err)
+			}
+			r := jobRun{job: job, store: store, run: &run, work: t.TempDir()}
+			if err := r.prepare(ctx); err != nil {
+				t.Fatal(err)
+			}
+			saved, err := store.Get(job.Name, run.ID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			data, err := os.ReadFile(filepath.Join(store.Directory, run.Job, run.ID, "result.json"))
+			if err != nil || strings.Contains(string(data), "private-token") {
+				t.Fatalf("credential leaked into run metadata: %v", err)
+			}
+
+			if !tc.publish {
+				if saved.ExpectedBranch != nil {
+					t.Fatal("non-publish job captured branch")
+				}
+				return
+			}
+			want := ""
+			if tc.exists {
+				want = base
+			}
+			if saved.ExpectedBranch == nil || *saved.ExpectedBranch != want {
+				t.Fatalf("snapshot = %v, want %q", saved.ExpectedBranch, want)
+			}
+			shallow, err := g.run(ctx, r.checkout, "rev-parse", "--is-shallow-repository")
+			if err != nil || shallow != "true" {
+				t.Fatalf("shallow = %q: %v", shallow, err)
+			}
+		})
 	}
 }

@@ -25,6 +25,7 @@ type Run struct {
 	FinishedAt             time.Time `json:"finished_at,omitzero"`
 	DurationSeconds        float64   `json:"duration_seconds"`
 	SandboxDurationSeconds float64   `json:"sandbox_duration_seconds"`
+	ExpectedBranch         *string   `json:"expected_branch,omitempty"`
 	StartCommit            string    `json:"start_commit,omitempty"`
 	ExistingPR             bool      `json:"existing_pr,omitempty"`
 	BaseCommit             string    `json:"base_commit,omitempty"`
