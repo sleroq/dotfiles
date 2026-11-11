@@ -72,7 +72,7 @@ func TestRetryPublicationRequiresValidatedMatchingRun(t *testing.T) {
 		Publish: Publication{Enabled: true, AppID: "1", InstallationID: "2", PrivateKeyFile: "/not-accessed"},
 	}
 
-	for _, scenario := range []string{"sandbox", "success", "repository", "branch", "base", "disabled"} {
+	for _, scenario := range []string{"sandbox", "success", "repository", "branch", "base", "disabled", "timed-out-publish", "timed-out-sandbox"} {
 		t.Run(scenario, func(t *testing.T) {
 			store := Store{Directory: t.TempDir()}
 			run, err := store.Create(job)
@@ -94,12 +94,24 @@ func TestRetryPublicationRequiresValidatedMatchingRun(t *testing.T) {
 				run.BaseCommit = ""
 			case "disabled":
 				configured.Publish.Enabled = false
+			case "timed-out-publish":
+				run.Status = "timed_out"
+			case "timed-out-sandbox":
+				run.Status, run.Phase = "timed_out", "sandbox"
 			}
 
 			if err := store.Save(run); err != nil {
 				t.Fatal(err)
 			}
 			err = RetryPublication(context.Background(), configured, store, run.ID)
+			if scenario == "timed-out-publish" {
+				var pathErr *os.PathError
+				artifact := filepath.Join(store.Directory, run.Job, run.ID, prBodyArtifact)
+				if !errors.As(err, &pathErr) || (pathErr.Path != artifact && !strings.HasPrefix(pathErr.Path, "/var/lib/agent-jobs-work")) {
+					t.Fatalf("retry did not reach workspace or artifact: %v", err)
+				}
+				return
+			}
 			if !errors.Is(err, errPublicationNotRetryable) {
 				t.Fatalf("unexpected retry result: %v", err)
 			}
