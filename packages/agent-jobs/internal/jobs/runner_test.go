@@ -4,7 +4,15 @@ import (
 	"archive/tar"
 	"bytes"
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/json"
+	"encoding/pem"
 	"errors"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -249,7 +257,7 @@ func TestStageInputExcludesHostPublicationSecrets(t *testing.T) {
 		EnvironmentFiles: map[string]string{"FUMO_PI_KEY": credential}, ReadTokenFile: "/private/read-token",
 		Publish: Publication{PrivateKeyFile: "/private/app-key", AppID: "123"},
 	}
-	input, err := stageInput(dir, checkout, job)
+	input, err := stageInput(context.Background(), dir, checkout, "", job, Run{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -333,5 +341,200 @@ func TestFailedRunRetainsPhase(t *testing.T) {
 	}
 	if len(runs) != 1 || runs[0].Status != "failed" || runs[0].Phase != "prepare" {
 		t.Fatalf("failed run metadata: %+v", runs)
+	}
+}
+
+func TestPrepareOpenPR(t *testing.T) {
+	ctx := context.Background()
+	g, source := gitTestRepo(t)
+	git := func(dir string, args ...string) string {
+		t.Helper()
+		out, err := g.run(ctx, dir, args...)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return out
+	}
+	git(source, "branch", "-M", "main")
+	base := git(source, "rev-parse", "HEAD")
+	git(source, "checkout", "-b", "automation/test")
+	git(source, "-c", "user.name=Test", "-c", "user.email=test@example.invalid",
+		"commit", "--allow-empty", "-qm", "proposal")
+	tip := git(source, "rev-parse", "HEAD")
+	git(source, "checkout", "main")
+	remote := filepath.Join(t.TempDir(), "remote.git")
+	git("", "clone", "--bare", source, remote)
+	key, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		t.Fatal(err)
+	}
+	keyFile := filepath.Join(t.TempDir(), "key")
+	keyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
+	if err := os.WriteFile(keyFile, keyPEM, 0600); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, tc := range []struct {
+		name, response          string
+		status                  int
+		move, wantPR, wantError bool
+	}{
+		{"open", fmt.Sprintf(`[{"head":{"sha":%q}}]`, tip), 200, false, true, false},
+		{"none", `[]`, 200, false, false, false},
+		{"lookup failure", ``, 403, false, false, true},
+		{"api tip mismatch", fmt.Sprintf(`[{"head":{"sha":%q}}]`, base), 200, false, false, true},
+		{"remote tip mismatch", fmt.Sprintf(`[{"head":{"sha":%q}}]`, tip), 200, true, false, true},
+		{"invalid response", `[{"head":{}}]`, 200, false, false, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			git(remote, "update-ref", "refs/heads/automation/test", tip)
+			checkout := filepath.Join(t.TempDir(), "checkout")
+			job := Job{
+				Repository: "owner/repo", Branch: "automation/test", CloneURL: remote,
+				Publish: Publication{AppID: "1", InstallationID: "42", PrivateKeyFile: keyFile},
+			}
+			if _, err := g.checkout(ctx, job, checkout); err != nil {
+				t.Fatal(err)
+			}
+			revoked := false
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+				switch {
+				case req.Method == "POST" && req.URL.Path == "/app/installations/42/access_tokens":
+					_, _ = fmt.Fprint(w, `{"token":"secret"}`)
+				case req.Method == "GET" && req.URL.Path == "/repos/owner/repo/pulls":
+					if req.URL.Query().Get("head") != "owner:automation/test" || req.URL.Query().Get("base") != "main" || req.URL.Query().Get("state") != "open" {
+						t.Errorf("query: %s", req.URL.RawQuery)
+					}
+					if tc.move {
+						git(remote, "update-ref", "refs/heads/automation/test", base)
+					}
+					w.WriteHeader(tc.status)
+					_, _ = fmt.Fprint(w, tc.response)
+				case req.Method == "DELETE" && req.URL.Path == "/installation/token":
+					revoked = true
+					w.WriteHeader(204)
+				default:
+					t.Errorf("unexpected request %s %s", req.Method, req.URL)
+					w.WriteHeader(404)
+				}
+			}))
+			defer server.Close()
+			run := Run{BaseCommit: base}
+			r := jobRun{job: job, git: g, checkout: checkout, defaultBranch: "main", run: &run}
+			err := r.prepareOpenPR(ctx, githubClient{baseURL: server.URL, client: server.Client()})
+			if (err != nil) != tc.wantError {
+				t.Fatalf("error: %v", err)
+			}
+			if !revoked {
+				t.Error("token not revoked")
+			}
+			want := base
+			if tc.wantPR {
+				want = tip
+			}
+			if got := git(checkout, "rev-parse", "HEAD"); got != want {
+				t.Errorf("HEAD = %s, want %s", got, want)
+			}
+			if !tc.wantError && (run.StartCommit != want || run.ExistingPR != tc.wantPR) {
+				t.Errorf("run: %+v", run)
+			}
+		})
+	}
+}
+
+func TestStageInputHistory(t *testing.T) {
+	ctx := context.Background()
+	g, source := gitTestRepo(t)
+	git := func(dir string, args ...string) string {
+		t.Helper()
+		out, err := g.run(ctx, dir, args...)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return out
+	}
+	git(source, "branch", "-M", "main")
+	base := git(source, "rev-parse", "HEAD")
+	git(source, "checkout", "-b", "automation/test")
+	git(source, "-c", "user.name=Test", "-c", "user.email=test@example.invalid",
+		"commit", "--allow-empty", "-qm", "proposal")
+	tip := git(source, "rev-parse", "HEAD")
+	git(source, "update-ref", "refs/remotes/origin/main", base)
+	git(source, "update-ref", "refs/remotes/origin/automation/test", tip)
+	git(source, "remote", "add", "origin", "https://user:credential-secret@example.invalid/repo")
+
+	for _, existing := range []bool{false, true} {
+		t.Run(fmt.Sprint(existing), func(t *testing.T) {
+			work := t.TempDir()
+			start := base
+			if existing {
+				start = tip
+			}
+			git(source, "checkout", "--detach", start)
+			job := Job{Name: "fixture", Branch: "automation/test", Prompt: "do work", ReuseOpenPR: true}
+			run := Run{BaseCommit: base, StartCommit: start, ExistingPR: existing}
+			input, err := stageInput(ctx, work, source, "main", job, run)
+			if err != nil {
+				t.Fatal(err)
+			}
+			data, err := os.ReadFile(filepath.Join(input, "job.json"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			var cfg sandboxConfig
+			if err := json.Unmarshal(data, &cfg); err != nil {
+				t.Fatal(err)
+			}
+			if !cfg.History || cfg.BaseCommit != base || cfg.StartCommit != start || cfg.ExistingPR != existing {
+				t.Fatalf("config: %+v", cfg)
+			}
+			bundle := filepath.Join(input, "repository.bundle")
+			bytes, err := os.ReadFile(bundle)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if strings.Contains(string(bytes), "credential-secret") {
+				t.Fatal("bundle contains credentials")
+			}
+			if _, err := os.Stat(filepath.Join(input, "repo", ".git")); !os.IsNotExist(err) {
+				t.Fatalf("Git metadata staged: %v", err)
+			}
+			dest := t.TempDir()
+			if err := cfg.prepareGit(ctx, g, dest, filepath.Join(input, "repo"), bundle); err != nil {
+				t.Fatal(err)
+			}
+			if got := git(dest, "rev-parse", "HEAD"); got != start {
+				t.Errorf("HEAD = %s", got)
+			}
+			if got := git(dest, "rev-parse", "refs/remotes/origin/main"); got != base {
+				t.Errorf("base ref = %s", got)
+			}
+			if got := git(dest, "rev-parse", "refs/remotes/origin/automation/test"); got != tip {
+				t.Errorf("PR ref = %s", got)
+			}
+			prompt, err := os.ReadFile(filepath.Join(input, "prompt"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, want := range []string{"refs/remotes/origin/main", base} {
+				if !strings.Contains(string(prompt), want) {
+					t.Errorf("prompt missing %q", want)
+				}
+			}
+			if existing {
+				for _, want := range []string{"automation/test", tip, "make no edits and do not rebase", "before editing", "stash"} {
+					if !strings.Contains(string(prompt), want) {
+						t.Errorf("prompt missing %q", want)
+					}
+				}
+			} else if !strings.Contains(string(prompt), "No open PR exists") || strings.Contains(string(prompt), "stash") {
+				t.Errorf("no PR prompt: %s", prompt)
+			}
+		})
+	}
+	cancelled, cancel := context.WithCancel(ctx)
+	cancel()
+	if _, err := stageInput(cancelled, t.TempDir(), source, "main", Job{ReuseOpenPR: true}, Run{}); err == nil {
+		t.Fatal("canceled bundle creation succeeded")
 	}
 }

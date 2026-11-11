@@ -24,6 +24,7 @@ let
         default = "";
       };
       branch = mkOption { type = types.str; };
+      reuseOpenPR = mkEnableOption "reuse of an open pull request";
       allowedPaths = mkOption { type = types.listOf types.str; };
       prompt = mkOption { type = types.lines; };
       piCommand = mkOption {
@@ -132,6 +133,7 @@ let
         pids
         ;
       clone_url = job.cloneURL;
+      reuse_open_pr = job.reuseOpenPR;
       allowed_paths = job.allowedPaths;
       image = cfg.imageName;
       network = "agentjobs";

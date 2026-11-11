@@ -202,17 +202,17 @@ func copySource(src, dst string) error {
 	})
 }
 
-func (g hostGit) publish(ctx context.Context, job Job, dir, base, defaultBranch, patch, body string, api githubClient) (string, string, error) {
+func (g hostGit) publish(ctx context.Context, job Job, dir, base, defaultBranch, patch, body string, api githubClient, run Run) (string, string, error) {
 	var pr, publication string
 	err := retryGit(ctx, func() error {
 		var err error
-		pr, publication, err = g.publishOnce(ctx, job, dir, base, defaultBranch, patch, body, api)
+		pr, publication, err = g.publishOnce(ctx, job, dir, base, defaultBranch, patch, body, api, run)
 		return err
 	})
 	return pr, publication, err
 }
 
-func (g hostGit) publishOnce(ctx context.Context, job Job, dir, base, defaultBranch, patch, body string, api githubClient) (prURL, publication string, resultErr error) {
+func (g hostGit) publishOnce(ctx context.Context, job Job, dir, base, defaultBranch, patch, body string, api githubClient, run Run) (prURL, publication string, resultErr error) {
 	token, err := api.installationToken(ctx, job)
 	if err != nil {
 		return "", "", err
@@ -273,6 +273,9 @@ func (g hostGit) publishOnce(ctx context.Context, job Job, dir, base, defaultBra
 			pr, err := api.pullRequest(ctx, job, token, defaultBranch, body)
 			return pr, "unchanged", err
 		}
+	}
+	if run.ExistingPR && expected != run.StartCommit {
+		return "", "", errors.New("remote branch changed since the run started")
 	}
 	title := job.Publish.Title
 	if title == "" {
