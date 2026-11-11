@@ -86,11 +86,20 @@ func retryGit(ctx context.Context, operation func() error) error {
 }
 
 func (g hostGit) checkout(ctx context.Context, job Job, dir string) (string, error) {
+	return g.checkoutWithDepth(ctx, job, dir, false)
+}
+
+func (g hostGit) checkoutWithDepth(ctx context.Context, job Job, dir string, shallow bool) (string, error) {
+	args := []string{"clone", "--no-checkout"}
+	if shallow {
+		args = append(args, "--depth=1", "--no-local")
+	}
+	args = append(args, "--", cloneURL(job), dir)
 	err := retryGit(ctx, func() error {
 		if err := os.RemoveAll(dir); err != nil {
 			return err
 		}
-		_, err := g.run(ctx, "", "clone", "--no-checkout", "--", cloneURL(job), dir)
+		_, err := g.run(ctx, "", args...)
 		return err
 	})
 	if err != nil {

@@ -169,7 +169,7 @@ func (r *jobRun) prepare(ctx context.Context) error {
 		r.git.token = strings.TrimSpace(string(token))
 	}
 	r.checkout = filepath.Join(r.work, "checkout")
-	base, err := r.git.checkout(ctx, r.job, r.checkout)
+	base, err := r.git.checkoutWithDepth(ctx, r.job, r.checkout, !r.job.ReuseOpenPR)
 	if err != nil {
 		return err
 	}
