@@ -50,7 +50,7 @@ func RetryPublication(ctx context.Context, job Job, store Store, id string) (res
 	if err != nil {
 		return err
 	}
-	if !job.Publish.Enabled || run.Status != "failed" || run.Phase != "publish" || run.Repository != job.Repository || run.Branch != job.Branch || run.BaseCommit == "" {
+	if !job.Publish.Enabled || (run.Status != "failed" && run.Status != "timed_out") || run.Phase != "publish" || run.Repository != job.Repository || run.Branch != job.Branch || run.BaseCommit == "" {
 		return errPublicationNotRetryable
 	}
 	work, err := os.MkdirTemp("/var/lib/agent-jobs-work", "publish-")
