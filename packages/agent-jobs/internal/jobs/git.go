@@ -70,8 +70,8 @@ func (e transientGitError) Unwrap() error { return e.err }
 func retryGit(ctx context.Context, operation func() error) error {
 	for attempt := 0; ; attempt++ {
 		err := operation()
-		var transient transientGitError
-		if err == nil || attempt == 2 || !errors.As(err, &transient) {
+		_, transient := errors.AsType[transientGitError](err)
+		if err == nil || attempt == 2 || !transient {
 			return err
 		}
 		timer := time.NewTimer(time.Duration(attempt+1) * time.Second)

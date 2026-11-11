@@ -115,8 +115,7 @@ func TestRetryPublicationRequiresValidatedMatchingRun(t *testing.T) {
 			}
 			err = RetryPublication(context.Background(), configured, store, run.ID)
 			if scenario == "timed-out-publish" {
-				var exitErr *exec.ExitError
-				if !errors.As(err, &exitErr) {
+				if _, ok := errors.AsType[*exec.ExitError](err); !ok {
 					t.Fatalf("retry did not require scratch: %v", err)
 				}
 				return
