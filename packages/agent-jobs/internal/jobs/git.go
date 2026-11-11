@@ -220,17 +220,38 @@ func copySource(src, dst string) error {
 	})
 }
 
-func (g hostGit) publish(ctx context.Context, job Job, dir, base, defaultBranch, patch, body string, api githubClient, run Run) (string, string, error) {
+func (g hostGit) restoreCandidate(ctx context.Context, job Job, checkout, base, patch string, api githubClient) (resultErr error) {
+	token, err := api.installationToken(ctx, job)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		cleanup, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		resultErr = errors.Join(resultErr, api.request(cleanup, http.MethodDelete, "/installation/token", token, nil, nil))
+	}()
+	g.token = token
+	if _, err := g.checkout(ctx, job, checkout); err != nil {
+		return err
+	}
+	if _, err := g.run(ctx, checkout, "checkout", "--detach", base, "--"); err != nil {
+		return err
+	}
+	_, err = g.applyCandidate(ctx, checkout, patch)
+	return err
+}
+
+func (g hostGit) publish(ctx context.Context, job Job, checkout, base, defaultBranch, body string, api githubClient, run Run) (string, string, error) {
 	var pr, publication string
 	err := retryGit(ctx, func() error {
 		var err error
-		pr, publication, err = g.publishOnce(ctx, job, dir, base, defaultBranch, patch, body, api, run)
+		pr, publication, err = g.publishOnce(ctx, job, checkout, base, defaultBranch, body, api, run)
 		return err
 	})
 	return pr, publication, err
 }
 
-func (g hostGit) publishOnce(ctx context.Context, job Job, dir, base, defaultBranch, patch, body string, api githubClient, run Run) (prURL, publication string, resultErr error) {
+func (g hostGit) publishOnce(ctx context.Context, job Job, checkout, base, defaultBranch, body string, api githubClient, run Run) (prURL, publication string, resultErr error) {
 	expected := run.ExpectedBranch
 	if expected == nil && run.ExistingPR && run.StartCommit != "" {
 		expected = &run.StartCommit
@@ -248,14 +269,6 @@ func (g hostGit) publishOnce(ctx context.Context, job Job, dir, base, defaultBra
 		resultErr = errors.Join(resultErr, api.request(cleanup, http.MethodDelete, "/installation/token", token, nil, nil))
 	}()
 	g.token = token
-	checkout := filepath.Join(dir, "publish")
-	_, err = g.checkout(ctx, job, checkout)
-	if err != nil {
-		return "", "", err
-	}
-	if _, err := g.run(ctx, checkout, "checkout", "--detach", base, "--"); err != nil {
-		return "", "", err
-	}
 	if defaultBranch == "" {
 		branch, err := g.run(ctx, checkout, "symbolic-ref", "--short", "refs/remotes/origin/HEAD")
 		if err != nil {
@@ -264,7 +277,7 @@ func (g hostGit) publishOnce(ctx context.Context, job Job, dir, base, defaultBra
 		defaultBranch = strings.TrimPrefix(branch, "origin/")
 	}
 
-	tree, err := g.applyCandidate(ctx, checkout, patch)
+	tree, err := g.run(ctx, checkout, "write-tree")
 	if err != nil {
 		return "", "", err
 	}
@@ -300,12 +313,12 @@ func (g hostGit) publishOnce(ctx context.Context, job Job, dir, base, defaultBra
 	if title == "" {
 		title = job.Name
 	}
-	_, err = g.run(ctx, checkout, "-c", "user.name=Agent Jobs", "-c",
-		"user.email=agent-jobs@users.noreply.github.com", "commit", "-m", title)
+	commit, err := g.run(ctx, checkout, "-c", "user.name=Agent Jobs", "-c",
+		"user.email=agent-jobs@users.noreply.github.com", "commit-tree", tree, "-p", base, "-m", title)
 	if err != nil {
 		return "", "", err
 	}
-	if _, err := g.run(ctx, checkout, "push", "--force-with-lease="+ref+":"+*expected, "origin", "HEAD:"+ref); err != nil {
+	if _, err := g.run(ctx, checkout, "push", "--force-with-lease="+ref+":"+*expected, "origin", commit+":"+ref); err != nil {
 		return "", "", err
 	}
 	pr, err := api.pullRequest(ctx, job, token, defaultBranch, body)

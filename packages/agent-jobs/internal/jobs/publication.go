@@ -94,6 +94,10 @@ func RetryPublication(ctx context.Context, job Job, store Store, id string) (res
 	if err != nil {
 		return err
 	}
-	run.PRURL, run.Publication, resultErr = git.publish(ctx, job, work, run.BaseCommit, "", patch, body, api, run)
+	checkout := filepath.Join(work, "checkout")
+	if err := git.restoreCandidate(ctx, job, checkout, run.BaseCommit, patch, api); err != nil {
+		return err
+	}
+	run.PRURL, run.Publication, resultErr = git.publish(ctx, job, checkout, run.BaseCommit, "", body, api, run)
 	return resultErr
 }

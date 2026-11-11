@@ -7,8 +7,10 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
+	"fmt"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -276,19 +278,57 @@ func TestPublishCheckoutRetainsPinnedBase(t *testing.T) {
 	server := httptest.NewServer(publicationHandler(t, &created, &revoked, &reviews, &body))
 	defer server.Close()
 	job := Job{
-		Name: "test", Repository: "owner/repo", CloneURL: "file://" + source, Branch: "automation/test",
+		Name: "test", Repository: "owner/repo", CloneURL: "https://github.com/owner/repo.git", Branch: "automation/test",
 		Publish: Publication{AppID: "123", InstallationID: "42", PrivateKeyFile: keyFile},
 	}
-	work := t.TempDir()
+	// Exercise the real credential helper while redirecting the HTTPS clone to the local fixture.
+	realGit, err := exec.LookPath("git")
+	if err != nil {
+		t.Fatal(err)
+	}
+	wrapperDir := t.TempDir()
+	marker := filepath.Join(wrapperDir, "authenticated")
+	wrapper := fmt.Sprintf(`#!/bin/bash
+args=("$@")
+for ((i=0; i<${#args[@]}; i++)); do
+  if [[ "${args[i]}" != clone ]]; then continue; fi
+  credential=$(printf 'protocol=https\nhost=github.com\n\n' | %s "${args[@]:0:i}" credential fill) || exit 1
+  [[ "$credential" == *"password=secret"* ]] || exit 1
+  printf authenticated > %s
+  args[${#args[@]}-2]=%s
+  break
+done
+exec %s "${args[@]}"
+`, strconv.Quote(realGit), strconv.Quote(marker), strconv.Quote("file://"+source), strconv.Quote(realGit))
+	if err := os.WriteFile(filepath.Join(wrapperDir, "git"), []byte(wrapper), 0755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("PATH", wrapperDir+string(os.PathListSeparator)+os.Getenv("PATH"))
+	g.credentialHost = "github.com"
+	checkout := filepath.Join(t.TempDir(), "checkout")
 	api := githubClient{baseURL: server.URL, client: server.Client()}
+	if err := g.restoreCandidate(ctx, job, checkout, base, patch, api); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(marker); err != nil || revoked != 1 {
+		t.Fatalf("authenticated restore: marker %v, revoked %d", err, revoked)
+	}
 	absent := ""
-	_, publication, err := g.publish(ctx, job, work, base, "", patch, body, api, Run{ExpectedBranch: &absent})
+	_, publication, err := g.publish(ctx, job, checkout, base, "", body, api, Run{ExpectedBranch: &absent})
 	if err != nil || publication != "published" {
 		t.Fatalf("publication %q: %v", publication, err)
 	}
 
-	parent, err := g.run(ctx, filepath.Join(work, "publish"), "rev-parse", "HEAD^")
+	parent, err := g.run(ctx, source, "rev-parse", "refs/heads/automation/test^")
 	if err != nil || parent != base {
 		t.Fatalf("publication parent %q: %v", parent, err)
+	}
+	head, err := g.run(ctx, checkout, "rev-parse", "HEAD")
+	if err != nil || head != base {
+		t.Fatalf("checkout HEAD %q: %v", head, err)
+	}
+	staged, err := g.run(ctx, checkout, "diff", "--cached", "--name-only")
+	if err != nil || staged != "file" || revoked != 2 {
+		t.Fatalf("staged %q, revoked %d: %v", staged, revoked, err)
 	}
 }
