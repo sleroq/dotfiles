@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -252,7 +253,8 @@ func (r *jobRun) sandbox(ctx context.Context) error {
 		return err
 	}
 	limit := int64(r.job.OutputMB) * 1024 * 1024
-	return runContainer(ctx, r.job, r.run.ID, input, output, r.stdout, r.stderr, limit, &r.run.SandboxDurationSeconds)
+	nixStore := filepath.Join("/var/lib/agent-jobs-work", r.job.Name, "nix")
+	return runContainer(ctx, r.job, r.run, nixStore, input, output, r.stdout, r.stderr, limit)
 }
 
 func (r *jobRun) publish(ctx context.Context) error {
@@ -468,12 +470,19 @@ func prepareNixStore(ctx context.Context, job Job, source, nixStore string, stdo
 	return nil
 }
 
-func runContainer(ctx context.Context, job Job, id, input, output string, stdout, stderr *boundedWriter, limit int64, duration *float64) (resultErr error) {
-	name := "agent-jobs-" + id
-	nixStore := filepath.Join("/var/lib/agent-jobs-work", job.Name, "nix")
-	if err := prepareNixStore(ctx, job, name+"-source", nixStore, stdout, stderr); err != nil {
+func runContainer(ctx context.Context, job Job, run *Run, nixStore, input, output string, stdout, stderr *boundedWriter, limit int64) (resultErr error) {
+	name := "agent-jobs-" + run.ID
+	started := time.Now()
+	err := prepareNixStore(ctx, job, name+"-source", nixStore, stdout, stderr)
+	run.NixStoreSetupDurationSeconds = time.Since(started).Seconds()
+	if err != nil {
 		return err
 	}
+	var stat syscall.Statfs_t
+	if err := syscall.Statfs(nixStore, &stat); err != nil {
+		return fmt.Errorf("measure private Nix store: %w", err)
+	}
+	run.NixStoreSeedBytes = int64(stat.Blocks-stat.Bfree) * int64(stat.Bsize)
 
 	containerStarted := false
 	defer func() {
@@ -495,12 +504,12 @@ func runContainer(ctx context.Context, job Job, id, input, output string, stdout
 		return fmt.Errorf("start sandbox: %w", err)
 	}
 	containerStarted = true
-	run := dockerCommand(ctx, "exec", name, "/bin/agent-jobs", "sandbox", "/input/job.json")
-	run.Stdout = stdout
-	run.Stderr = stderr
-	started := time.Now()
-	runErr := run.Run()
-	*duration = time.Since(started).Seconds()
+	sandbox := dockerCommand(ctx, "exec", name, "/bin/agent-jobs", "sandbox", "/input/job.json")
+	sandbox.Stdout = stdout
+	sandbox.Stderr = stderr
+	started = time.Now()
+	runErr := sandbox.Run()
+	run.SandboxDurationSeconds = time.Since(started).Seconds()
 
 	// Preserve partial sessions after a timeout; this context is independent of the job.
 	copyCtx, cancelCopy := context.WithTimeout(context.Background(), 20*time.Second)

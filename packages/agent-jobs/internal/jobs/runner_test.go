@@ -16,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 )
@@ -117,13 +118,24 @@ func TestContainerRestrictionsAndCleanup(t *testing.T) {
 	var stdout, stderr bytes.Buffer
 	out := &boundedWriter{writer: &stdout, remaining: 1024}
 	errOut := &boundedWriter{writer: &stderr, remaining: 1024}
-	duration := 0.0
+	run := Run{ID: "test-id"}
 	job := Job{
 		Name: "fixture", Network: "agentjobs", Image: "sandbox", CPUs: 2,
 		MemoryMB: 128, PIDs: 20, WorkspaceMB: 64, OutputMB: 1,
 	}
-	if err := runContainer(context.Background(), job, "test-id", input, output, out, errOut, 4096, &duration); err != nil {
+	if err := runContainer(context.Background(), job, &run, dir, input, output, out, errOut, 4096); err != nil {
 		t.Fatal(err)
+	}
+
+	var stat syscall.Statfs_t
+	if err := syscall.Statfs(dir, &stat); err != nil {
+		t.Fatal(err)
+	}
+	if run.NixStoreSeedBytes <= 0 || run.NixStoreSeedBytes%int64(stat.Bsize) != 0 {
+		t.Fatalf("seed allocation is not a positive number of filesystem blocks: %+v", run)
+	}
+	if run.NixStoreSetupDurationSeconds <= 0 || run.SandboxDurationSeconds <= 0 {
+		t.Fatalf("setup or execution duration missing: %+v", run)
 	}
 
 	args, err := os.ReadFile(calls)
@@ -132,16 +144,16 @@ func TestContainerRestrictionsAndCleanup(t *testing.T) {
 	}
 	text := string(args)
 	mountArgs, err := os.ReadFile(mountCalls)
-	if err != nil || string(mountArgs) != "-q /var/lib/agent-jobs-work/fixture/nix\n" {
+	if err != nil || string(mountArgs) != "-q "+dir+"\n" {
 		t.Fatalf("mountpoint args %q: %v", mountArgs, err)
 	}
 	required := []string{
 		"create --name agent-jobs-test-id-source --pull=never --network none --entrypoint /bin/agent-jobs sandbox hold",
-		"cp --archive agent-jobs-test-id-source:/nix/. /var/lib/agent-jobs-work/fixture/nix",
-		"--recursive --no-dereference 1000:1000 /var/lib/agent-jobs-work/fixture/nix",
+		"cp --archive agent-jobs-test-id-source:/nix/. " + dir,
+		"--recursive --no-dereference 1000:1000 " + dir,
 		"rm -f agent-jobs-test-id-source", "--runtime=runsc", "--network agentjobs",
 		"run --detach --pull=never", "--read-only", "--cap-drop ALL", "--security-opt no-new-privileges", "--user 1000:1000",
-		"--memory-swap 128m", "type=bind,src=/var/lib/agent-jobs-work/fixture/nix,dst=/nix",
+		"--memory-swap 128m", "type=bind,src=" + dir + ",dst=/nix",
 		"dst=/input,readonly", "src=" + filepath.Join(input, "resolv.conf") + ",dst=/etc/resolv.conf,readonly", "rm -f agent-jobs-test-id",
 	}
 	for _, item := range required {
@@ -216,8 +228,8 @@ func TestTimeoutRetainsPartialOutput(t *testing.T) {
 		Name: "timeout", Network: "agentjobs", Image: "sandbox", CPUs: 1,
 		MemoryMB: 128, PIDs: 10, WorkspaceMB: 64, OutputMB: 1,
 	}
-	var duration float64
-	err := runContainer(ctx, job, "timeout", dir, output, stdoutLog, stderrLog, 4096, &duration)
+	run := Run{ID: "timeout"}
+	err := runContainer(ctx, job, &run, dir, dir, output, stdoutLog, stderrLog, 4096)
 	if !errors.Is(err, context.DeadlineExceeded) {
 		t.Fatalf("expected deadline, got %v", err)
 	}
@@ -313,13 +325,37 @@ func TestContainerFailsWhenNixStoreIsNotMounted(t *testing.T) {
 
 	var out bytes.Buffer
 	log := &boundedWriter{writer: &out, remaining: 1024}
-	var duration float64
-	err := runContainer(context.Background(), Job{Name: "fixture"}, "id", dir, dir, log, log, 4096, &duration)
+	run := Run{ID: "id"}
+	err := runContainer(context.Background(), Job{Name: "fixture"}, &run, dir, dir, dir, log, log, 4096)
 	if err == nil {
 		t.Fatalf("expected mount failure, got %v", err)
 	}
+	if run.NixStoreSetupDurationSeconds <= 0 || run.NixStoreSeedBytes != 0 || run.SandboxDurationSeconds != 0 {
+		t.Fatalf("failed setup metrics: %+v", run)
+	}
 	if _, err := os.Stat(calls); !os.IsNotExist(err) {
 		t.Fatalf("docker called without a mounted store: %v", err)
+	}
+}
+
+func TestContainerFailsWhenNixStoreCannotBeMeasured(t *testing.T) {
+	dir := t.TempDir()
+	for _, name := range []string{"mountpoint", "docker", "chown"} {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte("#!/bin/sh\nexit 0\n"), 0755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	t.Setenv("PATH", dir+":"+os.Getenv("PATH"))
+	var out bytes.Buffer
+	log := &boundedWriter{writer: &out, remaining: 1024}
+	run := Run{ID: "id"}
+	nixStore := filepath.Join(dir, "missing")
+	err := runContainer(context.Background(), Job{Name: "fixture"}, &run, nixStore, dir, dir, log, log, 4096)
+	if !errors.Is(err, os.ErrNotExist) {
+		t.Fatalf("statfs error: %v", err)
+	}
+	if run.NixStoreSetupDurationSeconds <= 0 || run.NixStoreSeedBytes != 0 {
+		t.Fatalf("setup metrics: %+v", run)
 	}
 }
 

@@ -47,6 +47,9 @@ func WriteMetrics(store Store, filename string) error {
 		}
 		fmt.Fprintf(&buf, "agent_job_last_duration_seconds{agent_job=%q} %g\n", name, run.DurationSeconds)
 		fmt.Fprintf(&buf, "agent_job_last_sandbox_duration_seconds{agent_job=%q} %g\n", name, run.SandboxDurationSeconds)
+		fmt.Fprintf(&buf, "agent_job_last_nix_store_seed_bytes{agent_job=%q} %d\n", name, run.NixStoreSeedBytes)
+		fmt.Fprintf(&buf, "agent_job_last_nix_store_setup_duration_seconds{agent_job=%q} %g\n",
+			name, run.NixStoreSetupDurationSeconds)
 		fmt.Fprintf(&buf, "agent_job_last_run_success{agent_job=%q} %d\n", name, succeeded)
 		fmt.Fprintf(&buf, "agent_job_last_finished_timestamp_seconds{agent_job=%q} %d\n", name, run.FinishedAt.Unix())
 		if latest, ok := success[name]; ok {
