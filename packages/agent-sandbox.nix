@@ -6,6 +6,7 @@
   runCommand,
   agent-jobs,
   pi,
+  nodejs_24,
   bashInteractive,
   coreutils,
   git,
@@ -33,6 +34,7 @@ let
     paths = [
       agent-jobs
       pi
+      nodejs_24
       bashInteractive
       coreutils
       git
@@ -73,7 +75,17 @@ let
   piSettings = writeText "agent-pi-settings.json" (
     builtins.toJSON {
       extensions = lib.optional (fumo-pi != null) "${fumo-pi}/index.js";
-      packages = [ ];
+      packages = lib.filter (lib.hasPrefix "npm:@ff-labs/pi-fff@") (builtins.fromJSON (
+        builtins.readFile ../home/config/pi/agent/settings.json
+      )).packages;
+    }
+  );
+  piMcp = writeText "agent-pi-mcp.json" (
+    builtins.toJSON {
+      mcpServers = lib.getAttrs [
+        "exa"
+        "grep"
+      ] (builtins.fromJSON (builtins.readFile ../home/config/pi/agent/mcp.json)).mcpServers;
     }
   );
   svelteParser = callPackage ./tree-sitter-htmlx-svelte.nix { };
@@ -116,7 +128,9 @@ let
     ln -s ${bashInteractive}/bin/bash "$out/bin/sh"
     ln -s ${sgConfig} "$out/etc/sgconfig.yml"
     ln -s ${piSettings} "$out/etc/agent-pi/settings.json"
-    printf '%s\n' '{"mcpServers":{}}' > "$out/etc/agent-pi/mcp.json"
+    ln -s ${piMcp} "$out/etc/agent-pi/mcp.json"
+    ln -s ${../home/config/agents/AGENTS.md} "$out/etc/agent-pi/AGENTS.md"
+    ln -s ${../home/config/agents/skills} "$out/etc/agent-pi/skills"
     printf '%s\n' 'agent:x:1000:1000:Agent:/home/agent:${lib.getExe bashInteractive}' > "$out/etc/passwd"
     printf '%s\n' 'agent:x:1000:' > "$out/etc/group"
   '';

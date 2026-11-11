@@ -11,6 +11,7 @@ in
 {
   "secrets/agentJobsGithubKey".publicKeys = publicKeys;
   "secrets/agentJobsFumoKey".publicKeys = publicKeys;
+  "secrets/agentJobsExaKey".publicKeys = publicKeys;
   "secrets/githubRunnerCumbanToken".publicKeys = publicKeys;
   "secrets/kopokaEnv".publicKeys = publicKeys;
   "secrets/navidromeEnv".publicKeys = publicKeys;
