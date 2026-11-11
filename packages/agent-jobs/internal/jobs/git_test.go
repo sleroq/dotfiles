@@ -260,7 +260,8 @@ func TestPublishCheckoutRetainsPinnedBase(t *testing.T) {
 	}
 	work := t.TempDir()
 	api := githubClient{baseURL: server.URL, client: server.Client()}
-	_, publication, err := g.publish(ctx, job, work, base, "", patch, body, api, Run{})
+	absent := ""
+	_, publication, err := g.publish(ctx, job, work, base, "", patch, body, api, Run{ExpectedBranch: &absent})
 	if err != nil || publication != "published" {
 		t.Fatalf("publication %q: %v", publication, err)
 	}

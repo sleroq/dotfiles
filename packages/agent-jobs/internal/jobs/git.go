@@ -85,6 +85,19 @@ func retryGit(ctx context.Context, operation func() error) error {
 	}
 }
 
+func (g hostGit) remoteBranch(ctx context.Context, dir, branch string) (string, error) {
+	ref := "refs/heads/" + branch
+	remote, err := g.run(ctx, dir, "ls-remote", "--heads", "origin", ref)
+	if err != nil || remote == "" {
+		return "", err
+	}
+	fields := strings.Fields(remote)
+	if len(fields) != 2 || fields[1] != ref {
+		return "", errors.New("invalid remote branch response")
+	}
+	return fields[0], nil
+}
+
 func (g hostGit) checkout(ctx context.Context, job Job, dir string) (string, error) {
 	return g.checkoutWithDepth(ctx, job, dir, false)
 }
@@ -222,6 +235,13 @@ func (g hostGit) publish(ctx context.Context, job Job, dir, base, defaultBranch,
 }
 
 func (g hostGit) publishOnce(ctx context.Context, job Job, dir, base, defaultBranch, patch, body string, api githubClient, run Run) (prURL, publication string, resultErr error) {
+	expected := run.ExpectedBranch
+	if expected == nil && run.ExistingPR && run.StartCommit != "" {
+		expected = &run.StartCommit
+	}
+	if expected == nil {
+		return "", "", errors.New("publication requires a captured remote branch")
+	}
 	token, err := api.installationToken(ctx, job)
 	if err != nil {
 		return "", "", err
@@ -260,17 +280,11 @@ func (g hostGit) publishOnce(ctx context.Context, job Job, dir, base, defaultBra
 		return "", "no_change", nil
 	}
 	ref := "refs/heads/" + job.Branch
-	remote, err := g.run(ctx, checkout, "ls-remote", "--heads", "origin", ref)
+	remote, err := g.remoteBranch(ctx, checkout, job.Branch)
 	if err != nil {
 		return "", "", err
 	}
-	expected := ""
 	if remote != "" {
-		fields := strings.Fields(remote)
-		if len(fields) != 2 || fields[1] != ref {
-			return "", "", errors.New("invalid remote branch response")
-		}
-		expected = fields[0]
 		if _, err := g.run(ctx, checkout, "fetch", "--no-tags", "origin", ref); err != nil {
 			return "", "", err
 		}
@@ -283,7 +297,7 @@ func (g hostGit) publishOnce(ctx context.Context, job Job, dir, base, defaultBra
 			return pr, "unchanged", err
 		}
 	}
-	if run.ExistingPR && expected != run.StartCommit {
+	if remote != *expected {
 		return "", "", errors.New("remote branch changed since the run started")
 	}
 	title := job.Publish.Title
@@ -295,7 +309,7 @@ func (g hostGit) publishOnce(ctx context.Context, job Job, dir, base, defaultBra
 	if err != nil {
 		return "", "", err
 	}
-	if _, err := g.run(ctx, checkout, "push", "--force-with-lease="+ref+":"+expected, "origin", "HEAD:"+ref); err != nil {
+	if _, err := g.run(ctx, checkout, "push", "--force-with-lease="+ref+":"+*expected, "origin", "HEAD:"+ref); err != nil {
 		return "", "", err
 	}
 	pr, err := api.pullRequest(ctx, job, token, defaultBranch, body)

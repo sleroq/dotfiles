@@ -150,7 +150,9 @@ func TestPublishUsesStableBranchAndRevokesToken(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pr, publication, err := g.publish(ctx, job, work, base, branch, patchFile, body, api, Run{})
+	absent := ""
+	run := Run{ExpectedBranch: &absent}
+	pr, publication, err := g.publish(ctx, job, work, base, branch, patchFile, body, api, run)
 	if err != nil || publication != "published" || pr != "https://example.test/pr/7" {
 		t.Fatalf("publish %q %q: %v", pr, publication, err)
 	}
@@ -161,7 +163,7 @@ func TestPublishUsesStableBranchAndRevokesToken(t *testing.T) {
 	}
 
 	body = "Keep the fixture content current without another commit."
-	pr, publication, err = g.publish(ctx, job, work, base, "", patchFile, body, api, Run{})
+	pr, publication, err = g.publish(ctx, job, work, base, "", patchFile, body, api, run)
 	if err != nil || publication != "unchanged" || pr == "" {
 		t.Fatalf("republish %q %q: %v", pr, publication, err)
 	}
@@ -194,6 +196,24 @@ func TestPublishUsesStableBranchAndRevokesToken(t *testing.T) {
 	}
 	if _, _, err := g.publish(ctx, job, work, base, branch, patchFile, body, api, stale); err == nil {
 		t.Fatal("published over a moved branch")
+	}
+	// Both an absent snapshot and a different existing snapshot must reject a new tree.
+	for _, expected := range []string{"", base} {
+		if _, _, err := g.publish(ctx, job, work, base, branch, patchFile, body, api, Run{ExpectedBranch: &expected}); err == nil {
+			t.Fatalf("published over changed branch with snapshot %q", expected)
+		}
+		got, err := g.run(ctx, bare, "rev-parse", "refs/heads/automation/test")
+		if err != nil || got != first {
+			t.Fatalf("branch changed: %s: %v", got, err)
+		}
+	}
+	// An old branch that has not changed since preparation may be replaced.
+	if _, err := g.run(ctx, bare, "update-ref", "refs/heads/automation/test", base); err != nil {
+		t.Fatal(err)
+	}
+	_, publication, err = g.publish(ctx, job, work, base, branch, patchFile, body, api, Run{ExpectedBranch: &base})
+	if err != nil || publication != "published" {
+		t.Fatalf("publish over unchanged old branch: %q: %v", publication, err)
 	}
 }
 

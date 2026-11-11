@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -72,7 +73,7 @@ func TestRetryPublicationRequiresValidatedMatchingRun(t *testing.T) {
 		Publish: Publication{Enabled: true, AppID: "1", InstallationID: "2", PrivateKeyFile: "/not-accessed"},
 	}
 
-	for _, scenario := range []string{"sandbox", "success", "repository", "branch", "base", "disabled", "timed-out-publish", "timed-out-sandbox"} {
+	for _, scenario := range []string{"sandbox", "success", "repository", "branch", "base", "disabled", "timed-out-publish", "timed-out-sandbox", "legacy-missing"} {
 		t.Run(scenario, func(t *testing.T) {
 			store := Store{Directory: t.TempDir()}
 			run, err := store.Create(job)
@@ -80,8 +81,12 @@ func TestRetryPublicationRequiresValidatedMatchingRun(t *testing.T) {
 				t.Fatal(err)
 			}
 			run.Status, run.Phase, run.BaseCommit = "failed", "publish", "base"
+			snapshot := ""
+			run.ExpectedBranch = &snapshot
 			configured := job
 			switch scenario {
+			case "legacy-missing":
+				run.ExpectedBranch = nil
 			case "sandbox":
 				run.Phase = "sandbox"
 			case "success":
@@ -117,7 +122,7 @@ func TestRetryPublicationRequiresValidatedMatchingRun(t *testing.T) {
 			}
 
 			retained, err := store.Get(job.Name, run.ID)
-			if err != nil || retained != run {
+			if err != nil || !reflect.DeepEqual(retained, run) {
 				t.Fatalf("rejected retry changed run: %+v: %v", retained, err)
 			}
 		})
