@@ -14,7 +14,7 @@ import (
 func fixture(t *testing.T) (Store, http.Handler, Run) {
 	t.Helper()
 	s := Store{Directory: t.TempDir()}
-	run := Run{ID: "run-1", Job: "job_1", Status: "success", Phase: "validate", Model: "test", StartedAt: time.Now()}
+	run := Run{ID: "run-1", Job: "job_1", Status: "success", Phase: "sandbox", Model: "test", StartedAt: time.Now()}
 	dir := filepath.Join(s.Directory, run.Job, run.ID)
 	if err := os.MkdirAll(filepath.Join(dir, "output", "sessions"), 0755); err != nil {
 		t.Fatal(err)
