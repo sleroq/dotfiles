@@ -1,1 +1,29 @@
-{{define "session.html"}}{{template "head" .}}<p><a href="/jobs/{{.Run.Job}}/runs/{{.Run.ID}}">← Run</a></p><p class="eyebrow">Session history</p><h1>{{.Session}}</h1><p class="muted">Chronological events, including branches and compactions; not an active-tree replay. <a href="/api/jobs/{{.Run.Job}}/runs/{{.Run.ID}}/sessions/{{.Session}}">Raw JSONL</a></p>{{range .Events}}<article class="event">{{if .Issue}}<strong class="issue">{{.Issue}}</strong>{{else}}<div class="event-header"><strong>{{.Summary}}</strong><time>{{.Timestamp}}</time></div>{{end}}{{if .Text}}<pre>{{.Text}}</pre>{{end}}{{if .Detail}}<details><summary>Event details</summary><pre>{{.Detail}}</pre></details>{{end}}</article>{{else}}<p class="muted">No events yet.</p>{{end}}{{template "foot" .}}{{end}}
+{{define "session.html"}}{{template "head" .}}
+<p><a href="/jobs/{{.Run.Job}}/runs/{{.Run.ID}}">← Run</a></p>
+<p class="eyebrow">Session history</p>
+<h1>{{.Session}}</h1>
+<p class="muted">
+  Chronological events, including branches and compactions; not an active-tree
+  replay.
+  <a href="/api/jobs/{{.Run.Job}}/runs/{{.Run.ID}}/sessions/{{.Session}}"
+    >Raw JSONL</a
+  >
+</p>
+{{range .Events}}
+<article class="event">
+  {{if .Issue}}<strong class="issue">{{.Issue}}</strong>{{else}}
+  <div class="event-header">
+    <strong>{{.Summary}}</strong><time>{{.Timestamp}}</time>
+  </div>
+  {{end}}{{if .Text}}
+  <pre>{{.Text}}</pre>
+  {{end}}{{if .Detail}}
+  <details>
+    <summary>Event details</summary>
+    <pre>{{.Detail}}</pre>
+  </details>
+  {{end}}
+</article>
+{{else}}
+<p class="muted">No events yet.</p>
+{{end}}{{template "foot" .}}{{end}}
