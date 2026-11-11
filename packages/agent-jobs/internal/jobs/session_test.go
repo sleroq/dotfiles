@@ -38,7 +38,8 @@ func TestSessionUnknownAndIncomplete(t *testing.T) {
 }
 
 func TestSessionDetailsPreserveRawJSON(t *testing.T) {
-	data := `{"type":"extension_event","payload":` + strings.Repeat("[", 1000) + `"value"` + strings.Repeat("]", 1000) + `}`
+	payload := strings.Repeat("[", 1000) + `"value"` + strings.Repeat("]", 1000)
+	data := `{"type":"extension_event","payload":` + payload + `}`
 	events := parseSession(strings.NewReader(data), 0).Events
 	if len(events) != 1 || events[0].Detail != data {
 		t.Fatalf("details changed or expanded: events=%d", len(events))

@@ -1,6 +1,8 @@
 package jobs
 
 import (
+	"errors"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
@@ -73,4 +75,71 @@ func TestJobRejectsUnsafePublicationScope(t *testing.T) {
 			t.Errorf("accepted branch %q", branch)
 		}
 	}
+}
+
+func TestStoreRejectsInternalSymlinks(t *testing.T) {
+	store := Store{Directory: t.TempDir()}
+	run, err := store.Create(Job{Name: "helium"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := filepath.Join(store.Directory, run.Job, run.ID)
+	if err := os.Mkdir(filepath.Join(dir, "real"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "real", "artifact"), []byte("content"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	for link, target := range map[string]string{"link": "real/artifact", "linked-dir": "real"} {
+		if err := os.Symlink(target, filepath.Join(dir, link)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, name := range []string{"link", "linked-dir/artifact", ".", "", "real/../real/artifact", "real//artifact"} {
+		t.Run(name, func(t *testing.T) {
+			file, err := store.Open(run.Job, run.ID, name)
+			if err == nil {
+				_ = file.Close()
+				t.Fatalf("Open accepted %q", name)
+			}
+			if _, err := store.Read(run.Job, run.ID, name); err == nil {
+				t.Fatalf("Read accepted %q", name)
+			}
+		})
+	}
+	if data, err := store.Read(run.Job, run.ID, "real/artifact"); err != nil || string(data) != "content" {
+		t.Fatalf("regular artifact: %q %v", data, err)
+	}
+	for _, ids := range [][2]string{{"../helium", run.ID}, {run.Job, "../" + run.ID}} {
+		if _, err := store.Open(ids[0], ids[1], "real/artifact"); !errors.Is(err, fs.ErrNotExist) {
+			t.Errorf("invalid identifiers %q: %v", ids, err)
+		}
+	}
+}
+
+func TestStoreReadLimit(t *testing.T) {
+	store := Store{Directory: t.TempDir()}
+	run, err := store.Create(Job{Name: "helium"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(store.Directory, run.Job, run.ID, "large")
+	file, err := os.Create(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := file.Truncate((64 << 20) + 1); err != nil {
+		t.Fatal(err)
+	}
+	if err := file.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.Read(run.Job, run.ID, "large"); !errors.Is(err, errFileTooLarge) {
+		t.Fatalf("Read limit: %v", err)
+	}
+	file, err = store.Open(run.Job, run.ID, "large")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = file.Close()
 }

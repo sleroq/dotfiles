@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"time"
 )
 
@@ -35,6 +36,8 @@ type Run struct {
 }
 
 type Store struct{ Directory string }
+
+var errFileTooLarge = errors.New("file exceeds 64 MiB read limit")
 
 func (s Store) Create(job Job) (Run, error) {
 	run := Run{
@@ -107,32 +110,66 @@ func (s Store) List() ([]Run, error) {
 	return runs, nil
 }
 
-// Open confines agent-controlled artifact paths and symlinks to one run.
-func (s Store) Open(job, id, name string) (*os.File, error) {
-	if !Identifier(job) || !Identifier(id) {
+// runFiles opens each directory without following agent-controlled symlinks.
+func (s Store) runFiles(job, run string, dirs ...string) (*os.Root, error) {
+	if !Identifier(job) || !Identifier(run) {
 		return nil, fs.ErrNotExist
 	}
 	root, err := os.OpenRoot(s.Directory)
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = root.Close() }()
-	runRoot, err := root.OpenRoot(filepath.Join(job, id))
-	if err != nil {
-		return nil, err
-	}
-	defer func() { _ = runRoot.Close() }()
-	file, err := runRoot.Open(name)
-	if err != nil {
-		return nil, err
-	}
-	info, err := file.Stat()
-	if err != nil || !info.Mode().IsRegular() {
-		_ = file.Close()
-		if err != nil {
-			return nil, err
+	for _, name := range append([]string{job, run}, dirs...) {
+		info, e := root.Lstat(name)
+		if e != nil {
+			_ = root.Close()
+			return nil, e
 		}
-		return nil, fs.ErrPermission
+		if !info.IsDir() {
+			_ = root.Close()
+			return nil, fs.ErrNotExist
+		}
+		next, e := root.OpenRoot(name)
+		_ = root.Close()
+		if e != nil {
+			return nil, e
+		}
+		root = next
+	}
+	return root, nil
+}
+
+// Open opens a regular artifact without following symlinks in its run path.
+func (s Store) Open(job, id, name string) (*os.File, error) {
+	if !fs.ValidPath(name) || name == "." {
+		return nil, fs.ErrNotExist
+	}
+	parts := strings.Split(name, "/")
+	root, err := s.runFiles(job, id, parts[:len(parts)-1]...)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = root.Close() }()
+	base := parts[len(parts)-1]
+	info, err := root.Lstat(base)
+	if err != nil {
+		return nil, err
+	}
+	if !info.Mode().IsRegular() {
+		return nil, fs.ErrNotExist
+	}
+	file, err := root.Open(base)
+	if err != nil {
+		return nil, err
+	}
+	info, err = file.Stat()
+	if err != nil {
+		_ = file.Close()
+		return nil, err
+	}
+	if !info.Mode().IsRegular() {
+		_ = file.Close()
+		return nil, fs.ErrNotExist
 	}
 	return file, nil
 }
@@ -143,13 +180,20 @@ func (s Store) Read(job, id, name string) ([]byte, error) {
 		return nil, err
 	}
 	defer func() { _ = file.Close() }()
+	info, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
 	const limit = 64 << 20
+	if info.Size() > limit {
+		return nil, errFileTooLarge
+	}
 	data, err := io.ReadAll(io.LimitReader(file, limit+1))
 	if err != nil {
 		return nil, err
 	}
 	if len(data) > limit {
-		return nil, errors.New("artifact exceeds the 64 MiB viewer limit")
+		return nil, errFileTooLarge
 	}
 	return data, nil
 }

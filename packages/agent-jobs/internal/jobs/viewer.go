@@ -154,7 +154,7 @@ func (v *viewer) sessionHTML(w http.ResponseWriter, r *http.Request, run Run, na
 			return
 		}
 	}
-	file, err := v.store.openFile(run.Job, run.ID, "output/sessions/"+name)
+	file, err := v.store.Open(run.Job, run.ID, "output/sessions/"+name)
 	if err != nil {
 		v.fail(w, err)
 		return
@@ -185,7 +185,7 @@ func (v *viewer) artifactRoute(w http.ResponseWriter, r *http.Request, run Run, 
 		v.serveFile(w, r, run, name, "text/plain; charset=utf-8")
 		return
 	}
-	data, err := v.store.safeRead(run.Job, run.ID, name)
+	data, err := v.store.Read(run.Job, run.ID, name)
 	if err != nil {
 		v.fail(w, err)
 		return
@@ -194,7 +194,7 @@ func (v *viewer) artifactRoute(w http.ResponseWriter, r *http.Request, run Run, 
 	v.render(w, "artifact.html", p)
 }
 func (v *viewer) serveFile(w http.ResponseWriter, r *http.Request, run Run, name, contentType string) {
-	file, err := v.store.openFile(run.Job, run.ID, name)
+	file, err := v.store.Open(run.Job, run.ID, name)
 	if err != nil {
 		v.fail(w, err)
 		return
@@ -282,11 +282,12 @@ func (v *viewer) detail(w http.ResponseWriter, run Run) {
 	}
 	artifacts := []string{}
 	for _, name := range artifactNames {
-		e := v.store.checkFile(run.Job, run.ID, name)
-		if e == nil {
+		file, err := v.store.Open(run.Job, run.ID, name)
+		if err == nil {
+			_ = file.Close()
 			artifacts = append(artifacts, name)
-		} else if !errors.Is(e, fs.ErrNotExist) && !errors.Is(e, fs.ErrPermission) {
-			v.fail(w, e)
+		} else if !errors.Is(err, fs.ErrNotExist) && !errors.Is(err, fs.ErrPermission) {
+			v.fail(w, err)
 			return
 		}
 	}
