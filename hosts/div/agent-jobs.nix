@@ -56,6 +56,7 @@ in
 
   age.secrets.agentJobsGithubKey.file = ./secrets/agentJobsGithubKey;
   age.secrets.agentJobsFumoKey.file = ./secrets/agentJobsFumoKey;
+  age.secrets.agentJobsExaKey.file = ./secrets/agentJobsExaKey;
   services.agent-jobs = {
     enable = true;
     pi = inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.default;
@@ -82,6 +83,7 @@ in
         branch = "automation/${name}";
         reuseOpenPR = true;
         piCommand = [ "agent-pi" ];
+        environmentFiles.EXA_API_KEY = config.age.secrets.agentJobsExaKey.path;
         model = "fumo/codex/gpt-6.1-terra";
         thinking = "high";
         timeoutSeconds = 1800;

@@ -83,6 +83,7 @@ func RunSandbox(ctx context.Context, configPath string) (resultErr error) {
 func (cfg sandboxConfig) environment() ([]string, error) {
 	env := []string{
 		"PATH=/bin", "HOME=/home/agent", "TMPDIR=/tmp", "BASH_ENV=/etc/agent-jobs/bash-env",
+		"PI_FFF_MODE=override",
 		"SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt",
 		"GIT_CONFIG_NOSYSTEM=1", "GIT_CONFIG_GLOBAL=/dev/null",
 		"GIT_TERMINAL_PROMPT=0", "GIT_LFS_SKIP_SMUDGE=1",
