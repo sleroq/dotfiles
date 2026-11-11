@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path"
 	"regexp"
 	"strings"
 	"time"
@@ -18,7 +17,6 @@ type Job struct {
 	CloneURL         string            `json:"clone_url,omitempty"`
 	ReuseOpenPR      bool              `json:"reuse_open_pr,omitempty"`
 	Branch           string            `json:"branch"`
-	AllowedPaths     []string          `json:"allowed_paths"`
 	Prompt           string            `json:"prompt"`
 	Image            string            `json:"image"`
 	Network          string            `json:"network"`
@@ -103,16 +101,6 @@ func (j Job) checkScope() error {
 	if !strings.HasPrefix(j.Branch, "automation/") || strings.ContainsAny(j.Branch, "\x00\r\n ~^:?*[\\") || strings.Contains(j.Branch, "..") || strings.HasSuffix(j.Branch, "/") {
 		return errors.New("publication branch must be a valid automation/ branch")
 	}
-	if len(j.AllowedPaths) == 0 {
-		return errors.New("allowed_paths must not be empty")
-	}
-
-	for _, name := range j.AllowedPaths {
-		if name == "." || path.Clean(name) != name || strings.HasPrefix(name, "/") || strings.HasPrefix(name, "../") || strings.ContainsAny(name, "\x00\r\n") || strings.Split(name, "/")[0] == ".git" {
-			return fmt.Errorf("invalid allowed path %q", name)
-		}
-	}
-
 	return nil
 }
 

@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"slices"
 	"strings"
 	"time"
 )
@@ -129,7 +128,7 @@ func (g hostGit) checkoutWithDepth(ctx context.Context, job Job, dir string, sha
 }
 
 // applyCandidate only operates on a fresh trusted checkout, never the guest's .git.
-func (g hostGit) applyCandidate(ctx context.Context, dir, patch string, allowed []string) (string, error) {
+func (g hostGit) applyCandidate(ctx context.Context, dir, patch string) (string, error) {
 	if _, err := g.run(ctx, dir, "apply", "--index", "--", patch); err != nil {
 		return "", err
 	}
@@ -149,9 +148,6 @@ func (g hostGit) applyCandidate(ctx context.Context, dir, patch string, allowed 
 		name := entries[i+1]
 		if len(fields) != 5 {
 			return "", errors.New("invalid git diff metadata")
-		}
-		if !slices.Contains(allowed, name) {
-			return "", fmt.Errorf("candidate changes disallowed path %q", name)
 		}
 		for part := range strings.SplitSeq(name, "/") {
 			if strings.EqualFold(part, ".git") {
@@ -268,7 +264,7 @@ func (g hostGit) publishOnce(ctx context.Context, job Job, dir, base, defaultBra
 		defaultBranch = strings.TrimPrefix(branch, "origin/")
 	}
 
-	tree, err := g.applyCandidate(ctx, checkout, patch, job.AllowedPaths)
+	tree, err := g.applyCandidate(ctx, checkout, patch)
 	if err != nil {
 		return "", "", err
 	}

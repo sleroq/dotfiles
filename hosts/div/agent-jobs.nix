@@ -10,9 +10,8 @@ let
     bump-helium = {
       schedule = "*-*-* 07:00:00 UTC";
       overdueAfterSeconds = 90000;
-      allowedPaths = [ "packages/helium.nix" ];
       prompt = ''
-        Update only Helium in packages/helium.nix to the latest stable upstream Linux release from imputnet/helium-linux. Update the version and matching x86_64 AppImage hash together. Verify the release asset exists and run a focused package evaluation/build using lock.nodes.nixpkgs-div.locked; do not fetch a second nixpkgs revision. Do not change flake inputs, browser settings, or unrelated packages.
+        Update Helium in packages/helium.nix to the latest stable upstream Linux release from imputnet/helium-linux, including any necessary supporting repository changes. Update the version and matching x86_64 AppImage hash together. Verify the release asset exists and run a focused package evaluation/build using lock.nodes.nixpkgs-div.locked; do not fetch a second nixpkgs revision. Do not change flake inputs, browser settings, or unrelated packages.
       '';
       publish = {
         title = "chore: update Helium";
@@ -21,34 +20,6 @@ let
     bump-paseo-stack = {
       schedule = "*-*-1/3 06:00:00 UTC";
       overdueAfterSeconds = 262800;
-      allowedPaths = [
-        "flake.nix"
-        "flake.lock"
-        "modules/paseo.nix"
-        "modules/paseo/packages.nix"
-        "modules/paseo/pi.nix"
-        "modules/paseo/opencode.nix"
-        "modules/paseo/config.nix"
-        "modules/paseo/config.mjs"
-        "modules/paseo/pi-profile.mjs"
-        "modules/paseo/plugins/pi-cache-miss/package.json"
-        "modules/paseo/plugins/pi-cache-miss/package-lock.json"
-        "modules/paseo/plugins/pi-fast/package.json"
-        "modules/paseo/plugins/pi-fast/package-lock.json"
-        "modules/paseo/plugins/worktree-direnv/package.json"
-        "modules/paseo/plugins/worktree-direnv/package-lock.json"
-        "home/modules/programs/paseo.nix"
-        "home/modules/programs/pi.nix"
-        "home/modules/programs/opencode.nix"
-        "home/config/pi/agent/settings.json"
-        "home/config/opencode/opencode.json"
-        "home/config/opencode/plugins/direnv/package.json"
-        "home/config/opencode/plugins/direnv/bun.lock"
-        "home/config/opencode/plugins/paseo-managed-bridge/package.json"
-        "hosts/cumserver/modules/fumo-gateway.nix"
-        "packages/fumo-pi.nix"
-        "packages/fumo-pi-refresh.mjs"
-      ];
       prompt = builtins.readFile ./agent-jobs/bump-paseo-stack.txt;
       publish = {
         title = "chore: update Paseo stack";
@@ -57,27 +28,6 @@ let
     bump-dwl = {
       schedule = "*-*-01 09:00:00 UTC";
       overdueAfterSeconds = 2682000;
-      allowedPaths = [
-        "flake.nix"
-        "flake.lock"
-        "packages/dwl/default.nix"
-        "packages/dwl/README.md"
-        "packages/dwl/config.h"
-        "packages/dwl/patches/ipc.patch"
-        "packages/dwl/patches/desktop.patch"
-        "packages/dwl/patches/better-resize.patch"
-        "packages/dwl/patches/gpu-reset.patch"
-        "packages/dwl/tests/boundaries.c"
-        "packages/dwl/tests/run.sh"
-        "packages/dwl/tests/noctalia.py"
-        "packages/dwl/tests/resize.py"
-        "packages/dwl/tests/transitions.py"
-        "packages/dwl/tests/transient.c"
-        "packages/dwl/tests/drag.c"
-        "packages/dwl/tests/ipc-title.c"
-        "packages/dwl/tests/dwl-ipc-unstable-v2.xml"
-        "packages/dwl/tests/virtual-pointer.xml"
-      ];
       prompt = builtins.readFile ./agent-jobs/bump-dwl.txt;
       publish = {
         title = "chore: update DWL";
@@ -86,17 +36,6 @@ let
     bump-maintained-packages = {
       schedule = "Sun *-*-* 08:00:00 UTC";
       overdueAfterSeconds = 608400;
-      allowedPaths = [
-        "packages/trusttunnel-client.nix"
-        "packages/obs-moq.nix"
-        "packages/broadcast-box.nix"
-        "packages/tree-sitter-htmlx-svelte.nix"
-        "home/config/ast-grep/svelte-parser.json"
-        "packages/rift.nix"
-        "packages/paseo-relay.nix"
-        "hosts/cumserver/default.nix"
-        "hosts/ru-relay/default.nix"
-      ];
       prompt = builtins.readFile ./agent-jobs/bump-maintained-packages.txt;
       publish = {
         title = "chore: update maintained packages";
@@ -143,10 +82,7 @@ in
 
           ${job.prompt}
 
-          Edit only these permitted paths:
-          ${lib.concatStringsSep "\n" job.allowedPaths}
-
-          Use published upstream releases/revisions and update matching source/dependency hashes together. Preserve existing integrations and local patches. Do not change credentials, provider/model choices, prompts, skills, runtime bookkeeping, or unrelated packages/configuration. Never edit Paseo-managed built-in skills. Any permitted flake update must be targeted, never a blanket update: preserve every root nixpkgs pin, unrelated root and its independent dependency locks, and compare the lock graph against the supplied default-branch base before finishing. If a component needs an out-of-scope change, leave that upgrade out and report the blocker.
+          Use published upstream releases/revisions and update matching source/dependency hashes together. Preserve existing integrations and local patches. Do not change credentials, provider/model choices, prompts, skills, runtime bookkeeping, or unrelated packages/configuration. Never edit Paseo-managed built-in skills. Any permitted flake update must be targeted, never a blanket update: preserve every root nixpkgs pin, unrelated root and its independent dependency locks, and compare the lock graph against the supplied default-branch base before finishing. Make supporting repository changes needed for the scoped upgrades, but leave unrelated upgrades out.
 
           Validation must remain package-scoped. Use Nix to obtain any needed build/test tools inside this private sandbox. Never evaluate/build/test complete NixOS, Darwin or Home Manager configurations; never run nix flake check or an all-host/all-package build, even with --no-build. Do not deploy or activate anything. Run focused affected package tests/builds as required by the scope, format/lint edited Nix files, and run ast-grep scan --config "$HOME/sgconfig.yml" --no-ignore hidden . from the checkout root. Understand findings, fix introduced issues and report unrelated pre-existing blockers without broad cleanup. Never claim an unbuilt platform or unrun test was verified.
 

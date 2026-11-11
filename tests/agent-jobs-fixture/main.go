@@ -73,8 +73,8 @@ func scenario(mode string, args []string) error {
 		return checkIsolation()
 	case "symlink":
 		return os.Symlink("/etc/passwd", "/output/escape")
-	case "bad-path":
-		return os.WriteFile("forbidden.txt", []byte("forbidden\n"), 0644)
+	case "arbitrary-path":
+		return os.WriteFile("arbitrary.txt", []byte("arbitrary\n"), 0644)
 	case "success":
 		return inspectNixStore()
 	case "nix-build":

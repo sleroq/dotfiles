@@ -67,8 +67,7 @@ func TestNoChangeDoesNotRequirePRBody(t *testing.T) {
 
 func TestRetryPublicationRequiresValidatedMatchingRun(t *testing.T) {
 	job := Job{
-		Name: "fixture", Repository: "owner/repo", Branch: "automation/fixture", AllowedPaths: []string{"file"},
-		Image: "sandbox", Network: "agentjobs", PiCommand: []string{"pi"}, Prompt: "prompt", TimeoutSeconds: 5,
+		Name: "fixture", Repository: "owner/repo", Branch: "automation/fixture", Image: "sandbox", Network: "agentjobs", PiCommand: []string{"pi"}, Prompt: "prompt", TimeoutSeconds: 5,
 		MemoryMB: 128, CPUs: 1, PIDs: 10, WorkspaceMB: 64, OutputMB: 1,
 		Publish: Publication{Enabled: true, AppID: "1", InstallationID: "2", PrivateKeyFile: "/not-accessed"},
 	}

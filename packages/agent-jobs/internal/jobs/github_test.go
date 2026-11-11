@@ -141,8 +141,7 @@ func TestPublishUsesStableBranchAndRevokesToken(t *testing.T) {
 	api := githubClient{baseURL: server.URL, client: server.Client()}
 	job := Job{
 		Name: "test", Repository: "owner/repo", CloneURL: bare, Branch: "automation/test",
-		AllowedPaths: []string{"allowed.txt"},
-		Publish:      Publication{AppID: "123", InstallationID: "42", PrivateKeyFile: keyFile, Title: "Update", Reviewer: "reviewer"},
+		Publish: Publication{AppID: "123", InstallationID: "42", PrivateKeyFile: keyFile, Title: "Update", Reviewer: "reviewer"},
 	}
 	work := t.TempDir()
 	branch, err := g.run(ctx, source, "symbolic-ref", "--short", "HEAD")

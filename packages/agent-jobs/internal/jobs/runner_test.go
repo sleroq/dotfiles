@@ -326,8 +326,7 @@ func TestContainerFailsWhenNixStoreIsNotMounted(t *testing.T) {
 func TestFailedRunRetainsPhase(t *testing.T) {
 	store := Store{Directory: t.TempDir()}
 	job := Job{
-		Name: "fixture", Repository: "owner/repo", Branch: "automation/fixture", AllowedPaths: []string{"file"},
-		Image: "sandbox", Network: "agentjobs", PiCommand: []string{"pi"}, Prompt: "prompt", TimeoutSeconds: 5,
+		Name: "fixture", Repository: "owner/repo", Branch: "automation/fixture", Image: "sandbox", Network: "agentjobs", PiCommand: []string{"pi"}, Prompt: "prompt", TimeoutSeconds: 5,
 		MemoryMB: 128, CPUs: 1, PIDs: 10, WorkspaceMB: 64, OutputMB: 1,
 	}
 	ctx, cancel := context.WithCancel(context.Background())
