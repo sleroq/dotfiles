@@ -9,6 +9,7 @@ let
   ];
 in
 {
+  "secrets/garageEnv".publicKeys = publicKeys;
   "secrets/githubRunnerCumbanToken".publicKeys = publicKeys;
   "secrets/kopokaEnv".publicKeys = publicKeys;
   "secrets/navidromeEnv".publicKeys = publicKeys;

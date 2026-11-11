@@ -9,6 +9,7 @@
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
+    ./garage.nix
     ./github-runner.nix
     ./kopoka.nix
     ./paseo-monitor.nix
