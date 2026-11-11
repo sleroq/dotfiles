@@ -162,7 +162,9 @@ let
     Group = "job-viewer";
     UMask = "0027";
     LoadCredential = lib.mapAttrsToList (key: value: "${key}:${value}") (credentials job);
-    ExecStart = "${pkgs.util-linux}/bin/flock /run/lock/agent-job-${name}.lock ${cfg.package}/bin/agent-jobs ${command} -config ${jobConfig name job} -state ${cfg.stateDirectory} -metrics ${metrics}";
+    ExecStart = "${pkgs.util-linux}/bin/flock /run/lock/agent-job-${name}.lock ${cfg.package}/bin/agent-jobs ${command} ${
+      lib.optionalString (command == "run" && cfg.pi != null) "-pi ${cfg.pi}/bin/pi"
+    } -config ${jobConfig name job} -state ${cfg.stateDirectory} -metrics ${metrics}";
     TimeoutStartSec = 2 * job.timeoutSeconds + 600;
     KillMode = "control-group";
     MemoryMax = "${toString job.memoryMB}M";
@@ -189,6 +191,10 @@ in
     package = mkOption {
       type = types.package;
       default = pkgs.callPackage ../packages/agent-jobs { };
+    };
+    pi = mkOption {
+      type = types.nullOr types.package;
+      default = null;
     };
     gvisorPackage = mkOption {
       type = types.package;

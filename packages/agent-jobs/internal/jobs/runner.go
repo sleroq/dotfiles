@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
@@ -86,7 +87,10 @@ func extractOutput(destination string, archive io.Reader, limit int64) error {
 }
 
 // RunJob runs the untrusted workload before considering publication.
-func RunJob(ctx context.Context, job Job, store Store) (resultErr error) {
+func RunJob(ctx context.Context, job Job, store Store, pi string) (resultErr error) {
+	if pi != "" && !filepath.IsAbs(pi) {
+		return errors.New("pi executable must be an absolute path")
+	}
 	if err := job.Check(); err != nil {
 		return err
 	}
@@ -111,7 +115,15 @@ func RunJob(ctx context.Context, job Job, store Store) (resultErr error) {
 	ctx, cancel := context.WithTimeout(ctx, job.Timeout())
 	defer cancel()
 	execution := jobRun{job: job, store: store, run: &run, directory: filepath.Join(store.Directory, run.Job, run.ID)}
-	return execution.execute(ctx)
+	resultErr = execution.execute(ctx)
+	if pi != "" {
+		exportCtx, cancelExport := context.WithTimeout(context.Background(), 60*time.Second)
+		defer cancelExport()
+		if err := store.exportSessions(exportCtx, run, pi); err != nil {
+			slog.Warn("export sessions", "job", run.Job, "run", run.ID, "error", err)
+		}
+	}
+	return resultErr
 }
 
 type jobRun struct {

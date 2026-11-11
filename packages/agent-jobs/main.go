@@ -37,6 +37,7 @@ func execute(ctx context.Context, args []string) error {
 	case "run", "publish":
 		config := command.String("config", "", "Administrator-owned job JSON")
 		metrics := command.String("metrics", "", "Prometheus textfile destination")
+		pi := command.String("pi", "", "Trusted absolute Pi executable path")
 		var runID *string
 		if args[0] == "publish" {
 			runID = command.String("run", "", "Failed publication run ID")
@@ -53,7 +54,7 @@ func execute(ctx context.Context, args []string) error {
 		if runID != nil {
 			runErr = jobs.RetryPublication(ctx, job, store, *runID)
 		} else {
-			runErr = jobs.RunJob(ctx, job, store)
+			runErr = jobs.RunJob(ctx, job, store, *pi)
 		}
 		if *metrics != "" {
 			runErr = errors.Join(runErr, jobs.WriteMetrics(store, *metrics))
