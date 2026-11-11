@@ -1,0 +1,241 @@
+package jobs
+
+import (
+	"context"
+	"crypto"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/sha256"
+	"crypto/x509"
+	"encoding/base64"
+	"encoding/json"
+	"encoding/pem"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+func TestInstallationTokenScopedAndSigned(t *testing.T) {
+
+	key, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		t.Fatal(err)
+	}
+	file := filepath.Join(t.TempDir(), "key.pem")
+	keyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
+	if err := os.WriteFile(file, keyPEM, 0600); err != nil {
+		t.Fatal(err)
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" || r.URL.Path != "/app/installations/42/access_tokens" {
+			t.Errorf("request %s %s", r.Method, r.URL.Path)
+		}
+		token := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
+		parts := strings.Split(token, ".")
+		if len(parts) != 3 {
+			t.Errorf("invalid JWT")
+			return
+		}
+		signature, err := base64.RawURLEncoding.DecodeString(parts[2])
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		hash := sha256.Sum256([]byte(parts[0] + "." + parts[1]))
+		if err := rsa.VerifyPKCS1v15(&key.PublicKey, crypto.SHA256, hash[:], signature); err != nil {
+			t.Error(err)
+		}
+
+		payload, err := base64.RawURLEncoding.DecodeString(parts[1])
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		var claims struct {
+			Iss string `json:"iss"`
+			Iat int64  `json:"iat"`
+			Exp int64  `json:"exp"`
+		}
+		if err := json.Unmarshal(payload, &claims); err != nil || claims.Iss != "123" || claims.Exp-claims.Iat > 600 {
+			t.Errorf("claims %s: %v", payload, err)
+		}
+
+		var body struct {
+			Repositories []string          `json:"repositories"`
+			Permissions  map[string]string `json:"permissions"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Error(err)
+		}
+		if len(body.Repositories) != 1 || body.Repositories[0] != "repo" || len(body.Permissions) != 2 || body.Permissions["contents"] != "write" || body.Permissions["pull_requests"] != "write" {
+			t.Errorf("scope: %+v", body)
+		}
+		_, _ = w.Write([]byte(`{"token":"installation-secret"}`))
+	}))
+	defer server.Close()
+
+	client := githubClient{baseURL: server.URL, client: server.Client()}
+	job := Job{Repository: "owner/repo", Publish: Publication{AppID: "123", InstallationID: "42", PrivateKeyFile: file}}
+	token, err := client.installationToken(context.Background(), job)
+	if err != nil || token != "installation-secret" {
+		t.Fatalf("token %q: %v", token, err)
+	}
+}
+
+func TestPublishUsesStableBranchAndRevokesToken(t *testing.T) {
+	g, source := gitTestRepo(t)
+	ctx := context.Background()
+	if err := os.WriteFile(filepath.Join(source, "allowed.txt"), []byte("old\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	for _, args := range [][]string{{"add", "allowed.txt"}, {"-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "-qm", "initial"}} {
+		if _, err := g.run(ctx, source, args...); err != nil {
+			t.Fatal(err)
+		}
+	}
+	base, err := g.run(ctx, source, "rev-parse", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	bare := filepath.Join(t.TempDir(), "remote.git")
+	if _, err := g.run(ctx, "", "clone", "--bare", source, bare); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(source, "allowed.txt"), []byte("new\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := g.run(ctx, source, "add", "allowed.txt"); err != nil {
+		t.Fatal(err)
+	}
+
+	patch, err := g.command(ctx, source, "diff", "--cached", "--binary").Output()
+	if err != nil {
+		t.Fatal(err)
+	}
+	patchFile := filepath.Join(t.TempDir(), "candidate.patch")
+	if err := os.WriteFile(patchFile, patch, 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	key, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		t.Fatal(err)
+	}
+	keyFile := filepath.Join(t.TempDir(), "key")
+	keyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
+	if err := os.WriteFile(keyFile, keyPEM, 0600); err != nil {
+		t.Fatal(err)
+	}
+
+	created, revoked, reviews := 0, 0, 0
+	body := "Update the fixture content to **new**."
+
+	server := httptest.NewServer(publicationHandler(t, &created, &revoked, &reviews, &body))
+	defer server.Close()
+
+	api := githubClient{baseURL: server.URL, client: server.Client()}
+	job := Job{
+		Name: "test", Repository: "owner/repo", CloneURL: bare, Branch: "automation/test",
+		AllowedPaths: []string{"allowed.txt"},
+		Publish:      Publication{AppID: "123", InstallationID: "42", PrivateKeyFile: keyFile, Title: "Update", Reviewer: "reviewer"},
+	}
+	work := t.TempDir()
+	branch, err := g.run(ctx, source, "symbolic-ref", "--short", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	pr, publication, err := g.publish(ctx, job, work, base, branch, patchFile, body, api)
+	if err != nil || publication != "published" || pr != "https://example.test/pr/7" {
+		t.Fatalf("publish %q %q: %v", pr, publication, err)
+	}
+
+	first, err := g.run(ctx, bare, "rev-parse", "refs/heads/automation/test")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	body = "Keep the fixture content current without another commit."
+	pr, publication, err = g.publish(ctx, job, work, base, "", patchFile, body, api)
+	if err != nil || publication != "unchanged" || pr == "" {
+		t.Fatalf("republish %q %q: %v", pr, publication, err)
+	}
+
+	second, err := g.run(ctx, bare, "rev-parse", "refs/heads/automation/test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first != second || created != 1 || revoked != 2 || reviews != 2 {
+		t.Fatalf("first=%s second=%s created=%d revoked=%d reviews=%d", first, second, created, revoked, reviews)
+	}
+}
+
+func TestPullRequestDoesNotRequestReviewFromAuthor(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pr := `{"number":27,"html_url":"https://example.test/pr/27","user":{"login":"owner"}}`
+		switch {
+		case r.Method == "GET" && r.URL.Path == "/repos/owner/repo/pulls":
+			_, _ = w.Write([]byte("[" + pr + "]"))
+		case r.Method == "PATCH" && r.URL.Path == "/repos/owner/repo/pulls/27":
+			_, _ = w.Write([]byte(pr))
+		default:
+			t.Errorf("unexpected request %s %s", r.Method, r.URL.Path)
+			w.WriteHeader(http.StatusUnprocessableEntity)
+		}
+	}))
+	defer server.Close()
+
+	api := githubClient{baseURL: server.URL, client: server.Client()}
+	job := Job{Repository: "owner/repo", Branch: "automation/test", Publish: Publication{Reviewer: "Owner"}}
+	pr, err := api.pullRequest(context.Background(), job, "secret", "main", "Update the fixture.")
+	if err != nil || pr != "https://example.test/pr/27" {
+		t.Fatalf("pull request %q: %v", pr, err)
+	}
+}
+
+func publicationHandler(t *testing.T, created, revoked, reviews *int, expectedBody *string) http.Handler {
+	t.Helper()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if (r.Method == "POST" && r.URL.Path == "/repos/owner/repo/pulls") || (r.Method == "PATCH" && r.URL.Path == "/repos/owner/repo/pulls/7") {
+			var body struct {
+				Description string `json:"body"`
+			}
+			if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Description != *expectedBody {
+				t.Errorf("PR body %q, want %q: %v", body.Description, *expectedBody, err)
+			}
+		}
+
+		switch {
+		case r.URL.Path == "/app/installations/42/access_tokens":
+			_, _ = w.Write([]byte(`{"token":"secret"}`))
+		case r.URL.Path == "/installation/token" && r.Method == "DELETE":
+			(*revoked)++
+			w.WriteHeader(204)
+		case r.URL.Path == "/repos/owner/repo/pulls" && r.Method == "GET":
+			if r.URL.Query().Get("head") != "owner:automation/test" || r.URL.Query().Get("state") != "open" {
+				t.Errorf("PR query %s", r.URL.RawQuery)
+			}
+			if *created == 0 {
+				_, _ = w.Write([]byte(`[]`))
+			} else {
+				_, _ = w.Write([]byte(`[{"number":7,"html_url":"https://example.test/pr/7"}]`))
+			}
+		case r.URL.Path == "/repos/owner/repo/pulls" && r.Method == "POST":
+			(*created)++
+			_, _ = w.Write([]byte(`{"number":7,"html_url":"https://example.test/pr/7"}`))
+		case r.URL.Path == "/repos/owner/repo/pulls/7" && r.Method == "PATCH":
+			_, _ = w.Write([]byte(`{"number":7,"html_url":"https://example.test/pr/7"}`))
+		case r.URL.Path == "/repos/owner/repo/pulls/7/requested_reviewers":
+			(*reviews)++
+			w.WriteHeader(201)
+		default:
+			t.Errorf("unexpected request %s %s", r.Method, r.URL)
+			w.WriteHeader(404)
+		}
+	})
+}

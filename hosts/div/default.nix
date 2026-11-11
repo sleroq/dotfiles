@@ -8,10 +8,10 @@
 {
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
+    ./agent-jobs.nix
     ./disk-config.nix
     ./github-runner.nix
     ./kopoka.nix
-    ./paseo-monitor.nix
     ./remnanode.nix
     ./restic.nix
     ./starflake.nix
@@ -90,7 +90,6 @@
 
   services.paseo = {
     enable = true;
-    schedules = import ./paseo-schedules.nix;
     relay.enable = true;
     authorizedKeys = config.users.users.root.openssh.authorizedKeys.keys;
   };
@@ -150,7 +149,7 @@
     containers.registries.insecure = [ "div.capybara-menkent.ts.net:5000" ];
     podman = {
       enable = true;
-      dockerCompat = true;
+      dockerCompat = false;
       defaultNetwork.settings.dns_enabled = true;
       autoPrune.enable = true;
     };

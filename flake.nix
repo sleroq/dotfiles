@@ -135,8 +135,31 @@
       ];
 
       perSystem =
-        { pkgs, ... }:
+        { pkgs, system, ... }:
         {
+          packages = {
+            agent-jobs = pkgs.callPackage ./packages/agent-jobs { };
+          }
+          // nixpkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
+            agent-sandbox = pkgs.callPackage ./packages/agent-sandbox.nix {
+              agent-jobs = self.packages.${system}.agent-jobs;
+              pi = inputs.pi.packages.${system}.default;
+              fumo-pi = pkgs.callPackage ./packages/fumo-pi.nix {
+                pi = inputs.pi.packages.${system}.default;
+                source = inputs.fumo-gateway;
+              };
+            };
+          };
+          checks = nixpkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
+            agent-jobs =
+              let
+                workerPkgs = import inputs.nixpkgs-div { inherit system; };
+              in
+              import ./tests/agent-jobs.nix {
+                pkgs = workerPkgs;
+                agent-jobs = workerPkgs.callPackage ./packages/agent-jobs { };
+              };
+          };
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
               age
