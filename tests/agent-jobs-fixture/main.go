@@ -25,7 +25,15 @@ func run(args []string) error {
 	}
 	mode := args[0]
 	if mode == "serve" {
-		server := http.Server{Addr: ":18080", ReadHeaderTimeout: time.Second, Handler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		server := http.Server{Addr: ":18080", ReadHeaderTimeout: time.Second, Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/v1/check" {
+				if r.Header.Get("Authorization") != "Bearer fixture-real-key" {
+					http.Error(w, "wrong credential", http.StatusUnauthorized)
+					return
+				}
+				_, _ = fmt.Fprintln(w, "proxy authenticated")
+				return
+			}
 			_, _ = fmt.Fprintln(w, "fixture reachable")
 		})}
 		return server.ListenAndServe()
@@ -146,7 +154,32 @@ func inspectNixStore() error {
 	return nil
 }
 
+func checkProxy() error {
+	if os.Getenv("FUMO_PI_KEY") != "non-secret-proxy-placeholder" || os.Getenv("FUMO_BASE_URL") != "http://172.30.0.1:8789/v1" {
+		return errors.New("unexpected sandbox fumo configuration")
+	}
+	req, err := http.NewRequest(http.MethodGet, os.Getenv("FUMO_BASE_URL")+"/check", nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Authorization", "Bearer "+os.Getenv("FUMO_PI_KEY"))
+	client := &http.Client{Timeout: 3 * time.Second}
+	response, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = response.Body.Close() }()
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("proxy returned %s", response.Status)
+	}
+
+	return nil
+}
+
 func checkIsolation() error {
+	if err := checkProxy(); err != nil {
+		return err
+	}
 	for _, name := range []string{"/var/run/docker.sock", "/run/credentials", "/var/lib/agent-jobs", "/var/lib/agent-jobs-work", "/run/host-canary", "/input/files/forbidden", "/dev/kvm"} {
 		if _, err := os.Stat(name); err == nil {
 			return fmt.Errorf("unexpected host path: %s", name)

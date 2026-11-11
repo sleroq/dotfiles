@@ -65,6 +65,13 @@ func execute(ctx context.Context, args []string) error {
 			return err
 		}
 		return serve(ctx, jobs.Store{Directory: *state}, *listen)
+	case "proxy":
+		upstream := command.String("upstream", "", "Fixed upstream origin")
+		keyFile := command.String("key-file", "", "Credential file")
+		if err := command.Parse(args[1:]); err != nil {
+			return err
+		}
+		return serveProxy(ctx, "172.30.0.1:8789", *upstream, *keyFile)
 	case "prune":
 		days := command.Int("days", 30, "Days of completed runs to retain")
 		if err := command.Parse(args[1:]); err != nil {

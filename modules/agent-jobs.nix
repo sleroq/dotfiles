@@ -202,6 +202,16 @@ in
       type = types.ints.positive;
       default = 30;
     };
+    proxy = {
+      keyFile = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+      };
+      upstream = mkOption {
+        type = types.str;
+        default = "https://fumo.cum.army";
+      };
+    };
     viewer = {
       port = mkOption {
         type = types.port;
@@ -304,11 +314,13 @@ in
           requires = [
             "agent-jobs-network.service"
             (nixStoreUnit name)
-          ];
+          ]
+          ++ lib.optional (cfg.proxy.keyFile != null) "agent-jobs-proxy.service";
           after = [
             "agent-jobs-network.service"
             (nixStoreUnit name)
-          ];
+          ]
+          ++ lib.optional (cfg.proxy.keyFile != null) "agent-jobs-proxy.service";
           path = [
             pkgs.docker
             pkgs.git
@@ -326,6 +338,27 @@ in
           };
         }
       ) enabled
+      // lib.optionalAttrs (cfg.proxy.keyFile != null) {
+        agent-jobs-proxy = {
+          description = "Agent jobs fixed upstream proxy";
+          wantedBy = [ "multi-user.target" ];
+          requires = [ "agent-jobs-network.service" ];
+          after = [
+            "agent-jobs-network.service"
+            "network-online.target"
+          ];
+          wants = [ "network-online.target" ];
+          serviceConfig = {
+            DynamicUser = true;
+            LoadCredential = "fumo-key:${cfg.proxy.keyFile}";
+            ExecStart = "${cfg.package}/bin/agent-jobs proxy -upstream ${lib.escapeShellArg cfg.proxy.upstream} -key-file /run/credentials/agent-jobs-proxy.service/fumo-key";
+            NoNewPrivileges = true;
+            ProtectSystem = "strict";
+            ProtectHome = true;
+            PrivateTmp = true;
+          };
+        };
+      }
       // {
         agent-jobs-enablement = {
           description = "Track agent job timer enablement";
@@ -381,10 +414,14 @@ in
             RemainAfterExit = true;
           };
           script = ''
-            docker network inspect agentjobs >/dev/null 2>&1 || docker network create --driver bridge --subnet 172.30.0.0/24 --opt com.docker.network.bridge.name=agentjobs0 --opt com.docker.network.bridge.enable_icc=false agentjobs
+            docker network inspect agentjobs >/dev/null 2>&1 || docker network create --driver bridge --subnet 172.30.0.0/24 --gateway 172.30.0.1 --opt com.docker.network.bridge.name=agentjobs0 --opt com.docker.network.bridge.enable_icc=false agentjobs
             iptables -N AGENT-JOBS 2>/dev/null || iptables -F AGENT-JOBS
             iptables -C DOCKER-USER -i agentjobs0 -j AGENT-JOBS 2>/dev/null || iptables -I DOCKER-USER 1 -i agentjobs0 -j AGENT-JOBS
             iptables -C INPUT -i agentjobs0 -j DROP 2>/dev/null || iptables -I INPUT 1 -i agentjobs0 -j DROP
+            ${lib.optionalString (cfg.proxy.keyFile != null) ''
+              iptables -C INPUT -d 172.30.0.1 -p tcp --dport 8789 -j DROP 2>/dev/null || iptables -I INPUT 1 -d 172.30.0.1 -p tcp --dport 8789 -j DROP
+              iptables -C INPUT -i agentjobs0 -d 172.30.0.1 -p tcp --dport 8789 -j ACCEPT 2>/dev/null || iptables -I INPUT 1 -i agentjobs0 -d 172.30.0.1 -p tcp --dport 8789 -j ACCEPT
+            ''}
             ip6tables -C INPUT -i agentjobs0 -j DROP 2>/dev/null || ip6tables -I INPUT 1 -i agentjobs0 -j DROP
             ip6tables -C FORWARD -i agentjobs0 -j DROP 2>/dev/null || ip6tables -I FORWARD 1 -i agentjobs0 -j DROP
             iptables -A AGENT-JOBS -m conntrack --ctstate ESTABLISHED,RELATED -j RETURN

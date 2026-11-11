@@ -63,8 +63,10 @@ in
   services.agent-jobs = {
     enable = true;
     viewer.port = 8788;
+    proxy.keyFile = config.age.secrets.agentJobsFumoKey.path;
     image = pkgs.callPackage ../../packages/agent-sandbox.nix {
       agent-jobs = config.services.agent-jobs.package;
+      fumoProxy = true;
       substituters = config.nix.settings.substituters ++ (config.nix.settings.extra-substituters or [ ]);
       trustedPublicKeys =
         config.nix.settings.trusted-public-keys ++ (config.nix.settings.extra-trusted-public-keys or [ ]);
@@ -82,7 +84,6 @@ in
         repository = "sleroq/dotfiles";
         branch = "automation/${name}";
         reuseOpenPR = true;
-        environmentFiles.FUMO_PI_KEY = config.age.secrets.agentJobsFumoKey.path;
         piCommand = [ "agent-pi" ];
         model = "fumo/codex/gpt-6.1-terra";
         thinking = "high";
