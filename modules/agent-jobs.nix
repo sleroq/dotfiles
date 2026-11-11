@@ -157,6 +157,7 @@ let
       };
     };
   metrics = "/var/lib/prometheus-node-exporter-text-files/agent-jobs.prom";
+  enabledTimers = lib.filterAttrs (name: _: config.systemd.timers."agent-job-${name}".enable) enabled;
   blocked = [
     "0.0.0.0/8"
     "10.0.0.0/8"
@@ -326,6 +327,43 @@ in
         }
       ) enabled
       // {
+        agent-jobs-enablement = {
+          description = "Track agent job timer enablement";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "systemd-tmpfiles-setup.service" ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          script = ''
+            state=${lib.escapeShellArg "${cfg.stateDirectory}/enabled-since"}
+            mkdir -p "$state"
+            for file in "$state"/*; do
+              [ -e "$file" ] || continue
+              case "''${file##*/}" in
+                ${
+                  lib.concatStringsSep "|" (map lib.escapeShellArg (builtins.attrNames enabledTimers) ++ [ "\"\"" ])
+                }) ;;
+                *) rm -- "$file" ;;
+              esac
+            done
+            ${lib.concatStrings (
+              lib.mapAttrsToList (name: _: ''
+                if [ ! -e "$state"/${lib.escapeShellArg name} ]; then
+                  date +%s > "$state"/${lib.escapeShellArg name}
+                fi
+              '') enabledTimers
+            )}
+            output=$(mktemp /var/lib/prometheus-node-exporter-text-files/.agent-jobs-enablement.XXXXXX)
+            ${lib.concatStrings (
+              lib.mapAttrsToList (name: _: ''
+                printf 'agent_job_enabled_since_timestamp_seconds{agent_job="%s"} %s\n' ${lib.escapeShellArg name} "$(cat "$state"/${lib.escapeShellArg name})" >> "$output"
+              '') enabledTimers
+            )}
+            chmod 644 "$output"
+            mv -f "$output" /var/lib/prometheus-node-exporter-text-files/agent-jobs-enablement.prom
+          '';
+        };
         agent-jobs-network = {
           description = "Agent sandbox bridge and egress policy";
           requires = [ "docker.service" ];

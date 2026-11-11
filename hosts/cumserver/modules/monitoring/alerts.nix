@@ -269,7 +269,7 @@ in
                 {
                   uid = "agent-job-overdue";
                   title = "Sandboxed agent job overdue";
-                  expr = "((time() - agent_job_last_finished_timestamp_seconds) > on(instance,agent_job) agent_job_max_interval_seconds) and on(instance,agent_job) (agent_job_schedule_enabled == 1)";
+                  expr = "((time() - max by(instance,agent_job) ({__name__=~\"agent_job_last_finished_timestamp_seconds|agent_job_enabled_since_timestamp_seconds\"})) > on(instance,agent_job) agent_job_max_interval_seconds) and on(instance,agent_job) (agent_job_schedule_enabled == 1)";
                   threshold = 0;
                   duration = "5m";
                   summary = "{{ $labels.agent_job }}: agent job overdue";

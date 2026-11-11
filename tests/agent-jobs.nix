@@ -67,6 +67,10 @@ pkgs.testers.runNixOSTest {
       };
       systemd.services.fixture-listener = listener;
       systemd.timers.agent-job-security.enable = false;
+      specialisation.changed-timers.configuration = {
+        systemd.timers.agent-job-success.enable = pkgs.lib.mkForce false;
+        systemd.timers.agent-job-security.enable = pkgs.lib.mkForce true;
+      };
       virtualisation.podman = {
         enable = true;
         dockerCompat = false;
@@ -105,6 +109,24 @@ pkgs.testers.runNixOSTest {
   };
   testScript = ''
     start_all()
+    machine.wait_for_unit("agent-jobs-enablement.service")
+    machine.succeed("test ! -e /var/lib/agent-jobs/enabled-since/security")
+    machine.succeed("test -s /var/lib/agent-jobs/enabled-since/success")
+    machine.succeed("echo 123 > /var/lib/agent-jobs/enabled-since/success")
+    machine.reboot()
+    machine.wait_for_unit("agent-jobs-enablement.service")
+    machine.succeed("test \"$(cat /var/lib/agent-jobs/enabled-since/success)\" = 123")
+    machine.succeed("systemctl restart agent-jobs-enablement.service")
+    machine.succeed("test \"$(cat /var/lib/agent-jobs/enabled-since/success)\" = 123")
+    system = machine.succeed("readlink -f /run/current-system").strip()
+    machine.succeed(f"{system}/specialisation/changed-timers/bin/switch-to-configuration test")
+    machine.wait_for_unit("agent-jobs-enablement.service")
+    machine.succeed("test ! -e /var/lib/agent-jobs/enabled-since/success && test -s /var/lib/agent-jobs/enabled-since/security")
+    machine.succeed(f"{system}/bin/switch-to-configuration test")
+    machine.wait_for_unit("agent-jobs-enablement.service")
+    machine.succeed("test ! -e /var/lib/agent-jobs/enabled-since/security && test \"$(cat /var/lib/agent-jobs/enabled-since/success)\" -gt 123")
+    machine.succeed('grep -F \'agent_job_enabled_since_timestamp_seconds{agent_job="success"}\' /var/lib/prometheus-node-exporter-text-files/agent-jobs-enablement.prom')
+    machine.fail('grep -F \'agent_job_enabled_since_timestamp_seconds{agent_job="security"}\' /var/lib/prometheus-node-exporter-text-files/agent-jobs-enablement.prom')
     machine.wait_for_unit("docker.service")
     runtime = machine.succeed("curl -fsS --unix-socket /var/run/docker.sock http://localhost/info | jq -r '.Runtimes.runsc.path'").strip()
     assert runtime == "${gvisor}/bin/runsc", f"Unexpected configured runtime: {runtime}"
