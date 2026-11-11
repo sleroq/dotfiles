@@ -4,8 +4,32 @@ valid:
       const payloadContract = {};
   - |-
       type Result = string;
+  - |-
+      settingSchema.shape[key].parse(value);
+      settingSchema.shape['ai.model'].parse(operation.value);
+  - |-
+      const { shape: contract } = settingSchema;
+  - |-
+      useShape(payloadShape);
+      const result: ShapeResult = payload;
 invalid:
   - |-
       const payloadShape = {};
   - |-
       type ShapeResult = string;
+  - |-
+      function buildShape() {}
+  - |-
+      function parse(shapeValue: string) {}
+  - |-
+      class ShapeParser {}
+  - |-
+      interface Result { payloadShape: string }
+  - |-
+      class Parser { #payloadShape = {}; }
+  - |-
+      class Parser { buildShape() {} }
+  - |-
+      const parser = { payloadShape: {} };
+  - |-
+      type Result<ShapeValue> = ShapeValue;

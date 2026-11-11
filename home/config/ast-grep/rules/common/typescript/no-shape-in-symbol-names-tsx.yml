@@ -3,16 +3,39 @@ language: Tsx
 message: Rename this symbol for its domain role; shape describes structure rather than ownership.
 severity: warning
 rule:
-  any:
-    - all:
+  all:
+    - any:
         - kind: identifier
-        - regex: (?i)shape
-    - all:
         - kind: type_identifier
-        - regex: (?i)shape
-    - all:
         - kind: property_identifier
-        - regex: (?i)shape
-    - all:
         - kind: private_property_identifier
-        - regex: (?i)shape
+    - regex: (?i)shape
+    - any:
+        - inside:
+            field: name
+            any:
+              - kind: variable_declarator
+              - kind: function_declaration
+              - kind: function_expression
+              - kind: generator_function_declaration
+              - kind: generator_function
+              - kind: class_declaration
+              - kind: class
+              - kind: interface_declaration
+              - kind: type_alias_declaration
+              - kind: type_parameter
+              - kind: enum_declaration
+              - kind: enum_assignment
+              - kind: public_field_definition
+              - kind: method_definition
+              - kind: method_signature
+              - kind: abstract_method_signature
+              - kind: property_signature
+        - inside:
+            field: pattern
+            any:
+              - kind: required_parameter
+              - kind: optional_parameter
+        - inside:
+            kind: pair
+            field: key
