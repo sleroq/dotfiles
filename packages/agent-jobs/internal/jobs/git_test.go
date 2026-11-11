@@ -286,9 +286,13 @@ func TestPublishCheckoutRetainsPinnedBase(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	bash, err := exec.LookPath("bash")
+	if err != nil {
+		t.Fatal(err)
+	}
 	wrapperDir := t.TempDir()
 	marker := filepath.Join(wrapperDir, "authenticated")
-	wrapper := fmt.Sprintf(`#!/bin/bash
+	wrapper := fmt.Sprintf(`#!%s
 args=("$@")
 for ((i=0; i<${#args[@]}; i++)); do
   if [[ "${args[i]}" != clone ]]; then continue; fi
@@ -299,7 +303,7 @@ for ((i=0; i<${#args[@]}; i++)); do
   break
 done
 exec %s "${args[@]}"
-`, strconv.Quote(realGit), strconv.Quote(marker), strconv.Quote("file://"+source), strconv.Quote(realGit))
+`, bash, strconv.Quote(realGit), strconv.Quote(marker), strconv.Quote("file://"+source), strconv.Quote(realGit))
 	if err := os.WriteFile(filepath.Join(wrapperDir, "git"), []byte(wrapper), 0755); err != nil {
 		t.Fatal(err)
 	}

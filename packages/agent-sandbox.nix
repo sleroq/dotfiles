@@ -117,7 +117,7 @@ let
     ln -s ${sgConfig} "$out/etc/sgconfig.yml"
     ln -s ${piSettings} "$out/etc/agent-pi/settings.json"
     printf '%s\n' '{"mcpServers":{}}' > "$out/etc/agent-pi/mcp.json"
-    printf '%s\n' 'agent:x:1000:1000:Agent:/home/agent:/bin/bash' > "$out/etc/passwd"
+    printf '%s\n' 'agent:x:1000:1000:Agent:/home/agent:${lib.getExe bashInteractive}' > "$out/etc/passwd"
     printf '%s\n' 'agent:x:1000:' > "$out/etc/group"
   '';
 in

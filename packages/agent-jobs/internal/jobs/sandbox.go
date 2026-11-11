@@ -130,6 +130,10 @@ func (cfg sandboxConfig) prepareGit(ctx context.Context, git hostGit, directory,
 }
 
 func configureSandboxDirenv(ctx context.Context, git hostGit, directory string) error {
+	bash, err := exec.LookPath("bash")
+	if err != nil {
+		return err
+	}
 	tracked, err := git.command(ctx, directory, "ls-files", "-z", "--", ".envrc", "**/.envrc").Output()
 	if err != nil {
 		return fmt.Errorf("list project environment files: %w", err)
@@ -148,13 +152,13 @@ func configureSandboxDirenv(ctx context.Context, git hostGit, directory string) 
 	if err := os.MkdirAll(config, 0750); err != nil {
 		return err
 	}
-	contents := "[global]\nbash_path = \"/bin/bash\"\n[whitelist]\nexact = " + string(paths) + "\n"
+	contents := fmt.Sprintf("[global]\nbash_path = %q\n[whitelist]\nexact = %s\n", bash, paths)
 	return os.WriteFile(filepath.Join(config, "direnv.toml"), []byte(contents), 0640)
 }
 
 func sandboxCommand(ctx context.Context, env []string, args ...string) *exec.Cmd {
 	command := append([]string{"-c", `exec "$@"`, "agent-jobs"}, args...)
-	cmd := exec.CommandContext(ctx, "/bin/bash", command...)
+	cmd := exec.CommandContext(ctx, "bash", command...)
 	cmd.Dir = "/workspace"
 	cmd.Env = env
 	return cmd
