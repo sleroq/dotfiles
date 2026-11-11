@@ -154,6 +154,14 @@ func TestViewerLargeRawFiles(t *testing.T) {
 					head.StatusCode, head.ContentLength, len(body), head.Header.Get("Content-Type"), err)
 			}
 
+			rangeRequest := httptest.NewRequest(http.MethodGet, "/api"+base+tc.path, nil)
+			rangeRequest.Header.Set("Range", "bytes=-3")
+			w := httptest.NewRecorder()
+			h.ServeHTTP(w, rangeRequest)
+			if w.Code != http.StatusPartialContent || w.Body.String() != "end" {
+				t.Fatalf("range: status=%d body=%q", w.Code, w.Body.String())
+			}
+
 			if w := request(h, http.MethodGet, base+tc.path); w.Code != http.StatusRequestEntityTooLarge {
 				t.Fatalf("HTML: status=%d body=%s", w.Code, w.Body.String())
 			}
@@ -228,5 +236,28 @@ func TestUnknownSessionEscaped(t *testing.T) {
 	body := request(h, "GET", path).Body.String()
 	if !strings.Contains(body, "extension_event") || !strings.Contains(body, "payload") || !strings.Contains(body, "incomplete trailing entry") || strings.Contains(body, "<script>alert") {
 		t.Fatal(body)
+	}
+}
+
+func TestViewerSessionPagination(t *testing.T) {
+	s, h, run := fixture(t)
+	filename := filepath.Join(s.Directory, run.Job, run.ID, "output/sessions/2025-01_test.jsonl")
+	data := strings.Repeat("{}\n", 100) + `{"type":"second-page"}` + "\n"
+	if err := os.WriteFile(filename, []byte(data), 0644); err != nil {
+		t.Fatal(err)
+	}
+	path := "/jobs/" + run.Job + "/runs/" + run.ID + "/sessions/2025-01_test.jsonl"
+	first := request(h, "GET", path).Body.String()
+	if !strings.Contains(first, `?offset=100`) || strings.Contains(first, "second-page") {
+		t.Fatal(first)
+	}
+	second := request(h, "GET", path+"?offset=100").Body.String()
+	if !strings.Contains(second, "second-page") || !strings.Contains(second, "First events") || strings.Contains(second, "Next events") {
+		t.Fatal(second)
+	}
+	for _, offset := range []string{"", "-1", "67108865", "oops"} {
+		if w := request(h, "GET", path+"?offset="+offset); w.Code != http.StatusBadRequest {
+			t.Errorf("offset %q: %d", offset, w.Code)
+		}
 	}
 }

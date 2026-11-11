@@ -141,12 +141,37 @@ func (v *viewer) sessionRoute(w http.ResponseWriter, r *http.Request, run Run, p
 		v.serveFile(w, r, run, "output/sessions/"+name, "application/x-ndjson; charset=utf-8")
 		return
 	}
-	data, err := v.store.safeRead(run.Job, run.ID, "output/sessions/"+name)
+	v.sessionHTML(w, r, run, name)
+}
+
+func (v *viewer) sessionHTML(w http.ResponseWriter, r *http.Request, run Run, name string) {
+	offset := 0
+	if r.URL.Query().Has("offset") {
+		var err error
+		offset, err = strconv.Atoi(r.URL.Query().Get("offset"))
+		if err != nil || offset < 0 || offset > 64<<20 {
+			http.Error(w, "invalid offset", http.StatusBadRequest)
+			return
+		}
+	}
+	file, err := v.store.openFile(run.Job, run.ID, "output/sessions/"+name)
 	if err != nil {
 		v.fail(w, err)
 		return
 	}
-	p := page{Title: name, Run: run, Session: name, Events: parseSession(data)}
+	defer func() { _ = file.Close() }()
+	info, err := file.Stat()
+	if err != nil {
+		v.fail(w, err)
+		return
+	}
+	if info.Size() > 64<<20 {
+		v.fail(w, errFileTooLarge)
+		return
+	}
+	parsed := parseSession(file, offset)
+	p := page{Title: name, Run: run, Session: name, Events: parsed.Events,
+		Offset: offset, Next: parsed.Next, HasNext: parsed.HasNext}
 	v.render(w, "session.html", p)
 }
 

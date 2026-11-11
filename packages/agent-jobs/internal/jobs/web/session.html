@@ -26,4 +26,9 @@
 </article>
 {{else}}
 <p class="muted">No events yet.</p>
-{{end}}{{template "foot" .}}{{end}}
+{{end}}
+<p>
+  {{if .Offset}}<a href="?offset=0">First events</a>{{end}}
+  {{if .HasNext}}<a href="?offset={{.Next}}">Next events</a>{{end}}
+</p>
+{{template "foot" .}}{{end}}
