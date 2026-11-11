@@ -60,7 +60,7 @@ func TestStoreConfinesArtifactsAndRetainsRuns(t *testing.T) {
 func TestJobRejectsUnsafePublicationScope(t *testing.T) {
 	job := Job{
 		Name: "helium", Repository: "sleroq/dotfiles", Branch: "automation/helium",
-		AllowedPaths: []string{"packages/helium.nix"}, Prompt: "Update Helium", Image: "agent:pin",
+		Prompt: "Update Helium", Image: "agent:pin",
 		Network: "agent-jobs", PiCommand: []string{"/bin/pi"}, TimeoutSeconds: 60,
 		MemoryMB: 1024, CPUs: 1, PIDs: 64, WorkspaceMB: 512, OutputMB: 64,
 	}
@@ -71,13 +71,6 @@ func TestJobRejectsUnsafePublicationScope(t *testing.T) {
 		job.Branch = branch
 		if err := job.Check(); err == nil {
 			t.Errorf("accepted branch %q", branch)
-		}
-	}
-	job.Branch = "automation/helium"
-	for _, name := range []string{"../key", "/etc/passwd", ".git/config", ".", "packages/../key"} {
-		job.AllowedPaths = []string{name}
-		if err := job.Check(); err == nil {
-			t.Errorf("accepted allowed path %q", name)
 		}
 	}
 }

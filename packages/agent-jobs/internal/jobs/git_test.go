@@ -34,9 +34,9 @@ func gitTestRepo(t *testing.T) (hostGit, string) {
 
 func TestApplyCandidatePolicyAndHostConfig(t *testing.T) {
 	for _, tc := range []struct {
-		name, changed      string
-		symlink, wantError bool
-	}{{"allowed", "allowed.txt", false, false}, {"forbidden", "other.txt", false, true}, {"symlink", "allowed.txt", true, true}} {
+		name, changed, mode string
+		wantError           bool
+	}{{"arbitrary path", "any/nested/file.txt", "file", false}, {"symlink", "link", "symlink", true}, {"submodule", "module", "submodule", true}} {
 		t.Run(tc.name, func(t *testing.T) {
 			g, repo := gitTestRepo(t)
 			ctx := context.Background()
@@ -56,15 +56,30 @@ func TestApplyCandidatePolicyAndHostConfig(t *testing.T) {
 			}
 
 			source := filepath.Join(repo, tc.changed)
-			if tc.symlink {
+			if err := os.MkdirAll(filepath.Dir(source), 0755); err != nil {
+				t.Fatal(err)
+			}
+			switch tc.mode {
+			case "symlink":
 				if err := os.Symlink("/etc/passwd", source); err != nil {
 					t.Fatal(err)
 				}
-			} else if err := os.WriteFile(source, []byte("hello\n"), 0644); err != nil {
-				t.Fatal(err)
+			case "file":
+				if err := os.WriteFile(source, []byte("hello\n"), 0644); err != nil {
+					t.Fatal(err)
+				}
 			}
 			if _, err := g.run(ctx, repo, "add", "-A"); err != nil {
 				t.Fatal(err)
+			}
+			if tc.mode == "submodule" {
+				head, err := g.run(ctx, repo, "rev-parse", "HEAD")
+				if err != nil {
+					t.Fatal(err)
+				}
+				if _, err := g.run(ctx, repo, "update-index", "--add", "--cacheinfo", "160000,"+head+","+tc.changed); err != nil {
+					t.Fatal(err)
+				}
 			}
 
 			patch, err := g.command(ctx, repo, "diff", "--cached", "--binary").Output()
@@ -79,9 +94,15 @@ func TestApplyCandidatePolicyAndHostConfig(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			_, err = g.applyCandidate(ctx, repo, patchFile, []string{"allowed.txt"})
+			_, err = g.applyCandidate(ctx, repo, patchFile)
 			if (err != nil) != tc.wantError {
 				t.Fatalf("got error %v", err)
+			}
+			if tc.wantError {
+				staged, inspectErr := g.run(ctx, repo, "diff", "--cached", "--name-only")
+				if inspectErr != nil || staged != tc.changed {
+					t.Fatalf("candidate was not applied before rejection: %q, %v", staged, inspectErr)
+				}
 			}
 			_, err = g.run(ctx, repo, "-c", "user.name=Test", "-c", "user.email=test@example.invalid",
 				"commit", "--allow-empty", "-qm", "test")
@@ -256,7 +277,7 @@ func TestPublishCheckoutRetainsPinnedBase(t *testing.T) {
 	defer server.Close()
 	job := Job{
 		Name: "test", Repository: "owner/repo", CloneURL: "file://" + source, Branch: "automation/test",
-		AllowedPaths: []string{"file"}, Publish: Publication{AppID: "123", InstallationID: "42", PrivateKeyFile: keyFile},
+		Publish: Publication{AppID: "123", InstallationID: "42", PrivateKeyFile: keyFile},
 	}
 	work := t.TempDir()
 	api := githubClient{baseURL: server.URL, client: server.Client()}

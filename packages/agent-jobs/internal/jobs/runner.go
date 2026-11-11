@@ -273,7 +273,7 @@ func (r *jobRun) publish(ctx context.Context) error {
 		}
 	}
 
-	if _, err := r.git.applyCandidate(ctx, r.checkout, patch, r.job.AllowedPaths); err != nil {
+	if _, err := r.git.applyCandidate(ctx, r.checkout, patch); err != nil {
 		return err
 	}
 

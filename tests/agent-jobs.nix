@@ -21,7 +21,6 @@ let
     repository = "fixture/repo";
     cloneURL = "file:///var/lib/fixture-repo";
     branch = "automation/fixture";
-    allowedPaths = [ "allowed.txt" ];
     prompt = "Fixture only; do not contact any model.";
     piCommand = [
       "/bin/agent-jobs-fixture"
@@ -53,7 +52,7 @@ pkgs.testers.runNixOSTest {
         gvisorPackage = gvisor;
         viewer.port = 8788;
         jobs =
-          pkgs.lib.genAttrs [ "success" "failure" "timeout" "security" "bad-path" "symlink" ] makeJob
+          pkgs.lib.genAttrs [ "success" "failure" "timeout" "security" "arbitrary-path" "symlink" ] makeJob
           // {
             nix-build = makeJob "nix-build" // {
               piCommand = [
@@ -173,7 +172,8 @@ pkgs.testers.runNixOSTest {
     machine.succeed("""curl -fsS http://127.0.0.1:9100/metrics | grep -Fx 'agent_job_schedule_enabled{agent_job="success"} 1'""")
     machine.succeed("""curl -fsS http://127.0.0.1:9100/metrics | grep -Fx 'agent_job_schedule_enabled{agent_job="security"} 0'""")
     start_job("security")
-    for name in ["failure", "timeout", "bad-path", "symlink"]:
+    start_job("arbitrary-path")
+    for name in ["failure", "timeout", "symlink"]:
         machine.fail(f"systemctl start agent-job-{name}.service")
         machine.succeed(f"find /var/lib/agent-jobs/{name} -name result.json | grep .")
     timeout_id = machine.succeed("curl -fsS http://127.0.0.1:8788/api/runs?job=timeout | jq -r '.[0].id'").strip()
