@@ -186,6 +186,11 @@ pkgs.testers.runNixOSTest {
     assert runtime == "${gvisor}/bin/runsc", f"Unexpected configured runtime: {runtime}"
     print(machine.succeed(f"{runtime} --version"))
     machine.wait_for_unit("agent-job-viewer.service")
+    machine.succeed("systemctl --version | head -1")
+    machine.succeed("su -s /bin/sh agent-job-viewer -c 'LC_ALL=C TZ=UTC systemctl --system --no-pager --all --timestamp=unix --property=Id,LoadState,ActiveState,UnitFileState,NextElapseUSecRealtime show agent-job-success.timer' | grep -E '^NextElapseUSecRealtime=@[0-9]+$'")
+    machine.succeed("curl -fsS 'http://127.0.0.1:8788/?job=success' | grep -F 'Scheduled'")
+    machine.succeed("curl -fsS 'http://127.0.0.1:8788/?job=security' | grep -F 'Not scheduled or unavailable'")
+    machine.fail("systemctl is-enabled agent-job-security.timer")
     machine.wait_for_unit("fixture-listener.service")
     machine.wait_for_unit("agent-jobs-proxy.service")
     private.wait_for_unit("fixture-listener.service")

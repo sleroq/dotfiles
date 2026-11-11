@@ -35,7 +35,7 @@ func fixture(t *testing.T) (Store, http.Handler, Run) {
 {bad}
 {"type":`
 	put("output/sessions/2025-01_test.jsonl", session)
-	h, err := NewViewer(s)
+	h, err := NewViewer(s, TimerInventory{})
 	if err != nil {
 		t.Fatal(err)
 	}

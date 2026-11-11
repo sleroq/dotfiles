@@ -61,11 +61,17 @@ func execute(ctx context.Context, args []string) error {
 		}
 		return runErr
 	case "serve":
+		inventoryFile := command.String("jobs", "", "Configured job inventory JSON")
+		systemctl := command.String("systemctl", "", "Trusted absolute systemctl path")
 		listen := command.String("listen", "127.0.0.1:8787", "Loopback HTTP listen address")
 		if err := command.Parse(args[1:]); err != nil {
 			return err
 		}
-		return serve(ctx, jobs.Store{Directory: *state}, *listen)
+		inventory, err := jobs.LoadTimerInventory(*inventoryFile, *systemctl)
+		if err != nil {
+			return err
+		}
+		return serve(ctx, jobs.Store{Directory: *state}, *listen, inventory)
 	case "proxy":
 		upstream := command.String("upstream", "", "Fixed upstream origin")
 		keyFile := command.String("key-file", "", "Credential file")
@@ -102,7 +108,7 @@ func execute(ctx context.Context, args []string) error {
 	}
 }
 
-func serve(ctx context.Context, store jobs.Store, address string) error {
+func serve(ctx context.Context, store jobs.Store, address string, inventory jobs.TimerInventory) error {
 	host, _, err := net.SplitHostPort(address)
 	if err != nil {
 		return err
@@ -110,7 +116,7 @@ func serve(ctx context.Context, store jobs.Store, address string) error {
 	if ip := net.ParseIP(host); ip == nil || !ip.IsLoopback() {
 		return errors.New("viewer must bind a loopback IP; use an authenticated HTTPS proxy or SSH tunnel")
 	}
-	handler, err := jobs.NewViewer(store)
+	handler, err := jobs.NewViewer(store, inventory)
 	if err != nil {
 		return err
 	}

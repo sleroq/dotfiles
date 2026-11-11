@@ -18,64 +18,42 @@
 </html>
 {{end}} {{define "index.html"}}{{template "head" .}}
 <div class="heading">
-  <div>
-    <p class="eyebrow">Activity</p>
-    <h1>Runs</h1>
-    <p class="muted">Review recent agent work and its output.</p>
-  </div>
+  <p class="eyebrow">Activity</p>
+  <h1>Run timeline</h1>
+  <p class="muted">Upcoming schedules and recent agent work, in UTC.</p>
 </div>
 <form class="filters" method="get">
-  <label
-    >Job
-    <select name="job">
-      <option value="">All jobs</option>
-      {{range .Jobs}}
-      <option value="{{.}}" {{if eq . $.Job}}selected{{end}}>{{.}}</option>
-      {{end}}
-    </select></label
-  ><label
-    >Status
-    <input
-      name="status"
-      value="{{.Status}}"
-      placeholder="All statuses" /></label
-  ><button>Filter</button>
+  <label>Job <select name="job"><option value="">All jobs</option>
+    {{range .Jobs}}<option value="{{.}}" {{if eq . $.Job}}selected{{end}}>{{.}}</option>{{end}}
+  </select></label>
+  <label>Status <input name="status" value="{{.Status}}" placeholder="All statuses" aria-describedby="status-help" /></label>
+  <button>Filter</button>
 </form>
-<div class="table-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th>Status</th>
-        <th>Started</th>
-        <th>Job</th>
-        <th>Duration</th>
-        <th>Model</th>
-        <th>Pull request</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{range .Runs}}
-      <tr>
-        <td>
-          <a class="status" href="/jobs/{{.Job}}/runs/{{.ID}}">{{.Status}}</a>
-        </td>
-        <td>{{.StartedAt.Format "2006-01-02 15:04:05 UTC"}}</td>
-        <td><a href="/jobs/{{.Job}}/runs/{{.ID}}">{{.Job}}</a></td>
-        <td>{{printf "%.1f s" .DurationSeconds}}</td>
-        <td>{{.Model}}</td>
-        <td>
-          {{if .PRURL}}<a href="{{.PRURL}}" rel="noreferrer">View PR ↗</a
-          >{{else}}—{{end}}
-        </td>
-      </tr>
-      {{else}}
-      <tr>
-        <td colspan="6" class="muted">No runs found.</td>
-      </tr>
-      {{end}}
-    </tbody>
-  </table>
-</div>
+<p id="status-help" class="muted filter-help">Status filters run history only. Upcoming timers follow the job filter.</p>
+<section aria-labelledby="upcoming-heading">
+  <h2 id="upcoming-heading">Upcoming</h2>
+  <p class="muted">Relative times as of <time datetime="{{.AsOf.Format "2006-01-02T15:04:05Z"}}">{{.AsOf.Format "2006-01-02 15:04:05 UTC"}}</time>; refresh for current state.</p>
+  <ol class="timeline">
+    {{range .Upcoming}}<li class="timeline-item">
+      <div><strong>{{.Name}}</strong> <span class="status">Scheduled</span></div>
+      <div><time datetime="{{.Next.Format "2006-01-02T15:04:05Z"}}">{{.Next.Format "2006-01-02 15:04:05 UTC"}}</time> · {{.Relative}}</div>
+      <small>Runtime: {{.Active}} · Unit file: {{.UnitFile}}</small>
+    </li>{{else}}<li class="empty">No upcoming timers for this selection.</li>{{end}}
+  </ol>
+  {{if .OtherTimers}}<h3>Not scheduled or unavailable</h3>
+  <ul class="timer-states">{{range .OtherTimers}}<li><strong>{{.Name}}</strong> — {{if .Available}}Runtime: {{.Active}} · Unit file: {{.UnitFile}} · No active next trigger{{else}}Timer state unavailable{{end}}</li>{{end}}</ul>{{end}}
+</section>
+<div class="now-divider"><span>Now</span></div>
+<section aria-labelledby="history-heading">
+  <h2 id="history-heading">Recent runs</h2>
+  <ol class="timeline">
+    {{range .Runs}}<li class="timeline-item">
+      <div><a class="run-link" href="/jobs/{{.Job}}/runs/{{.ID}}">{{.Job}}</a> <span class="status">{{.Status}}</span></div>
+      <div><time datetime="{{.StartedAt.UTC.Format "2006-01-02T15:04:05Z"}}">{{.StartedAt.UTC.Format "2006-01-02 15:04:05 UTC"}}</time> · {{printf "%.1f s" .DurationSeconds}}</div>
+      <small>{{.Model}}{{if .PRURL}} · <a href="{{.PRURL}}" rel="noreferrer">View pull request ↗</a>{{end}}</small>
+    </li>{{else}}<li class="empty">No runs match these filters.</li>{{end}}
+  </ol>
+</section>
 <nav class="pagination" aria-label="Pagination">
   {{if .Offset}}<a
     href="/?job={{query .Job}}&amp;status={{query .Status}}&amp;limit={{.Limit}}"

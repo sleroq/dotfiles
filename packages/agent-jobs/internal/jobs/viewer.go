@@ -22,28 +22,31 @@ var viewerAssets embed.FS
 type viewer struct {
 	store     Store
 	templates *template.Template
+	timers    TimerInventory
 }
 type page struct {
-	Title               string
-	Runs                []Run
-	Run                 Run
-	Jobs                []string
-	Job, Status         string
-	Limit, Offset, Next int
-	HasNext             bool
-	Sessions, Artifacts []string
-	Session             string
-	Artifact, Content   string
+	Title                 string
+	Upcoming, OtherTimers []timer
+	AsOf                  time.Time
+	Runs                  []Run
+	Run                   Run
+	Jobs                  []string
+	Job, Status           string
+	Limit, Offset, Next   int
+	HasNext               bool
+	Sessions, Artifacts   []string
+	Session               string
+	Artifact, Content     string
 }
 
 var artifactNames = []string{"stdout.log", "stderr.log", "output/candidate.patch", prBodyArtifact, "output/validation.log", "output/result.json"}
 
-func NewViewer(store Store) (http.Handler, error) {
+func NewViewer(store Store, inventory TimerInventory) (http.Handler, error) {
 	t, err := template.New("viewer").Funcs(template.FuncMap{"query": url.QueryEscape}).ParseFS(viewerAssets, "web/*.html")
 	if err != nil {
 		return nil, err
 	}
-	return &viewer{store: store, templates: t}, nil
+	return &viewer{store: store, templates: t, timers: inventory}, nil
 }
 func (v *viewer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	csp := "default-src 'self'; script-src 'none'; object-src 'none'; frame-ancestors 'none'"
@@ -263,7 +266,20 @@ func (v *viewer) list(w http.ResponseWriter, r *http.Request, api bool) {
 		return
 	}
 
-	p := page{Title: "Runs", Runs: selected, Jobs: jobNames(runs), Job: filter.job, Status: filter.status,
+	names := jobNames(runs)
+	for _, name := range v.timers.Names {
+		if !slices.Contains(names, name) {
+			names = append(names, name)
+		}
+	}
+	sort.Strings(names)
+	now := time.Now().UTC()
+	upcoming, other := v.timers.query(r.Context(), now)
+	if filter.job != "" {
+		upcoming = slices.DeleteFunc(upcoming, func(t timer) bool { return t.Name != filter.job })
+		other = slices.DeleteFunc(other, func(t timer) bool { return t.Name != filter.job })
+	}
+	p := page{Title: "Runs", Runs: selected, Jobs: names, Job: filter.job, Status: filter.status, Upcoming: upcoming, OtherTimers: other, AsOf: now,
 		Limit: filter.limit, Offset: filter.offset, Next: filter.offset + filter.limit, HasNext: end < len(filtered)}
 	v.render(w, "index.html", p)
 }
