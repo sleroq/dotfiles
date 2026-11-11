@@ -179,11 +179,62 @@ func (r *jobRun) prepare(ctx context.Context) error {
 		return err
 	}
 	r.defaultBranch = strings.TrimPrefix(branch, "origin/")
+	if r.job.ReuseOpenPR {
+		api := githubClient{baseURL: "https://api.github.com", client: &http.Client{Timeout: 30 * time.Second}}
+		if err := r.prepareOpenPR(ctx, api); err != nil {
+			return err
+		}
+	}
 	return r.store.Save(*r.run)
 }
 
+func (r *jobRun) prepareOpenPR(ctx context.Context, api githubClient) (resultErr error) {
+	token, err := api.installationToken(ctx, r.job)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		cleanup, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		resultErr = errors.Join(resultErr, api.request(cleanup, http.MethodDelete, "/installation/token", token, nil, nil))
+	}()
+
+	pulls, err := api.openPullRequests(ctx, r.job, token, r.defaultBranch)
+	if err != nil {
+		return err
+	}
+	r.run.StartCommit = r.run.BaseCommit
+	if len(pulls) == 0 {
+		return nil
+	}
+	if len(pulls) != 1 || pulls[0].Head.SHA == "" {
+		return errors.New("GitHub returned invalid open pull requests")
+	}
+
+	ref := "refs/remotes/origin/" + r.job.Branch
+	tip, err := r.git.run(ctx, r.checkout, "rev-parse", "--verify", ref+"^{commit}")
+	if err != nil {
+		return err
+	}
+	remoteRef := "refs/heads/" + r.job.Branch
+	remote, err := r.git.run(ctx, r.checkout, "ls-remote", "--heads", "origin", remoteRef)
+	if err != nil {
+		return err
+	}
+	if tip != pulls[0].Head.SHA || remote != tip+"\t"+remoteRef {
+		return errors.New("open pull request does not match remote branch")
+	}
+	if _, err := r.git.run(ctx, r.checkout, "checkout", "--detach", tip, "--"); err != nil {
+		return err
+	}
+
+	r.run.StartCommit, r.run.ExistingPR = tip, true
+	return nil
+}
+
 func (r *jobRun) sandbox(ctx context.Context) error {
-	input, err := stageInput(r.work, r.checkout, r.job)
+	input, err := stageInput(ctx, r.work, r.checkout, r.defaultBranch, r.job, *r.run)
 	if err != nil {
 		return err
 	}
@@ -210,14 +261,23 @@ func (r *jobRun) publish(ctx context.Context) error {
 		r.run.Publication = "no_change"
 		return nil
 	}
+
+	if r.run.ExistingPR {
+		if _, err := r.git.run(ctx, r.checkout, "checkout", "--detach", r.run.BaseCommit, "--"); err != nil {
+			return err
+		}
+	}
+
 	if _, err := r.git.applyCandidate(ctx, r.checkout, patch, r.job.AllowedPaths); err != nil {
 		return err
 	}
+
 	if !r.job.Publish.Enabled {
 		r.run.Status = "success"
 		r.run.Publication = "disabled"
 		return nil
 	}
+
 	r.run.Phase = "publish"
 	if err := r.store.Save(*r.run); err != nil {
 		return err
@@ -227,7 +287,7 @@ func (r *jobRun) publish(ctx context.Context) error {
 		return err
 	}
 	api := githubClient{baseURL: "https://api.github.com", client: &http.Client{Timeout: 30 * time.Second}}
-	pr, publication, err := r.git.publish(ctx, r.job, r.work, r.run.BaseCommit, r.defaultBranch, patch, body, api)
+	pr, publication, err := r.git.publish(ctx, r.job, r.work, r.run.BaseCommit, r.defaultBranch, patch, body, api, *r.run)
 	if err != nil {
 		return err
 	}
@@ -237,7 +297,7 @@ func (r *jobRun) publish(ctx context.Context) error {
 	return nil
 }
 
-func stageInput(work, checkout string, job Job) (string, error) {
+func stageInput(ctx context.Context, work, checkout, defaultBranch string, job Job, run Run) (string, error) {
 	input := filepath.Join(work, "input")
 	for _, name := range []string{"", "repo", "env", "files"} {
 		dir := filepath.Join(input, name)
@@ -249,13 +309,26 @@ func stageInput(work, checkout string, job Job) (string, error) {
 		}
 	}
 
-	if err := copySource(checkout, filepath.Join(input, "repo")); err != nil {
-		return "", err
+	if !job.ReuseOpenPR {
+		if err := copySource(checkout, filepath.Join(input, "repo")); err != nil {
+			return "", err
+		}
 	}
 	cfg := sandboxConfig{
 		Name: job.Name, PiCommand: job.PiCommand,
 		Model: job.Model, Thinking: job.Thinking, OutputMB: job.OutputMB,
 		EnvironmentFiles: map[string]string{},
+	}
+	if job.ReuseOpenPR {
+		cfg.History, cfg.BaseCommit, cfg.StartCommit, cfg.ExistingPR = true, run.BaseCommit, run.StartCommit, run.ExistingPR
+		git := hostGit{home: filepath.Join(work, "home")}
+		bundle := filepath.Join(input, "repository.bundle")
+		if _, err := git.run(ctx, checkout, "bundle", "create", bundle, "--all"); err != nil {
+			return "", err
+		}
+		if err := os.Chmod(bundle, 0444); err != nil {
+			return "", err
+		}
 	}
 	for name, filename := range job.EnvironmentFiles {
 		data, err := os.ReadFile(filename)
@@ -281,7 +354,20 @@ func stageInput(work, checkout string, job Job) (string, error) {
 	if err := stageFile(filepath.Join(input, "resolv.conf"), []byte("nameserver 1.1.1.1\n")); err != nil {
 		return "", err
 	}
-	if err := stageFile(filepath.Join(input, "prompt"), []byte(job.Prompt+"\n\n"+prBodyInstruction)); err != nil {
+	prompt := job.Prompt
+	if job.ReuseOpenPR {
+		baseRef := "refs/remotes/origin/" + defaultBranch
+		if run.ExistingPR {
+			prompt += fmt.Sprintf(`
+
+An open PR exists on branch %s at %s. The supplied default branch is %s at %s. Inspect the existing updates and compare against that default reference for conflicts. If no update is needed and there are no conflicts, make no edits and do not rebase. If there are conflicts or new changes are needed, rebase locally onto %s before editing; if you already have edits, stash them before rebasing and restore them afterward. Resolve conflicts locally. When updating the proposal, including conflict resolution alone, write /output/pr-body.md. Do not make other commits or push.`, job.Branch, run.StartCommit, baseRef, run.BaseCommit, baseRef)
+		} else {
+			prompt += fmt.Sprintf(`
+
+No open PR exists. The checkout is detached at the default branch %s at %s; supplied Git history and refs are available for inspection.`, baseRef, run.BaseCommit)
+		}
+	}
+	if err := stageFile(filepath.Join(input, "prompt"), []byte(prompt+"\n\n"+prBodyInstruction)); err != nil {
 		return "", err
 	}
 	data, err := json.Marshal(cfg)

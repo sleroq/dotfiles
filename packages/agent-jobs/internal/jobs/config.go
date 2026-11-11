@@ -16,6 +16,7 @@ type Job struct {
 	Name             string            `json:"name"`
 	Repository       string            `json:"repository"`
 	CloneURL         string            `json:"clone_url,omitempty"`
+	ReuseOpenPR      bool              `json:"reuse_open_pr,omitempty"`
 	Branch           string            `json:"branch"`
 	AllowedPaths     []string          `json:"allowed_paths"`
 	Prompt           string            `json:"prompt"`
@@ -80,6 +81,9 @@ func (j Job) Check() error {
 		if !Identifier(name) {
 			return fmt.Errorf("invalid credential filename %q", name)
 		}
+	}
+	if j.ReuseOpenPR && !j.Publish.Enabled {
+		return errors.New("reuse_open_pr requires publication")
 	}
 	if j.Publish.Enabled && (j.Publish.AppID == "" || j.Publish.InstallationID == "" || j.Publish.PrivateKeyFile == "") {
 		return errors.New("publication requires app ID, installation ID, and private key file")

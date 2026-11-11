@@ -264,7 +264,7 @@ in
                   threshold = 0.5;
                   duration = "0s";
                   summary = "{{ $labels.agent_job }}: agent job failed";
-                  description = "Inspect the retained run, session, and validation logs in the private agent run viewer.";
+                  description = "Inspect the retained run and session logs in the private agent run viewer.";
                 }
                 {
                   uid = "agent-job-overdue";

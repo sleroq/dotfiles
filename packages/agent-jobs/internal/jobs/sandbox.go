@@ -23,6 +23,10 @@ type sandboxConfig struct {
 	Thinking         string            `json:"thinking"`
 	EnvironmentFiles map[string]string `json:"environment_files"`
 	OutputMB         int               `json:"output_mb"`
+	History          bool              `json:"history"`
+	BaseCommit       string            `json:"base_commit"`
+	StartCommit      string            `json:"start_commit"`
+	ExistingPR       bool              `json:"existing_pr"`
 }
 
 type sandboxResult struct {
@@ -50,11 +54,8 @@ func RunSandbox(ctx context.Context, configPath string) (resultErr error) {
 	if err := setupSandboxHome(); err != nil {
 		return err
 	}
-	if err := copySource("/input/repo", "/workspace"); err != nil {
-		return err
-	}
 	git := hostGit{home: "/home/agent"}
-	if err := prepareSandboxGit(ctx, git); err != nil {
+	if err := cfg.prepareGit(ctx, git, "/workspace", "/input/repo", "/input/repository.bundle"); err != nil {
 		return err
 	}
 	if err := configureSandboxDirenv(ctx, git, "/workspace"); err != nil {
@@ -76,7 +77,7 @@ func RunSandbox(ctx context.Context, configPath string) (resultErr error) {
 		return err
 	}
 	result.Agent = "success"
-	return cfg.writeCandidate(ctx, git)
+	return cfg.writeCandidate(ctx, git, "/workspace", "/output/candidate.patch")
 }
 
 func (cfg sandboxConfig) environment() ([]string, error) {
@@ -99,13 +100,27 @@ func (cfg sandboxConfig) environment() ([]string, error) {
 	return env, nil
 }
 
-func prepareSandboxGit(ctx context.Context, git hostGit) error {
-	commands := [][]string{
-		{"init", "-q"}, {"add", "-A", "--force"},
-		{"-c", "user.name=Agent Jobs", "-c", "user.email=agent-jobs@localhost", "commit", "--allow-empty", "-qm", "base"},
+func (cfg sandboxConfig) prepareGit(ctx context.Context, git hostGit, directory, source, bundle string) error {
+	var commands [][]string
+	if cfg.History {
+		commands = [][]string{
+			{"init", "-q"},
+			{"fetch", "--update-head-ok", "--no-tags", bundle, "+refs/*:refs/*"},
+			{"checkout", "--detach", cfg.StartCommit},
+			{"config", "user.name", "Agent Jobs"},
+			{"config", "user.email", "agent-jobs@localhost"},
+		}
+	} else {
+		if err := copySource(source, directory); err != nil {
+			return err
+		}
+		commands = [][]string{
+			{"init", "-q"}, {"add", "-A", "--force"},
+			{"-c", "user.name=Agent Jobs", "-c", "user.email=agent-jobs@localhost", "commit", "--allow-empty", "-qm", "base"},
+		}
 	}
 	for _, args := range commands {
-		if _, err := git.run(ctx, "/workspace", args...); err != nil {
+		if _, err := git.run(ctx, directory, args...); err != nil {
 			return err
 		}
 	}
@@ -162,16 +177,51 @@ func (cfg sandboxConfig) runAgent(ctx context.Context, env []string) error {
 	return nil
 }
 
-func (cfg sandboxConfig) writeCandidate(ctx context.Context, git hostGit) error {
-	if _, err := git.run(ctx, "/workspace", "add", "-A"); err != nil {
+func (cfg sandboxConfig) writeCandidate(ctx context.Context, git hostGit, directory, patchPath string) error {
+	if cfg.History {
+		if err := checkCandidateCheckout(ctx, git, directory); err != nil {
+			return err
+		}
+	}
+	if _, err := git.run(ctx, directory, "add", "-A"); err != nil {
 		return err
 	}
-	patch, err := os.OpenFile("/output/candidate.patch", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0640)
+	patch, err := os.OpenFile(patchPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0640)
 	if err != nil {
 		return err
 	}
-	diff := git.command(ctx, "/workspace", "diff", "--cached", "--binary", "--full-index",
-		"--no-ext-diff", "--no-textconv")
+	defer func() { _ = patch.Close() }()
+
+	args := []string{"diff", "--cached", "--binary", "--full-index", "--no-ext-diff", "--no-textconv"}
+	if cfg.History {
+		if cfg.ExistingPR {
+			unchanged, err := cfg.unchangedProposal(ctx, git, directory)
+			if err != nil {
+				return err
+			}
+			if unchanged {
+				return patch.Close()
+			}
+		}
+		if _, err := git.run(ctx, directory, "merge-base", "--is-ancestor", cfg.BaseCommit, "HEAD"); err != nil {
+			return fmt.Errorf("base commit is not an ancestor of final HEAD: %w", err)
+		}
+		if cfg.ExistingPR {
+			tree, err := git.run(ctx, directory, "write-tree")
+			if err != nil {
+				return err
+			}
+			baseTree, err := git.run(ctx, directory, "rev-parse", cfg.BaseCommit+"^{tree}")
+			if err != nil {
+				return err
+			}
+			if tree == baseTree {
+				return errors.New("existing PR now has no diff against the default base and needs operator attention")
+			}
+		}
+		args = append(args, cfg.BaseCommit)
+	}
+	diff := git.command(ctx, directory, args...)
 	patchWriter := &boundedWriter{writer: patch, remaining: int64(cfg.OutputMB) * 1024 * 1024}
 	diff.Stdout = patchWriter
 	diff.Stderr = os.Stderr
@@ -181,6 +231,44 @@ func (cfg sandboxConfig) writeCandidate(ctx context.Context, git hostGit) error 
 		return errors.New("candidate patch exceeds output limit")
 	}
 	return errors.Join(err, closeErr)
+}
+
+func checkCandidateCheckout(ctx context.Context, git hostGit, directory string) error {
+	for _, name := range []string{"rebase-merge", "rebase-apply"} {
+		location, err := git.run(ctx, directory, "rev-parse", "--git-path", name)
+		if err != nil {
+			return err
+		}
+		if !filepath.IsAbs(location) {
+			location = filepath.Join(directory, location)
+		}
+		if _, err := os.Stat(location); err == nil {
+			return errors.New("cannot write candidate while a rebase is in progress")
+		} else if !errors.Is(err, os.ErrNotExist) {
+			return err
+		}
+	}
+	unmerged, err := git.run(ctx, directory, "ls-files", "--unmerged")
+	if err != nil {
+		return err
+	}
+	if unmerged != "" {
+		return errors.New("cannot write candidate with unresolved index entries")
+	}
+	return nil
+}
+
+func (cfg sandboxConfig) unchangedProposal(ctx context.Context, git hostGit, directory string) (bool, error) {
+	head, err := git.run(ctx, directory, "rev-parse", "HEAD")
+	if err != nil || head != cfg.StartCommit {
+		return false, err
+	}
+	tree, err := git.run(ctx, directory, "write-tree")
+	if err != nil {
+		return false, err
+	}
+	initial, err := git.run(ctx, directory, "rev-parse", cfg.StartCommit+"^{tree}")
+	return tree == initial, err
 }
 
 type boundedWriter struct {

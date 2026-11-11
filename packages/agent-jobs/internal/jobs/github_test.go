@@ -150,7 +150,7 @@ func TestPublishUsesStableBranchAndRevokesToken(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pr, publication, err := g.publish(ctx, job, work, base, branch, patchFile, body, api)
+	pr, publication, err := g.publish(ctx, job, work, base, branch, patchFile, body, api, Run{})
 	if err != nil || publication != "published" || pr != "https://example.test/pr/7" {
 		t.Fatalf("publish %q %q: %v", pr, publication, err)
 	}
@@ -161,7 +161,7 @@ func TestPublishUsesStableBranchAndRevokesToken(t *testing.T) {
 	}
 
 	body = "Keep the fixture content current without another commit."
-	pr, publication, err = g.publish(ctx, job, work, base, "", patchFile, body, api)
+	pr, publication, err = g.publish(ctx, job, work, base, "", patchFile, body, api, Run{})
 	if err != nil || publication != "unchanged" || pr == "" {
 		t.Fatalf("republish %q %q: %v", pr, publication, err)
 	}
@@ -172,6 +172,28 @@ func TestPublishUsesStableBranchAndRevokesToken(t *testing.T) {
 	}
 	if first != second || created != 1 || revoked != 2 || reviews != 2 {
 		t.Fatalf("first=%s second=%s created=%d revoked=%d reviews=%d", first, second, created, revoked, reviews)
+	}
+	// A retry may accept an already-published tree even when the branch moved.
+	stale := Run{ExistingPR: true, StartCommit: base}
+	_, publication, err = g.publish(ctx, job, work, base, branch, patchFile, body, api, stale)
+	if err != nil || publication != "unchanged" {
+		t.Fatalf("retry identical tree: %q: %v", publication, err)
+	}
+	if err := os.WriteFile(filepath.Join(source, "allowed.txt"), []byte("different\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := g.run(ctx, source, "add", "allowed.txt"); err != nil {
+		t.Fatal(err)
+	}
+	patch, err = g.command(ctx, source, "diff", "--cached", "--binary").Output()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(patchFile, patch, 0644); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := g.publish(ctx, job, work, base, branch, patchFile, body, api, stale); err == nil {
+		t.Fatal("published over a moved branch")
 	}
 }
 

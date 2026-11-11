@@ -158,20 +158,33 @@ func (g githubClient) installationToken(ctx context.Context, job Job) (string, e
 }
 
 type githubPullRequest struct {
-	Number int    `json:"number"`
-	URL    string `json:"html_url"`
-	User   struct {
+	Number int `json:"number"`
+	Head   struct {
+		SHA string `json:"sha"`
+	} `json:"head"`
+	URL  string `json:"html_url"`
+	User struct {
 		Login string `json:"login"`
 	} `json:"user"`
 }
 
-func (g githubClient) pullRequest(ctx context.Context, job Job, token, base, description string) (string, error) {
+func pullRequestEndpoint(job Job) string {
 	parts := strings.Split(job.Repository, "/")
-	endpoint := "/repos/" + url.PathEscape(parts[0]) + "/" + url.PathEscape(parts[1]) + "/pulls"
+	return "/repos/" + url.PathEscape(parts[0]) + "/" + url.PathEscape(parts[1]) + "/pulls"
+}
 
-	query := url.Values{"state": {"open"}, "head": {parts[0] + ":" + job.Branch}, "base": {base}, "per_page": {"100"}}
+func (g githubClient) openPullRequests(ctx context.Context, job Job, token, base string) ([]githubPullRequest, error) {
+	owner, _, _ := strings.Cut(job.Repository, "/")
+	query := url.Values{"state": {"open"}, "head": {owner + ":" + job.Branch}, "base": {base}, "per_page": {"100"}}
 	var pulls []githubPullRequest
-	if err := g.request(ctx, http.MethodGet, endpoint+"?"+query.Encode(), token, nil, &pulls); err != nil {
+	err := g.request(ctx, http.MethodGet, pullRequestEndpoint(job)+"?"+query.Encode(), token, nil, &pulls)
+	return pulls, err
+}
+
+func (g githubClient) pullRequest(ctx context.Context, job Job, token, base, description string) (string, error) {
+	endpoint := pullRequestEndpoint(job)
+	pulls, err := g.openPullRequests(ctx, job, token, base)
+	if err != nil {
 		return "", err
 	}
 
