@@ -56,7 +56,41 @@ func LoadJob(filename string) (Job, error) {
 	if err := decoder.Decode(&job); err != nil {
 		return Job{}, fmt.Errorf("decode job: %w", err)
 	}
+	if err := job.resolveCredentialPaths(); err != nil {
+		return Job{}, err
+	}
 	return job, job.Check()
+}
+
+func (job *Job) resolveCredentialPaths() error {
+	credentialPath := func(path *string) error {
+		const prefix = "$CREDENTIALS_DIRECTORY/"
+		if !strings.HasPrefix(*path, prefix) {
+			return nil
+		}
+		directory := os.Getenv("CREDENTIALS_DIRECTORY")
+		if directory == "" {
+			return errors.New("CREDENTIALS_DIRECTORY is required for credential paths")
+		}
+		*path = directory + "/" + strings.TrimPrefix(*path, prefix)
+		return nil
+	}
+	for name, path := range job.EnvironmentFiles {
+		if err := credentialPath(&path); err != nil {
+			return err
+		}
+		job.EnvironmentFiles[name] = path
+	}
+	for name, path := range job.Files {
+		if err := credentialPath(&path); err != nil {
+			return err
+		}
+		job.Files[name] = path
+	}
+	if err := credentialPath(&job.ReadTokenFile); err != nil {
+		return err
+	}
+	return credentialPath(&job.Publish.PrivateKeyFile)
 }
 
 func (j Job) Check() error {
