@@ -56,10 +56,6 @@ in
 
   age.secrets.agentJobsGithubKey.file = ./secrets/agentJobsGithubKey;
   age.secrets.agentJobsFumoKey.file = ./secrets/agentJobsFumoKey;
-  systemd.timers = lib.mapAttrs' (
-    name: _: lib.nameValuePair "agent-job-${name}" { enable = false; }
-  ) jobs;
-
   services.agent-jobs = {
     enable = true;
     viewer.port = 8788;
