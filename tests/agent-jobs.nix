@@ -67,6 +67,14 @@ pkgs.testers.runNixOSTest {
               ];
             };
             direnv = makeJob "direnv";
+            retry = makeJob "success" // {
+              publish = {
+                enabled = true;
+                appID = "1";
+                installationID = "2";
+                privateKeyFile = toString (pkgs.writeText "fixture-invalid-private-key" "invalid fixture key");
+              };
+            };
           };
       };
       systemd.services.fixture-listener = listener;
@@ -175,6 +183,11 @@ pkgs.testers.runNixOSTest {
     machine.succeed(f"curl -fsS http://127.0.0.1:8788/api/jobs/success/runs/{run_id}/artifacts/output/pr-body.md | grep -Fx 'Update the fixture file.'")
     machine.succeed(f"curl -fsS http://127.0.0.1:8788/api/jobs/success/runs/{run_id}/artifacts/output/result.json | jq -e '.agent == \"success\" and (has(\"validation\") | not)'")
     machine.succeed(f"test ! -e /var/lib/agent-jobs/success/{run_id}/output/validation.log")
+    machine.succeed(f"mkdir -p /var/lib/agent-jobs/retry && cp -a /var/lib/agent-jobs/success/{run_id} /var/lib/agent-jobs/retry/")
+    machine.succeed(f"jq '.job = \"retry\" | .status = \"failed\" | .phase = \"publish\" | .base_commit = \"fixture\" | .expected_branch = \"\"' /var/lib/agent-jobs/retry/{run_id}/result.json > /tmp/retry.json && mv /tmp/retry.json /var/lib/agent-jobs/retry/{run_id}/result.json")
+    machine.fail(f"systemctl start agent-job-publish-retry@{run_id}.service")
+    machine.succeed(f"jq -e '.status == \"failed\" and .error == \"invalid GitHub app private key\"' /var/lib/agent-jobs/retry/{run_id}/result.json")
+    machine.succeed(f"journalctl -u agent-job-publish-retry@{run_id}.service | grep -F 'invalid GitHub app private key'")
     machine.succeed(f"curl -fsS http://127.0.0.1:8788/jobs/success/runs/{run_id}/sessions/fixture.jsonl | grep 'fixture complete'")
     machine.succeed("test -s /var/lib/prometheus-node-exporter-text-files/agent-jobs.prom")
     machine.succeed(f"curl -fsS http://127.0.0.1:8788/api/jobs/success/runs/{run_id} | jq -e '.nix_store_seed_bytes > 0 and .nix_store_seed_bytes <= 2147483648 and .nix_store_setup_duration_seconds > 0'")

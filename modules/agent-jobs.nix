@@ -118,7 +118,7 @@ let
   jobConfig =
     name: job:
     let
-      cred = key: "/run/credentials/agent-job-${name}.service/${key}";
+      cred = key: "$CREDENTIALS_DIRECTORY/${key}";
     in
     json.generate "agent-job-${name}.json" {
       inherit name;
@@ -155,6 +155,15 @@ let
       };
     };
   metrics = "/var/lib/prometheus-node-exporter-text-files/agent-jobs.prom";
+  jobService = name: job: command: {
+    Type = "oneshot";
+    Group = "job-viewer";
+    UMask = "0027";
+    LoadCredential = lib.mapAttrsToList (key: value: "${key}:${value}") (credentials job);
+    ExecStart = "${pkgs.util-linux}/bin/flock /run/lock/agent-job-${name}.lock ${cfg.package}/bin/agent-jobs ${command} -config ${jobConfig name job} -state ${cfg.stateDirectory} -metrics ${metrics}";
+    TimeoutStartSec = 2 * job.timeoutSeconds + 600;
+    KillMode = "control-group";
+  };
   enabledTimers = lib.filterAttrs (name: _: config.systemd.timers."agent-job-${name}".enable) enabled;
   blocked = [
     "0.0.0.0/8"
@@ -327,15 +336,15 @@ in
             pkgs.coreutils
             pkgs.util-linux
           ];
-          serviceConfig = {
-            Type = "oneshot";
-            Group = "job-viewer";
-            UMask = "0027";
-            LoadCredential = lib.mapAttrsToList (key: value: "${key}:${value}") (credentials job);
-            ExecStart = "${cfg.package}/bin/agent-jobs run -config ${jobConfig name job} -state ${cfg.stateDirectory} -metrics ${metrics}";
-            TimeoutStartSec = job.timeoutSeconds + 300;
-            KillMode = "control-group";
-          };
+          serviceConfig = jobService name job "run";
+        }
+      ) enabled
+      // lib.mapAttrs' (
+        name: job:
+        lib.nameValuePair "agent-job-publish-${name}@" {
+          description = "Retry publication for agent job ${name} run %i";
+          path = [ pkgs.git ];
+          serviceConfig = jobService name job "publish -run %i";
         }
       ) enabled
       // lib.optionalAttrs (cfg.proxy.keyFile != null) {
