@@ -280,3 +280,119 @@ func publicationHandler(t *testing.T, created, revoked, reviews *int, expectedBo
 		}
 	})
 }
+
+func TestPullRequestReconcilesLostCreateResponse(t *testing.T) {
+	created, reviews, updates := 0, 0, 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pr := `{"number":7,"html_url":"https://example.test/pr/7","user":{"login":"author"}}`
+		switch {
+		case r.Method == "GET" && r.URL.Path == "/repos/owner/repo/pulls":
+			if r.URL.Query().Get("head") != "owner:automation/test" || r.URL.Query().Get("base") != "main" || r.URL.Query().Get("state") != "open" {
+				t.Errorf("unexpected query: %s", r.URL.RawQuery)
+			}
+			if created == 0 {
+				_, _ = w.Write([]byte(`[]`))
+			} else {
+				_, _ = w.Write([]byte("[" + pr + "]"))
+			}
+		case r.Method == "POST" && r.URL.Path == "/repos/owner/repo/pulls":
+			created++
+			conn, _, err := w.(http.Hijacker).Hijack()
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			_ = conn.Close()
+		case r.Method == "PATCH" && r.URL.Path == "/repos/owner/repo/pulls/7":
+			updates++
+			var body struct {
+				Title string `json:"title"`
+				Body  string `json:"body"`
+				Head  string `json:"head"`
+				Base  string `json:"base"`
+			}
+			if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Title != "Update" || body.Body != "Description" || body.Head != "" || body.Base != "" {
+				t.Errorf("update body %+v: %v", body, err)
+			}
+			_, _ = w.Write([]byte(pr))
+		case r.Method == "POST" && r.URL.Path == "/repos/owner/repo/pulls/7/requested_reviewers":
+			reviews++
+			var body struct {
+				Reviewers []string `json:"reviewers"`
+			}
+			if err := json.NewDecoder(r.Body).Decode(&body); err != nil || len(body.Reviewers) != 1 || body.Reviewers[0] != "reviewer" {
+				t.Errorf("reviewers %+v: %v", body, err)
+			}
+			w.WriteHeader(http.StatusCreated)
+		default:
+			t.Errorf("unexpected request %s %s", r.Method, r.URL)
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer server.Close()
+
+	api := githubClient{baseURL: server.URL, client: server.Client()}
+	job := Job{
+		Repository: "owner/repo", Branch: "automation/test",
+		Publish: Publication{Title: "Update", Reviewer: "reviewer"},
+	}
+	pr, err := api.pullRequest(context.Background(), job, "secret", "main", "Description")
+	if err != nil || pr != "https://example.test/pr/7" || created != 1 || updates != 1 || reviews != 1 {
+		t.Fatalf("pr=%q error=%v created=%d updates=%d reviews=%d", pr, err, created, updates, reviews)
+	}
+}
+
+func TestPullRequestCreateFailureWithoutMatch(t *testing.T) {
+	created, lookups := 0, 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			lookups++
+			_, _ = w.Write([]byte(`[]`))
+		case http.MethodPost:
+			created++
+			w.WriteHeader(http.StatusUnprocessableEntity)
+		default:
+			t.Errorf("unexpected request %s", r.Method)
+		}
+	}))
+	defer server.Close()
+
+	api := githubClient{baseURL: server.URL, client: server.Client()}
+	job := Job{Repository: "owner/repo", Branch: "test"}
+	_, err := api.pullRequest(context.Background(), job, "secret", "main", "Description")
+	if err == nil || created != 1 || lookups != 2 {
+		t.Fatalf("error=%v created=%d lookups=%d", err, created, lookups)
+	}
+}
+
+func TestPullRequestRetriesTransientCreateAfterLookup(t *testing.T) {
+	created, lookups := 0, 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			lookups++
+			_, _ = w.Write([]byte(`[]`))
+		case http.MethodPost:
+			created++
+			if created == 1 {
+				w.WriteHeader(http.StatusServiceUnavailable)
+				return
+			}
+			if lookups != 2 {
+				t.Errorf("retry occurred after %d lookups", lookups)
+			}
+			_, _ = w.Write([]byte(`{"number":7,"html_url":"https://example.test/pr/7"}`))
+		default:
+			t.Errorf("unexpected request %s", r.Method)
+		}
+	}))
+	defer server.Close()
+
+	api := githubClient{baseURL: server.URL, client: server.Client()}
+	job := Job{Repository: "owner/repo", Branch: "test"}
+	pr, err := api.pullRequest(context.Background(), job, "secret", "main", "Description")
+	if err != nil || pr != "https://example.test/pr/7" || created != 2 || lookups != 2 {
+		t.Fatalf("pr=%q error=%v created=%d lookups=%d", pr, err, created, lookups)
+	}
+}

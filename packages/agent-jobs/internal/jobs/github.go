@@ -87,15 +87,22 @@ func (g githubClient) request(ctx context.Context, method, endpoint, token strin
 		if attempt == 2 {
 			return fmt.Errorf("GitHub request failed: %w", err)
 		}
-		timer := time.NewTimer(time.Duration(attempt+1) * time.Second)
-		select {
-		case <-ctx.Done():
-			timer.Stop()
-			return ctx.Err()
-		case <-timer.C:
+		if err := githubRetryDelay(ctx, attempt); err != nil {
+			return err
 		}
 	}
 	return errors.New("GitHub request failed")
+}
+
+func githubRetryDelay(ctx context.Context, attempt int) error {
+	timer := time.NewTimer(time.Duration(attempt+1) * time.Second)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-timer.C:
+		return nil
+	}
 }
 
 func (g githubClient) requestOnce(ctx context.Context, method, endpoint, token string, body []byte, hasBody bool, result any) (bool, error) {
@@ -181,6 +188,52 @@ func (g githubClient) openPullRequests(ctx context.Context, job Job, token, base
 	return pulls, err
 }
 
+type githubPullRequestBody struct {
+	Title string `json:"title"`
+	Body  string `json:"body"`
+	Head  string `json:"head,omitempty"`
+	Base  string `json:"base,omitempty"`
+}
+
+func (g githubClient) createPullRequest(ctx context.Context, job Job, token, base string, body githubPullRequestBody) (githubPullRequest, error) {
+	var pr githubPullRequest
+	encoded, err := json.Marshal(body)
+	if err != nil {
+		return pr, err
+	}
+	for attempt := range 3 {
+		retry, err := g.requestOnce(ctx, http.MethodPost, pullRequestEndpoint(job), token, encoded, true, &pr)
+		if err == nil {
+			return pr, nil
+		}
+		if ctx.Err() != nil {
+			return pr, ctx.Err()
+		}
+		// A failed response can still mean GitHub created the PR; check before replaying.
+		pulls, lookupErr := g.openPullRequests(ctx, job, token, base)
+		if lookupErr != nil {
+			return pr, fmt.Errorf("reconcile pull request after %w: %w", err, lookupErr)
+		}
+		if len(pulls) > 0 {
+			pr = pulls[0]
+			body.Head = ""
+			body.Base = ""
+			err := g.request(ctx, http.MethodPatch, fmt.Sprintf("%s/%d", pullRequestEndpoint(job), pr.Number), token, body, &pr)
+			return pr, err
+		}
+		if !retry {
+			return pr, err
+		}
+		if attempt == 2 {
+			return pr, fmt.Errorf("GitHub request failed: %w", err)
+		}
+		if err := githubRetryDelay(ctx, attempt); err != nil {
+			return pr, err
+		}
+	}
+	return pr, errors.New("GitHub request failed")
+}
+
 func (g githubClient) pullRequest(ctx context.Context, job Job, token, base, description string) (string, error) {
 	endpoint := pullRequestEndpoint(job)
 	pulls, err := g.openPullRequests(ctx, job, token, base)
@@ -192,17 +245,13 @@ func (g githubClient) pullRequest(ctx context.Context, job Job, token, base, des
 	if title == "" {
 		title = job.Name
 	}
-	body := struct {
-		Title string `json:"title"`
-		Body  string `json:"body"`
-		Head  string `json:"head,omitempty"`
-		Base  string `json:"base,omitempty"`
-	}{Title: title, Body: description}
+	body := githubPullRequestBody{Title: title, Body: description}
 	var pr githubPullRequest
 	if len(pulls) == 0 {
 		body.Head = job.Branch
 		body.Base = base
-		if err := g.request(ctx, http.MethodPost, endpoint, token, body, &pr); err != nil {
+		pr, err = g.createPullRequest(ctx, job, token, base, body)
+		if err != nil {
 			return "", err
 		}
 	} else {
