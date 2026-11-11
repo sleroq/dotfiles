@@ -85,7 +85,7 @@ in
         piCommand = [ "agent-pi" ];
         environmentFiles.EXA_API_KEY = config.age.secrets.agentJobsExaKey.path;
         model = "fumo/codex/gpt-6.1-terra";
-        thinking = "high";
+        thinking = "low";
         timeoutSeconds = 1800;
         memoryMB = 8192;
         workspaceMB = 6144;
