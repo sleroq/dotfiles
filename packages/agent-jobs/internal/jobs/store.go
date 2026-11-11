@@ -15,24 +15,26 @@ import (
 )
 
 type Run struct {
-	ID                     string    `json:"id"`
-	Job                    string    `json:"job"`
-	Repository             string    `json:"repository"`
-	Branch                 string    `json:"branch"`
-	Model                  string    `json:"model"`
-	Status                 string    `json:"status"`
-	Phase                  string    `json:"phase"`
-	StartedAt              time.Time `json:"started_at"`
-	FinishedAt             time.Time `json:"finished_at,omitzero"`
-	DurationSeconds        float64   `json:"duration_seconds"`
-	SandboxDurationSeconds float64   `json:"sandbox_duration_seconds"`
-	ExpectedBranch         *string   `json:"expected_branch,omitempty"`
-	StartCommit            string    `json:"start_commit,omitempty"`
-	ExistingPR             bool      `json:"existing_pr,omitempty"`
-	BaseCommit             string    `json:"base_commit,omitempty"`
-	PRURL                  string    `json:"pr_url,omitempty"`
-	Publication            string    `json:"publication,omitempty"`
-	Error                  string    `json:"error,omitempty"`
+	ID                           string    `json:"id"`
+	Job                          string    `json:"job"`
+	Repository                   string    `json:"repository"`
+	Branch                       string    `json:"branch"`
+	Model                        string    `json:"model"`
+	Status                       string    `json:"status"`
+	Phase                        string    `json:"phase"`
+	StartedAt                    time.Time `json:"started_at"`
+	FinishedAt                   time.Time `json:"finished_at,omitzero"`
+	DurationSeconds              float64   `json:"duration_seconds"`
+	SandboxDurationSeconds       float64   `json:"sandbox_duration_seconds"`
+	NixStoreSeedBytes            int64     `json:"nix_store_seed_bytes"`
+	NixStoreSetupDurationSeconds float64   `json:"nix_store_setup_duration_seconds"`
+	ExpectedBranch               *string   `json:"expected_branch,omitempty"`
+	StartCommit                  string    `json:"start_commit,omitempty"`
+	ExistingPR                   bool      `json:"existing_pr,omitempty"`
+	BaseCommit                   string    `json:"base_commit,omitempty"`
+	PRURL                        string    `json:"pr_url,omitempty"`
+	Publication                  string    `json:"publication,omitempty"`
+	Error                        string    `json:"error,omitempty"`
 }
 
 type Store struct{ Directory string }

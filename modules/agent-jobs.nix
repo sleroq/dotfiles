@@ -276,6 +276,8 @@ in
     environment.etc."agent-jobs-schedules.prom".text = lib.concatStrings (
       lib.mapAttrsToList (name: job: ''
         agent_job_max_interval_seconds{agent_job="${name}"} ${toString job.overdueAfterSeconds}
+        agent_job_nix_store_limit_bytes{agent_job="${name}"} ${toString (job.workspaceMB * 1024 * 1024)}
+        agent_job_sandbox_memory_limit_bytes{agent_job="${name}"} ${toString (job.memoryMB * 1024 * 1024)}
         agent_job_schedule_enabled{agent_job="${name}"} ${
           if config.systemd.timers."agent-job-${name}".enable then "1" else "0"
         }
