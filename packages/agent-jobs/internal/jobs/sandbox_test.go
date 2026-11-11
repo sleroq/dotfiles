@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -39,7 +41,11 @@ func TestConfigureSandboxDirenv(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	prefix := "[global]\nbash_path = \"/bin/bash\"\n[whitelist]\nexact = "
+	bash, err := exec.LookPath("bash")
+	if err != nil {
+		t.Fatal(err)
+	}
+	prefix := fmt.Sprintf("[global]\nbash_path = %q\n[whitelist]\nexact = ", bash)
 	if !strings.HasPrefix(string(data), prefix) {
 		t.Fatalf("unexpected config: %s", data)
 	}
@@ -58,10 +64,14 @@ func TestConfigureSandboxDirenv(t *testing.T) {
 }
 
 func TestSandboxCommandPreservesArguments(t *testing.T) {
+	bash, err := exec.LookPath("bash")
+	if err != nil {
+		t.Fatal(err)
+	}
 	env := []string{"BASH_ENV=/etc/agent-jobs/bash-env"}
 	cmd := sandboxCommand(context.Background(), env, "tool", "arg with spaces", "$(false)")
-	want := []string{"/bin/bash", "-c", `exec "$@"`, "agent-jobs", "tool", "arg with spaces", "$(false)"}
-	if !reflect.DeepEqual(cmd.Args, want) || cmd.Dir != "/workspace" || !reflect.DeepEqual(cmd.Env, env) {
+	want := []string{"bash", "-c", `exec "$@"`, "agent-jobs", "tool", "arg with spaces", "$(false)"}
+	if cmd.Path != bash || !reflect.DeepEqual(cmd.Args, want) || cmd.Dir != "/workspace" || !reflect.DeepEqual(cmd.Env, env) {
 		t.Fatalf("command: %#v", cmd)
 	}
 }

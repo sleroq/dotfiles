@@ -11,7 +11,7 @@ let
   opencodeConfig = (pkgs.formats.json { }).generate "paseo-opencode.json" (
     sharedOpencode
     // {
-      shell = "/etc/profiles/per-user/${cfg.user}/bin/bash";
+      shell = lib.getExe pkgs.bashInteractive;
       plugins = builtins.filter (
         plugin: !(builtins.isString plugin && lib.hasPrefix "./" plugin)
       ) sharedOpencode.plugins;
