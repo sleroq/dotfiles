@@ -65,6 +65,9 @@ in
     viewer.port = 8788;
     image = pkgs.callPackage ../../packages/agent-sandbox.nix {
       agent-jobs = config.services.agent-jobs.package;
+      substituters = config.nix.settings.substituters ++ (config.nix.settings.extra-substituters or [ ]);
+      trustedPublicKeys =
+        config.nix.settings.trusted-public-keys ++ (config.nix.settings.extra-trusted-public-keys or [ ]);
       pi = inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.default;
       fumo-pi = pkgs.callPackage ../../packages/fumo-pi.nix {
         pi = inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.default;

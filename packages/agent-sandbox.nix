@@ -23,6 +23,8 @@
   callPackage,
   tree-sitter-grammars,
   fumo-pi ? null,
+  substituters ? [ ],
+  trustedPublicKeys ? [ ],
 }:
 let
   tools = buildEnv {
@@ -52,6 +54,8 @@ let
     sandbox = false
     build-users-group =
     experimental-features = nix-command flakes
+    extra-substituters = ${lib.concatStringsSep " " substituters}
+    extra-trusted-public-keys = ${lib.concatStringsSep " " trustedPublicKeys}
   '';
   bashEnv = writeText "agent-bash-env" ''
     _agent_jobs_direnv() {
