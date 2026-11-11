@@ -137,7 +137,7 @@ func (r *jobRun) execute(ctx context.Context) (resultErr error) {
 	limit := int64(r.job.OutputMB) * 1024 * 1024
 	r.stdout = &boundedWriter{writer: stdout, remaining: limit / 4}
 	r.stderr = &boundedWriter{writer: stderr, remaining: limit / 4}
-	r.work, err = os.MkdirTemp("/var/lib/agent-jobs-work", "run-")
+	r.work, err = createWork(ctx, r.job.Name, "run-")
 	if err != nil {
 		return fmt.Errorf("create work directory: %w", err)
 	}
@@ -150,6 +150,19 @@ func (r *jobRun) execute(ctx context.Context) (resultErr error) {
 		return err
 	}
 	return r.publish(ctx)
+}
+
+func createWork(ctx context.Context, name, prefix string) (string, error) {
+	scratch := filepath.Join("/var/lib/agent-jobs-work", name, "scratch")
+	mountpoint := exec.CommandContext(ctx, "mountpoint", "-q", scratch)
+	mountpoint.Env = []string{"PATH=" + os.Getenv("PATH")}
+	if err := mountpoint.Run(); err != nil {
+		if ctx.Err() != nil {
+			return "", ctx.Err()
+		}
+		return "", fmt.Errorf("scratch is not mounted: %w", err)
+	}
+	return os.MkdirTemp(scratch, prefix)
 }
 
 func (r *jobRun) prepare(ctx context.Context) error {

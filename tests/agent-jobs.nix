@@ -40,6 +40,44 @@ let
     wantedBy = [ "multi-user.target" ];
     serviceConfig.ExecStart = "${fixture}/bin/agent-jobs-fixture serve";
   };
+  inspectScratch = pkgs.writeShellScript "inspect-agent-job-scratch" ''
+    set -eu
+    export PATH=${
+      pkgs.lib.makeBinPath [
+        pkgs.coreutils
+        pkgs.git
+        pkgs.util-linux
+        pkgs.gnugrep
+      ]
+    }
+    scratch=/var/lib/agent-jobs-work/success/scratch
+    tmp=$(mktemp -d)
+    cleanup() {
+      rm -rf "$scratch/repo" "$tmp"
+      mount -o remount,size=2048M "$scratch"
+    }
+    trap cleanup EXIT
+
+    options=$(findmnt -n -T "$scratch" -o OPTIONS)
+    echo "$options" | grep -F size=2097152k
+    echo "$options" | grep -F nosuid
+    echo "$options" | grep -F nodev
+    test "$(stat -c '%a:%u:%g' "$scratch")" = 700:0:0
+
+    mount -o remount,size=16M "$scratch"
+    git init -q "$tmp/source"
+    git -C "$tmp/source" config user.name Fixture
+    git -C "$tmp/source" config user.email fixture@example.invalid
+    dd if=/dev/zero of="$tmp/source/large.bin" bs=1M count=32 status=none
+    git -C "$tmp/source" add large.bin
+    git -C "$tmp/source" diff --cached --binary > "$tmp/candidate.patch"
+    git init -q "$scratch/repo"
+    if git -C "$scratch/repo" apply --index "$tmp/candidate.patch" 2> "$tmp/error"; then
+      echo 'oversized binary patch unexpectedly succeeded' >&2
+      exit 1
+    fi
+    grep -F 'No space left on device' "$tmp/error"
+  '';
 in
 pkgs.testers.runNixOSTest {
   name = "agent-jobs";
@@ -175,7 +213,18 @@ pkgs.testers.runNixOSTest {
                 _, content = machine.execute(f"curl -fsS http://127.0.0.1:8788/api/jobs/{name}/runs/{failed_id}/artifacts/{artifact}")
                 print(content)
             raise Exception(f"{name}: {output}")
+    scratch_unit = "var-lib-agent\\x2djobs\\x2dwork-success-scratch.mount"
+    for service in ["agent-job-success.service", "agent-job-publish-success@fixture.service"]:
+        for dependency in ["Requires", "After"]:
+            machine.succeed(f"systemctl show {service} -p {dependency} --value | grep -F '{scratch_unit}'")
+        machine.succeed(f"test $(systemctl show {service} -p MemoryMax --value) = 2147483648")
+        machine.succeed(f"test $(systemctl show {service} -p MemorySwapMax --value) = 0")
+    machine.succeed("test $(systemctl show agent-jobs-proxy.service -p MemoryMax --value) = 268435456")
+    machine.succeed("test $(systemctl show agent-jobs-proxy.service -p MemorySwapMax --value) = 0")
+    machine.succeed(f"systemd-run --wait --pipe --property='Requires={scratch_unit}' --property='After={scratch_unit}' ${inspectScratch}")
+    machine.wait_until_succeeds("! mountpoint -q /var/lib/agent-jobs-work/success/scratch")
     start_job("success")
+    machine.wait_until_succeeds("! mountpoint -q /var/lib/agent-jobs-work/success/scratch")
     start_job("direnv")
     machine.succeed("curl -fsS http://127.0.0.1:8788/api/runs | jq -e '.[] | select(.job == \"success\" and .status == \"success\")'")
     run_id = machine.succeed("curl -fsS http://127.0.0.1:8788/api/runs?job=success | jq -r '.[0].id'").strip()

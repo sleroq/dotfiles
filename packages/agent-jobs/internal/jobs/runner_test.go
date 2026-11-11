@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"syscall"
@@ -649,5 +650,20 @@ func TestPrepareCapturesPublicationBranch(t *testing.T) {
 				t.Fatalf("shallow = %q: %v", shallow, err)
 			}
 		})
+	}
+}
+
+func TestCreateWorkRequiresScratchMount(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "mountpoint"), []byte("#!/bin/sh\nexit 1\n"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("PATH", dir)
+	for _, prefix := range []string{"run-", "publish-"} {
+		work, err := createWork(context.Background(), "fixture", prefix)
+		var exitErr *exec.ExitError
+		if work != "" || !errors.As(err, &exitErr) {
+			t.Fatalf("work = %q, error = %v", work, err)
+		}
 	}
 }

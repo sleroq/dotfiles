@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -66,6 +67,11 @@ func TestNoChangeDoesNotRequirePRBody(t *testing.T) {
 }
 
 func TestRetryPublicationRequiresValidatedMatchingRun(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "mountpoint"), []byte("#!/bin/sh\nexit 1\n"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("PATH", dir)
 	job := Job{
 		Name: "fixture", Repository: "owner/repo", Branch: "automation/fixture", Image: "sandbox", Network: "agentjobs", PiCommand: []string{"pi"}, Prompt: "prompt", TimeoutSeconds: 5,
 		MemoryMB: 128, CPUs: 1, PIDs: 10, WorkspaceMB: 64, OutputMB: 1,
@@ -109,10 +115,9 @@ func TestRetryPublicationRequiresValidatedMatchingRun(t *testing.T) {
 			}
 			err = RetryPublication(context.Background(), configured, store, run.ID)
 			if scenario == "timed-out-publish" {
-				var pathErr *os.PathError
-				artifact := filepath.Join(store.Directory, run.Job, run.ID, prBodyArtifact)
-				if !errors.As(err, &pathErr) || (pathErr.Path != artifact && !strings.HasPrefix(pathErr.Path, "/var/lib/agent-jobs-work")) {
-					t.Fatalf("retry did not reach workspace or artifact: %v", err)
+				var exitErr *exec.ExitError
+				if !errors.As(err, &exitErr) {
+					t.Fatalf("retry did not require scratch: %v", err)
 				}
 				return
 			}
