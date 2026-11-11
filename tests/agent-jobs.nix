@@ -14,6 +14,7 @@ let
   image = pkgs.callPackage ../packages/agent-sandbox.nix {
     inherit agent-jobs;
     pi = fixture;
+    fumoProxy = true;
   };
   makeJob = mode: {
     enable = true;
@@ -51,6 +52,10 @@ pkgs.testers.runNixOSTest {
         inherit image;
         gvisorPackage = gvisor;
         viewer.port = 8788;
+        proxy = {
+          keyFile = toString (pkgs.writeText "fixture-fumo-key" "fixture-real-key");
+          upstream = "http://127.0.0.1:18080";
+        };
         jobs =
           pkgs.lib.genAttrs [ "success" "failure" "timeout" "security" "arbitrary-path" "symlink" ] makeJob
           // {
@@ -65,6 +70,7 @@ pkgs.testers.runNixOSTest {
           };
       };
       systemd.services.fixture-listener = listener;
+      networking.firewall.trustedInterfaces = [ "eth1" ];
       systemd.timers.agent-job-security.enable = false;
       specialisation.changed-timers.configuration = {
         systemd.timers.agent-job-success.enable = pkgs.lib.mkForce false;
@@ -132,11 +138,14 @@ pkgs.testers.runNixOSTest {
     print(machine.succeed(f"{runtime} --version"))
     machine.wait_for_unit("agent-job-viewer.service")
     machine.wait_for_unit("fixture-listener.service")
+    machine.wait_for_unit("agent-jobs-proxy.service")
     private.wait_for_unit("fixture-listener.service")
     private.succeed("ip address add 1.1.1.1/32 dev lo")
     private.succeed("systemctl start dnsmasq.service")
     private.wait_for_unit("dnsmasq.service")
     private.fail("curl --connect-timeout 2 http://192.168.1.1:8788/api/runs")
+    private.succeed("ip route add 172.30.0.0/24 via 192.168.1.1")
+    private.fail("curl --connect-timeout 2 http://172.30.0.1:8789/v1/check")
     private.succeed("ip address add 203.0.113.2/32 dev lo")
     machine.succeed("ip route add 203.0.113.2/32 via 192.168.1.2")
     machine.succeed("ip route add 1.1.1.1/32 via 192.168.1.2")

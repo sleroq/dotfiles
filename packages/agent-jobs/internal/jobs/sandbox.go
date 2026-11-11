@@ -87,8 +87,10 @@ func (cfg sandboxConfig) environment() ([]string, error) {
 		"GIT_CONFIG_NOSYSTEM=1", "GIT_CONFIG_GLOBAL=/dev/null",
 		"GIT_TERMINAL_PROMPT=0", "GIT_LFS_SKIP_SMUDGE=1",
 	}
-	if value := os.Getenv("FUMO_BASE_URL"); value != "" {
-		env = append(env, "FUMO_BASE_URL="+value)
+	for _, name := range []string{"FUMO_BASE_URL", "FUMO_PI_KEY"} {
+		if value := os.Getenv(name); value != "" {
+			env = append(env, name+"="+value)
+		}
 	}
 	for name, file := range cfg.EnvironmentFiles {
 		value, err := os.ReadFile(file)

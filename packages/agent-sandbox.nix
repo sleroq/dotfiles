@@ -23,6 +23,7 @@
   callPackage,
   tree-sitter-grammars,
   fumo-pi ? null,
+  fumoProxy ? false,
   substituters ? [ ],
   trustedPublicKeys ? [ ],
 }:
@@ -141,8 +142,16 @@ dockerTools.buildLayeredImage {
       "PATH=/bin"
       "HOME=/home/agent"
       "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt"
-      "FUMO_BASE_URL=https://fumo.cum.army/v1"
-    ];
+    ]
+    ++ (
+      if fumoProxy then
+        [
+          "FUMO_BASE_URL=http://172.30.0.1:8789/v1"
+          "FUMO_PI_KEY=non-secret-proxy-placeholder"
+        ]
+      else
+        [ "FUMO_BASE_URL=https://fumo.cum.army/v1" ]
+    );
     WorkingDir = "/workspace";
   };
 }
