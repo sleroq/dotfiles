@@ -1,0 +1,101 @@
+Backport https://github.com/google/gvisor/pull/17244
+Upstream HEAD: ff8a928c6f29632eff3ee351b8f1631ad442d99b
+
+diff --git a/pkg/sentry/fsimpl/devpts/devpts_state_autogen.go b/pkg/sentry/fsimpl/devpts/devpts_state_autogen.go
+index 7be2967..f257a90 100644
+--- a/pkg/sentry/fsimpl/devpts/devpts_state_autogen.go
++++ b/pkg/sentry/fsimpl/devpts/devpts_state_autogen.go
+@@ -167,6 +167,7 @@ func (l *lineDiscipline) StateFields() []string {
+ 		"termios",
+ 		"column",
+ 		"numReplicas",
++		"replicaOpened",
+ 		"masterWaiter",
+ 		"replicaWaiter",
+ 		"terminal",
+@@ -185,10 +186,11 @@ func (l *lineDiscipline) StateSave(stateSinkObject state.Sink) {
+ 	stateSinkObject.Save(3, &l.termios)
+ 	stateSinkObject.Save(4, &l.column)
+ 	stateSinkObject.Save(5, &l.numReplicas)
+-	stateSinkObject.Save(6, &l.masterWaiter)
+-	stateSinkObject.Save(7, &l.replicaWaiter)
+-	stateSinkObject.Save(8, &l.terminal)
+-	stateSinkObject.Save(9, &l.packet)
++	stateSinkObject.Save(6, &l.replicaOpened)
++	stateSinkObject.Save(7, &l.masterWaiter)
++	stateSinkObject.Save(8, &l.replicaWaiter)
++	stateSinkObject.Save(9, &l.terminal)
++	stateSinkObject.Save(10, &l.packet)
+ }
+ 
+ func (l *lineDiscipline) afterLoad(context.Context) {}
+@@ -201,10 +203,11 @@ func (l *lineDiscipline) StateLoad(ctx context.Context, stateSourceObject state.
+ 	stateSourceObject.Load(3, &l.termios)
+ 	stateSourceObject.Load(4, &l.column)
+ 	stateSourceObject.Load(5, &l.numReplicas)
+-	stateSourceObject.Load(6, &l.masterWaiter)
+-	stateSourceObject.Load(7, &l.replicaWaiter)
+-	stateSourceObject.Load(8, &l.terminal)
+-	stateSourceObject.Load(9, &l.packet)
++	stateSourceObject.Load(6, &l.replicaOpened)
++	stateSourceObject.Load(7, &l.masterWaiter)
++	stateSourceObject.Load(8, &l.replicaWaiter)
++	stateSourceObject.Load(9, &l.terminal)
++	stateSourceObject.Load(10, &l.packet)
+ }
+ 
+ func (o *outputQueueTransformer) StateTypeName() string {
+diff --git a/pkg/sentry/fsimpl/devpts/line_discipline.go b/pkg/sentry/fsimpl/devpts/line_discipline.go
+index c40dca0..94e62ca 100644
+--- a/pkg/sentry/fsimpl/devpts/line_discipline.go
++++ b/pkg/sentry/fsimpl/devpts/line_discipline.go
+@@ -110,6 +110,11 @@ type lineDiscipline struct {
+ 	// numReplicas is the number of replica file descriptors.
+ 	numReplicas int
+ 
++	// replicaOpened is true once a replica has been opened.
++	//
++	// +checklocks:termiosMu
++	replicaOpened bool
++
+ 	// masterWaiter is used to wait on the master end of the TTY.
+ 	masterWaiter waiter.Queue
+ 
+@@ -226,7 +231,7 @@ func (l *lineDiscipline) masterReadiness() waiter.EventMask {
+ 	// The master termios is immutable so termiosMu is not needed.
+ 	res := l.inQueue.writeReadiness(&linux.MasterTermios) | l.outQueue.readReadiness(&linux.MasterTermios)
+ 	l.termiosMu.RLock()
+-	if l.numReplicas == 0 {
++	if l.replicaHungUp() {
+ 		res |= waiter.EventHUp
+ 	}
+ 	l.termiosMu.RUnlock()
+@@ -329,6 +334,15 @@ func (l *lineDiscipline) replicaOpen() {
+ 	l.termiosMu.Lock()
+ 	defer l.termiosMu.Unlock()
+ 	l.numReplicas++
++	l.replicaOpened = true
++}
++
++// replicaHungUp returns true if a replica was opened and all replicas have
++// since been closed, like TTY_OTHER_CLOSED on a Linux master.
++//
++// +checklocksread:l.termiosMu
++func (l *lineDiscipline) replicaHungUp() bool {
++	return l.numReplicas == 0 && l.replicaOpened
+ }
+ 
+ // replicaClose is called when a replica file descriptor is closed.
+diff --git a/pkg/sentry/fsimpl/devpts/queue.go b/pkg/sentry/fsimpl/devpts/queue.go
+index 6461606..4bbf387 100644
+--- a/pkg/sentry/fsimpl/devpts/queue.go
++++ b/pkg/sentry/fsimpl/devpts/queue.go
+@@ -110,7 +110,7 @@ func (q *queue) read(ctx context.Context, dst usermem.IOSequence, l *lineDiscipl
+ 	defer q.mu.Unlock()
+ 
+ 	if !q.readable {
+-		if l.numReplicas == 0 {
++		if l.replicaHungUp() {
+ 			return 0, false, false, linuxerr.EIO
+ 		}
+ 		return 0, false, false, linuxerr.ErrWouldBlock

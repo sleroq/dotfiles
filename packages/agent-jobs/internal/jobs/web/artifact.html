@@ -1,0 +1,1 @@
+{{define "artifact.html"}}{{template "head" .}}<p><a href="/jobs/{{.Run.Job}}/runs/{{.Run.ID}}">← Run</a></p><p class="eyebrow">Artifact</p><h1>{{.Artifact}}</h1><pre>{{.Content}}</pre>{{template "foot" .}}{{end}}

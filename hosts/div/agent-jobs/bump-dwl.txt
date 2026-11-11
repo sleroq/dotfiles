@@ -1,0 +1,4 @@
+Scope:
+Update the dwl flake input to the latest stable upstream release, with only its necessary lock node changes. Inspect flake.nix, packages/dwl/default.nix, packages/dwl/README.md, local patches/configuration, and compositor consumers. Port the existing patches only as required for compatibility; preserve desktop behavior, keybindings, IPC, and local features. Do not change other flake inputs, the wlroots/nixpkgs pins, or the Noctalia shell.
+
+Build only the patched DWL package and run the focused boundary/regression tests documented in packages/dwl/README.md on a capable Linux host. Update the documented supported DWL revision when it changes. If the release requires a different wlroots/nixpkgs pin, a feature redesign, or tests cannot validate a patch port, leave the unsupported upgrade out and report the blocker; do not submit an unverified compositor port.

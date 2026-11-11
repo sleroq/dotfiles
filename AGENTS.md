@@ -44,10 +44,8 @@ check it is running; if stopped, ask the user. Select `a9d4` for `div`, `6678` f
 `desktop`/`portable`. Switching is allowed, but coordinate with other deployment
 sessions: the laptop's selected network is shared.
 
-## Paseo schedules
+## Agent jobs
 
-Manage definitions through `services.paseo.schedules` and prompt files in host Nix,
-never GUI/CLI/MCP. Div uses `hosts/div/paseo-schedules.nix`. Repository state wins
-over runtime state, including undeployed changes. Use `adoptId` to retain an
-existing schedule's ID/history; the reconciler leaves unmanaged schedules alone.
-Pause/resume, run-now, and log inspection are allowed. Heartbeats are outside Nix ownership.
+Manage jobs through `services.agent-jobs` in `hosts/div/agent-jobs.nix` and its
+host-owned prompt files. Keep job timers disabled until explicitly approved.
+Paseo is for interactive agents, not recurring jobs.
