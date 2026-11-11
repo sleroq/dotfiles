@@ -6,9 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -18,8 +16,6 @@ const (
 	maxSessionPageEvents = 100
 )
 
-var errFileTooLarge = fmt.Errorf("file exceeds 64 MiB read limit")
-
 type sessionEvent struct {
 	Type      string
 	Timestamp string
@@ -27,32 +23,6 @@ type sessionEvent struct {
 	Text      string
 	Detail    string
 	Issue     string
-}
-
-// runFiles opens each directory without following agent-controlled symlinks.
-func (s Store) runFiles(job, run string, dirs ...string) (*os.Root, error) {
-	root, err := os.OpenRoot(s.Directory)
-	if err != nil {
-		return nil, err
-	}
-	for _, name := range append([]string{job, run}, dirs...) {
-		info, e := root.Lstat(name)
-		if e != nil {
-			_ = root.Close()
-			return nil, e
-		}
-		if !info.IsDir() {
-			_ = root.Close()
-			return nil, fs.ErrNotExist
-		}
-		next, e := root.OpenRoot(name)
-		_ = root.Close()
-		if e != nil {
-			return nil, e
-		}
-		root = next
-	}
-	return root, nil
 }
 
 func sessionName(name string) bool {
@@ -84,78 +54,6 @@ func (s Store) sessions(job, run string) ([]string, error) {
 		}
 	}
 	return names, nil
-}
-
-// fileRoot confines lookups to the run and rejects symlinks and special files.
-func (s Store) fileRoot(job, run, name string) (*os.Root, string, error) {
-	parts := strings.Split(filepath.ToSlash(name), "/")
-	root, err := s.runFiles(job, run, parts[:len(parts)-1]...)
-	if err != nil {
-		return nil, "", err
-	}
-	base := parts[len(parts)-1]
-	info, err := root.Lstat(base)
-	if err == nil && !info.Mode().IsRegular() {
-		err = fs.ErrNotExist
-	}
-	if err != nil {
-		_ = root.Close()
-		return nil, "", err
-	}
-	return root, base, nil
-}
-
-func (s Store) checkFile(job, run, name string) error {
-	root, _, err := s.fileRoot(job, run, name)
-	if err != nil {
-		return err
-	}
-	return root.Close()
-}
-
-func (s Store) openFile(job, run, name string) (*os.File, error) {
-	root, base, err := s.fileRoot(job, run, name)
-	if err != nil {
-		return nil, err
-	}
-	defer func() { _ = root.Close() }()
-	file, err := root.Open(base)
-	if err != nil {
-		return nil, err
-	}
-	info, err := file.Stat()
-	if err != nil {
-		_ = file.Close()
-		return nil, err
-	}
-	if !info.Mode().IsRegular() {
-		_ = file.Close()
-		return nil, fs.ErrNotExist
-	}
-	return file, nil
-}
-
-func (s Store) safeRead(job, run, name string) ([]byte, error) {
-	file, err := s.openFile(job, run, name)
-	if err != nil {
-		return nil, err
-	}
-	defer func() { _ = file.Close() }()
-	info, err := file.Stat()
-	if err != nil {
-		return nil, err
-	}
-	if info.Size() > 64<<20 {
-		return nil, errFileTooLarge
-	}
-	data, err := io.ReadAll(io.LimitReader(file, (64<<20)+1))
-	if err != nil {
-		return nil, err
-	}
-	if len(data) > 64<<20 {
-		return nil, errFileTooLarge
-	}
-	return data, nil
 }
 
 type sessionPage struct {
