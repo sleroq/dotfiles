@@ -107,6 +107,8 @@ let
   enabled = lib.filterAttrs (_: job: job.enable) cfg.jobs;
   nixStore = name: "/var/lib/agent-jobs-work/${name}/nix";
   nixStoreUnit = name: "${utils.escapeSystemdPath (nixStore name)}.mount";
+  scratch = name: "/var/lib/agent-jobs-work/${name}/scratch";
+  scratchUnit = name: "${utils.escapeSystemdPath (scratch name)}.mount";
   credentials =
     job:
     (lib.mapAttrs' (name: value: lib.nameValuePair "env-${name}" value) job.environmentFiles)
@@ -163,6 +165,8 @@ let
     ExecStart = "${pkgs.util-linux}/bin/flock /run/lock/agent-job-${name}.lock ${cfg.package}/bin/agent-jobs ${command} -config ${jobConfig name job} -state ${cfg.stateDirectory} -metrics ${metrics}";
     TimeoutStartSec = 2 * job.timeoutSeconds + 600;
     KillMode = "control-group";
+    MemoryMax = "${toString job.memoryMB}M";
+    MemorySwapMax = 0;
   };
   enabledTimers = lib.filterAttrs (name: _: config.systemd.timers."agent-job-${name}".enable) enabled;
   blocked = [
@@ -308,13 +312,21 @@ in
       "d /var/lib/agent-jobs-work 0700 root root -"
       "d /var/lib/prometheus-node-exporter-text-files 0755 root root -"
     ];
-    systemd.mounts = lib.mapAttrsToList (name: job: {
-      what = "tmpfs";
-      where = nixStore name;
-      type = "tmpfs";
-      options = "size=${toString job.workspaceMB}M,mode=0750,uid=1000,gid=1000,nosuid,nodev";
-      unitConfig.StopWhenUnneeded = true;
-    }) enabled;
+    systemd.mounts =
+      lib.mapAttrsToList (name: job: {
+        what = "tmpfs";
+        where = nixStore name;
+        type = "tmpfs";
+        options = "size=${toString job.workspaceMB}M,mode=0750,uid=1000,gid=1000,nosuid,nodev";
+        unitConfig.StopWhenUnneeded = true;
+      }) enabled
+      ++ lib.mapAttrsToList (name: job: {
+        what = "tmpfs";
+        where = scratch name;
+        type = "tmpfs";
+        options = "size=${toString job.workspaceMB}M,mode=0700,uid=0,gid=0,nosuid,nodev";
+        unitConfig.StopWhenUnneeded = true;
+      }) enabled;
     systemd.services =
       lib.mapAttrs' (
         name: job:
@@ -323,11 +335,13 @@ in
           requires = [
             "agent-jobs-network.service"
             (nixStoreUnit name)
+            (scratchUnit name)
           ]
           ++ lib.optional (cfg.proxy.keyFile != null) "agent-jobs-proxy.service";
           after = [
             "agent-jobs-network.service"
             (nixStoreUnit name)
+            (scratchUnit name)
           ]
           ++ lib.optional (cfg.proxy.keyFile != null) "agent-jobs-proxy.service";
           path = [
@@ -343,7 +357,12 @@ in
         name: job:
         lib.nameValuePair "agent-job-publish-${name}@" {
           description = "Retry publication for agent job ${name} run %i";
-          path = [ pkgs.git ];
+          requires = [ (scratchUnit name) ];
+          after = [ (scratchUnit name) ];
+          path = [
+            pkgs.git
+            pkgs.util-linux
+          ];
           serviceConfig = jobService name job "publish -run %i";
         }
       ) enabled
@@ -359,6 +378,8 @@ in
           wants = [ "network-online.target" ];
           serviceConfig = {
             DynamicUser = true;
+            MemoryMax = "256M";
+            MemorySwapMax = 0;
             LoadCredential = "fumo-key:${cfg.proxy.keyFile}";
             ExecStart = "${cfg.package}/bin/agent-jobs proxy -upstream ${lib.escapeShellArg cfg.proxy.upstream} -key-file /run/credentials/agent-jobs-proxy.service/fumo-key";
             NoNewPrivileges = true;

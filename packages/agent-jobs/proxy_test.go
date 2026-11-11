@@ -57,3 +57,97 @@ func TestProxyOverridesAuthorizationAndStreams(t *testing.T) {
 		t.Fatalf("remaining chunk: %q %v", rest, err)
 	}
 }
+
+func TestProxyUploadLimit(t *testing.T) {
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = io.Copy(io.Discard, r.Body)
+	}))
+	defer upstream.Close()
+
+	handler, err := proxyHandler(upstream.URL, "key")
+	if err != nil {
+		t.Fatal(err)
+	}
+	proxy := httptest.NewServer(handler)
+	defer proxy.Close()
+	for _, known := range []bool{true, false} {
+		t.Run(fmt.Sprint("known=", known), func(t *testing.T) {
+			body := strings.NewReader(strings.Repeat("x", maxProxyBody+1))
+			req, err := http.NewRequest(http.MethodPost, proxy.URL, body)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !known {
+				req.ContentLength = -1
+			}
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer func() { _ = resp.Body.Close() }()
+			if resp.StatusCode != http.StatusRequestEntityTooLarge {
+				t.Fatalf("status = %s", resp.Status)
+			}
+		})
+	}
+}
+
+func TestProxyConcurrencyReleasedOnClose(t *testing.T) {
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.(http.Flusher).Flush()
+		<-r.Context().Done()
+	}))
+	defer upstream.Close()
+
+	handler, err := proxyHandler(upstream.URL, "key")
+	if err != nil {
+		t.Fatal(err)
+	}
+	proxy := httptest.NewServer(handler)
+	defer proxy.Close()
+	client := &http.Client{Timeout: 5 * time.Second}
+
+	responses := make([]*http.Response, 0, maxProxyRequests)
+	defer func() {
+		for _, resp := range responses {
+			_ = resp.Body.Close()
+		}
+	}()
+	for range maxProxyRequests {
+		resp, err := client.Get(proxy.URL)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != http.StatusOK {
+			t.Fatalf("status = %s", resp.Status)
+		}
+		responses = append(responses, resp)
+	}
+
+	resp, err := client.Get(proxy.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = resp.Body.Close()
+	if resp.StatusCode != http.StatusServiceUnavailable {
+		t.Fatalf("status = %s", resp.Status)
+	}
+	_ = responses[0].Body.Close()
+
+	deadline := time.Now().Add(3 * time.Second)
+	for {
+		resp, err = client.Get(proxy.URL)
+		if err != nil {
+			t.Fatal(err)
+		}
+		_ = resp.Body.Close()
+		if resp.StatusCode == http.StatusOK {
+			break
+		}
+		if resp.StatusCode != http.StatusServiceUnavailable || time.Now().After(deadline) {
+			t.Fatalf("capacity not released: %s", resp.Status)
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+}
