@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -53,7 +54,7 @@ func run(args []string) error {
 	}
 	fmt.Println("fixture output")
 
-	if err := scenario(mode); err != nil {
+	if err := scenario(mode, args[1:]); err != nil {
 		return err
 	}
 	if err := os.WriteFile("allowed.txt", []byte("updated\n"), 0644); err != nil {
@@ -62,7 +63,7 @@ func run(args []string) error {
 	return os.WriteFile("/output/pr-body.md", []byte("Update the fixture file.\n"), 0644)
 }
 
-func scenario(mode string) error {
+func scenario(mode string, args []string) error {
 	switch mode {
 	case "timeout":
 		time.Sleep(10 * time.Minute)
@@ -76,15 +77,61 @@ func scenario(mode string) error {
 		return os.WriteFile("forbidden.txt", []byte("forbidden\n"), 0644)
 	case "success":
 		return inspectNixStore()
+	case "nix-build":
+		return checkOfflineNix(args[0])
 	case "direnv":
-		if os.Getenv("FIXTURE_ENV") != "root" {
-			return errors.New("project environment was not loaded for the agent")
-		}
-		return nil
+		return checkDirenv()
 	default:
 		return fmt.Errorf("unknown mode %q", mode)
 	}
 	return nil
+}
+
+func checkOfflineNix(builder string) error {
+	expression := fmt.Sprintf(`derivation {
+		name = "offline-fixture";
+		system = builtins.currentSystem;
+		builder = %q;
+		args = [ "-c" "echo ok > $out" ];
+	}`, builder)
+	cmd := exec.Command("nix-build", "--out-link", "/tmp/offline-fixture",
+		"--option", "substituters", "", "--expr", expression)
+	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	data, err := os.ReadFile("/tmp/offline-fixture")
+	if err != nil {
+		return err
+	}
+	if string(data) != "ok\n" {
+		return errors.New("unexpected offline build output")
+	}
+	return nil
+}
+
+func checkDirenv() error {
+	if os.Getenv("FIXTURE_ENV") != "root" {
+		return errors.New("project environment was not loaded for the agent")
+	}
+	cmd := exec.Command("bash", "-c", `
+		set -eu
+		test "$FIXTURE_ENV" = root
+		cd /workspace/nested
+		test "$FIXTURE_ENV" = nested
+		cd /workspace
+		test "$FIXTURE_ENV" = root
+		git clone -q /workspace /workspace/cloned
+		printf '%s\n' 'touch /tmp/untrusted-envrc-ran' > /workspace/cloned/.envrc
+		cd /workspace/cloned
+		test ! -e /tmp/untrusted-envrc-ran
+		cd /tmp
+		test ! -e /tmp/untrusted-envrc-ran
+		rm -rf /workspace/cloned
+	`)
+	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
+	return cmd.Run()
 }
 
 func inspectNixStore() error {

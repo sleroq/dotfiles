@@ -22,7 +22,6 @@ type Job struct {
 	Image            string            `json:"image"`
 	Network          string            `json:"network"`
 	PiCommand        []string          `json:"pi_command"`
-	Validation       [][]string        `json:"validation"`
 	Model            string            `json:"model"`
 	Thinking         string            `json:"thinking"`
 	TimeoutSeconds   int               `json:"timeout_seconds"`
@@ -70,11 +69,6 @@ func (j Job) Check() error {
 	}
 	if j.TimeoutSeconds <= 0 || j.MemoryMB <= 0 || j.CPUs <= 0 || j.PIDs <= 0 || j.WorkspaceMB <= 0 || j.OutputMB <= 0 {
 		return errors.New("timeout and resource limits must be positive")
-	}
-	for _, command := range j.Validation {
-		if len(command) == 0 {
-			return errors.New("validation commands must not be empty")
-		}
 	}
 
 	for name := range j.EnvironmentFiles {

@@ -253,7 +253,7 @@ func stageInput(work, checkout string, job Job) (string, error) {
 		return "", err
 	}
 	cfg := sandboxConfig{
-		Name: job.Name, PiCommand: job.PiCommand, Validation: job.Validation,
+		Name: job.Name, PiCommand: job.PiCommand,
 		Model: job.Model, Thinking: job.Thinking, OutputMB: job.OutputMB,
 		EnvironmentFiles: map[string]string{},
 	}

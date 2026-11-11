@@ -36,24 +36,6 @@ let
       allowed = "${pkgs.writeText "allowed-fixture-credential" "allowed fixture credential"}";
     };
   };
-  nixValidation = [
-    [
-      "nix-build"
-      "--out-link"
-      "/tmp/offline-fixture"
-      "--option"
-      "substituters"
-      ""
-      "--expr"
-      ''derivation { name = "offline-fixture"; system = builtins.currentSystem; builder = "${pkgs.bashInteractive}/bin/bash"; args = [ "-c" "echo ok > $out" ]; }''
-    ]
-    [
-      "rg"
-      "-Fx"
-      "ok"
-      "/tmp/offline-fixture"
-    ]
-  ];
   listener = {
     wantedBy = [ "multi-user.target" ];
     serviceConfig.ExecStart = "${fixture}/bin/agent-jobs-fixture serve";
@@ -73,35 +55,14 @@ pkgs.testers.runNixOSTest {
         jobs =
           pkgs.lib.genAttrs [ "success" "failure" "timeout" "security" "bad-path" "symlink" ] makeJob
           // {
-            nix-build = makeJob "success" // {
-              validation = nixValidation;
-            };
-            direnv = makeJob "direnv" // {
-              validation = [
-                [
-                  "bash"
-                  "-c"
-                  ''
-                    set -eu
-                    test "$FIXTURE_ENV" = root
-                    cd /workspace/nested
-                    test "$FIXTURE_ENV" = nested
-                    cd /workspace
-                    test "$FIXTURE_ENV" = root
-                    git clone -q /workspace /workspace/cloned
-                    printf '%s\n' 'touch /tmp/untrusted-envrc-ran' > /workspace/cloned/.envrc
-                    cd /workspace/cloned
-                    test ! -e /tmp/untrusted-envrc-ran
-                    cd /tmp
-                    test ! -e /tmp/untrusted-envrc-ran
-                    rm -rf /workspace/cloned
-                  ''
-                ]
+            nix-build = makeJob "nix-build" // {
+              piCommand = [
+                "/bin/agent-jobs-fixture"
+                "nix-build"
+                "${pkgs.bashInteractive}/bin/bash"
               ];
             };
-            validation-failure = makeJob "success" // {
-              validation = [ [ "false" ] ];
-            };
+            direnv = makeJob "direnv";
           };
       };
       systemd.services.fixture-listener = listener;
@@ -172,7 +133,7 @@ pkgs.testers.runNixOSTest {
         status, output = machine.execute(f"systemctl start agent-job-{name}.service")
         if status != 0:
             failed_id = machine.succeed(f"curl -fsS http://127.0.0.1:8788/api/runs?job={name} | jq -r '.[0].id'").strip()
-            for artifact in ["stderr.log", "stdout.log", "output/validation.log"]:
+            for artifact in ["stderr.log", "stdout.log"]:
                 _, content = machine.execute(f"curl -fsS http://127.0.0.1:8788/api/jobs/{name}/runs/{failed_id}/artifacts/{artifact}")
                 print(content)
             raise Exception(f"{name}: {output}")
@@ -182,13 +143,15 @@ pkgs.testers.runNixOSTest {
     run_id = machine.succeed("curl -fsS http://127.0.0.1:8788/api/runs?job=success | jq -r '.[0].id'").strip()
     machine.succeed(f"curl -fsS http://127.0.0.1:8788/api/jobs/success/runs/{run_id}/sessions | jq -e 'length == 1'")
     machine.succeed(f"curl -fsS http://127.0.0.1:8788/api/jobs/success/runs/{run_id}/artifacts/output/pr-body.md | grep -Fx 'Update the fixture file.'")
+    machine.succeed(f"curl -fsS http://127.0.0.1:8788/api/jobs/success/runs/{run_id}/artifacts/output/result.json | jq -e '.agent == \"success\" and (has(\"validation\") | not)'")
+    machine.succeed(f"test ! -e /var/lib/agent-jobs/success/{run_id}/output/validation.log")
     machine.succeed(f"curl -fsS http://127.0.0.1:8788/jobs/success/runs/{run_id}/sessions/fixture.jsonl | grep 'fixture complete'")
     machine.succeed("test -s /var/lib/prometheus-node-exporter-text-files/agent-jobs.prom")
     machine.succeed("curl -fsS http://127.0.0.1:9100/metrics | grep agent_job_last_duration_seconds")
     machine.succeed("""curl -fsS http://127.0.0.1:9100/metrics | grep -Fx 'agent_job_schedule_enabled{agent_job="success"} 1'""")
     machine.succeed("""curl -fsS http://127.0.0.1:9100/metrics | grep -Fx 'agent_job_schedule_enabled{agent_job="security"} 0'""")
     start_job("security")
-    for name in ["failure", "timeout", "bad-path", "symlink", "validation-failure"]:
+    for name in ["failure", "timeout", "bad-path", "symlink"]:
         machine.fail(f"systemctl start agent-job-{name}.service")
         machine.succeed(f"find /var/lib/agent-jobs/{name} -name result.json | grep .")
     timeout_id = machine.succeed("curl -fsS http://127.0.0.1:8788/api/runs?job=timeout | jq -r '.[0].id'").strip()

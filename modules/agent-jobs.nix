@@ -30,10 +30,6 @@ let
         type = types.listOf types.str;
         default = [ "pi" ];
       };
-      validation = mkOption {
-        type = types.listOf (types.listOf types.str);
-        default = [ ];
-      };
       model = mkOption {
         type = types.str;
         default = "";
@@ -130,7 +126,6 @@ let
         repository
         branch
         prompt
-        validation
         model
         thinking
         cpus

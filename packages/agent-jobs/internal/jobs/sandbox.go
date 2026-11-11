@@ -19,7 +19,6 @@ import (
 type sandboxConfig struct {
 	Name             string            `json:"name"`
 	PiCommand        []string          `json:"pi_command"`
-	Validation       [][]string        `json:"validation"`
 	Model            string            `json:"model"`
 	Thinking         string            `json:"thinking"`
 	EnvironmentFiles map[string]string `json:"environment_files"`
@@ -27,8 +26,7 @@ type sandboxConfig struct {
 }
 
 type sandboxResult struct {
-	Agent      string `json:"agent"`
-	Validation string `json:"validation"`
+	Agent string `json:"agent"`
 }
 
 func Hold(ctx context.Context) error { <-ctx.Done(); return nil }
@@ -66,7 +64,7 @@ func RunSandbox(ctx context.Context, configPath string) (resultErr error) {
 		return err
 	}
 
-	result := sandboxResult{Agent: "failed", Validation: "not_run"}
+	result := sandboxResult{Agent: "failed"}
 	defer func() {
 		data, err := json.Marshal(result)
 		if err == nil {
@@ -78,11 +76,6 @@ func RunSandbox(ctx context.Context, configPath string) (resultErr error) {
 		return err
 	}
 	result.Agent = "success"
-	result.Validation = "failed"
-	if err := cfg.validate(ctx, env); err != nil {
-		return err
-	}
-	result.Validation = "success"
 	return cfg.writeCandidate(ctx, git)
 }
 
@@ -165,30 +158,6 @@ func (cfg sandboxConfig) runAgent(ctx context.Context, env []string) error {
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("agent: %w", err)
-	}
-	return nil
-}
-
-func (cfg sandboxConfig) validate(ctx context.Context, env []string) (resultErr error) {
-	log, err := os.OpenFile("/output/validation.log", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0640)
-	if err != nil {
-		return err
-	}
-	defer func() { resultErr = errors.Join(resultErr, log.Close()) }()
-	limited := &boundedWriter{writer: log, remaining: int64(cfg.OutputMB) * 1024 * 1024}
-	for _, args := range cfg.Validation {
-		if len(args) == 0 {
-			return errors.New("empty validation command")
-		}
-		if _, err := fmt.Fprintf(limited, "+ %s\n", strings.Join(args, " ")); err != nil {
-			return err
-		}
-		cmd := sandboxCommand(ctx, env, args...)
-		cmd.Stdout = limited
-		cmd.Stderr = limited
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("validation: %w", err)
-		}
 	}
 	return nil
 }
