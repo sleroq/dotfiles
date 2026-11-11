@@ -62,6 +62,7 @@ in
     home.sessionVariables = {
       FUMO_BASE_URL = "https://fumo.cum.army/v1";
       PI_FFF_MODE = "override";
+      PI_SKIP_VERSION_CHECK = "1";
     }
     // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
       # OpenCode's built-in "done" sound at the same volume as opencode/tui.json.
