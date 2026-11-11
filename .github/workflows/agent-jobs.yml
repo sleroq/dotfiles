@@ -1,0 +1,73 @@
+name: agent-jobs
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/agent-jobs.yml'
+      - 'hosts/div/agent-jobs.nix'
+      - 'hosts/div/agent-jobs/**'
+      - 'modules/agent-jobs.nix'
+      - 'packages/agent-jobs/**'
+      - 'packages/agent-sandbox.nix'
+      - 'packages/fumo-pi.nix'
+      - 'packages/fumo-pi-refresh.mjs'
+      - 'packages/gvisor-pty-fix.nix'
+      - 'packages/gvisor-pty-fix.patch'
+      - 'packages/tree-sitter-htmlx-svelte.nix'
+      - 'home/config/ast-grep/svelte-parser.json'
+      - 'home/config/ast-grep/rules/common/**'
+      - 'tests/agent-jobs.nix'
+      - 'tests/agent-jobs-fixture/**'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/agent-jobs.yml'
+      - 'hosts/div/agent-jobs.nix'
+      - 'hosts/div/agent-jobs/**'
+      - 'modules/agent-jobs.nix'
+      - 'packages/agent-jobs/**'
+      - 'packages/agent-sandbox.nix'
+      - 'packages/fumo-pi.nix'
+      - 'packages/fumo-pi-refresh.mjs'
+      - 'packages/gvisor-pty-fix.nix'
+      - 'packages/gvisor-pty-fix.patch'
+      - 'packages/tree-sitter-htmlx-svelte.nix'
+      - 'home/config/ast-grep/svelte-parser.json'
+      - 'home/config/ast-grep/rules/common/**'
+      - 'tests/agent-jobs.nix'
+      - 'tests/agent-jobs-fixture/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@3dc140bfc76c49fbd4dd958429132e3746bcb086 # v31
+      - name: Enable KVM access
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666"' | sudo tee /etc/udev/rules.d/99-kvm.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Build worker and NixOS VM test
+        run: |
+          nix build --impure --no-link --expr '
+            let
+              lock = builtins.fromJSON (builtins.readFile ./flake.lock);
+              nixpkgs = builtins.fetchTree lock.nodes.nixpkgs-div.locked;
+              pkgs = import nixpkgs { system = "x86_64-linux"; };
+              agent-jobs = pkgs.callPackage ./packages/agent-jobs {};
+            in [
+              agent-jobs
+              (import ./tests/agent-jobs.nix { inherit pkgs agent-jobs; })
+            ]
+          '
