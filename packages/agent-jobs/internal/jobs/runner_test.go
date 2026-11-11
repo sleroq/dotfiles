@@ -368,7 +368,7 @@ func TestFailedRunRetainsPhase(t *testing.T) {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	if err := RunJob(ctx, job, store); err == nil {
+	if err := RunJob(ctx, job, store, ""); err == nil {
 		t.Fatal("expected canceled run to fail")
 	}
 	runs, err := store.List()

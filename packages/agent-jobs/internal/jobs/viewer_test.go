@@ -60,7 +60,7 @@ func TestViewer(t *testing.T) {
 		}
 	}
 
-	for _, path := range []string{base + "/sessions/2025-01_test.jsonl", base + "/artifacts/stdout.log"} {
+	for _, path := range []string{base + "/artifacts/stdout.log"} {
 		body := request(h, "GET", path).Body.String()
 		if strings.Contains(body, "<script>alert") || !strings.Contains(body, "&lt;script&gt;") {
 			t.Errorf("unescaped content: %s", body)
@@ -68,7 +68,7 @@ func TestViewer(t *testing.T) {
 	}
 
 	body := request(h, "GET", base+"/sessions/2025-01_test.jsonl").Body.String()
-	if !strings.Contains(body, "invalid JSON") || !strings.Contains(body, "incomplete trailing entry") {
+	if !strings.Contains(body, "HTML session report unavailable") || !strings.Contains(body, "Raw JSONL") || strings.Contains(body, "<script>") {
 		t.Error(body)
 	}
 
@@ -162,7 +162,7 @@ func TestViewerLargeRawFiles(t *testing.T) {
 				t.Fatalf("range: status=%d body=%q", w.Code, w.Body.String())
 			}
 
-			if w := request(h, http.MethodGet, base+tc.path); w.Code != http.StatusRequestEntityTooLarge {
+			if w := request(h, http.MethodGet, base+tc.path); tc.name == "stdout.log" && w.Code != http.StatusRequestEntityTooLarge {
 				t.Fatalf("HTML: status=%d body=%s", w.Code, w.Body.String())
 			}
 		})
@@ -225,39 +225,32 @@ func TestViewerRejectsArtifactSymlinks(t *testing.T) {
 	}
 }
 
-func TestUnknownSessionEscaped(t *testing.T) {
+func TestViewerTrustedSessionHTML(t *testing.T) {
 	s, h, run := fixture(t)
-	filename := filepath.Join(s.Directory, run.Job, run.ID, "output/sessions/unknown.jsonl")
-	data := `{"type":"extension_event","payload":"<script>alert(1)</script>"}` + "\n" + `{"type":`
-	if err := os.WriteFile(filename, []byte(data), 0644); err != nil {
+	dir := filepath.Join(s.Directory, run.Job, run.ID)
+	name := "2025-01_test.jsonl"
+	path := "/jobs/" + run.Job + "/runs/" + run.ID + "/sessions/" + name
+	if err := os.WriteFile(filepath.Join(dir, "output/sessions", name+".html"), []byte("malicious sandbox html"), 0644); err != nil {
 		t.Fatal(err)
 	}
-	path := "/jobs/" + run.Job + "/runs/" + run.ID + "/sessions/unknown.jsonl"
-	body := request(h, "GET", path).Body.String()
-	if !strings.Contains(body, "extension_event") || !strings.Contains(body, "payload") || !strings.Contains(body, "incomplete trailing entry") || strings.Contains(body, "<script>alert") {
-		t.Fatal(body)
+	fallback := request(h, "GET", path)
+	if strings.Contains(fallback.Body.String(), "malicious") || !strings.Contains(fallback.Body.String(), "Raw JSONL") {
+		t.Fatal(fallback.Body.String())
 	}
-}
-
-func TestViewerSessionPagination(t *testing.T) {
-	s, h, run := fixture(t)
-	filename := filepath.Join(s.Directory, run.Job, run.ID, "output/sessions/2025-01_test.jsonl")
-	data := strings.Repeat("{}\n", 100) + `{"type":"second-page"}` + "\n"
-	if err := os.WriteFile(filename, []byte(data), 0644); err != nil {
+	if err := os.Mkdir(filepath.Join(dir, "session-html"), 0750); err != nil {
 		t.Fatal(err)
 	}
-	path := "/jobs/" + run.Job + "/runs/" + run.ID + "/sessions/2025-01_test.jsonl"
-	first := request(h, "GET", path).Body.String()
-	if !strings.Contains(first, `?offset=100`) || strings.Contains(first, "second-page") {
-		t.Fatal(first)
+	if err := os.WriteFile(filepath.Join(dir, "session-html", name+".html"), []byte("<script>trusted report</script>"), 0640); err != nil {
+		t.Fatal(err)
 	}
-	second := request(h, "GET", path+"?offset=100").Body.String()
-	if !strings.Contains(second, "second-page") || !strings.Contains(second, "First events") || strings.Contains(second, "Next events") {
-		t.Fatal(second)
-	}
-	for _, offset := range []string{"", "-1", "67108865", "oops"} {
-		if w := request(h, "GET", path+"?offset="+offset); w.Code != http.StatusBadRequest {
-			t.Errorf("offset %q: %d", offset, w.Code)
+	w := request(h, "GET", path)
+	csp := w.Header().Get("Content-Security-Policy")
+	for _, part := range []string{"sandbox allow-scripts", "default-src 'none'", "connect-src 'none'", "frame-ancestors 'none'"} {
+		if !strings.Contains(csp, part) {
+			t.Fatal(csp)
 		}
+	}
+	if w.Body.String() != "<script>trusted report</script>" || w.Header().Get("Cache-Control") != "no-store" || w.Header().Get("X-Content-Type-Options") != "nosniff" {
+		t.Fatal(w)
 	}
 }

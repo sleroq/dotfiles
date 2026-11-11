@@ -87,6 +87,9 @@ pkgs.testers.runNixOSTest {
       services.agent-jobs = {
         enable = true;
         package = agent-jobs;
+        pi = pkgs.writeShellScriptBin "pi" ''
+          exec ${fixture}/bin/agent-jobs-fixture "$@"
+        '';
         inherit image;
         gvisorPackage = gvisor;
         viewer.port = 8788;
@@ -213,6 +216,12 @@ pkgs.testers.runNixOSTest {
                 _, content = machine.execute(f"curl -fsS http://127.0.0.1:8788/api/jobs/{name}/runs/{failed_id}/artifacts/{artifact}")
                 print(content)
             raise Exception(f"{name}: {output}")
+    def check_session_export(name, run_id):
+        base = f"http://127.0.0.1:8788"
+        machine.succeed(f"test -s /var/lib/agent-jobs/{name}/{run_id}/session-html/fixture.jsonl.html")
+        machine.succeed(f"curl -fsS {base}/jobs/{name}/runs/{run_id}/sessions/fixture.jsonl | grep -F 'fixture exported session'")
+        machine.succeed(f"curl -fsSI {base}/jobs/{name}/runs/{run_id}/sessions/fixture.jsonl | tr -d '\\r' | grep -Fx \"Content-Security-Policy: sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'\"")
+        machine.succeed(f"curl -fsS {base}/api/jobs/{name}/runs/{run_id}/sessions/fixture.jsonl | grep -F 'fixture complete'")
     scratch_unit = "var-lib-agent\\x2djobs\\x2dwork-success-scratch.mount"
     for service in ["agent-job-success.service", "agent-job-publish-success@fixture.service"]:
         for dependency in ["Requires", "After"]:
@@ -237,7 +246,7 @@ pkgs.testers.runNixOSTest {
     machine.fail(f"systemctl start agent-job-publish-retry@{run_id}.service")
     machine.succeed(f"jq -e '.status == \"failed\" and .error == \"invalid GitHub app private key\"' /var/lib/agent-jobs/retry/{run_id}/result.json")
     machine.succeed(f"journalctl -u agent-job-publish-retry@{run_id}.service | grep -F 'invalid GitHub app private key'")
-    machine.succeed(f"curl -fsS http://127.0.0.1:8788/jobs/success/runs/{run_id}/sessions/fixture.jsonl | grep 'fixture complete'")
+    check_session_export("success", run_id)
     machine.succeed("test -s /var/lib/prometheus-node-exporter-text-files/agent-jobs.prom")
     machine.succeed(f"curl -fsS http://127.0.0.1:8788/api/jobs/success/runs/{run_id} | jq -e '.nix_store_seed_bytes > 0 and .nix_store_seed_bytes <= 2147483648 and .nix_store_setup_duration_seconds > 0'")
     machine.succeed(r"""curl -fsS http://127.0.0.1:9100/metrics | grep -E '^agent_job_last_nix_store_seed_bytes\{agent_job="success"\} [1-9][0-9]*$'""")
@@ -251,8 +260,10 @@ pkgs.testers.runNixOSTest {
     for name in ["failure", "timeout", "symlink"]:
         machine.fail(f"systemctl start agent-job-{name}.service")
         machine.succeed(f"find /var/lib/agent-jobs/{name} -name result.json | grep .")
-    timeout_id = machine.succeed("curl -fsS http://127.0.0.1:8788/api/runs?job=timeout | jq -r '.[0].id'").strip()
-    machine.succeed(f"curl -fsS http://127.0.0.1:8788/api/jobs/timeout/runs/{timeout_id}/sessions | jq -e 'length == 1'")
+    for name, status in [("failure", "failed"), ("timeout", "timed_out")]:
+        run_id = machine.succeed(f"curl -fsS http://127.0.0.1:8788/api/runs?job={name} | jq -er '.[0] | select(.status == \"{status}\") | .id'").strip()
+        machine.succeed(f"curl -fsS http://127.0.0.1:8788/api/jobs/{name}/runs/{run_id}/sessions | jq -e 'length == 1'")
+        check_session_export(name, run_id)
     machine.succeed("test -z \"$(docker ps -aq --filter name=agent-jobs-)\"")
     machine.succeed("test -z \"$(docker volume ls -q --filter name=agent-jobs-)\"")
     machine.succeed("test \"$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:8788/api/runs)\" = 405")

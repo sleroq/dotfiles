@@ -58,6 +58,7 @@ in
   age.secrets.agentJobsFumoKey.file = ./secrets/agentJobsFumoKey;
   services.agent-jobs = {
     enable = true;
+    pi = inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.default;
     viewer.port = 8788;
     proxy.keyFile = config.age.secrets.agentJobsFumoKey.path;
     image = pkgs.callPackage ../../packages/agent-sandbox.nix {

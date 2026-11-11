@@ -33,7 +33,6 @@ type page struct {
 	HasNext             bool
 	Sessions, Artifacts []string
 	Session             string
-	Events              []sessionEvent
 	Artifact, Content   string
 }
 
@@ -145,34 +144,28 @@ func (v *viewer) sessionRoute(w http.ResponseWriter, r *http.Request, run Run, p
 }
 
 func (v *viewer) sessionHTML(w http.ResponseWriter, r *http.Request, run Run, name string) {
-	offset := 0
-	if r.URL.Query().Has("offset") {
-		var err error
-		offset, err = strconv.Atoi(r.URL.Query().Get("offset"))
-		if err != nil || offset < 0 || offset > 64<<20 {
-			http.Error(w, "invalid offset", http.StatusBadRequest)
-			return
-		}
+	file, err := v.store.Open(run.Job, run.ID, "session-html/"+name+".html")
+	if err == nil {
+		defer func() { _ = file.Close() }()
+		csp := "sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; " +
+			"style-src 'unsafe-inline'; img-src data:; connect-src 'none'; " +
+			"object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+		w.Header().Set("Content-Security-Policy", csp)
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		http.ServeContent(w, r, name+".html", time.Time{}, file)
+		return
 	}
-	file, err := v.store.Open(run.Job, run.ID, "output/sessions/"+name)
+	if !errors.Is(err, os.ErrNotExist) {
+		v.fail(w, err)
+		return
+	}
+	raw, err := v.store.Open(run.Job, run.ID, "output/sessions/"+name)
 	if err != nil {
 		v.fail(w, err)
 		return
 	}
-	defer func() { _ = file.Close() }()
-	info, err := file.Stat()
-	if err != nil {
-		v.fail(w, err)
-		return
-	}
-	if info.Size() > 64<<20 {
-		v.fail(w, errFileTooLarge)
-		return
-	}
-	parsed := parseSession(file, offset)
-	p := page{Title: name, Run: run, Session: name, Events: parsed.Events,
-		Offset: offset, Next: parsed.Next, HasNext: parsed.HasNext}
-	v.render(w, "session.html", p)
+	_ = raw.Close()
+	v.render(w, "session.html", page{Title: name, Run: run, Session: name})
 }
 
 func (v *viewer) artifactRoute(w http.ResponseWriter, r *http.Request, run Run, parts []string, api bool) {

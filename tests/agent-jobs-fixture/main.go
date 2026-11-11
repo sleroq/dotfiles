@@ -24,6 +24,9 @@ func run(args []string) error {
 		return errors.New("fixture scenario required")
 	}
 	mode := args[0]
+	if mode == "--export" {
+		return exportSession(args[1:])
+	}
 	if mode == "serve" {
 		server := http.Server{Addr: ":18080", ReadHeaderTimeout: time.Second, Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == "/v1/check" {
@@ -69,6 +72,20 @@ func run(args []string) error {
 		return err
 	}
 	return os.WriteFile("/output/pr-body.md", []byte("Update the fixture file.\n"), 0644)
+}
+
+func exportSession(args []string) error {
+	if len(args) != 2 || filepath.Base(args[0]) != "session.jsonl" || filepath.Base(args[1]) != "session.html" {
+		return errors.New("expected --export session.jsonl session.html")
+	}
+	session, err := os.ReadFile(args[0])
+	if err != nil {
+		return err
+	}
+	if !strings.Contains(string(session), "fixture complete") {
+		return errors.New("unexpected session contents")
+	}
+	return os.WriteFile(args[1], []byte("<!doctype html><html><body>fixture exported session</body></html>\n"), 0644)
 }
 
 func scenario(mode string, args []string) error {
