@@ -1,1 +1,82 @@
-{{define "run.html"}}{{template "head" .}}<p><a href="/">← All runs</a></p><p class="eyebrow">{{.Run.Job}} / Run</p><h1>{{.Run.ID}}</h1><p><span class="status">{{.Run.Status}}</span></p><section><h2>Overview</h2><dl class="metadata"><div><dt>Started</dt><dd>{{.Run.StartedAt.Format "2006-01-02 15:04:05 UTC"}}</dd></div><div><dt>Duration</dt><dd>{{printf "%.1f s" .Run.DurationSeconds}}</dd></div><div><dt>Sandbox duration (including checks)</dt><dd>{{printf "%.1f s" .Run.SandboxDurationSeconds}}</dd></div><div><dt>Phase</dt><dd>{{.Run.Phase}}</dd></div><div><dt>Model</dt><dd>{{.Run.Model}}</dd></div><div><dt>Repository</dt><dd>{{.Run.Repository}}</dd></div><div><dt>Branch</dt><dd>{{.Run.Branch}}</dd></div><div><dt>Base commit</dt><dd>{{.Run.BaseCommit}}</dd></div><div><dt>Publication</dt><dd>{{.Run.Publication}}</dd></div><div><dt>Pull request</dt><dd>{{if .Run.PRURL}}<a href="{{.Run.PRURL}}" rel="noreferrer">View PR ↗</a>{{else}}—{{end}}</dd></div></dl>{{if .Run.Error}}<h3>Error</h3><pre>{{.Run.Error}}</pre>{{end}}</section><section><h2>Artifacts</h2><ul class="links">{{range .Artifacts}}<li><a href="/jobs/{{$.Run.Job}}/runs/{{$.Run.ID}}/artifacts/{{.}}">{{.}}</a></li>{{else}}<li class="muted">No artifacts available.</li>{{end}}</ul></section><section><h2>Sessions</h2><ul class="links">{{range .Sessions}}<li><a href="/jobs/{{$.Run.Job}}/runs/{{$.Run.ID}}/sessions/{{.}}">{{.}}</a></li>{{else}}<li class="muted">No sessions available.</li>{{end}}</ul></section>{{template "foot" .}}{{end}}
+{{define "run.html"}}{{template "head" .}}
+<p><a href="/">← All runs</a></p>
+<p class="eyebrow">{{.Run.Job}} / Run</p>
+<h1>{{.Run.ID}}</h1>
+<p><span class="status">{{.Run.Status}}</span></p>
+<section>
+  <h2>Overview</h2>
+  <dl class="metadata">
+    <div>
+      <dt>Started</dt>
+      <dd>{{.Run.StartedAt.Format "2006-01-02 15:04:05 UTC"}}</dd>
+    </div>
+    <div>
+      <dt>Duration</dt>
+      <dd>{{printf "%.1f s" .Run.DurationSeconds}}</dd>
+    </div>
+    <div>
+      <dt>Sandbox duration (including checks)</dt>
+      <dd>{{printf "%.1f s" .Run.SandboxDurationSeconds}}</dd>
+    </div>
+    <div>
+      <dt>Phase</dt>
+      <dd>{{.Run.Phase}}</dd>
+    </div>
+    <div>
+      <dt>Model</dt>
+      <dd>{{.Run.Model}}</dd>
+    </div>
+    <div>
+      <dt>Repository</dt>
+      <dd>{{.Run.Repository}}</dd>
+    </div>
+    <div>
+      <dt>Branch</dt>
+      <dd>{{.Run.Branch}}</dd>
+    </div>
+    <div>
+      <dt>Base commit</dt>
+      <dd>{{.Run.BaseCommit}}</dd>
+    </div>
+    <div>
+      <dt>Publication</dt>
+      <dd>{{.Run.Publication}}</dd>
+    </div>
+    <div>
+      <dt>Pull request</dt>
+      <dd>
+        {{if .Run.PRURL}}<a href="{{.Run.PRURL}}" rel="noreferrer">View PR ↗</a
+        >{{else}}—{{end}}
+      </dd>
+    </div>
+  </dl>
+  {{if .Run.Error}}
+  <h3>Error</h3>
+  <pre>{{.Run.Error}}</pre>
+  {{end}}
+</section>
+<section>
+  <h2>Artifacts</h2>
+  <ul class="links">
+    {{range .Artifacts}}
+    <li>
+      <a href="/jobs/{{$.Run.Job}}/runs/{{$.Run.ID}}/artifacts/{{.}}">{{.}}</a>
+    </li>
+    {{else}}
+    <li class="muted">No artifacts available.</li>
+    {{end}}
+  </ul>
+</section>
+<section>
+  <h2>Sessions</h2>
+  <ul class="links">
+    {{range .Sessions}}
+    <li>
+      <a href="/jobs/{{$.Run.Job}}/runs/{{$.Run.ID}}/sessions/{{.}}">{{.}}</a>
+    </li>
+    {{else}}
+    <li class="muted">No sessions available.</li>
+    {{end}}
+  </ul>
+</section>
+{{template "foot" .}}{{end}}
