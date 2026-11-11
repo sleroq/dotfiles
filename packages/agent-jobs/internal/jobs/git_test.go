@@ -2,9 +2,15 @@ package jobs
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
 	"errors"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -154,5 +160,113 @@ func TestGitCredentialIsRestrictedToCloneHost(t *testing.T) {
 		if strings.Contains(string(data), "test-secret") != test.allowed {
 			t.Fatalf("host %s protocol %s output %q err %v", test.host, test.protocol, data, err)
 		}
+	}
+}
+
+func TestCheckoutDepthAndRemoteBranches(t *testing.T) {
+	g, source := gitTestRepo(t)
+	ctx := context.Background()
+	old, err := g.run(ctx, source, "rev-parse", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, args := range [][]string{{"branch", "other"}, {"-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "--allow-empty", "-qm", "new"}} {
+		if _, err := g.run(ctx, source, args...); err != nil {
+			t.Fatal(err)
+		}
+	}
+	branch, err := g.run(ctx, source, "symbolic-ref", "--short", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, tc := range []struct {
+		name, url string
+		shallow   bool
+	}{
+		{"path shallow", source, true}, {"path full", source, false},
+		{"file shallow", "file://" + source, true}, {"file full", "file://" + source, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			url, shallow := tc.url, tc.shallow
+			dir := filepath.Join(t.TempDir(), "checkout")
+			base, err := g.checkoutWithDepth(ctx, Job{CloneURL: url}, dir, shallow)
+			if err != nil {
+				t.Fatal(err)
+			}
+			tip, err := g.run(ctx, source, "rev-parse", "HEAD")
+			if err != nil || base != tip {
+				t.Fatalf("base %q, tip %q: %v", base, tip, err)
+			}
+			got, err := g.run(ctx, dir, "rev-parse", "--is-shallow-repository")
+			if err != nil || got != strconv.FormatBool(shallow) {
+				t.Fatalf("shallow %q: %v", got, err)
+			}
+			got, err = g.run(ctx, dir, "symbolic-ref", "--short", "refs/remotes/origin/HEAD")
+			if err != nil || got != "origin/"+branch {
+				t.Fatalf("default branch %q: %v", got, err)
+			}
+			if !shallow {
+				got, err = g.run(ctx, dir, "rev-parse", "refs/remotes/origin/other")
+				if err != nil || got != old {
+					t.Fatalf("other branch %q: %v", got, err)
+				}
+			}
+			_, err = g.run(ctx, dir, "rev-parse", "--verify", "HEAD^")
+			if (err != nil) != shallow {
+				t.Fatalf("parent error: %v", err)
+			}
+		})
+	}
+}
+
+func TestPublishCheckoutRetainsPinnedBase(t *testing.T) {
+	g, source := gitTestRepo(t)
+	ctx := context.Background()
+	base, err := g.run(ctx, source, "rev-parse", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := g.run(ctx, source, "-c", "user.name=Test", "-c", "user.email=test@example.invalid",
+		"commit", "--allow-empty", "-qm", "advanced"); err != nil {
+		t.Fatal(err)
+	}
+
+	patch := filepath.Join(t.TempDir(), "patch")
+	patchData := "diff --git a/file b/file\nnew file mode 100644\nindex 0000000..ce01362\n" +
+		"--- /dev/null\n+++ b/file\n@@ -0,0 +1 @@\n+hello\n"
+	if err := os.WriteFile(patch, []byte(patchData), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	key, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		t.Fatal(err)
+	}
+	keyFile := filepath.Join(t.TempDir(), "key")
+	keyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
+	if err := os.WriteFile(keyFile, keyPEM, 0600); err != nil {
+		t.Fatal(err)
+	}
+
+	created, revoked, reviews := 0, 0, 0
+	body := "Update"
+	server := httptest.NewServer(publicationHandler(t, &created, &revoked, &reviews, &body))
+	defer server.Close()
+	job := Job{
+		Name: "test", Repository: "owner/repo", CloneURL: "file://" + source, Branch: "automation/test",
+		AllowedPaths: []string{"file"}, Publish: Publication{AppID: "123", InstallationID: "42", PrivateKeyFile: keyFile},
+	}
+	work := t.TempDir()
+	api := githubClient{baseURL: server.URL, client: server.Client()}
+	_, publication, err := g.publish(ctx, job, work, base, "", patch, body, api, Run{})
+	if err != nil || publication != "published" {
+		t.Fatalf("publication %q: %v", publication, err)
+	}
+
+	parent, err := g.run(ctx, filepath.Join(work, "publish"), "rev-parse", "HEAD^")
+	if err != nil || parent != base {
+		t.Fatalf("publication parent %q: %v", parent, err)
 	}
 }
