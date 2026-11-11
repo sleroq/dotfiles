@@ -143,3 +143,41 @@ func TestStoreReadLimit(t *testing.T) {
 	}
 	_ = file.Close()
 }
+
+func TestStoreIgnoresInterruptedStaging(t *testing.T) {
+	store := Store{Directory: t.TempDir()}
+	jobDir := filepath.Join(store.Directory, "helium")
+	staging := filepath.Join(jobDir, ".run-interrupted")
+	if err := os.MkdirAll(staging, 0750); err != nil {
+		t.Fatal(err)
+	}
+	run, err := store.Create(Job{Name: "helium"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := store.Get(run.Job, run.ID)
+	if err != nil || got != run {
+		t.Fatalf("created run: %+v, %v", got, err)
+	}
+	info, err := os.Stat(filepath.Join(jobDir, run.ID))
+	if err != nil || info.Mode().Perm() != 0750 {
+		t.Fatalf("run directory: %v, %v", info, err)
+	}
+	entries, err := os.ReadDir(jobDir)
+	if err != nil || len(entries) != 2 {
+		t.Fatalf("job entries: %v, %v", entries, err)
+	}
+	runs, err := store.List()
+	if err != nil || len(runs) != 1 || runs[0].ID != run.ID {
+		t.Fatalf("list: %v, %v", runs, err)
+	}
+	if err := WriteMetrics(store, filepath.Join(t.TempDir(), "metrics.prom")); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Prune(time.Now()); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(staging); err != nil {
+		t.Fatalf("staging removed: %v", err)
+	}
+}

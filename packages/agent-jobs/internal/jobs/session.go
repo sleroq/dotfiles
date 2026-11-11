@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -11,7 +12,6 @@ import (
 )
 
 const (
-	maxSessionEntry      = 16 << 20
 	maxSessionPageBytes  = 1 << 20
 	maxSessionPageEvents = 100
 )
@@ -62,37 +62,57 @@ type sessionPage struct {
 	HasNext bool
 }
 
-// scanSessionLine retains the newline so a malformed final line can be distinguished.
-func scanSessionLine(data []byte, atEOF bool) (int, []byte, error) {
-	if i := bytes.IndexByte(data, '\n'); i >= 0 {
-		return i + 1, data[:i+1], nil
+// readSessionLine retains the newline to identify incomplete trailing entries.
+func readSessionLine(reader *bufio.Reader) ([]byte, bool, error) {
+	var raw []byte
+	oversized := false
+	for {
+		chunk, err := reader.ReadSlice('\n')
+		if !oversized {
+			if len(raw)+len(chunk) > maxSessionPageBytes+2 {
+				raw = nil
+				oversized = true
+			} else {
+				raw = append(raw, chunk...)
+			}
+		}
+		if !errors.Is(err, bufio.ErrBufferFull) {
+			return raw, oversized, err
+		}
 	}
-	if atEOF && len(data) > 0 {
-		return len(data), data, nil
-	}
-	return 0, nil, nil
 }
 
 func parseSession(reader io.Reader, offset int) sessionPage {
-	scanner := bufio.NewScanner(reader)
-	scanner.Buffer(make([]byte, 4096), maxSessionEntry)
-	scanner.Split(scanSessionLine)
+	lines := bufio.NewReader(reader)
 	page := sessionPage{Next: offset}
 	line, size := 0, 0
-	for scanner.Scan() {
+	for {
+		raw, oversized, err := readSessionLine(lines)
+		if err != nil && !errors.Is(err, io.EOF) {
+			if len(page.Events) == maxSessionPageEvents {
+				page.HasNext = true
+			} else {
+				issue := fmt.Sprintf("Line %d: cannot be read: %v", line+1, err)
+				page.Events = append(page.Events, sessionEvent{Issue: issue})
+			}
+			return page
+		}
+		if errors.Is(err, io.EOF) && len(raw) == 0 && !oversized {
+			return page
+		}
 		line++
 		if line <= offset {
 			continue
 		}
-		raw := scanner.Bytes()
 		incomplete := len(raw) == 0 || raw[len(raw)-1] != '\n'
 		raw = bytes.TrimSuffix(raw, []byte("\n"))
 		raw = bytes.TrimSuffix(raw, []byte("\r"))
-		if len(page.Events) == maxSessionPageEvents || (len(page.Events) > 0 && size+len(raw) > maxSessionPageBytes) {
+		oversized = oversized || len(raw) > maxSessionPageBytes
+		if len(page.Events) == maxSessionPageEvents || (len(page.Events) > 0 && (oversized || size+len(raw) > maxSessionPageBytes)) {
 			page.HasNext = true
 			return page
 		}
-		if len(raw) > maxSessionPageBytes {
+		if oversized {
 			issue := fmt.Sprintf("Line %d: entry exceeds 1 MiB; download Raw JSONL to view it", line)
 			page.Events = append(page.Events, sessionEvent{Issue: issue})
 		} else {
@@ -101,15 +121,6 @@ func parseSession(reader io.Reader, offset int) sessionPage {
 		}
 		page.Next = line
 	}
-	if err := scanner.Err(); err != nil {
-		if len(page.Events) == maxSessionPageEvents {
-			page.HasNext = true
-		} else {
-			issue := fmt.Sprintf("Line %d: entry exceeds %d bytes or cannot be read: %v", line+1, maxSessionEntry, err)
-			page.Events = append(page.Events, sessionEvent{Issue: issue})
-		}
-	}
-	return page
 }
 
 func parseSessionEntry(raw []byte, line int, incomplete bool) sessionEvent {

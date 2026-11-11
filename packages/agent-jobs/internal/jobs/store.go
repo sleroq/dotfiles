@@ -47,14 +47,32 @@ func (s Store) Create(job Job) (Run, error) {
 		Job: job.Name, Repository: job.Repository, Branch: job.Branch, Model: job.Model,
 		Status: "running", Phase: "prepare", StartedAt: time.Now().UTC(),
 	}
-	if err := os.MkdirAll(filepath.Join(s.Directory, run.Job, run.ID), 0750); err != nil {
+	jobDir := filepath.Join(s.Directory, run.Job)
+	if err := os.MkdirAll(jobDir, 0750); err != nil {
 		return Run{}, err
 	}
-	return run, s.Save(run)
+	staging, err := os.MkdirTemp(jobDir, ".run-*")
+	if err != nil {
+		return Run{}, err
+	}
+	defer func() { _ = os.RemoveAll(staging) }()
+	if err := saveRun(staging, run); err != nil {
+		return Run{}, err
+	}
+	if err := os.Chmod(staging, 0750); err != nil {
+		return Run{}, err
+	}
+	if err := os.Rename(staging, filepath.Join(jobDir, run.ID)); err != nil {
+		return Run{}, err
+	}
+	return run, nil
 }
 
 func (s Store) Save(run Run) error {
-	directory := filepath.Join(s.Directory, run.Job, run.ID)
+	return saveRun(filepath.Join(s.Directory, run.Job, run.ID), run)
+}
+
+func saveRun(directory string, run Run) error {
 	data, err := json.MarshalIndent(run, "", "  ")
 	if err != nil {
 		return err
