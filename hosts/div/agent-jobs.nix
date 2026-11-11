@@ -75,6 +75,7 @@ in
         piCommand = [ "agent-pi" ];
         model = "fumo/codex/gpt-6.1-terra";
         thinking = "high";
+        timeoutSeconds = 1800;
         memoryMB = 8192;
         workspaceMB = 6144;
         prompt = ''
