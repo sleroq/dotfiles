@@ -82,10 +82,22 @@ let
   );
   piMcp = writeText "agent-pi-mcp.json" (
     builtins.toJSON {
-      mcpServers = lib.getAttrs [
-        "exa"
-        "grep"
-      ] (builtins.fromJSON (builtins.readFile ../home/config/pi/agent/mcp.json)).mcpServers;
+      mcpServers = {
+        exa = {
+          command = "npx";
+          args = [
+            "-y"
+            "exa-mcp-server@3.4.3"
+          ];
+          env = {
+            EXA_API_KEY = "\${EXA_API_KEY}";
+            NPM_CONFIG_REGISTRY = "https://registry.npmjs.org";
+          };
+          exposure = "direct";
+          toolExposure.read_tools_list = "hidden";
+        };
+        grep.url = "https://mcp.grep.app";
+      };
     }
   );
   svelteParser = callPackage ./tree-sitter-htmlx-svelte.nix { };
