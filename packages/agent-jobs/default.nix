@@ -1,6 +1,6 @@
-{ buildGoModule, git }:
+{ buildGo127Module, git }:
 
-buildGoModule {
+buildGo127Module {
   pname = "agent-jobs";
   version = "0.1.0";
   src = ./.;

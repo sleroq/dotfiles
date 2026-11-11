@@ -37,8 +37,7 @@ func proxyHandler(upstream, key string) (http.Handler, error) {
 			IdleConnTimeout:       90 * time.Second,
 		},
 		ErrorHandler: func(w http.ResponseWriter, _ *http.Request, err error) {
-			var tooLarge *http.MaxBytesError
-			if errors.As(err, &tooLarge) {
+			if _, ok := errors.AsType[*http.MaxBytesError](err); ok {
 				http.Error(w, "request body too large", http.StatusRequestEntityTooLarge)
 				return
 			}
