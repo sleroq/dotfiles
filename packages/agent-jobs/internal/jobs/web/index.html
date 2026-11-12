@@ -18,15 +18,12 @@
 </html>
 {{end}} {{define "index.html"}}{{template "head" .}}
 <div class="heading">
-  <p class="eyebrow">Activity</p>
   <h1>Run timeline</h1>
-  <p class="muted">Upcoming schedules and recent agent work, in UTC.</p>
 </div>
 <form class="filters" method="get">
   <label>Job <select name="job"><option value="">All jobs</option>
     {{range .Jobs}}<option value="{{.}}" {{if eq . $.Job}}selected{{end}}>{{.}}</option>{{end}}
   </select></label>
-  <label>Status <input name="status" value="{{.Status}}" placeholder="All statuses" aria-describedby="status-help" /></label>
   <button>Filter</button>
 </form>
 <p id="status-help" class="muted filter-help">Status filters run history only. Upcoming timers follow the job filter.</p>
