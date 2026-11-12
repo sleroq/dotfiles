@@ -78,6 +78,22 @@
             "$__all"
           ]
         }
+      },
+      {
+        "name": "app",
+        "label": "Application logs",
+        "type": "query",
+        "datasource": {
+          "type": "loki",
+          "uid": "Loki1"
+        },
+        "query": "label_values({unit=~\"starflake-app-.+[.]service\"}, unit)",
+        "regex": "/starflake-app-(.+)\\.service/",
+        "multi": false,
+        "includeAll": false,
+        "sort": 1,
+        "refresh": 2,
+        "options": []
       }
     ]
   },
@@ -1125,7 +1141,7 @@
     },
     {
       "id": 13,
-      "title": "cumserver logs",
+      "title": "cumserver Starflake system logs",
       "type": "logs",
       "gridPos": {
         "x": 0,
@@ -1137,7 +1153,7 @@
         "type": "loki",
         "uid": "Loki1"
       },
-      "description": "cumserver reconcile, build and application logs for selected deployments. These journal streams have no host label, so the Host filter does not apply; div logs are not included. Unstructured build/application logs are retained. Read-only view.",
+      "description": "Reconcile and build logs for selected deployments on cumserver. These journal streams have no host label, so the Host filter does not apply; other hosts are not included.",
       "targets": [
         {
           "refId": "A",
@@ -1145,7 +1161,49 @@
             "type": "loki",
             "uid": "Loki1"
           },
-          "expr": "{unit=~\"starflake-(reconcile|build|app)-(${deployment:regex})[.]service\"}",
+          "expr": "{unit=~\"starflake-(reconcile|build)-(${deployment:regex})[.]service\"}",
+          "queryType": "range",
+          "maxLines": 1000
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      }
+    },
+    {
+      "id": 14,
+      "title": "cumserver application logs",
+      "type": "logs",
+      "gridPos": {
+        "x": 0,
+        "y": 39,
+        "w": 24,
+        "h": 9
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "Loki1"
+      },
+      "description": "Logs for the selected application on cumserver. The Host and Deployment filters do not apply; other hosts are not included.",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "Loki1"
+          },
+          "expr": "{unit=\"starflake-app-${app}.service\"}",
           "queryType": "range",
           "maxLines": 1000
         }
