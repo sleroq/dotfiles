@@ -8,7 +8,6 @@
 }:
 {
   imports = [
-    ../../modules/paseo.nix
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
@@ -52,13 +51,6 @@
 
   services.logrotate.enable = true;
   services.fail2ban.enable = true;
-  services.paseo = {
-    enable = true;
-    user = config.cumserver.dev-env.user;
-    manageUser = false;
-    relay.enable = true;
-  };
-
   services.openssh = {
     enable = true;
     settings = {
