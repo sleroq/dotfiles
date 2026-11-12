@@ -99,7 +99,6 @@
     roundy-test.inputs.nixpkgs-stable.follows = "nixpkgs-roundy";
 
     zefxi.url = "github:sleroq/zefxi";
-    zefxi.inputs.nixpkgs.follows = "nixpkgs-div";
 
     music-link.url = "github:sleroq/music-link";
     # music-link.url = "path:/Users/sleroq/develop/music-link";

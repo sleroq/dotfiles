@@ -2516,6 +2516,18 @@
     },
     "nixpkgs_26": {
       "locked": {
+        "lastModified": 1793977579,
+        "narHash": "sha256-WrSODdZFVIs/Hh2NzC0bY+ROByi0bATg8WfePX8dPj8=",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/nixpkgs-unstable.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/nixpkgs-unstable.tar.gz"
+      }
+    },
+    "nixpkgs_27": {
+      "locked": {
         "lastModified": 1771043024,
         "narHash": "sha256-O1XDr7EWbRp+kHrNNgLWgIrB0/US5wvw9K6RERWAj6I=",
         "owner": "NixOS",
@@ -2530,7 +2542,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_27": {
+    "nixpkgs_28": {
       "locked": {
         "lastModified": 1791883866,
         "narHash": "sha256-yvkDdToRZ4IgPc9tSBzzCYJvTLf8n5eE3rgUkpCuD5A=",
@@ -3405,9 +3417,7 @@
     },
     "zefxi": {
       "inputs": {
-        "nixpkgs": [
-          "nixpkgs-div"
-        ]
+        "nixpkgs": "nixpkgs_26"
       },
       "locked": {
         "lastModified": 1794248771,
@@ -3426,7 +3436,7 @@
     "zig": {
       "inputs": {
         "flake-compat": "flake-compat_10",
-        "nixpkgs": "nixpkgs_26",
+        "nixpkgs": "nixpkgs_27",
         "systems": "systems_15"
       },
       "locked": {
@@ -3466,7 +3476,7 @@
     },
     "zls": {
       "inputs": {
-        "nixpkgs": "nixpkgs_27",
+        "nixpkgs": "nixpkgs_28",
         "zig-flake": "zig-flake"
       },
       "locked": {

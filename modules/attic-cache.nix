@@ -10,6 +10,7 @@
       "https://cache.cum.army/sieve"
       "https://cache.cum.army/fumo-gateway"
       "https://cache.cum.army/kopoka"
+      "https://cache.cum.army/zefxi"
     ];
     extra-trusted-public-keys = [
       "music-link:agcaBqYuR+kFl8V9OS2P8nekfhTXYfg4i8bA/0+/yII="
@@ -19,6 +20,7 @@
       "sieve:UrgY6krg1isOiCkmz9Um9gyvyDaaMPRlyh0F+O4ov+U="
       "fumo-gateway:XQHLMyDoYCcsiVIdoAGf/B1HANxxTKR2wNr1SHL3WXw="
       "kopoka:AhAzvs/u600OVl/wMujSPopaGhn840LGu1xPuBZJD9U="
+      "zefxi:F5fF+u3Zx4sagOUOZrjU7pHNebA1k8demQVtLRNGDsM="
     ];
   };
 }
