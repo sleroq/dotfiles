@@ -452,8 +452,6 @@
 
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK72BBTnP5Os5ZQfS1BuigNzWMqNFl7lgUH4CJq1bl9P cantundo@pm.me"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILrfoGZEccuZNAYoVPeCC+es5Za42z2bWmOdqS1jFLIT paseo-deploy@cumserver"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICX8bDAQEWSnMyNxKOuovzlnMn/oK8M2QNC7pCMPi9ib paseo-deploy@sleroq-interplanetary"
   ];
 
   users.users.root.hashedPassword = "$6$vsKWQuT3n7JRBP.s$uI.Pyq.dN/kxLqmGF9Pl/yuVGRp/9Y6sQXVNqAsNm4impBdDgAnazM1VVu9jZ4oHfZRsFCXvZTIwvXWoSF76x.";
