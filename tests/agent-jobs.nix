@@ -258,9 +258,10 @@ pkgs.testers.runNixOSTest {
     check_session_export("success", run_id)
     machine.succeed("test -s /var/lib/prometheus-node-exporter-text-files/agent-jobs.prom")
     machine.succeed(f"curl -fsS http://127.0.0.1:8788/api/jobs/success/runs/{run_id} | jq -e '.nix_store_seed_bytes > 0 and .nix_store_seed_bytes <= 2147483648 and .nix_store_setup_duration_seconds > 0'")
-    machine.succeed(r"""curl -fsS http://127.0.0.1:9100/metrics | grep -E '^agent_job_last_nix_store_seed_bytes\{agent_job="success"\} [1-9][0-9]*$'""")
-    machine.succeed("""curl -fsS http://127.0.0.1:9100/metrics | grep -Fx 'agent_job_nix_store_limit_bytes{agent_job="success"} 2147483648'""")
-    machine.succeed("""curl -fsS http://127.0.0.1:9100/metrics | grep -Fx 'agent_job_sandbox_memory_limit_bytes{agent_job="success"} 2147483648'""")
+    metrics = dict(line.split() for line in machine.succeed("curl -fsS http://127.0.0.1:9100/metrics | grep '^agent_job_'").splitlines())
+    assert float(metrics['agent_job_last_nix_store_seed_bytes{agent_job="success"}']) > 0
+    assert float(metrics['agent_job_nix_store_limit_bytes{agent_job="success"}']) == 2147483648
+    assert float(metrics['agent_job_sandbox_memory_limit_bytes{agent_job="success"}']) == 2147483648
     machine.succeed("curl -fsS http://127.0.0.1:9100/metrics | grep agent_job_last_duration_seconds")
     machine.succeed("""curl -fsS http://127.0.0.1:9100/metrics | grep -Fx 'agent_job_schedule_enabled{agent_job="success"} 1'""")
     machine.succeed("""curl -fsS http://127.0.0.1:9100/metrics | grep -Fx 'agent_job_schedule_enabled{agent_job="security"} 0'""")
