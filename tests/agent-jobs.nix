@@ -162,7 +162,8 @@ pkgs.testers.runNixOSTest {
     };
   };
   testScript = ''
-    start_all()
+    machine.start(allow_reboot=True)
+    private.start()
     machine.wait_for_unit("agent-jobs-enablement.service")
     machine.succeed("test ! -e /var/lib/agent-jobs/enabled-since/security")
     machine.succeed("test -s /var/lib/agent-jobs/enabled-since/success")
