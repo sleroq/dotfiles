@@ -58,8 +58,8 @@ in
       package = pkgs.broadcast-box.override {
         version = "moq-player-2026-11-12";
         owner = "sleroq";
-        rev = "45fbb2f5414bd8237450b61feccd6f6074848b09"; # feat/moq-player
-        hash = "sha256-bC0BGPIwoCbwvMsqQfTm6N31hX3wlVLSNJh6letyMaQ=";
+        rev = "c24e6134578599b723141a5605610f43437859b7"; # feat/moq-player
+        hash = "sha256-g1m28F6ma5CC1YGwtAOGSkAGK4VOfxAm6GmTo3TBLgw=";
         vendorHash = "sha256-0LyylgNtAD/HT/ojhyI2eo5e8G4+4BU1jO4zXkohAIs=";
         frontendNpmDepsHash = "sha256-19J1YiJ6etpx3X+e35YUtWjEhOBVfCgYRSflNIQmHUA=";
       };
