@@ -65,10 +65,6 @@
 
     nixpkgs-master.url = "github:nixos/nixpkgs/master";
 
-    # Single-quality MoQ pilot; release source is copied to the build host.
-    moq-box.url = "path:/nix/store/d9ynfnm6b7ghwm3ldnkzb0yvbbqwbmq1-source";
-    moq-box.inputs.nixpkgs.follows = "nixpkgs";
-
     fumo-gateway.url = "github:sleroq/fumo-gateway";
 
     # Cumserver flakes
@@ -291,7 +287,6 @@
               specialArgs.secrets = import ./hosts/ru-relay/secrets/default.nix;
               modules = [
                 inputs.disko.nixosModules.disko
-                ./hosts/ru-relay/moq.nix
               ];
             };
 

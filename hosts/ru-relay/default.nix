@@ -23,6 +23,7 @@ in
     ./coturn.nix
     ./warsaw-tunnels.nix
     ../../modules/broadcast-box.nix
+    ../../modules/moq-box.nix
   ];
 
   networking = {
@@ -68,7 +69,6 @@ in
 
   services.moq-box = {
     enable = true;
-    domain = "moq.cum.army";
     relayDomain = "moq-relay.cum.army";
   };
 

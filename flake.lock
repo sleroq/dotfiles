@@ -1728,22 +1728,6 @@
         "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/"
       }
     },
-    "moq-box": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "narHash": "sha256-ONOzNflDtua2n/UiyAIM8bcPmznEr7d+8N9wXywQ1tc=",
-        "path": "/nix/store/d9ynfnm6b7ghwm3ldnkzb0yvbbqwbmq1-source",
-        "type": "path"
-      },
-      "original": {
-        "path": "/nix/store/d9ynfnm6b7ghwm3ldnkzb0yvbbqwbmq1-source",
-        "type": "path"
-      }
-    },
     "music-link": {
       "inputs": {
         "nixpkgs": "nixpkgs_11"
@@ -2803,7 +2787,6 @@
         "kopoka": "kopoka",
         "llm-agents": "llm-agents",
         "mailserver": "mailserver",
-        "moq-box": "moq-box",
         "music-link": "music-link",
         "neovim-nightly-overlay": "neovim-nightly-overlay",
         "nix-darwin": "nix-darwin",
