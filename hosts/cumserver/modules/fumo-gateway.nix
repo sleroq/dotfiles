@@ -17,9 +17,9 @@ in
     settings = {
       clients.pi.key_env = "FUMO_PI_KEY";
       upstreams.codex = {
-        base_url = "https://api.openai.com/v1";
+        base_url = "https://chatgpt.com/backend-api/codex";
         auth = {
-          provider = "codex";
+          provider = "codex_legacy";
           credentials_dir = "/var/lib/fumo-gateway/credentials";
         };
       };
@@ -51,7 +51,7 @@ in
   # Login must precede the first reconciliation: a failed initialPackage is
   # journaled by Starflake and is not automatically attempted again.
   systemd.services.starflake-reconcile-fumo-gateway.unitConfig.ConditionPathExists =
-    "/var/lib/fumo-gateway/credentials/codex.json";
+    "/var/lib/fumo-gateway/credentials/codex-legacy.json";
 
   systemd.services.starflake-app-fumo-gateway = {
     restartTriggers = [ config.age.secrets.fumoGatewayEnv.file ];
