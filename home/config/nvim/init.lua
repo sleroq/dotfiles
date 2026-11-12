@@ -134,6 +134,9 @@ vim.g.fff = {
     },
     hl = {
         border = "NormalFloat",
+        winhl = {
+            list = "Normal:NormalFloat,FloatBorder:NormalFloat,FloatTitle:Title,SignColumn:NormalFloat",
+        },
     },
 }
 
@@ -288,6 +291,14 @@ otree_fs.scan_dir = function(...)
     end
     return nodes
 end
+
+vim.api.nvim_create_autocmd("User", {
+    pattern = "OtreeRender",
+    callback = function()
+        local win = require("Otree.state").win
+        vim.wo[win].winhighlight = "Search:None,CurSearch:None,IncSearch:None,WinBar:Normal,WinBarNC:Normal"
+    end,
+})
 
 require("Otree").setup({
     open_on_left = false,
