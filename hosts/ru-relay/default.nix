@@ -1,5 +1,6 @@
 {
   config,
+  pkgs,
   secrets,
   ...
 }:
@@ -54,6 +55,14 @@ in
       redisDb = 0;
       stateDirectory = "broadcast-box";
       backup.enable = false;
+      package = pkgs.broadcast-box.override {
+        version = "moq-player-2026-11-11";
+        owner = "sleroq";
+        rev = "e37a8452b07b2cbb38aaddb0cc8b72b187f251ee"; # feat/moq-player
+        hash = "sha256-8n2h4CpbdwlnR/W741+um16XXxioGhyxK+inG0A3kGs=";
+        vendorHash = "sha256-0LyylgNtAD/HT/ojhyI2eo5e8G4+4BU1jO4zXkohAIs=";
+        frontendNpmDepsHash = "sha256-19J1YiJ6etpx3X+e35YUtWjEhOBVfCgYRSflNIQmHUA=";
+      };
     };
   };
 
@@ -77,10 +86,16 @@ in
           protocols h1 h2
         }
       '';
-      virtualHosts."http://alt-web.cum.army".extraConfig = ''
-        bind 0.0.0.0
-        redir https://alt-web.cum.army{uri} permanent
-      '';
+      virtualHosts = {
+        "http://alt-web.cum.army".extraConfig = ''
+          bind 0.0.0.0
+          redir https://alt-web.cum.army{uri} permanent
+        '';
+        "alt-web.cum.army".extraConfig = ''
+          header Cross-Origin-Opener-Policy same-origin
+          header Cross-Origin-Embedder-Policy require-corp
+        '';
+      };
     };
 
     haproxy = {
@@ -108,7 +123,7 @@ in
           tcp-request inspect-delay 5s
           tcp-request content accept if { req.ssl_hello_type 1 }
           use_backend moq_https if { req.ssl_sni -i moq-relay.cum.army }
-          use_backend broadcast_box_https if { req.ssl_sni -i alt-web.cum.army moq.cum.army }
+          use_backend broadcast_box_https if { req.ssl_sni -i alt-web.cum.army }
           # RU-initiated connections to Warsaw are dropped upstream; reuse
           # the Warsaw-initiated bridge without changing client settings.
           default_backend warsaw_reverse

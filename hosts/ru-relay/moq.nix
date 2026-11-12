@@ -1,4 +1,10 @@
-{ inputs, pkgs, ... }:
+{
+  config,
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 let
   system = pkgs.stdenv.hostPlatform.system;
   packages = inputs.moq-box.packages.${system};
@@ -13,7 +19,7 @@ let
     });
 in
 {
-  # Retain the immutable pilot viewer/module, updating only its release binaries.
+  # Retain the pinned relay/auth module, updating only its release binaries.
   imports = [
     (import "${inputs.moq-box}/nix/module.nix" {
       self = inputs.moq-box // {
@@ -26,4 +32,15 @@ in
       };
     })
   ];
+
+  # The pilot module also serves its own viewer; Broadcast Box now owns playback.
+  options.services.caddy.virtualHosts = lib.mkOption {
+    apply = lib.filterAttrs (
+      name: _:
+      !builtins.elem name [
+        config.services.moq-box.domain
+        "http://${config.services.moq-box.domain}"
+      ]
+    );
+  };
 }
