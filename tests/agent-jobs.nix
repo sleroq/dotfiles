@@ -239,7 +239,7 @@ pkgs.testers.runNixOSTest {
         machine.succeed(f"test $(systemctl show {service} -p MemorySwapMax --value) = 0")
     machine.succeed("test $(systemctl show agent-jobs-proxy.service -p MemoryMax --value) = 268435456")
     machine.succeed("test $(systemctl show agent-jobs-proxy.service -p MemorySwapMax --value) = 0")
-    machine.succeed(f"systemd-run --wait --pipe --property='Requires={scratch_unit}' --property='After={scratch_unit}' ${inspectScratch}")
+    machine.succeed("systemd-run --wait --pipe --property=RequiresMountsFor=/var/lib/agent-jobs-work/success/scratch ${inspectScratch}")
     machine.wait_until_succeeds("! mountpoint -q /var/lib/agent-jobs-work/success/scratch")
     start_job("success")
     machine.wait_until_succeeds("! mountpoint -q /var/lib/agent-jobs-work/success/scratch")
