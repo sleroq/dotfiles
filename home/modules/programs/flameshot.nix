@@ -2,7 +2,6 @@
 
 let
   shareScreenshot = pkgs.writeShellScriptBin "share-screenshot" ''
-    #!/bin/bash
     export XDG_CURRENT_DESKTOP=sway
     flameshot gui -r > /tmp/screenshot.png
 
@@ -62,7 +61,7 @@ in
     curl
     jq
     wl-clipboard
-    libnotify  # For notify-send notifications
+    libnotify # For notify-send notifications
   ];
 
   xdg.configFile."flameshot/flameshot.ini" = {
