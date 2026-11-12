@@ -142,7 +142,22 @@ let
     ln -s ${piSettings} "$out/etc/agent-pi/settings.json"
     ln -s ${piMcp} "$out/etc/agent-pi/mcp.json"
     ln -s ${../home/config/agents/AGENTS.md} "$out/etc/agent-pi/AGENTS.md"
-    ln -s ${../home/config/agents/skills} "$out/etc/agent-pi/skills"
+    mkdir -p "$out/etc/agent-pi/skills"
+    ${lib.concatMapStringsSep "\n"
+      (skill: ''
+        ln -s ${../home/config/agents/skills}/${skill} "$out/etc/agent-pi/skills/${skill}"
+      '')
+      [
+        "effect-ts"
+        "interface-design"
+        "solidjs"
+        "golang"
+        "nix"
+        "rust"
+        "commit-pr"
+        "codebase-audit"
+      ]
+    }
     printf '%s\n' 'agent:x:1000:1000:Agent:/home/agent:${lib.getExe bashInteractive}' > "$out/etc/passwd"
     printf '%s\n' 'agent:x:1000:' > "$out/etc/group"
   '';
