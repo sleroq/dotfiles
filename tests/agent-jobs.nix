@@ -162,6 +162,8 @@ pkgs.testers.runNixOSTest {
     };
   };
   testScript = ''
+    import shlex
+
     machine.start(allow_reboot=True)
     private.start()
     machine.wait_for_unit("agent-jobs-enablement.service")
@@ -231,7 +233,8 @@ pkgs.testers.runNixOSTest {
     scratch_unit = "var-lib-agent\\x2djobs\\x2dwork-success-scratch.mount"
     for service in ["agent-job-success.service", "agent-job-publish-success@fixture.service"]:
         for dependency in ["Requires", "After"]:
-            machine.succeed(f"systemctl show {service} -p {dependency} --value | grep -F '{scratch_unit}'")
+            dependencies = shlex.split(machine.succeed(f"systemctl show {service} -p {dependency} --value"))
+            assert scratch_unit in dependencies, (service, dependency, dependencies)
         machine.succeed(f"test $(systemctl show {service} -p MemoryMax --value) = 2147483648")
         machine.succeed(f"test $(systemctl show {service} -p MemorySwapMax --value) = 0")
     machine.succeed("test $(systemctl show agent-jobs-proxy.service -p MemoryMax --value) = 268435456")
