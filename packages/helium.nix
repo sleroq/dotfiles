@@ -1,7 +1,7 @@
 {
   appimageTools,
-  version ? "0.21.2.1",
-  hash ? "sha256-IdP+SyvmN+uT/eogjWsG1/6feO6MF9gP/57SM3AsBmo=",
+  version ? (builtins.fromJSON (builtins.readFile ./helium.json)).version,
+  hash ? (builtins.fromJSON (builtins.readFile ./helium.json)).hash,
 }:
 
 let

@@ -7,16 +7,6 @@
 }:
 let
   jobs = {
-    bump-helium = {
-      schedule = "*-*-* 07:00:00 UTC";
-      overdueAfterSeconds = 90000;
-      prompt = ''
-        Update Helium in packages/helium.nix to the latest stable upstream Linux release from imputnet/helium-linux, including any necessary supporting repository changes. Update the version and matching x86_64 AppImage hash together. Verify the release asset exists and run a focused package evaluation/build using lock.nodes.nixpkgs-div.locked; do not fetch a second nixpkgs revision. Do not change flake inputs, browser settings, or unrelated packages.
-      '';
-      publish = {
-        title = "chore: update Helium";
-      };
-    };
     bump-paseo-stack = {
       schedule = "*-*-1/3 06:00:00 UTC";
       overdueAfterSeconds = 262800;

@@ -1,0 +1,62 @@
+name: update-helium
+
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-helium
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+      - uses: cachix/install-nix-action@3dc140bfc76c49fbd4dd958429132e3746bcb086 # v31.11.5
+      - name: Check latest release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          release=$(gh api repos/imputnet/helium-linux/releases/latest)
+          version=$(jq -er '.tag_name' <<< "$release")
+          if [[ ! "$version" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+            echo "Unexpected release version: $version" >&2
+            exit 1
+          fi
+          asset="helium-${version}-x86_64.AppImage"
+          jq -e --arg asset "$asset" 'any(.assets[]; .name == $asset)' <<< "$release" >/dev/null
+          if [[ "$version" == "$(jq -r '.version' packages/helium.json)" ]]; then
+            echo "Helium $version is already current"
+            exit 0
+          fi
+          url="https://github.com/imputnet/helium-linux/releases/download/${version}/${asset}"
+          hash=$(nix hash convert --hash-algo sha256 --to sri "$(nix-prefetch-url "$url")")
+          jq -n --arg version "$version" --arg hash "$hash" '{version: $version, hash: $hash}' > packages/helium.json
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+      - name: Build Helium
+        if: steps.release.outputs.changed == 'true'
+        run: |
+          nix build --print-build-logs --impure --no-link --expr '
+            let
+              lock = builtins.fromJSON (builtins.readFile ./flake.lock);
+              nixpkgs = builtins.fetchTree lock.nodes.nixpkgs-div.locked;
+              pkgs = import nixpkgs { system = "x86_64-linux"; };
+            in pkgs.callPackage ./packages/helium.nix {}
+          '
+      - name: Commit and push
+        if: steps.release.outputs.changed == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add packages/helium.json
+          git commit -m 'chore: update Helium'
+          git push origin HEAD:main
