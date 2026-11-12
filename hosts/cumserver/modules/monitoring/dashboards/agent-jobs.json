@@ -37,78 +37,42 @@
   },
   "panels": [
     {
-      "id": 1,
-      "title": "Last run success (1 = success)",
+      "id": 2,
+      "title": "Successful runs (approx.)",
       "type": "stat",
       "gridPos": {
         "x": 0,
         "y": 0,
-        "w": 8,
+        "w": 12,
         "h": 4
       },
       "datasource": {
         "type": "prometheus",
         "uid": "Prometheus1"
       },
+      "description": "Approximate count over the selected range: multiple runs between scrapes can be missed, the first observation is not counted, and runs sharing timestamp resolution may be indistinguishable.",
       "targets": [
         {
+          "refId": "A",
           "datasource": {
             "type": "prometheus",
             "uid": "Prometheus1"
           },
-          "expr": "agent_job_last_run_success{agent_job=~\"${job:regex}\"}",
-          "refId": "A",
-          "legendFormat": "{{agent_job}}"
+          "expr": "sum(changes(agent_job_last_success_timestamp_seconds{agent_job=~\"${job:regex}\"}[$__range])) or vector(0)",
+          "legendFormat": "",
+          "instant": true,
+          "range": false,
+          "format": "time_series"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "none",
-          "decimals": 1
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        }
-      }
-    },
-    {
-      "id": 2,
-      "title": "Time since last completion",
-      "type": "stat",
-      "gridPos": {
-        "x": 8,
-        "y": 0,
-        "w": 8,
-        "h": 4
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Prometheus1"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Prometheus1"
-          },
-          "expr": "time() - agent_job_last_finished_timestamp_seconds{agent_job=~\"${job:regex}\"}",
-          "refId": "A",
-          "legendFormat": "{{agent_job}}"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "s",
-          "decimals": 1
+          "noValue": "No data",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "green"
+          }
         },
         "overrides": []
       },
@@ -126,33 +90,41 @@
     },
     {
       "id": 3,
-      "title": "Time since last success",
+      "title": "Failed runs (approx.)",
       "type": "stat",
       "gridPos": {
-        "x": 16,
+        "x": 12,
         "y": 0,
-        "w": 8,
+        "w": 12,
         "h": 4
       },
       "datasource": {
         "type": "prometheus",
         "uid": "Prometheus1"
       },
+      "description": "Approximate count over the selected range: multiple runs between scrapes can be missed, the first observation is not counted, and runs sharing timestamp resolution may be indistinguishable.",
       "targets": [
         {
+          "refId": "A",
           "datasource": {
             "type": "prometheus",
             "uid": "Prometheus1"
           },
-          "expr": "time() - agent_job_last_success_timestamp_seconds{agent_job=~\"${job:regex}\"}",
-          "refId": "A",
-          "legendFormat": "{{agent_job}}"
+          "expr": "sum(changes(agent_job_last_finished_timestamp_seconds{agent_job=~\"${job:regex}\"}[$__range])) - (sum(changes(agent_job_last_success_timestamp_seconds{agent_job=~\"${job:regex}\"}[$__range])) or vector(0))",
+          "legendFormat": "",
+          "instant": true,
+          "range": false,
+          "format": "time_series"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "s",
-          "decimals": 1
+          "unit": "none",
+          "noValue": "No data",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "red"
+          }
         },
         "overrides": []
       },
@@ -169,12 +141,308 @@
       }
     },
     {
+      "id": 1,
+      "title": "Last completed runs",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus1"
+      },
+      "description": "Current last completed run outcome and completion age per job. Missing fields remain unknown.",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus1"
+          },
+          "expr": "agent_job_last_run_success{agent_job=~\"${job:regex}\"}",
+          "legendFormat": "",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus1"
+          },
+          "expr": "time() - agent_job_last_finished_timestamp_seconds{agent_job=~\"${job:regex}\"}",
+          "legendFormat": "",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "noValue": "—",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Outcome"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "Failed",
+                        "color": "red",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "Success",
+                        "color": "green",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Last completion age"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "sortBy": [
+          {
+            "displayName": "Job",
+            "desc": false
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "agent_job",
+            "mode": "outerTabular"
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "pattern": "^(agent_job|Value #[AB])$"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "agent_job": 0,
+              "Value #A": 1,
+              "Value #B": 2
+            },
+            "renameByName": {
+              "agent_job": "Job",
+              "Value #A": "Outcome",
+              "Value #B": "Last completion age"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Execution intervals",
+      "type": "state-timeline",
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "AgentJobsHistory"
+      },
+      "description": "Completed execution intervals overlapping the selected range. History is limited to retained records from the last 30 days.",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "AgentJobsHistory"
+          },
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "table",
+          "url": "/runs",
+          "url_options": {
+            "method": "GET",
+            "params": [
+              {
+                "key": "from",
+                "value": "${__from}"
+              },
+              {
+                "key": "to",
+                "value": "${__to}"
+              },
+              {
+                "key": "job",
+                "value": "${job:regex}"
+              }
+            ]
+          },
+          "root_selector": "",
+          "columns": [
+            {
+              "selector": "start",
+              "text": "start",
+              "type": "timestamp"
+            },
+            {
+              "selector": "end",
+              "text": "end",
+              "type": "timestamp"
+            },
+            {
+              "selector": "job",
+              "text": "job",
+              "type": "string"
+            },
+            {
+              "selector": "status",
+              "text": "status",
+              "type": "string"
+            }
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "noValue": "No data",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "success": {
+                  "text": "Success",
+                  "color": "green",
+                  "index": 0
+                },
+                "failed": {
+                  "text": "Failed",
+                  "color": "red",
+                  "index": 1
+                },
+                "timed_out": {
+                  "text": "Timed out",
+                  "color": "red",
+                  "index": 2
+                }
+              }
+            }
+          ],
+          "custom": {
+            "lineWidth": 0,
+            "fillOpacity": 70,
+            "spanNulls": false,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": false,
+        "showValue": "never",
+        "rowHeight": 0.9,
+        "alignValue": "left",
+        "legend": {
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "start": 0,
+              "end": 1,
+              "job": 2,
+              "status": 3
+            }
+          }
+        },
+        {
+          "id": "partitionByValues",
+          "options": {
+            "fields": [
+              "job"
+            ],
+            "keepFields": false,
+            "naming": {
+              "asLabels": false
+            }
+          }
+        }
+      ]
+    },
+    {
       "id": 4,
       "title": "Run duration",
       "type": "timeseries",
       "gridPos": {
         "x": 0,
-        "y": 4,
+        "y": 20,
         "w": 24,
         "h": 8
       },

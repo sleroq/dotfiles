@@ -28,7 +28,7 @@ func main() {
 
 func execute(ctx context.Context, args []string) error {
 	if len(args) == 0 {
-		return errors.New("usage: agent-jobs run|publish|serve|prune|metrics|sandbox|hold")
+		return errors.New("usage: agent-jobs run|publish|serve|history|prune|metrics|sandbox|hold")
 	}
 
 	command := flag.NewFlagSet(args[0], flag.ContinueOnError)
@@ -72,6 +72,12 @@ func execute(ctx context.Context, args []string) error {
 			return err
 		}
 		return serve(ctx, jobs.Store{Directory: *state}, *listen, inventory)
+	case "history":
+		listen := command.String("listen", "127.0.0.1:8788", "HTTP listen address")
+		if err := command.Parse(args[1:]); err != nil {
+			return err
+		}
+		return serveHTTP(ctx, *listen, jobs.NewHistory(jobs.Store{Directory: *state}))
 	case "proxy":
 		upstream := command.String("upstream", "", "Fixed upstream origin")
 		keyFile := command.String("key-file", "", "Credential file")
@@ -120,6 +126,10 @@ func serve(ctx context.Context, store jobs.Store, address string, inventory jobs
 	if err != nil {
 		return err
 	}
+	return serveHTTP(ctx, address, handler)
+}
+
+func serveHTTP(ctx context.Context, address string, handler http.Handler) error {
 	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		return err
@@ -134,10 +144,10 @@ func serve(ctx context.Context, store jobs.Store, address string, inventory jobs
 		shutdown, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		if err := server.Shutdown(shutdown); err != nil {
-			slog.Error("stop viewer", "error", err)
+			slog.Error("stop HTTP server", "error", err)
 		}
 	}()
-	slog.Info("run viewer listening", "address", listener.Addr())
+	slog.Info("HTTP server listening", "address", listener.Addr())
 	if err := server.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}

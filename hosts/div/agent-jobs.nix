@@ -50,9 +50,28 @@ let
       };
     };
   };
+  cfg = config.services.agent-jobs;
 in
 {
   imports = [ ../../modules/agent-jobs.nix ];
+
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 8790 ];
+
+  systemd.services.agent-jobs-history = {
+    wantedBy = [ "multi-user.target" ];
+    after = [ "systemd-tmpfiles-setup.service" ];
+    serviceConfig = {
+      User = "agent-job-viewer";
+      Group = "job-viewer";
+      ExecStart = "${cfg.package}/bin/agent-jobs history -state ${cfg.stateDirectory} -listen 0.0.0.0:8790";
+      ProtectSystem = "strict";
+      ProtectHome = true;
+      NoNewPrivileges = true;
+      PrivateTmp = true;
+      InaccessiblePaths = [ "/var/lib/agent-jobs-work" ];
+      ReadOnlyPaths = [ cfg.stateDirectory ];
+    };
+  };
 
   age.secrets.agentJobsGithubKey.file = ./secrets/agentJobsGithubKey;
   age.secrets.agentJobsFumoKey.file = ./secrets/agentJobsFumoKey;

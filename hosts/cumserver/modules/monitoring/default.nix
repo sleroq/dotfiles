@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.cumserver.monitoring;
 in
@@ -86,6 +91,12 @@ in
       }
     ];
 
+    systemd.tmpfiles.rules = [
+      "d ${config.services.grafana.dataDir} 0700 grafana grafana -"
+      "d ${config.services.grafana.dataDir}/plugins 0750 grafana grafana -"
+      "L+ ${config.services.grafana.dataDir}/plugins/yesoreyeram-infinity-datasource - - - - ${pkgs.grafanaPlugins.yesoreyeram-infinity-datasource}"
+    ];
+
     services = {
       alloy = {
         enable = true;
@@ -113,6 +124,17 @@ in
           datasources.settings = {
             apiVersion = 1;
             datasources = [
+              {
+                name = "Agent Jobs History";
+                uid = "AgentJobsHistory";
+                type = "yesoreyeram-infinity-datasource";
+                access = "proxy";
+                url = "http://div.capybara-menkent.ts.net:8790";
+                jsonData = {
+                  url = "http://div.capybara-menkent.ts.net:8790";
+                  allowedHosts = [ "http://div.capybara-menkent.ts.net:8790" ];
+                };
+              }
               {
                 name = "Loki";
                 type = "loki";
