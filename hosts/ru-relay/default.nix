@@ -56,10 +56,10 @@ in
       stateDirectory = "broadcast-box";
       backup.enable = false;
       package = pkgs.broadcast-box.override {
-        version = "moq-player-2026-11-11";
+        version = "moq-player-2026-11-12";
         owner = "sleroq";
-        rev = "e37a8452b07b2cbb38aaddb0cc8b72b187f251ee"; # feat/moq-player
-        hash = "sha256-8n2h4CpbdwlnR/W741+um16XXxioGhyxK+inG0A3kGs=";
+        rev = "72e316866cde6cad7e889508a24e601d51165e96"; # feat/moq-player
+        hash = "sha256-C8gGA9gbnfcraVxTP8GYVDmpNV2Izt/nfi4oz3ejXoY=";
         vendorHash = "sha256-0LyylgNtAD/HT/ojhyI2eo5e8G4+4BU1jO4zXkohAIs=";
         frontendNpmDepsHash = "sha256-19J1YiJ6etpx3X+e35YUtWjEhOBVfCgYRSflNIQmHUA=";
       };
