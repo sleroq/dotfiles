@@ -64,8 +64,6 @@ These helpers are also passed into Home Manager via =extraSpecialArgs=, so HM mo
 
 AI agents update packages in disposable sandboxes. The host opens or updates pull requests with their changes, keeping GitHub write credentials outside the sandbox.
 
-A private web viewer shows run history, logs, and agent sessions. Jobs live in =hosts/div/agent-jobs.nix=; scheduled runs are disabled until approved.
-
 ** Install / Rebuild
 
 1. Enable flakes
