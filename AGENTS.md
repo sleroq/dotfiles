@@ -47,5 +47,4 @@ sessions: the laptop's selected network is shared.
 ## Agent jobs
 
 Manage jobs through `services.agent-jobs` in `hosts/div/agent-jobs.nix` and its
-host-owned prompt files. Keep job timers disabled until explicitly approved.
-Paseo is for interactive agents, not recurring jobs.
+host-owned prompt files. Paseo is for interactive agents, not recurring jobs.
