@@ -1,12 +1,13 @@
 {
   appimageTools,
+  fetchurl,
   version ? (builtins.fromJSON (builtins.readFile ./helium.json)).version,
   hash ? (builtins.fromJSON (builtins.readFile ./helium.json)).hash,
 }:
 
 let
   pname = "helium";
-  src = builtins.fetchurl {
+  src = fetchurl {
     url = "https://github.com/imputnet/helium-linux/releases/download/${version}/${pname}-${version}-x86_64.AppImage";
     sha256 = hash;
   };
