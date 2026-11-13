@@ -6,24 +6,27 @@
   zlib,
 }:
 
+let
+  releaseInfo = builtins.fromJSON (builtins.readFile ./rift.json);
+in
 stdenv.mkDerivation (finalAttrs: {
   pname = "rift";
-  version = "0.0.13";
+  version = releaseInfo.version;
 
   src =
     let
       releases = {
         x86_64-linux = {
           target = "x86_64-unknown-linux-gnu";
-          hash = "sha256-Q6cBY5dCZiDAqX7meKPgJ6H0uD+4g3fMaxcJBHSr8F8=";
+          hash = releaseInfo.hashes."x86_64-unknown-linux-gnu";
         };
         aarch64-darwin = {
           target = "aarch64-apple-darwin";
-          hash = "sha256-Tl9ti1yNjQ2RSCsITQVYfNMMLmuJpIxry5vr+FKp2Fo=";
+          hash = releaseInfo.hashes."aarch64-apple-darwin";
         };
         x86_64-darwin = {
           target = "x86_64-apple-darwin";
-          hash = "sha256-Zk2FehrIqxsUScloyC6tFqP0lKZwq7ddSsjZE4vHdTg=";
+          hash = releaseInfo.hashes."x86_64-apple-darwin";
         };
       };
       release = releases.${stdenv.hostPlatform.system};

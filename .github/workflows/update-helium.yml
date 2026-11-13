@@ -19,29 +19,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       - uses: cachix/install-nix-action@3dc140bfc76c49fbd4dd958429132e3746bcb086 # v31.11.5
       - name: Check latest release
         id: release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          release=$(gh api repos/imputnet/helium-linux/releases/latest)
-          version=$(jq -er '.tag_name' <<< "$release")
-          if [[ ! "$version" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
-            echo "Unexpected release version: $version" >&2
-            exit 1
-          fi
-          asset="helium-${version}-x86_64.AppImage"
-          jq -e --arg asset "$asset" 'any(.assets[]; .name == $asset)' <<< "$release" >/dev/null
-          if [[ "$version" == "$(jq -r '.version' packages/helium.json)" ]]; then
-            echo "Helium $version is already current"
-            exit 0
-          fi
-          url="https://github.com/imputnet/helium-linux/releases/download/${version}/${asset}"
-          hash=$(nix hash convert --hash-algo sha256 --to sri "$(nix-prefetch-url "$url")")
-          jq -n --arg version "$version" --arg hash "$hash" '{version: $version, hash: $hash}' > packages/helium.json
-          echo 'changed=true' >> "$GITHUB_OUTPUT"
+        run: bun .github/scripts/update-maintained-package.ts helium
       - name: Build Helium
         if: steps.release.outputs.changed == 'true'
         run: |

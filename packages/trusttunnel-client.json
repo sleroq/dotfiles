@@ -1,0 +1,8 @@
+{
+  "version": "1.1.11",
+  "hashes": {
+    "linux-x86_64": "sha256-AOBUams1hA27krdB3/PaZzKnS/LWxYHgRLtFZ8DZaCU=",
+    "linux-aarch64": "sha256-iA6civ1czn/zjFOXjw6lMP+V5nm8/vacUSeyazaS0RA=",
+    "macos-universal": "sha256-4sZ6rqlB/Nz8JOyYaBZEYvzqjR9zH2koxJu+8wDc8aM="
+  }
+}

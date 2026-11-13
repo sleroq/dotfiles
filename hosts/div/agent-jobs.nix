@@ -23,14 +23,6 @@ let
         title = "chore: update DWL";
       };
     };
-    bump-maintained-packages = {
-      schedule = "Sun *-*-* 08:00:00 UTC";
-      overdueAfterSeconds = 608400;
-      prompt = builtins.readFile ./agent-jobs/bump-maintained-packages.txt;
-      publish = {
-        title = "chore: update maintained packages";
-      };
-    };
     bump-container-images = {
       schedule = "Sun *-*-* 10:00:00 UTC";
       overdueAfterSeconds = 608400;

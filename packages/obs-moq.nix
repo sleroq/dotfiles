@@ -11,10 +11,11 @@
 }:
 
 let
-  version = "0.6.23";
+  release = builtins.fromJSON (builtins.readFile ./obs-moq.json);
+  inherit (release) version;
   libmoq = fetchzip {
     url = "https://github.com/moq-dev/moq/releases/download/libmoq-v${version}/moq-${version}-x86_64-unknown-linux-gnu.tar.gz";
-    hash = "sha256-9Gb//uC5Fsro3FHOHl25HH0PU+YSANe6l7QtsLPYFMw=";
+    hash = release.libmoqHash;
   };
 in
 stdenv.mkDerivation {
@@ -25,7 +26,7 @@ stdenv.mkDerivation {
     owner = "moq-dev";
     repo = "moq";
     rev = "libmoq-v${version}";
-    hash = "sha256-ZpVqZ2Jn9azSFJBc3zgnWS5F/a524N+38l9SAMDvpK4=";
+    hash = release.sourceHash;
   };
 
   sourceRoot = "source/cpp/obs";

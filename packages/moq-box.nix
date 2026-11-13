@@ -5,6 +5,7 @@
   lib,
 }:
 let
+  relay = builtins.fromJSON (builtins.readFile ./moq-relay.json);
   releaseBinary =
     name: version: hash: executable:
     stdenv.mkDerivation {
@@ -34,8 +35,6 @@ let
     };
 in
 {
-  moq-relay =
-    releaseBinary "moq-relay" "0.17.10" "sha256-R7IJFmE0Hi/sNt+8wPUQ7acCt3FvxPTz2QGAa5ubjiM="
-      "moq-relay";
+  moq-relay = releaseBinary "moq-relay" relay.version relay.hash "moq-relay";
   moq = releaseBinary "moq-cli" "0.14.10" "sha256-mXzvUvE2fjXMUUutW+91w5IYKX+aHZcWbyaJZTu4sp4=" "moq";
 }

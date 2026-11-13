@@ -1,0 +1,104 @@
+name: update-maintained-packages
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-maintained-packages
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+      - uses: cachix/install-nix-action@3dc140bfc76c49fbd4dd958429132e3746bcb086 # v31.11.5
+      - name: Update TrustTunnel client
+        id: trusttunnel
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bun .github/scripts/update-maintained-package.ts trusttunnel-client
+      - name: Update Rift
+        id: rift
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bun .github/scripts/update-maintained-package.ts rift
+      - name: Update MoQ relay
+        id: relay
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bun .github/scripts/update-maintained-package.ts moq-relay
+      - name: Update OBS MoQ
+        id: obs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bun .github/scripts/update-maintained-package.ts obs-moq
+      - name: Update Svelte parser
+        id: svelte
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bun .github/scripts/update-maintained-package.ts svelte
+      - name: Build changed packages
+        env:
+          TRUSTTUNNEL_CHANGED: ${{ steps.trusttunnel.outputs.changed }}
+          RIFT_CHANGED: ${{ steps.rift.outputs.changed }}
+          RELAY_CHANGED: ${{ steps.relay.outputs.changed }}
+          OBS_CHANGED: ${{ steps.obs.outputs.changed }}
+        run: |
+          set -euo pipefail
+          build() {
+            nix build --print-build-logs --impure --no-link --expr "
+              let
+                lock = builtins.fromJSON (builtins.readFile ./flake.lock);
+                nixpkgs = builtins.fetchTree lock.nodes.nixpkgs-div.locked;
+                pkgs = import nixpkgs { system = \"x86_64-linux\"; };
+              in $1
+            "
+          }
+          if [[ "$TRUSTTUNNEL_CHANGED" == true ]]; then build 'pkgs.callPackage ./packages/trusttunnel-client.nix {}'; fi
+          if [[ "$RIFT_CHANGED" == true ]]; then build 'pkgs.callPackage ./packages/rift.nix {}'; fi
+          if [[ "$RELAY_CHANGED" == true ]]; then build '(pkgs.callPackage ./packages/moq-box.nix {}).moq-relay'; fi
+          if [[ "$OBS_CHANGED" == true ]]; then build 'pkgs.callPackage ./packages/obs-moq.nix {}'; fi
+      - name: Build and scan with Svelte parser
+        if: steps.svelte.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          tools=$(nix build --print-build-logs --impure --no-link --print-out-paths --expr '
+            let
+              lock = builtins.fromJSON (builtins.readFile ./flake.lock);
+              nixpkgs = builtins.fetchTree lock.nodes.nixpkgs-div.locked;
+              pkgs = import nixpkgs { system = "x86_64-linux"; };
+            in pkgs.linkFarm "svelte-scan-tools" [
+              { name = "svelte"; path = pkgs.callPackage ./packages/tree-sitter-htmlx-svelte.nix {}; }
+              { name = "ast-grep"; path = pkgs.ast-grep; }
+              { name = "zig"; path = pkgs.tree-sitter-grammars.tree-sitter-zig; }
+            ]
+          ')
+          config=$(mktemp -d)
+          trap 'rm -rf "$config"' EXIT
+          cp home/config/ast-grep/sgconfig.yml "$config/sgconfig.yml"
+          ln -s "$PWD/home/config/ast-grep/rules" "$config/rules"
+          mkdir "$config/parsers"
+          ln -s "$tools/svelte/lib/tree-sitter-svelte" "$config/parsers/tree-sitter-svelte"
+          ln -s "$tools/zig/parser" "$config/parsers/tree-sitter-zig"
+          args=()
+          if "$tools/ast-grep/bin/ast-grep" --help | grep -q -- --custom-languages; then
+            args+=(--custom-languages allow)
+          fi
+          "$tools/ast-grep/bin/ast-grep" "${args[@]}" scan --config "$config/sgconfig.yml" --no-ignore hidden .
+      - name: Commit and push
+        if: steps.trusttunnel.outputs.changed == 'true' || steps.rift.outputs.changed == 'true' || steps.relay.outputs.changed == 'true' || steps.obs.outputs.changed == 'true' || steps.svelte.outputs.changed == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add packages/trusttunnel-client.json packages/rift.json packages/moq-relay.json packages/obs-moq.json home/config/ast-grep/svelte-parser.json
+          git commit -m 'chore: update maintained packages'
+          git push origin HEAD:main
