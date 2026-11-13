@@ -64,6 +64,7 @@ function linkProfileResources(release: string, agent: string, home: string, back
   }
   mkdirSync(join(release, "skills"), { recursive: true });
   linkResource(join(home, ".agents/skills"), join(release, "skills"), home, backup);
+  linkResource(join(home, ".pi/paseo-skills"), join(release, "paseo-skills"), home, backup);
   linkResource(join(home, ".config/ast-grep"), join(release, "ast-grep"), home, backup);
   linkResource(join(home, "sgconfig.yml"), join(release, "sgconfig.yml"), home, backup);
   linkResource(join(home, "develop/frg/sgconfig.yml"), join(release, "sgconfig-frg.yml"), home, backup);

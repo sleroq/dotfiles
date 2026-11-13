@@ -88,6 +88,8 @@ in
 
       $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
         ${opts.realConfigs}/agents/AGENTS.md "$HOME/.pi/agent/AGENTS.md"
+      $DRY_RUN_CMD ln -sfn $VERBOSE_ARG \
+        ${opts.realConfigs}/paseo-skills "$HOME/.pi/paseo-skills"
 
       for path in ${opts.realConfigs}/pi/agent/*; do
         case "$path" in

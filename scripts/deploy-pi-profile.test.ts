@@ -31,6 +31,11 @@ test("the work profile uses the private Exa file without proxying Pi or Exa", as
     EXA_API_KEY: '!. "$HOME/.config/pi/exa.env" && printf %s "$EXA_API_KEY"',
   });
   const entries = (await $`tar -tf - < ${work.archive}`.quiet()).stdout.toString();
+  expect(entries).toContain("./pi/extensions/paseo-skills.ts");
+  for (const name of ["paseo", "paseo-advisor", "paseo-committee", "paseo-handoff", "paseo-help", "paseo-plugin"]) {
+    expect(entries).toContain(`./paseo-skills/${name}/SKILL.md`);
+    expect(entries).not.toContain(`./skills/${name}/SKILL.md`);
+  }
   expect(entries).not.toContain("exa.env");
   expect(entries).not.toContain("shared/secrets");
   for (const name of ["sgconfig.yml", "svelte-parser.json", "zig-parser.json", "README.md", "tests/", "rules/common/", "rules/frg/"]) {
@@ -57,6 +62,9 @@ test.each(["work", "desktop"])("deployment scopes rules and scans Svelte and Zig
     expect(readlinkSync(join(home, ".pi/agent/AGENTS.md"))).toBe(join(release, "pi/AGENTS.md"));
     expect(readFileSync(join(home, ".pi/agent/AGENTS.md"), "utf8"))
       .toBe(readFileSync(join(root, "home/config/agents/AGENTS.md"), "utf8"));
+    expect(readlinkSync(join(home, ".pi/paseo-skills"))).toBe(join(release, "paseo-skills"));
+    expect(readFileSync(join(home, ".pi/paseo-skills/paseo/SKILL.md"), "utf8"))
+      .toBe(readFileSync(join(root, "home/config/paseo-skills/paseo/SKILL.md"), "utf8"));
     expect(readlinkSync(join(home, ".config/ast-grep"))).toBe(join(release, "ast-grep"));
     expect(readlinkSync(join(home, "develop/frg/sgconfig.yml"))).toBe(join(release, "sgconfig-frg.yml"));
 

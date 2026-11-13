@@ -39,7 +39,7 @@ function resourceName(path: string) {
     if (["AGENTS.md", "models.json", "settings.json", "mcp.json"].includes(name)
       || ["agents", "extensions", "prompts", "sounds"].includes(name.split("/")[0] ?? "")) return `pi/${name}`;
   }
-  for (const [prefix, target] of [["home/config/agents/skills/", "skills/"], ["home/config/ast-grep/", "ast-grep/"]]) {
+  for (const [prefix, target] of [["home/config/agents/skills/", "skills/"], ["home/config/paseo-skills/", "paseo-skills/"], ["home/config/ast-grep/", "ast-grep/"]]) {
     if (prefix && path.startsWith(prefix)) return target + path.slice(prefix.length);
   }
   if (installerFiles.includes(path)) {
