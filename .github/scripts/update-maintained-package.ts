@@ -54,12 +54,11 @@ const packages = {
     assetPrefix: (version: string) => `rift-v${version}-`,
     platforms: ["x86_64-unknown-linux-gnu", "aarch64-apple-darwin", "x86_64-apple-darwin"],
   }),
-  "moq-relay": packageStrategy<StableConfig & BinaryConfig>({
+  "moq-relay": packageStrategy({
     repo: "moq-dev/moq",
     prefix: "moq-relay-v",
     release: latestStableRelease,
-    update: singleBinary,
-    assets: (version: string) => [`moq-relay-v${version}-x86_64-unknown-linux-gnu`],
+    update: relaySource,
   }),
   "obs-moq": packageStrategy<StableConfig & BinaryConfig>({
     repo: "moq-dev/moq",
@@ -131,6 +130,16 @@ async function updateAssets(config: BaseConfig, packageName: string, release: Ve
 
   const base = `https://github.com/${repo}/releases/download/${tag}`;
   await writeUpdate(file, await metadata(base));
+}
+
+async function relaySource(config: BaseConfig, packageName: string, release: VersionedRelease) {
+  const file = `packages/${packageName}.json`;
+  if (release.version === (await Bun.file(file).json()).version) {
+    console.log(`${packageName} ${release.version} is already current`);
+    return;
+  }
+  const url = `https://github.com/${config.repo}/archive/refs/tags/${release.tag_name}.tar.gz`;
+  await writeUpdate(file, { version: release.version, hash: await prefetch(url, true) });
 }
 
 function singleBinary(config: BinaryConfig, packageName: string, release: VersionedRelease) {

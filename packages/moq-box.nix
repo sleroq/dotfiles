@@ -1,6 +1,8 @@
 {
   stdenv,
   fetchurl,
+  fetchFromGitHub,
+  rustPlatform,
   autoPatchelfHook,
   lib,
 }:
@@ -35,6 +37,35 @@ let
     };
 in
 {
-  moq-relay = releaseBinary "moq-relay" relay.version relay.hash "moq-relay";
+  moq-relay = rustPlatform.buildRustPackage rec {
+    pname = "moq-relay";
+    inherit (relay) version;
+    src = fetchFromGitHub {
+      owner = "moq-dev";
+      repo = "moq";
+      rev = "moq-relay-v${version}";
+      hash = relay.hash;
+    };
+    cargoLock.lockFile = "${src}/Cargo.lock";
+    cargoBuildFlags = [
+      "--package=moq-relay"
+      "--features=jemalloc"
+    ];
+    cargoTestFlags = [
+      "--package=moq-stats"
+      "no_origin_collects_without_publishing"
+    ];
+    hardeningDisable = [ "fortify" ];
+    RUSTFLAGS = "-C force-frame-pointers=yes";
+    patches = [ ./patches/moq-relay-private-stats.patch ];
+    meta = {
+      mainProgram = "moq-relay";
+      platforms = [ "x86_64-linux" ];
+      license = with lib.licenses; [
+        mit
+        asl20
+      ];
+    };
+  };
   moq = releaseBinary "moq-cli" "0.14.10" "sha256-mXzvUvE2fjXMUUutW+91w5IYKX+aHZcWbyaJZTu4sp4=" "moq";
 }
