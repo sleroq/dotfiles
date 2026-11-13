@@ -102,7 +102,12 @@ in
 
           ${job.prompt}
 
-          Use published upstream releases/revisions and update matching source/dependency hashes together. Preserve existing integrations and local patches. Do not change credentials, provider/model choices, prompts, skills, runtime bookkeeping, or unrelated packages/configuration. Never edit Paseo-managed built-in skills. Any permitted flake update must be targeted, never a blanket update: preserve every root nixpkgs pin, unrelated root and its independent dependency locks, and compare the lock graph against the supplied default-branch base before finishing. Make supporting repository changes needed for the scoped upgrades, but leave unrelated upgrades out.
+          Use published upstream releases/revisions and update matching source/dependency hashes together. Preserve existing integrations and local patches. Do not change credentials, provider/model choices, prompts, runtime bookkeeping, or unrelated packages/configuration. ${
+            if name == "bump-paseo-stack" then
+              "Only sync vendored Paseo built-in skills verbatim from the corresponding upstream release as instructed above; never edit their contents manually or change other skills."
+            else
+              "Do not change skills, including Paseo-managed built-in skills."
+          } Any permitted flake update must be targeted, never a blanket update: preserve every root nixpkgs pin, unrelated root and its independent dependency locks, and compare the lock graph against the supplied default-branch base before finishing. Make supporting repository changes needed for the scoped upgrades, but leave unrelated upgrades out.
 
           Validation must remain package-scoped. Use Nix to obtain any needed build/test tools inside this private sandbox. Never evaluate/build/test complete NixOS, Darwin or Home Manager configurations; never run nix flake check or an all-host/all-package build, even with --no-build. Do not deploy or activate anything. Run focused affected package tests/builds as required by the scope, format/lint edited Nix files, and run ast-grep scan --config "$HOME/sgconfig.yml" --no-ignore hidden . from the checkout root. Understand findings, fix introduced issues and report unrelated pre-existing blockers without broad cleanup. Never claim an unbuilt platform or unrun test was verified.
 

@@ -415,6 +415,19 @@ in
                   }
                 }
               }
+              handle /loki/api/v1/push {
+                route {
+                  @unsupportedMethod not method POST
+                  header @unsupportedMethod Allow POST
+                  respond @unsupportedMethod 405
+                  basic_auth {
+                    import {$DIV_LOKI_AUTH_FILE}
+                  }
+                  reverse_proxy 127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port} {
+                    header_up -Authorization
+                  }
+                }
+              }
               handle_path /grafana/* {
                   reverse_proxy 127.0.0.1:3200
               }
@@ -424,15 +437,18 @@ in
       };
     };
 
+    age.secrets.divLokiCaddyAuth.file = ../../../../shared/secrets/divLokiCaddyAuth;
     age.secrets.metricsRemoteWriteCaddyAuth.file = ../../../../shared/secrets/metricsRemoteWriteCaddyAuth;
     age.secrets.ruRelayMetricsCaddyAuth.file = ../../../../shared/secrets/ruRelayMetricsCaddyAuth;
     # ExecReload needs both a stable credential path and a refreshed credential mount.
     systemd.services.caddy.environment = {
+      DIV_LOKI_AUTH_FILE = "%d/div-loki-auth";
       METRICS_AUTH_FILE = "%d/metrics-auth";
       RU_RELAY_METRICS_AUTH_FILE = "%d/ru-relay-metrics-auth";
     };
     systemd.services.caddy.serviceConfig = {
       LoadCredential = [
+        "div-loki-auth:${config.age.secrets.divLokiCaddyAuth.path}"
         "metrics-auth:${config.age.secrets.metricsRemoteWriteCaddyAuth.path}"
         "ru-relay-metrics-auth:${config.age.secrets.ruRelayMetricsCaddyAuth.path}"
       ];

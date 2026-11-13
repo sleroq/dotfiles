@@ -61,6 +61,12 @@ in
   "secrets/metricsRemoteWriteCaddyAuth" = {
     publicKeys = commonPublicKeys ++ [ cumserver ];
   };
+  "secrets/divLokiPassword" = {
+    publicKeys = commonPublicKeys ++ [ div ];
+  };
+  "secrets/divLokiCaddyAuth" = {
+    publicKeys = commonPublicKeys ++ [ cumserver ];
+  };
   "secrets/ruRelayMetricsPassword" = {
     publicKeys = commonPublicKeys ++ [ ruRelay ];
   };

@@ -67,6 +67,48 @@
     SystemMaxUse=500M
   '';
 
+  services.alloy = {
+    enable = true;
+    extraFlags = [
+      "--server.http.listen-addr=127.0.0.1:12345"
+      "--disable-reporting"
+    ];
+  };
+  age.secrets.divLokiPassword.file = ../../shared/secrets/divLokiPassword;
+  systemd.services.alloy.serviceConfig.LoadCredential = [
+    "loki-password:${config.age.secrets.divLokiPassword.path}"
+  ];
+  environment.etc."alloy/config.alloy".text = ''
+    discovery.relabel "journal" {
+      targets = []
+
+      rule {
+        source_labels = ["__journal__systemd_unit"]
+        target_label = "unit"
+      }
+      rule {
+        source_labels = ["__journal_priority_keyword"]
+        target_label = "level"
+      }
+    }
+
+    loki.source.journal "journal" {
+      labels = { instance = "Div" }
+      relabel_rules = discovery.relabel.journal.rules
+      forward_to = [loki.write.cumserver.receiver]
+    }
+
+    loki.write "cumserver" {
+      endpoint {
+        url = "https://cum.army/loki/api/v1/push"
+        basic_auth {
+          username = "div"
+          password_file = sys.env("CREDENTIALS_DIRECTORY") + "/loki-password"
+        }
+      }
+    }
+  '';
+
   services.avahi = {
     enable = true;
     nssmdns4 = true;
