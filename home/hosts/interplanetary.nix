@@ -64,22 +64,23 @@ in
       chromium.enable = true;
       opencode.enable = true;
       mangohud.enable = true;
-      extraPackages = with pkgs; [
-        exodus
-        obsidian
-        paseoPackages.desktop
-        # ollama-rocm
-        # chatbox
-        scrcpy
-        zig
-        zls
-        bottles
-        qFlipper
-        # blender
-        # android-studio-full
-      ];
     };
   };
+
+  home.packages = with pkgs; [
+    exodus
+    obsidian
+    paseoPackages.desktop
+    # ollama-rocm
+    # chatbox
+    scrcpy
+    zig
+    zls
+    bottles
+    qFlipper
+    # blender
+    # android-studio-full
+  ];
 
   programs.obs-studio.plugins = [ (pkgs.callPackage ../../packages/obs-moq.nix { }) ];
 

@@ -34,10 +34,23 @@ in
     inherit (opts) username;
     homeDirectory = "/Users/${opts.username}"; # TODO: is this needed?
     stateVersion = "25.05";
-    packages = [
+    packages = with pkgs; [
       (pkgs.writeShellScriptBin "tailscale" ''
         exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
       '')
+      nerd-fonts.jetbrains-mono
+      inputs'.agenix.packages.default
+      ffmpeg
+      rsync
+      wget
+      uv
+      dust
+      ollama
+      moonlight-qt
+      scrcpy
+      typst
+      zig
+      zls
     ];
     sessionPath = [
       "$HOME/.orbstack/bin"
@@ -104,21 +117,7 @@ in
       opencode.enable = true;
       # mpv.enable = true; # waiting for fix
       ghostty.enable = true;
-      extraPackages = with pkgs; [
-        nerd-fonts.jetbrains-mono
-        inputs'.agenix.packages.default
-        ffmpeg
-        rsync
-        wget
-        uv
-        dust
-        ollama
-        moonlight-qt
-        scrcpy
-        typst
-        zig
-        zls
-      ];
     };
   };
+
 }

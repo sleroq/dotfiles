@@ -48,12 +48,6 @@ in
     accounting.enable = lib.mkEnableOption "accounting software";
     activity-watch.enable = lib.mkEnableOption "Activity Watch";
     mangohud.enable = lib.mkEnableOption "MangoHUD";
-
-    extraPackages = lib.mkOption {
-      type = lib.types.listOf lib.types.package;
-      default = [ ];
-      description = "A list of extra packages to install.";
-    };
   };
 
   config = lib.mkMerge [
@@ -129,7 +123,6 @@ in
     (lib.mkIf (cfg.pi.enable || cfg.opencode.enable) {
       home.packages = [ pkgs.agent-browser ];
     })
-    (lib.mkIf (cfg.extraPackages != [ ]) { home.packages = cfg.extraPackages; })
     {
       home.activation.agentSkillsConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         mkdir -p $HOME/.agents

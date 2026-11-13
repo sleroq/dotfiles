@@ -26,11 +26,9 @@
     ./scripts.nix
   ];
 
-  home = {
-    username = "sleroq";
-    homeDirectory = "/home/sleroq";
-    stateVersion = "22.11";
-  };
+  home.username = "sleroq";
+  home.homeDirectory = "/home/sleroq";
+  home.stateVersion = "22.11";
 
   age.secrets.ssh-config = {
     file = ../secrets/ssh-config;
@@ -58,45 +56,6 @@
         enable = true;
         default = true;
       };
-
-      extraPackages = with pkgs; [
-        # monero-gui
-        # signal-desktop
-        legcord
-
-        # teamspeak6-client
-        syncplay
-
-        # krita
-        # libreoffice-fresh
-        xournalpp
-        picard # music tagger
-
-        # obsidian
-        qbittorrent
-        thunderbird
-
-        keepassxc
-
-        nemo
-
-        kdePackages.filelight
-        p7zip
-        unzip
-        nomacs # Image viewer
-
-        # CLI
-        # rclone
-        gdb
-        ffmpeg
-
-        # Remote stuff
-        # bore-cli
-        # nomachine-client
-        # rustdesk
-        # vial
-        inputs'.agenix.packages.default
-      ];
     };
 
     development = {
@@ -105,6 +64,45 @@
 
     astGrep.enable = lib.mkDefault true;
   };
+
+  home.packages = with pkgs; [
+    # monero-gui
+    # signal-desktop
+    legcord
+
+    # teamspeak6-client
+    syncplay
+
+    # krita
+    # libreoffice-fresh
+    xournalpp
+    picard # music tagger
+
+    # obsidian
+    qbittorrent
+    thunderbird
+
+    keepassxc
+
+    nemo
+
+    kdePackages.filelight
+    p7zip
+    unzip
+    nomacs # Image viewer
+
+    # CLI
+    # rclone
+    gdb
+    ffmpeg
+
+    # Remote stuff
+    # bore-cli
+    # nomachine-client
+    # rustdesk
+    # vial
+    inputs'.agenix.packages.default
+  ];
 
   xsession.enable = true;
 
