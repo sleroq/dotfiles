@@ -38,6 +38,9 @@ let
     "secrets/trusttunnelCredentials" = {
       publicKeys = commonPublicKeys;
     };
+    "secrets/frpToken" = {
+      publicKeys = commonPublicKeys;
+    };
     "secrets/grafanaPassword" = {
       publicKeys = commonPublicKeys;
     };

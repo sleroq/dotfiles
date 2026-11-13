@@ -1,4 +1,4 @@
-{ config, lib, secrets, ... }:
+{ config, lib, ... }:
 let
   cfg = config.cumserver.frp;
 in
@@ -8,6 +8,10 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    age.secrets.frpToken.file = ../secrets/frpToken;
+    systemd.services.frp-frps.serviceConfig.LoadCredential =
+      "frp-token:${config.age.secrets.frpToken.path}";
+
     services.frp = {
       instances.frps = {
         enable = true;
@@ -17,7 +21,10 @@ in
 
           auth = {
             method = "token";
-            token = secrets.frpToken;
+            tokenSource = {
+              type = "file";
+              file.path = "/run/credentials/frp-frps.service/frp-token";
+            };
           };
 
           webServer = {
@@ -29,7 +36,14 @@ in
       };
     };
 
-    networking.firewall.allowedTCPPorts = [ 7000 27015 28801 ];
-    networking.firewall.allowedUDPPorts = [ 27015 28802 ];
+    networking.firewall.allowedTCPPorts = [
+      7000
+      27015
+      28801
+    ];
+    networking.firewall.allowedUDPPorts = [
+      27015
+      28802
+    ];
   };
 }
