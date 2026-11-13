@@ -8,7 +8,8 @@ let
   cfg = config.cumserver.broadcast-box;
   enabledInstances = if cfg.enable then cfg.instances else { };
   instanceList = lib.mapAttrsToList (name: instance: instance // { inherit name; }) enabledInstances;
-  backupInstances = lib.filterAttrs (_: instance: instance.backup.enable) enabledInstances;
+  redisInstances = lib.optionalAttrs cfg.redis.enable enabledInstances;
+  backupInstances = lib.filterAttrs (_: instance: instance.backup.enable) redisInstances;
 
   envValueToString =
     value:
@@ -40,7 +41,6 @@ let
     _: instance:
     let
       defaultSettings = {
-        REDIS_URL = "redis://localhost:${toString instance.redisPort}/${toString instance.redisDb}";
         UDP_MUX_PORT = instance.udpPort;
         NETWORK_TYPES = "udp4";
         NAT_1_TO_1_IP = cfg.publicIPv4;
@@ -50,7 +50,12 @@ let
         DISABLE_FRONTEND = "true";
         DISABLE_STATUS = "true";
       };
-      resolvedSettings = defaultSettings // instance.settings;
+      resolvedSettings =
+        defaultSettings
+        // lib.optionalAttrs cfg.redis.enable {
+          REDIS_URL = "redis://localhost:${toString instance.redisPort}/${toString instance.redisDb}";
+        }
+        // instance.settings;
     in
     (lib.mapAttrs (_: envValueToString) resolvedSettings)
     // {
@@ -67,10 +72,7 @@ let
     in
     {
       description = "Broadcast Box (${name})";
-      after = [
-        "network-online.target"
-        redisService
-      ];
+      after = [ "network-online.target" ] ++ lib.optional cfg.redis.enable redisService;
       wants = [ "network-online.target" ];
       wantedBy = [ "multi-user.target" ];
       startLimitBurst = 3;
@@ -198,6 +200,7 @@ in
 {
   options.cumserver.broadcast-box = {
     enable = lib.mkEnableOption "Broadcast Box WebRTC streaming server";
+    redis.enable = lib.mkEnableOption "Redis and its backups for Redis-enabled Broadcast Box builds";
 
     publicIPv4 = lib.mkOption {
       type = lib.types.str;
@@ -299,7 +302,7 @@ in
           message = "broadcast-box instances must use unique UDP ports";
         }
         {
-          assertion = lib.allUnique (map (instance: instance.redisPort) instanceList);
+          assertion = lib.allUnique (map (instance: instance.redisPort) (lib.attrValues redisInstances));
           message = "broadcast-box instances must use unique Redis ports";
         }
         {
@@ -310,7 +313,7 @@ in
 
       services.redis.servers = lib.mapAttrs' (
         name: instance: lib.nameValuePair "broadcast-box-${name}" (mkRedisServer name instance)
-      ) enabledInstances;
+      ) redisInstances;
 
       systemd.services = lib.mapAttrs' (
         name: instance: lib.nameValuePair "broadcast-box-${name}" (mkService name instance)
