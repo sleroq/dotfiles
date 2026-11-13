@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
@@ -54,16 +53,6 @@ in
     services.syncplay = {
       enable = true;
       port = cfg.port;
-      # TODO: Remove override after updating main input
-      package = pkgs.syncplay-nogui.overrideAttrs {
-        version = "1.7.5";
-        src = pkgs.fetchFromGitHub {
-          owner = "Syncplay";
-          repo = "syncplay";
-          tag = "v1.7.5";
-          hash = "sha256-qNkucK7+OuNmTGLuTn4hXxKjMq3WpT4CvGRXoQ2+1Oc=";
-        };
-      };
       # NixOS presents the renewed ACME certificate to Syncplay as
       # cert.pem, privkey.pem, and chain.pem in its credential directory.
       useACMEHost = cfg.domain;

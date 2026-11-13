@@ -63,9 +63,9 @@ in
       obs.enable = true;
       chromium.enable = true;
       opencode.enable = true;
-      exodus.enable = true;
       mangohud.enable = true;
       extraPackages = with pkgs; [
+        exodus
         obsidian
         paseoPackages.desktop
         # ollama-rocm

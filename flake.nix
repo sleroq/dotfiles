@@ -9,6 +9,7 @@
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
     ph.url = "github:sleroq/proxy-helper";
+    paisa.url = "https://github.com/ananthakumaran/paisa/archive/refs/heads/master.tar.gz";
 
     easy-hosts.url = "github:tgirlcloud/easy-hosts";
 
@@ -96,7 +97,8 @@
     music-link.url = "github:sleroq/music-link";
     # music-link.url = "path:/Users/sleroq/develop/music-link";
 
-    # Keep the module pinned; the host overrides its package with the running legacy binary.
+    # Intentionally pin the module: later versions are incompatible with the running legacy binary.
+    # The host overrides its package with that binary.
     # Future bot-split deployment (requires the new SIEVE_* credentials):
     # sieve.url = "git+ssh://git@github.com/sleroq/sieve";
     sieve.url = "git+ssh://git@github.com/sleroq/sieve?rev=7696c1bdc3c4f2e43b93a801d0b7012c3398be7e";

@@ -47,7 +47,6 @@ in
     };
     accounting.enable = lib.mkEnableOption "accounting software";
     activity-watch.enable = lib.mkEnableOption "Activity Watch";
-    exodus.enable = lib.mkEnableOption "Exodus wallet";
     mangohud.enable = lib.mkEnableOption "MangoHUD";
 
     extraPackages = lib.mkOption {
