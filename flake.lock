@@ -2134,6 +2134,19 @@
         "type": "github"
       }
     },
+    "nixpkgs-ru-relay": {
+      "locked": {
+        "lastModified": 1793582901,
+        "narHash": "sha256-TmjnoezEMTuSmEjtCa9gTaK6hLOFJv+ZvIDCu5s9vec=",
+        "rev": "5c9de89ec55bff981cb8da1a4ee92b10f1438ffc",
+        "type": "tarball",
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1106677.5c9de89ec55b/nixexprs.tar.xz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz"
+      }
+    },
     "nixpkgs-roundy": {
       "locked": {
         "lastModified": 1790750587,
@@ -2751,6 +2764,7 @@
         "nixpkgs-master": "nixpkgs-master",
         "nixpkgs-portable": "nixpkgs-portable",
         "nixpkgs-roundy": "nixpkgs-roundy",
+        "nixpkgs-ru-relay": "nixpkgs-ru-relay",
         "nixpkgs-warsaw": "nixpkgs-warsaw",
         "paisa": "paisa",
         "ph": "ph",
