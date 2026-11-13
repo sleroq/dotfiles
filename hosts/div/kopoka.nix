@@ -16,25 +16,15 @@
   };
   users.groups.kopoka = { };
 
-  systemd.services.kopoka = {
-    description = "Kopoka Telegram Bot";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network.target" ];
-    serviceConfig = {
-      ExecStart = "${inputs'.kopoka.packages.default}/bin/kopoka";
-      User = "kopoka";
-      Group = "kopoka";
-      Restart = "always";
-      RestartSec = "10s";
-      EnvironmentFile = config.age.secrets.kopokaEnv.path;
-      NoNewPrivileges = true;
-      PrivateTmp = true;
-      ProtectSystem = "strict";
-      ProtectHome = true;
-      PrivateDevices = true;
-      ProtectKernelTunables = true;
-      ProtectKernelModules = true;
-      ProtectControlGroups = true;
+  services.starflake.deployments.kopoka = {
+    source.url = "github:sleroq/kopoka";
+    initialPackage = inputs'.kopoka.packages.default;
+    runtime = {
+      exec = [ "bin/kopoka" ];
+      user = "kopoka";
+      group = "kopoka";
+      environmentFiles = [ config.age.secrets.kopokaEnv.path ];
     };
+    poll.interval = "10m";
   };
 }
