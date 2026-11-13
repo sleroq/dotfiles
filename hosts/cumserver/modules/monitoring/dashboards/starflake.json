@@ -99,94 +99,13 @@
   },
   "panels": [
     {
-      "id": 1,
-      "title": "Exporter availability",
-      "type": "stat",
-      "gridPos": {
-        "x": 0,
-        "y": 0,
-        "w": 4,
-        "h": 4
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Prometheus1"
-      },
-      "description": "Minimum scrape availability across selected hosts; independent of deployment selection.",
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Prometheus1"
-          },
-          "expr": "min(up{job=\"starflake\",instance=~\"${host:regex}\"})",
-          "legendFormat": "",
-          "instant": true,
-          "range": false,
-          "format": "time_series"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "none",
-          "noValue": "No data",
-          "color": {
-            "mode": "thresholds",
-            "fixedColor": "text"
-          },
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "Down",
-                  "color": "red",
-                  "index": 0
-                },
-                "1": {
-                  "text": "Up",
-                  "color": "green",
-                  "index": 1
-                }
-              }
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": ""
-        },
-        "orientation": "auto",
-        "textMode": "value",
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto"
-      }
-    },
-    {
       "id": 2,
       "title": "Healthy",
       "type": "stat",
       "gridPos": {
-        "x": 4,
+        "x": 0,
         "y": 0,
-        "w": 5,
+        "w": 6,
         "h": 4
       },
       "datasource": {
@@ -249,9 +168,9 @@
       "title": "Unhealthy",
       "type": "stat",
       "gridPos": {
-        "x": 9,
+        "x": 6,
         "y": 0,
-        "w": 5,
+        "w": 6,
         "h": 4
       },
       "datasource": {
@@ -318,9 +237,9 @@
       "title": "Paused",
       "type": "stat",
       "gridPos": {
-        "x": 14,
+        "x": 12,
         "y": 0,
-        "w": 5,
+        "w": 6,
         "h": 4
       },
       "datasource": {
@@ -387,9 +306,9 @@
       "title": "Read errors",
       "type": "stat",
       "gridPos": {
-        "x": 19,
+        "x": 18,
         "y": 0,
-        "w": 5,
+        "w": 6,
         "h": 4
       },
       "datasource": {
