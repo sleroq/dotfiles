@@ -1,6 +1,5 @@
 { pkgs, inputs' }:
 let
-  pkgsMaster = inputs'.nixpkgs-master.legacyPackages;
   package = pkgs.wrapNeovimUnstable inputs'.neovim-nightly-overlay.packages.default {
     wrapRc = false;
     withRuby = false;
@@ -8,7 +7,7 @@ let
     wrapperArgs = [
       "--set"
       "FFF_NVIM"
-      "${pkgsMaster.vimPlugins.fff-nvim}"
+      "${pkgs.vimPlugins.fff-nvim}"
       "--prefix"
       "PATH"
       ":"

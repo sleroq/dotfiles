@@ -68,9 +68,6 @@ in
 
     starship = {
       enable = true;
-      enableBashIntegration = true;
-      enableZshIntegration = true;
-      enableNushellIntegration = true;
     };
 
     direnv = {
@@ -78,31 +75,15 @@ in
       silent = true;
       config.global.hide_env_diff = true;
       nix-direnv.enable = true;
-      enableBashIntegration = true;
-      enableZshIntegration = true;
-      enableNushellIntegration = true;
-    };
-
-    eza = {
-      enable = false;
-      enableBashIntegration = true;
-      enableZshIntegration = true;
-      enableNushellIntegration = true;
     };
 
     yazi = {
       enable = true;
       shellWrapperName = "y";
-      enableBashIntegration = true;
-      enableZshIntegration = true;
-      enableNushellIntegration = true;
     };
 
     zoxide = {
       enable = true;
-      enableBashIntegration = true;
-      enableNushellIntegration = true;
-      enableZshIntegration = true;
       options = [
         "--cmd"
         "cd"
@@ -111,8 +92,6 @@ in
 
     carapace = {
       enable = true;
-      enableNushellIntegration = true;
-      enableZshIntegration = true;
     };
 
     fastfetch.enable = true;

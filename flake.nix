@@ -34,7 +34,7 @@
     caelestia_shell-interplanetary.inputs.quickshell.url = "git+https://git.outfoxxed.me/quickshell/quickshell?ref=refs/tags/v0.3.2";
 
     # Per-host nixpkgs pins
-    nixpkgs-warsaw.url = "github:NixOS/nixpkgs/nixos-26.05";
+    nixpkgs-warsaw.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-ru-relay.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-interplanetary.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     nixpkgs-cumserver.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
@@ -61,8 +61,6 @@
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
-
-    nixpkgs-master.url = "github:nixos/nixpkgs/master";
 
     fumo-gateway.url = "github:sleroq/fumo-gateway";
 
@@ -171,7 +169,6 @@
       flake.overlays = import ./overlays/default.nix {
         inherit nixpkgs;
         inherit (inputs)
-          nixpkgs-master
           rust-overlay
           ph
           ;

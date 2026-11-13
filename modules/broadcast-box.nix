@@ -22,7 +22,6 @@ let
 
   mkRedisServer = _: instance: {
     enable = true;
-    bind = "127.0.0.1";
     port = instance.redisPort;
     appendOnly = true;
     save = [

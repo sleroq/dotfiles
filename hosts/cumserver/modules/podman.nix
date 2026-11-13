@@ -37,7 +37,6 @@ in
         containers = {
           prometheus-podman-exporter = lib.mkIf config.cumserver.monitoring.enable {
             image = "quay.io/navidys/prometheus-podman-exporter:v2.0.0@sha256:ddaa9003e86f435f2d958ab68041959e4d2bb290a350a2649a123c449db032db";
-            autoStart = true;
             ports = [ "127.0.0.1:9882:9882" ];
             volumes = [
               "/run/podman/podman.sock:/run/podman/podman.sock:ro"

@@ -136,8 +136,6 @@
     noto-fonts-cjk-serif-static
     inter
     roboto
-    noto-fonts
-    noto-fonts-color-emoji
     # CBDT color glyphs work in Chromium/Helium as well as other Linux apps;
     # twemoji-color-font uses SVGinOT, which Chromium renders in monochrome.
     twitter-color-emoji

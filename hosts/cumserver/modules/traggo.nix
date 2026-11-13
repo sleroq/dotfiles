@@ -56,7 +56,6 @@ in
 
     virtualisation.oci-containers.containers.traggo = {
       inherit (cfg) image environment;
-      autoStart = true;
       ports = [ "127.0.0.1:${toString cfg.port}:3030" ];
       volumes = [
         "${cfg.dataDir}:/opt/traggo/data"
@@ -81,7 +80,6 @@ in
     };
 
     services.restic.backups.traggo = {
-      user = "root";
       repository = "s3:https://b9b008414ac92325dff304821d2a0a2c.eu.r2.cloudflarestorage.com/bots-backups";
       passwordFile = config.age.secrets.resticBackupsPassword.path;
       environmentFile = config.age.secrets.resticS3Keys.path;

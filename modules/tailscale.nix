@@ -1,4 +1,8 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  lib,
+  ...
+}:
 let
   cfg = config.sleroq.tailscale;
 in
@@ -12,9 +16,5 @@ in
       trustedInterfaces = [ "tailscale0" ];
       allowedUDPPorts = [ config.services.tailscale.port ];
     };
-
-    environment.systemPackages = [
-      pkgs.tailscale
-    ];
   };
 }

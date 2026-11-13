@@ -236,7 +236,6 @@
         redisDb = 0;
         settings.INTERFACE_FILTER = "ens3";
         stateDirectory = "broadcast-box";
-        backup.enable = true;
       };
 
       testing = {

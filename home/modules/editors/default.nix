@@ -14,7 +14,6 @@ in
 
   options.myHome.editors = {
     vscode.enable = lib.mkEnableOption "Visual Studio Code";
-    cursor.enable = lib.mkEnableOption "Cursor";
     datagrip.enable = lib.mkEnableOption "DataGrip";
     helix.enable = lib.mkEnableOption "Helix";
     zed = {
@@ -37,10 +36,6 @@ in
     # TODO: Get rid of package-toggle options?
     (lib.mkIf cfg.datagrip.enable {
       home.packages = [ pkgs.jetbrains.datagrip ];
-    })
-
-    (lib.mkIf cfg.cursor.enable {
-      home.packages = [ pkgs.code-cursor ];
     })
 
     (lib.mkIf cfg.helix.enable (import ./helix.nix { inherit pkgs; }))
