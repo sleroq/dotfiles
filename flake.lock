@@ -1048,11 +1048,11 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1794445858,
-        "narHash": "sha256-NNxYCTjcBZFIEvKNHHbKRPohWsIqWVDqW2pSD8Mxe2k=",
+        "lastModified": 1794602438,
+        "narHash": "sha256-Gc1HkChziZQp28fpEU4DWS8WYYGEzjY315UJYpNpyFc=",
         "owner": "sleroq",
         "repo": "fumo-gateway",
-        "rev": "4c41b4cd7a2608fe99590a3201c186c4d102e05c",
+        "rev": "1970a0ecbcebfa9719b87f43e6533a49c5ee4dae",
         "type": "github"
       },
       "original": {
