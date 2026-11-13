@@ -71,9 +71,8 @@ in
         # ollama-rocm
         # chatbox
         scrcpy
-        # Match the Zig release supported by the locked ZLS.
-        inputs'.zig.packages."0.17.0"
-        inputs'.zls.packages.default
+        zig
+        zls
         bottles
         qFlipper
         # blender

@@ -59,9 +59,6 @@
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
-    zig.url = "github:mitchellh/zig-overlay";
-    zls.url = "github:zigtools/zls";
-    zed-interplanetary.url = "github:zed-industries/zed/nightly"; # Lock to hit the cache
 
     nixpkgs-master.url = "github:nixos/nixpkgs/master";
 

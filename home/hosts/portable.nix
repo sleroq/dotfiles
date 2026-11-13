@@ -116,8 +116,8 @@ in
         moonlight-qt
         scrcpy
         typst
-        inputs'.zig.packages.master
-        inputs'.zls.packages.default
+        zig
+        zls
       ];
     };
   };

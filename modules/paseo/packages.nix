@@ -49,8 +49,8 @@ let
     deno
     typescript
     typescript-language-server
-    inputs'.zig.packages."0.17.0"
-    inputs'.zls.packages.default
+    zig
+    zls
     go
     gopls
     golangci-lint

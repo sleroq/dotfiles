@@ -1,5 +1,4 @@
 {
-  inputs',
   pkgs,
   lib,
   config,
@@ -22,7 +21,7 @@ in
       enable = lib.mkEnableOption "Zed Editor";
       package = lib.mkOption {
         type = lib.types.nullOr lib.types.package;
-        default = inputs'.zed.packages.default;
+        default = pkgs.zed-editor;
         description = "The Zed package to use. Set to null to enable config without installing.";
       };
       default = lib.mkEnableOption "default env";
@@ -50,13 +49,7 @@ in
 
     (lib.mkIf cfg.zed.enable (
       import ./zed.nix {
-        inherit
-          pkgs
-          lib
-          opts
-          inputs'
-          config
-          ;
+        inherit lib opts config;
       }
     ))
     (lib.mkIf (cfg.zed.enable && cfg.zed.default) {
