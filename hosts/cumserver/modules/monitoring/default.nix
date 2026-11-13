@@ -145,6 +145,7 @@ in
                 type = "loki";
                 uid = "Loki1";
                 url = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}";
+                jsonData.manageAlerts = false;
               }
               {
                 name = "Prometheus";
@@ -361,20 +362,21 @@ in
             configs = [
               {
                 from = "2024-01-01";
-                store = "boltdb";
+                store = "tsdb";
                 object_store = "filesystem";
                 schema = "v13";
                 index = {
                   prefix = "index_";
-                  period = "168h"; # seven days
+                  period = "24h";
                 };
               }
             ];
           };
 
           storage_config = {
-            boltdb = {
-              directory = "/var/lib/loki/index";
+            tsdb_shipper = {
+              active_index_directory = "/var/lib/loki/index";
+              cache_location = "/var/lib/loki/index_cache";
             };
             filesystem = {
               directory = "/var/lib/loki/chunks";
@@ -385,23 +387,13 @@ in
             allow_structured_metadata = false;
             reject_old_samples = true;
             reject_old_samples_max_age = "168h";
+            retention_period = "168h";
           };
 
-          table_manager = {
-            chunk_tables_provisioning = {
-              inactive_read_throughput = 0;
-              inactive_write_throughput = 0;
-              provisioned_read_throughput = 0;
-              provisioned_write_throughput = 0;
-            };
-            index_tables_provisioning = {
-              inactive_read_throughput = 0;
-              inactive_write_throughput = 0;
-              provisioned_read_throughput = 0;
-              provisioned_write_throughput = 0;
-            };
-            retention_deletes_enabled = true;
-            retention_period = "168h"; # 7 days
+          compactor = {
+            working_directory = "/var/lib/loki/compactor";
+            retention_enabled = true;
+            delete_request_store = "filesystem";
           };
         };
       };
