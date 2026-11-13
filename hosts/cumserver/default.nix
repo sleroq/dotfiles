@@ -56,7 +56,6 @@
     settings = {
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
-      X11Forwarding = false;
       AllowUsers = [
         "root"
         config.cumserver.dev-env.user

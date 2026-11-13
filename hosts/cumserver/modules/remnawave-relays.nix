@@ -119,10 +119,7 @@ in
         PrivateDevices = true;
         PrivateTmp = true;
         ProtectClock = true;
-        ProtectControlGroups = true;
         ProtectKernelLogs = true;
-        ProtectKernelModules = true;
-        ProtectKernelTunables = true;
         RestrictAddressFamilies = [
           "AF_INET"
           "AF_UNIX"

@@ -59,7 +59,6 @@ in
       NoNewPrivileges = true;
       PrivateTmp = true;
       InaccessiblePaths = [ "/var/lib/agent-jobs-work" ];
-      ReadOnlyPaths = [ cfg.stateDirectory ];
     };
   };
 

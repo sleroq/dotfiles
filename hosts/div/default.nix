@@ -60,8 +60,6 @@
       AuthorizedKeysFile = ".ssh/authorized_keys /etc/ssh/authorized_keys.d/%u";
       KbdInteractiveAuthentication = false;
       PasswordAuthentication = false;
-      PermitRootLogin = "prohibit-password";
-      X11Forwarding = false;
     };
   };
 

@@ -74,8 +74,6 @@
       settings = {
         PasswordAuthentication = false;
         KbdInteractiveAuthentication = false;
-        PermitRootLogin = "prohibit-password";
-        X11Forwarding = false;
         AllowUsers = [ "root" ];
       };
     };

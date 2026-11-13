@@ -52,8 +52,6 @@
         LoginGraceTime = 30;
         MaxAuthTries = 6;
         PasswordAuthentication = false;
-        PermitRootLogin = "prohibit-password";
-        X11Forwarding = false;
       };
     };
     qemuGuest.enable = true;

@@ -58,11 +58,9 @@ in
 
     services.navidrome = {
       enable = true;
-      openFirewall = false;
       inherit (cfg) environmentFile;
       settings = {
         Address = cfg.listenAddress;
-        Port = 4533;
         MusicFolder = cfg.musicFolder;
         DataFolder = "/var/lib/navidrome/data";
         CacheFolder = "/var/lib/navidrome/cache";
