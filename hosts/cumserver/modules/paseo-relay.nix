@@ -1,7 +1,4 @@
 { config, pkgs, ... }:
-let
-  paseoRelay = pkgs.callPackage ../../../packages/paseo-relay.nix { };
-in
 {
   # Own the persistent links used by the relay-only activation as well as the normal unit.
   environment.etc."systemd/system.control/paseo-relay.service".source = "${
@@ -29,7 +26,7 @@ in
       StateDirectory = "paseo-relay";
       RuntimeDirectory = "paseo-relay";
       WorkingDirectory = "/var/lib/paseo-relay";
-      ExecStart = "${paseoRelay}/bin/paseo_relay start";
+      ExecStart = "${pkgs.paseo-relay}/bin/paseo-relay start";
       Restart = "on-failure";
       RestartSec = 5;
       MemoryMax = "512M";

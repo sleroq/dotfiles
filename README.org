@@ -28,7 +28,7 @@ Note: Some HM configs are linked via activation scripts for local editing withou
 
 ** Notable features
 
-I use =easy-hosts= and special input resolver to make it easier to manage per-host inputs:
+I use =easy-hosts= to make it easier to manage per-host inputs:
 
 - Convenience attrs: =self'= and =inputs'= to avoid repeating =${pkgs.system}=.
   - Instead of: =inputs.input-name.packages.${pkgs.system}.package-name=
@@ -36,18 +36,11 @@ I use =easy-hosts= and special input resolver to make it easier to manage per-ho
   - Instead of: =self.packages.${pkgs.system}.package-name=
     use: =self'.packages.package-name=
 
-- Per-host inputs resolver that exposes =inputsResolved'= to modules.
-  - Naming convention: define host-specific inputs as =baseName-hostName= (e.g. =zed-interplanetary=).
-  - For a host =HOST=, =inputsResolved'.baseName= becomes:
-    - the host-specific input if =baseName-HOST= exists, otherwise
-    - the shared =baseName= input if it exists, otherwise =null=.
-
 Example usage in modules:
 
 #+BEGIN_SRC nix
 { lib, pkgs, inputs', ... }:
 {
-  # Host-aware: picks inputs.zed-interplanetary on "interplanetary" host
   environment.systemPackages = [
     # shorter access thanks to inputs'
     inputs'.zed.packages.default

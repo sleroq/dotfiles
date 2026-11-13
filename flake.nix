@@ -205,9 +205,6 @@
             // {
               # TODO: Refactor
               nixpkgs = if builtins.hasAttr key inputs then builtins.getAttr key inputs else inputs.nixpkgs;
-              specialArgs = (extra.specialArgs or { }) // {
-                easyHostsHost = name;
-              };
             };
         in
         {
@@ -317,7 +314,7 @@
                   inputs.ph.darwinModules.default
                   inputs.home-manager-portable.darwinModules.home-manager
                   (
-                    { inputs, inputsResolved', ... }:
+                    { inputs, inputs', ... }:
                     {
                       home-manager = {
                         useGlobalPkgs = true;
@@ -332,8 +329,7 @@
                         users.${username}.imports = [ ./home/hosts/portable.nix ];
 
                         extraSpecialArgs = {
-                          inherit self inputs;
-                          inputs' = inputsResolved';
+                          inherit self inputs inputs';
                           opts = rec {
                             inherit username;
                             flakeRoot = "/Users/sleroq/develop/dotfiles";
@@ -348,7 +344,6 @@
           };
 
           shared.modules = [
-            (import ./lib/inputs-resolver.nix)
             (
               { inputs, ... }:
               {
@@ -361,12 +356,12 @@
             modules = builtins.concatLists [
               (nixpkgs.lib.optionals (tag == "linux-personal") [
                 (
-                  { inputs, inputsResolved', ... }@args:
+                  { inputs, inputs', ... }@args:
                   (import ./home/default.nix) (
                     args
                     // rec {
                       agenixModule = inputs.agenix.homeManagerModules.default;
-                      inputs' = inputsResolved';
+                      inherit inputs';
                       inherit (inputs) self;
 
                       # FIXME: Feels like this should really be per-host, without this confusing grouping
