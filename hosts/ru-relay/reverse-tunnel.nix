@@ -12,8 +12,11 @@
       bindAddr = "0.0.0.0";
       bindPort = 7443;
       proxyBindAddr = "127.0.0.1";
-      allowPorts = [ { single = 12085; } ];
-      maxPortsPerClient = 1;
+      allowPorts = [
+        { single = 12085; }
+        { single = 12086; }
+      ];
+      maxPortsPerClient = 2;
       auth = {
         method = "token";
         additionalScopes = [

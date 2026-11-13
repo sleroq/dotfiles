@@ -202,6 +202,7 @@
       {
         name = "RU Relay";
         address = "${secrets.ruRelayIP}:9100";
+        scrapeNode = false;
       }
       {
         name = "Poland";

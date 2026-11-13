@@ -50,6 +50,13 @@
             useEncryption = false;
           };
         }
+        {
+          name = "cumserver-metrics";
+          type = "tcp";
+          localIP = "cum.army";
+          localPort = 443;
+          remotePort = 12086;
+        }
       ];
     };
   };

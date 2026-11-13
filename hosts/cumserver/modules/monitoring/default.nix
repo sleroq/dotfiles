@@ -50,6 +50,11 @@ in
               type = lib.types.str;
               description = "Address of the remote node (IP:PORT)";
             };
+            scrapeNode = lib.mkOption {
+              type = lib.types.bool;
+              default = true;
+              description = "Scrape the remote node exporter";
+            };
             podmanAddress = lib.mkOption {
               type = lib.types.nullOr lib.types.str;
               default = null;
@@ -267,7 +272,7 @@ in
               replacement = "\${1}";
             }
           ];
-        }) cfg.remoteNodes)
+        }) (lib.filter (node: node.scrapeNode) cfg.remoteNodes))
         ++ (map (node: {
           job_name = "podman-${lib.strings.toLower node.name}";
           static_configs = [
@@ -411,6 +416,7 @@ in
                   respond @unsupportedMethod 405
                   basic_auth {
                     import {$METRICS_AUTH_FILE}
+                    import {$RU_RELAY_METRICS_AUTH_FILE}
                   }
                   reverse_proxy 127.0.0.1:${toString config.services.prometheus.port} {
                     header_up -Authorization
@@ -427,10 +433,17 @@ in
     };
 
     age.secrets.metricsRemoteWriteCaddyAuth.file = ../../../../shared/secrets/metricsRemoteWriteCaddyAuth;
+    age.secrets.ruRelayMetricsCaddyAuth.file = ../../../../shared/secrets/ruRelayMetricsCaddyAuth;
     # ExecReload needs both a stable credential path and a refreshed credential mount.
-    systemd.services.caddy.environment.METRICS_AUTH_FILE = "%d/metrics-auth";
+    systemd.services.caddy.environment = {
+      METRICS_AUTH_FILE = "%d/metrics-auth";
+      RU_RELAY_METRICS_AUTH_FILE = "%d/ru-relay-metrics-auth";
+    };
     systemd.services.caddy.serviceConfig = {
-      LoadCredential = [ "metrics-auth:${config.age.secrets.metricsRemoteWriteCaddyAuth.path}" ];
+      LoadCredential = [
+        "metrics-auth:${config.age.secrets.metricsRemoteWriteCaddyAuth.path}"
+        "ru-relay-metrics-auth:${config.age.secrets.ruRelayMetricsCaddyAuth.path}"
+      ];
       RefreshOnReload = "extensions credentials";
     };
 

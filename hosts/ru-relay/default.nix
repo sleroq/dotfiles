@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   secrets,
   ...
@@ -37,10 +38,8 @@ in
         2083 # Alternate ingress to the shared Warsaw reverse bridge
         2080 # Legacy Warsaw host via Germany's Remnawave relay
       ];
-      # Metrics are scraped only by cumserver, never exposed to clients.
       extraInputRules = ''
         ip saddr ${warsawAddress} tcp dport 7443 accept
-        ip saddr ${backendAddress} tcp dport 9100 accept
       '';
     };
   };
@@ -71,6 +70,58 @@ in
     enable = true;
     relayDomain = "moq-relay.cum.army";
   };
+
+  services.prometheus.exporters.node.listenAddress = lib.mkForce "127.0.0.1";
+  services.alloy = {
+    enable = true;
+    extraFlags = [
+      "--server.http.listen-addr=127.0.0.1:12345"
+      "--disable-reporting"
+    ];
+  };
+  age.secrets.ruRelayMetricsPassword.file = ../../shared/secrets/ruRelayMetricsPassword;
+  systemd.services.alloy.serviceConfig = {
+    LoadCredential = [ "metrics-password:${config.age.secrets.ruRelayMetricsPassword.path}" ];
+    BindReadOnlyPaths = [
+      "${pkgs.writeText "alloy-hosts" "127.0.0.1 cum.army localhost\n::1 localhost\n"}:/etc/hosts"
+    ];
+  };
+  environment.etc."alloy/config.alloy".text = ''
+    prometheus.scrape "node" {
+      targets = [{
+        __address__ = "127.0.0.1:9100",
+        job = "node",
+        instance = "RU Relay",
+        node_name = "RU Relay",
+        node_type = "remote",
+      }]
+      scrape_interval = "60s"
+      forward_to = [prometheus.remote_write.cumserver.receiver]
+    }
+
+    prometheus.scrape "moq" {
+      targets = [{
+        __address__ = "127.0.0.1:9101",
+        job = "moq",
+        instance = "RU Relay MoQ",
+      }]
+      scrape_interval = "60s"
+      forward_to = [prometheus.remote_write.cumserver.receiver]
+    }
+
+    prometheus.remote_write "cumserver" {
+      endpoint {
+        url = "https://cum.army:12086/api/v1/write"
+        tls_config {
+          server_name = "cum.army"
+        }
+        basic_auth {
+          username = "ru-relay"
+          password_file = sys.env("CREDENTIALS_DIRECTORY") + "/metrics-password"
+        }
+      }
+    }
+  '';
 
   services = {
     # Preserve the running bus backend so updates can be switched without a reboot.
