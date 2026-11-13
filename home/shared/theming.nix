@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... } :
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
   catppuccinAccent = "Blue";
   catppuccinFlavor = "Macchiato";
@@ -9,7 +14,8 @@ let
   };
 
   qtThemeName = "catppuccin-${lib.toLower catppuccinFlavor}-${lib.toLower catppuccinAccent}";
-in {
+in
+{
   dconf.settings = {
     "org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
@@ -24,7 +30,7 @@ in {
 
   xdg.configFile = {
     "Kvantum/${qtThemeName}".source = "${catppuccinKvantum}/share/Kvantum/${qtThemeName}";
-    "Kvantum/kvantum.kvconfig".source = (pkgs.formats.ini {}).generate "kvantum.kvconfig" {
+    "Kvantum/kvantum.kvconfig".source = (pkgs.formats.ini { }).generate "kvantum.kvconfig" {
       General.theme = qtThemeName;
       General.icon_theme = "Tela";
     };
@@ -52,29 +58,33 @@ in {
       ".icons/Tela".source = "${pkgs.tela-icon-theme}/share/icons/Tela";
     };
 
-    pointerCursor = 
-      let 
+    pointerCursor =
+      let
         getFrom = url: hash: name: {
-            enable = true;
-            gtk.enable = true;
-            x11.enable = true;
-            hyprcursor.enable = true;
-            inherit name;
-            size = 24;
-            package = 
-              pkgs.runCommand "moveUp" {} ''
-                mkdir -p $out/share/icons
-                ln -s ${pkgs.fetchzip {
-                  inherit url hash;
-                }} $out/share/icons/${name}
-            '';
-          };
+          enable = true;
+          gtk.enable = true;
+          x11.enable = true;
+          hyprcursor.enable = true;
+          inherit name;
+          size = 24;
+          package = pkgs.runCommand "moveUp" { } ''
+            mkdir -p $out/share/icons
+            ln -s ${
+              pkgs.fetchzip {
+                inherit url hash;
+              }
+            } $out/share/icons/${name}
+          '';
+        };
       in
-        getFrom 
-          "https://github.com/ful1e5/fuchsia-cursor/releases/download/v2.0.0/Fuchsia-Pop.tar.gz"
-          "sha256-BvVE9qupMjw7JRqFUj1J0a4ys6kc9fOLBPx2bGaapTk="
-          "Fuchsia-Pop";
+      getFrom "https://github.com/ful1e5/fuchsia-cursor/releases/download/v2.0.1/Fuchsia-Pop.tar.xz"
+        "sha256-rjeDa/hRZVOS8XeTWEG0Uzf3nTWPd2leWQ2krQFVKks="
+        "Fuchsia-Pop";
 
-    packages = [ pkgs.libsForQt5.qt5ct pkgs.qt6Packages.qt6ct pkgs.material-symbols ];
+    packages = [
+      pkgs.libsForQt5.qt5ct
+      pkgs.qt6Packages.qt6ct
+      pkgs.material-symbols
+    ];
   };
 }
