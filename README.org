@@ -36,12 +36,11 @@ I use =easy-hosts= and special input resolver to make it easier to manage per-ho
   - Instead of: =self.packages.${pkgs.system}.package-name=
     use: =self'.packages.package-name=
 
-- Per-host inputs resolver that exposes two helpers to modules: =inputsResolved'= and =inputFor=.
+- Per-host inputs resolver that exposes =inputsResolved'= to modules.
   - Naming convention: define host-specific inputs as =baseName-hostName= (e.g. =zed-interplanetary=).
   - For a host =HOST=, =inputsResolved'.baseName= becomes:
     - the host-specific input if =baseName-HOST= exists, otherwise
     - the shared =baseName= input if it exists, otherwise =null=.
-  - =inputFor "baseName"= returns the resolved input for the current host.
 
 Example usage in modules:
 
