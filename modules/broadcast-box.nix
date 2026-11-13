@@ -48,6 +48,7 @@ let
         LOGGING_DIRECTORY = "/var/lib/private/${instance.stateDirectory}/logs";
         STREAM_PROFILE_PATH = "/var/lib/private/${instance.stateDirectory}/profiles";
         DISABLE_FRONTEND = "true";
+        DISABLE_STATUS = "true";
       };
       resolvedSettings = defaultSettings // instance.settings;
     in
