@@ -14,6 +14,11 @@ import (
 	"time"
 )
 
+const (
+	commitAuthorName  = "teto-automation[bot]"
+	commitAuthorEmail = "354363800+teto-automation[bot]@users.noreply.github.com"
+)
+
 type hostGit struct{ home, token, credentialHost string }
 
 func (g hostGit) command(ctx context.Context, dir string, args ...string) *exec.Cmd {
@@ -313,8 +318,8 @@ func (g hostGit) publishOnce(ctx context.Context, job Job, checkout, base, defau
 	if title == "" {
 		title = job.Name
 	}
-	commit, err := g.run(ctx, checkout, "-c", "user.name=Agent Jobs", "-c",
-		"user.email=agent-jobs@users.noreply.github.com", "commit-tree", tree, "-p", base, "-m", title)
+	commit, err := g.run(ctx, checkout, "-c", "user.name="+commitAuthorName, "-c",
+		"user.email="+commitAuthorEmail, "commit-tree", tree, "-p", base, "-m", title)
 	if err != nil {
 		return "", "", err
 	}
