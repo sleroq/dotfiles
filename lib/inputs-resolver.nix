@@ -9,7 +9,7 @@ let
   names = builtins.attrNames inputs';
   dashed = builtins.filter (n: builtins.match ".*-.*" n != null) names;
   baseOf = n: builtins.head (builtins.split "-" n);
-  bases = lib.unique (builtins.map baseOf dashed);
+  bases = lib.unique (map baseOf dashed);
 
   resolveFor =
     base:
@@ -24,7 +24,7 @@ let
       null;
 
   aliasList = builtins.filter (a: a.value != null) (
-    builtins.map (b: {
+    map (b: {
       name = b;
       value = resolveFor b;
     }) bases

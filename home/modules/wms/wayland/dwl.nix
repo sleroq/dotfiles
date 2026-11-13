@@ -12,7 +12,7 @@ let
   provisionKey = pkgs.writeShellScript "noctalia-storage-key" ''
     if [ ! -f ${lib.escapeShellArg storageKey} ]; then
       umask 077
-      ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg (builtins.dirOf storageKey)}
+      ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg (dirOf storageKey)}
       ${pkgs.coreutils}/bin/od -An -N32 -tx1 /dev/urandom | ${pkgs.coreutils}/bin/tr -d ' \n' > ${lib.escapeShellArg storageKey}
     fi
   '';

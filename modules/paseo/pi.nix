@@ -16,7 +16,7 @@ let
           if cfg.pi.cloudflare.enable then
             sharedMcp.mcpServers
           else
-            builtins.removeAttrs sharedMcp.mcpServers [
+            removeAttrs sharedMcp.mcpServers [
               "cloudflare"
               "cloudflare-docs"
             ]
