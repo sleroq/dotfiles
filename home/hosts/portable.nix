@@ -110,6 +110,7 @@ in
 
     programs = {
       hammerspoon.enable = true;
+      rcmd.enable = true;
       pi.enable = true;
       paseo.enable = true;
       pi.cloudflare.enable = true;

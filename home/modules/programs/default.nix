@@ -17,6 +17,7 @@ in
     ./opencode.nix
     ./paseo.nix
     ./pi.nix
+    ./rcmd.nix
   ];
 
   options.myHome.programs = {

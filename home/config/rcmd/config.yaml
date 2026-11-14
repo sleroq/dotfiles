@@ -1,0 +1,139 @@
+# rcmd configuration file
+# Edit this file to customise rcmd's behaviour. Changes are picked up within a few seconds.
+# Full settings reference: run `rcmd config help`
+
+# true: settings this file leaves out reset to defaults on every read
+overrideUserDefaults: false
+
+triggers:
+  triggerKeys: [rcmd]
+  windowTriggerKeys: [ralt]
+  stageTriggerKeys: []
+  secondTriggerGestures: [hold, doubleTap]
+  enableAssignHotkey: true
+  enableHideOthersHotkey: false
+  assignKeyTriggerKeys: []
+  hideOnFocusTriggerKeys: []
+  alwaysHideOthers: false
+  doubleTapGapMs: 250
+  doubleTapMaxPressMs: 250
+  doubleTapDisabled: false
+
+# trigger + key → app
+appKeyAssignments:
+  r: {app: /Applications/Rex Beta.app, launchIfNotRunning: true, whenAlreadyFocusedAction: DoNothing}
+
+# app → letter → saved window
+windowKeyAssignments: {}
+
+# what the window switcher lists first
+favorites: []
+
+favoritesPrefix: f
+
+stages: []
+
+# typed query → the app it always opens
+searchPins: {}
+
+appSwitcher:
+  showAppSwitcher: false
+  appSwitcherOSDDelay: 150
+  adaptiveFollowupGraceMs: 150
+  appSwitcherFeatures: [lastWindow, runningApps, launchableApps, bottomActions]
+  switcherScreenPlacement: {position: bottomRight, offsetX: 0, offsetY: 0}
+  osdSize: {width: 400, height: 600}
+  actionKeys: {hideKey: minus, actionKey: equal, exposeKey: period, enableHideAndActionKeys: true}
+  hideOnlyFocusedAppOnMinus: false
+  appSort: name
+  appSortReverse: false
+
+windowSwitcher:
+  windowSwitcherOSDDelay: 0
+  windowSwitcherAppearance: comfortable
+  osdLook:
+    density: comfortable
+    backgroundStyle:
+      glass: {opacity: 0}
+    accentColor: system
+    foregroundColor: adaptive
+    keycapColor: adaptive
+    keycapStyle: badge
+    searchBarStyle: glassy
+    cornerRadius: 14
+    appIconSize: 30
+    iconStyle: native
+    fontStyle: rounded
+    focusStyle: bar
+    rowSeparationStyle: filled
+  windowSwitcherFeatures: [lastWindow, windows, windowActions, bottomActions]
+  windowSwitcherDimFocused: false
+  windowSwitcherPlacement: {mirrorAppSwitcher: true}
+  osdSize: {width: 800, height: 650}
+  actionKeys: {windowMinimizeKey: minus, windowAssignKey: equal, enableWindowMinimizeAndAssignKeys: true}
+  minimizeOnlyFocusedWindowOnMinus: true
+
+stageSwitcher: {actionKeys: {stageAssignKey: equal, stageCloseKey: minus, stageRepositionKey: section, stageCloseAction: close}, stageReopenClosedItems: true, showStageSwitcher: true}
+
+tabCycle:
+  enableTabCycle: true
+  tabCycleScope: allWindows
+  tabCycleSearchScope: allWindows
+  tabCycleInclude: [minimized, hidden]
+  commandTabSwitcher: {left: macos, right: windows}
+  disableSystemCommandTabHotkey: false
+  commandTabPassThroughApps: [codes.rambo.VirtualBuddy, com.apple.ScreenSharing]
+  commandKeySticky: {left: false, right: false}
+  commandKeyCycleKey: {left: true, right: true}
+  stickyAppSwitcher: false
+  windowCycleKey: grave
+  enableWindowCycleKey: true
+  windowCycleShowsTiles: true
+
+spaces: {spaceMode: single, createMissingSpaces: true, osdOnActiveSpaceOnly: false, enableInstantSpaceSwitching: true, instantSpaceSwipe: false}
+
+general:
+  whenAlreadyFocusedAction: Adaptive
+  focusBehaviour: mainWindow
+  focusBehaviourSingle: mainWindow
+  focusBehaviourMulti: sameSpaceWindow
+  focusOnKeyUp: false
+  activationMode: onPress
+  searchMatchMode: anchored
+  osdDisplay: activeWindow
+  searchOptionalPrefixes:
+  - google
+  - microsoft
+  - adobe
+  - apple
+  - amazon
+  - affinity
+  - jetbrains
+  - nvidia
+  - parallels
+  - elgato
+  - logitech
+  - synology
+  - wondershare
+  - the
+  - 4k
+  - 8k
+  - 3d
+  showMenubarAppsInSearch: true
+  showLensItemsInSearch: true
+  lensRowCap: 30
+  lensFetchFavicons: true
+  enableQuickKeys: true
+  editorApp: ''
+  terminalApp: ''
+  enableStickySpaceSearch: true
+  enableAppSearch: true
+
+# bundle IDs rcmd never lists
+ignoredApps: [io.tailscale.ipn.macsys]
+
+# keys rcmd never takes
+ignoredKeys: []
+
+# bundle IDs where rcmd stops intercepting keys
+appsWhereRcmdIsPaused: []
