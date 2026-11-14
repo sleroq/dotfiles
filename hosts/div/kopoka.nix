@@ -25,6 +25,7 @@
       group = "kopoka";
       environmentFiles = [ config.age.secrets.kopokaEnv.path ];
     };
+    state.dataDir = "/var/lib/kopoka";
     poll.interval = "10m";
   };
 }
