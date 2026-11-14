@@ -27,6 +27,7 @@ in
   imports = [
     ../modules/programs/starship.nix
     ../modules/programs/btop.nix
+    ../modules/programs/yazi.nix
   ];
   home = {
     # Do not rely on the PATH inherited from macOS applications or terminal
@@ -75,11 +76,6 @@ in
       silent = true;
       config.global.hide_env_diff = true;
       nix-direnv.enable = true;
-    };
-
-    yazi = {
-      enable = true;
-      shellWrapperName = "y";
     };
 
     zoxide = {

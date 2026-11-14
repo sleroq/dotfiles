@@ -22,7 +22,6 @@ in
   options.myHome.programs = {
     helium.enable = lib.mkEnableOption "helium";
     remmina.enable = lib.mkEnableOption "Remmina";
-    lf.enable = lib.mkEnableOption "lf file manager";
     zathura.enable = lib.mkEnableOption "Zathura PDF viewer";
 
     foot.enable = lib.mkEnableOption "Foot terminal emulator";
@@ -57,7 +56,6 @@ in
       ];
     })
     (lib.mkIf cfg.remmina.enable { home.packages = [ pkgs.remmina ]; })
-    (lib.mkIf cfg.lf.enable (import ./lf.nix { inherit pkgs; }))
     (lib.mkIf cfg.zathura.enable (import ./zathura.nix { }))
 
     (lib.mkIf cfg.foot.enable (import ./foot.nix { inherit pkgs; }))
