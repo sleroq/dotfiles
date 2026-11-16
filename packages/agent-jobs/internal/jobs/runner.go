@@ -530,10 +530,12 @@ func runContainer(ctx context.Context, job Job, run *Run, nixStore, input, outpu
 	}
 	containerStarted = true
 	sandbox := dockerCommand(ctx, "exec", name, "/bin/agent-jobs", "sandbox", "/input/job.json")
-	sandbox.Stdout = stdout
+	events := &piEventLog{output: stdout}
+	sandbox.Stdout = events
 	sandbox.Stderr = stderr
 	started = time.Now()
 	runErr := sandbox.Run()
+	runErr = errors.Join(runErr, events.Close())
 	run.SandboxDurationSeconds = time.Since(started).Seconds()
 
 	// Preserve partial sessions after a timeout; this context is independent of the job.

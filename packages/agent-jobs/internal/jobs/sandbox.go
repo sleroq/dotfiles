@@ -167,7 +167,7 @@ func sandboxCommand(ctx context.Context, env []string, args ...string) *exec.Cmd
 
 func (cfg sandboxConfig) runAgent(ctx context.Context, env []string) error {
 	args := append([]string{}, cfg.PiCommand[1:]...)
-	args = append(args, "--print", "--session-dir", "/output/sessions", "--name", cfg.Name)
+	args = append(args, "--print", "--mode", "json", "--session-dir", "/output/sessions", "--name", cfg.Name)
 	if cfg.Model != "" {
 		args = append(args, "--model", cfg.Model)
 	}
