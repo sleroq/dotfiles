@@ -1,6 +1,7 @@
 {
   flakeRoot,
   pkgs,
+  lib,
   ...
 }:
 
@@ -43,6 +44,14 @@ in
     NH_OS_FLAKE = flakeRoot;
     CURL_CA_BUNDLE = curlCaBundle;
   };
+
+  # Launchd can start before the Nix store is mounted; a system shell lets
+  # KeepAlive retry instead of treating the missing store executable as permanent.
+  launchd.daemons.ph-proxy.serviceConfig.ProgramArguments = lib.mkForce [
+    "/bin/sh"
+    "-c"
+    "exec /run/current-system/sw/bin/ph run"
+  ];
 
   launchd.daemons."limit-maxfiles".serviceConfig = {
     ProgramArguments = [
