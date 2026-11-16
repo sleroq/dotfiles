@@ -1,8 +1,8 @@
 {
-  "version": "1.1.11",
+  "version": "1.1.12",
   "hashes": {
-    "linux-x86_64": "sha256-AOBUams1hA27krdB3/PaZzKnS/LWxYHgRLtFZ8DZaCU=",
-    "linux-aarch64": "sha256-iA6civ1czn/zjFOXjw6lMP+V5nm8/vacUSeyazaS0RA=",
-    "macos-universal": "sha256-4sZ6rqlB/Nz8JOyYaBZEYvzqjR9zH2koxJu+8wDc8aM="
+    "linux-x86_64": "sha256-dbffWTUeJkYkh0ZN5fNGIVPgAZXy1AZ3hy+5OltExIg=",
+    "linux-aarch64": "sha256-EEAr5+cV81OA6Lz2fi2PLOufrYHu+CdKRy46CFoNXME=",
+    "macos-universal": "sha256-ky3/TzloEeMcZGRLykIoCL87ecRYd6rnlWQpCCoschQ="
   }
 }
