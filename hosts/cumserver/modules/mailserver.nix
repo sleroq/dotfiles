@@ -148,6 +148,11 @@ in
 
       # Wait for caddy, so certs are ready on first ever boot
       systemd.services.dovecot.after = [ "caddy.service" ];
+      services.postfix.settings.main.mynetworks = [
+        "127.0.0.1/32"
+        "[::1]/128"
+      ];
+
       # The TLS policy daemon listens on a Unix socket.
       systemd.services.postfix-tlspol.serviceConfig.RestrictAddressFamilies = lib.mkAfter [ "AF_UNIX" ];
 
