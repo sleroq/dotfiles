@@ -16,6 +16,8 @@
   };
   users.groups.kopoka = { };
 
+  sleroq.cloudflared.tunnels.music.routes."kopoka.cum.army" = "http://127.0.0.1:8080";
+
   services.starflake.deployments.kopoka = {
     source.url = "github:sleroq/kopoka";
     initialPackage = inputs'.kopoka.packages.default;
@@ -24,6 +26,7 @@
       user = "kopoka";
       group = "kopoka";
       environmentFiles = [ config.age.secrets.kopokaEnv.path ];
+      environment.THUMBNAIL_BASE_URL = "https://kopoka.cum.army";
     };
     state.dataDir = "/var/lib/kopoka";
     poll.interval = "10m";
