@@ -82,13 +82,8 @@ in
   age.identityPaths = [ "/var/lib/agenix-key.txt" ];
   sleroq.sing-box = {
     # enable = lib.mkForce false;
-    # The current proxy has no working IPv6 egress. Advertising an IPv6 TUN
-    # makes libcurl/Nix prefer AAAA records and repeatedly hit that broken path.
-    enableIPv6 = false;
     directDomains = [
       "zoom.us"
-      "teams.microsoft.com"
-      "teams.live.com"
       "skype.com"
       "skype.net"
       "cardlink.link"

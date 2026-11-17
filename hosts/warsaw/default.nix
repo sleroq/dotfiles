@@ -83,6 +83,7 @@ in
 
   networking = {
     hostName = "warsaw";
+    enableIPv6 = lib.mkForce true;
     firewall = {
       allowedTCPPorts = [
         22
