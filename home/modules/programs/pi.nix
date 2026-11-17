@@ -9,6 +9,13 @@
 
 let
   cfg = config.myHome.programs.pi;
+  pi = inputs'.pi.packages.default;
+  herdrPi = pkgs.writeShellScriptBin "pi" ''
+    if [ -n "''${HC_TERMINAL_ID:-}" ]; then
+      exec ${pi}/bin/pi --skill ${../../config/herdr-core/skills/herdr} "$@"
+    fi
+    exec ${pi}/bin/pi "$@"
+  '';
   settings = ../../config/pi/agent/settings.json;
   sharedMcp = builtins.fromJSON (builtins.readFile ../../config/pi/agent/mcp.json);
   mcpDefaults = (pkgs.formats.json { }).generate "pi-mcp.json" (
@@ -39,7 +46,20 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = [ inputs'.pi.packages.default ];
+    home.packages = [
+      (
+        if config.myHome.programs.herdr.enable then
+          pkgs.symlinkJoin {
+            name = "pi-with-herdr-skill";
+            paths = [
+              herdrPi
+              pi
+            ];
+          }
+        else
+          pi
+      )
+    ];
 
     home.activation.removeLegacyPi = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       run rm -f "${config.xdg.cacheHome}/.bun/bin/pi" "$HOME/.bun/bin/pi"

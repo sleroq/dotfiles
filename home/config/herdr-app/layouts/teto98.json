@@ -1,0 +1,112 @@
+{
+  "id": "root",
+  "cloned_from": {
+    "name": "win98",
+    "version": "0.1.16"
+  },
+  "type": "column",
+  "children": [
+    {
+      "id": "screen",
+      "type": "row",
+      "children": [
+        {
+          "id": "desktop",
+          "type": "block",
+          "content": {
+            "mod": "win98",
+            "props": {
+              "role": "desktop"
+            }
+          },
+          "size": {
+            "px": 49.4119987487793
+          },
+          "window_drag": true
+        },
+        {
+          "id": "main",
+          "type": "block",
+          "content": {
+            "tab": "active",
+            "pane": {
+              "header": {
+                "content": {
+                  "mod": "win98",
+                  "props": {
+                    "role": "window"
+                  }
+                },
+                "reveal": "always",
+                "height": 10.588000297546387,
+                "position": "top"
+              },
+              "background": "#000000",
+              "border": {
+                "width": 1.7649999856948853,
+                "color": "#c0c0c0"
+              },
+              "focus": {
+                "width": 1.7649999856948853,
+                "color": "#c0c0c0"
+              },
+              "radius": 0,
+              "gap": 8,
+              "lone": true
+            }
+          },
+          "padding": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "teto-host",
+          "type": "block",
+          "content": {
+            "mod": "teto98",
+            "props": {
+              "role": "host"
+            }
+          },
+          "size": {
+            "px": 0
+          }
+        }
+      ],
+      "resizable": false
+    },
+    {
+      "id": "taskbar",
+      "type": "block",
+      "content": {
+        "mod": "teto98-taskbar",
+        "props": {
+          "role": "taskbar"
+        }
+      },
+      "size": {
+        "px": 16.47100067138672
+      },
+      "window_drag": true
+    }
+  ],
+  "background": "#008080",
+  "theme": "win98",
+  "font": "PxPlus IBM VGA 8x16",
+  "font_size": 16,
+  "ui_font": "Pixelated MS Sans Serif",
+  "terminal_padding": [
+    4,
+    2
+  ],
+  "terminal_opacity": 0,
+  "titlebar": "none",
+  "traffic_lights": [
+    14,
+    14
+  ],
+  "preview": "layouts/teto98.png",
+  "terminal_menu": "teto98-menu",
+  "toast": "teto98-toast"
+}

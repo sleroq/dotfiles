@@ -110,6 +110,7 @@ in
 
     programs = {
       hammerspoon.enable = true;
+      herdr.enable = true;
       rcmd.enable = true;
       pi.enable = true;
       paseo.enable = true;
