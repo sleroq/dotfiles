@@ -20,7 +20,7 @@
             }
           },
           "size": {
-            "px": 49.4119987487793
+            "px": 60
           },
           "window_drag": true
         },
@@ -38,16 +38,16 @@
                   }
                 },
                 "reveal": "always",
-                "height": 10.588000297546387,
+                "height": 12.857000350952148,
                 "position": "top"
               },
               "background": "#000000",
               "border": {
-                "width": 1.7649999856948853,
+                "width": 2.1429998874664307,
                 "color": "#c0c0c0"
               },
               "focus": {
-                "width": 1.7649999856948853,
+                "width": 2.1429998874664307,
                 "color": "#c0c0c0"
               },
               "radius": 0,
@@ -86,7 +86,7 @@
         }
       },
       "size": {
-        "px": 16.47100067138672
+        "px": 20
       },
       "window_drag": true
     }

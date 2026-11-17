@@ -1,0 +1,30 @@
+--- a/crates/nu-protocol/src/errors/report_error.rs	2026-11-17 18:32:27.417597679 +0300
++++ b/crates/nu-protocol/src/errors/report_error.rs	2026-11-17 18:32:27.455857029 +0300
+@@ -11,8 +11,8 @@
+     engine::{EngineState, Stack, StateWorkingSet},
+ };
+ use miette::{
+-    LabeledSpan, MietteHandlerOpts, NarratableReportHandler, ReportHandler, RgbColors, Severity,
+-    SourceCode,
++    GraphicalTheme, LabeledSpan, MietteHandlerOpts, NarratableReportHandler, ReportHandler,
++    RgbColors, Severity, SourceCode,
+ };
+ use serde::{Deserialize, Serialize};
+ use thiserror::Error;
+@@ -253,6 +253,16 @@
+                     .terminal_links(ansi_support)
+                     .context_lines(error_lines as usize)
+                     .with_cause_chain();
++                let handler = if ansi_support {
++                    let mut theme = GraphicalTheme::unicode();
++                    theme.characters.ltop = '┌';
++                    theme.characters.rtop = '┐';
++                    theme.characters.lbot = '└';
++                    theme.characters.rbot = '┘';
++                    handler.graphical_theme(theme)
++                } else {
++                    handler
++                };
+                 match style {
+                     ErrorStyle::Nested => Box::new(handler.show_related_errors_as_nested().build()),
+                     _ => Box::new(handler.build()),
