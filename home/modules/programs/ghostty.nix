@@ -7,7 +7,10 @@
     enable = true;
     settings = {
       command = "${pkgs.nushell}/bin/nu";
-      font-family = "JetBrainsMono Nerd Font";
+      font-family = [
+        "JetBrainsMono Nerd Font"
+        "Pixel Icons"
+      ];
       theme = "dark:Rose Pine,light:Rose Pine Dawn";
       font-size = 18;
       cursor-style = "block";

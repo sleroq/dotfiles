@@ -22,6 +22,11 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = neovim.packages ++ [ pkgs.obsidian-neovide ];
 
+    home.file."${
+      if pkgs.stdenv.isDarwin then "Library/Fonts" else ".local/share/fonts"
+    }/PixelIcons.ttf".source =
+      ../../config/nvim/pixel-icons/PixelIcons.ttf;
+
     home.sessionVariables = lib.mkIf cfg.default {
       EDITOR = "nvim";
     };

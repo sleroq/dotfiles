@@ -117,6 +117,8 @@ vim.pack.add({
     { src = "https://github.com/3rd/diagram.nvim" },
 })
 
+require("pixel_icons")
+
 vim.g.fff = {
     lazy_sync = true,
     layout = {
@@ -297,11 +299,13 @@ vim.api.nvim_create_autocmd("User", {
     callback = function()
         local win = require("Otree.state").win
         vim.wo[win].winhighlight = "Search:None,CurSearch:None,IncSearch:None,WinBar:Normal,WinBarNC:Normal"
+        vim.wo[win].statuscolumn = "%#Title#%{v:lnum == line('.') ? '❯ ' : '  '}"
     end,
 })
 
 require("Otree").setup({
     open_on_left = false,
+    cursorline = false,
     win_size = 35,
     hijack_netrw = true,
     oil = "float",
@@ -407,7 +411,7 @@ if vim.g.neovide then -- Copy paste for neovide
     local font_size = 20
     local function change_font_size(delta)
         font_size = math.max(1, font_size + delta)
-        vim.o.guifont = "JetBrainsMono Nerd Font:h" .. font_size
+        vim.o.guifont = "JetBrainsMono Nerd Font:h" .. font_size .. ",Pixel Icons:h" .. font_size
     end
     change_font_size(0)
 
@@ -583,6 +587,6 @@ vim.api.nvim_create_autocmd("FileType", {
 -- require("vague").setup()
 -- vim.cmd("colorscheme vague")
 -- vim.cmd("colorscheme rose-pine")
-vim.cmd("colorscheme midnight-tundra")
+vim.cmd("colorscheme midnight-tundra-black")
 vim.api.nvim_set_hl(0, "ZenBg", { link = "Normal" })
 -- vim.cmd("colorscheme monochrome")
