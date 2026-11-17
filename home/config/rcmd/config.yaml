@@ -21,7 +21,7 @@ triggers:
 
 # trigger + key → app
 appKeyAssignments:
-  r: {app: /Applications/Rex Beta.app, launchIfNotRunning: true, whenAlreadyFocusedAction: DoNothing}
+  r: {app: /Applications/Herdr.app, launchIfNotRunning: true, whenAlreadyFocusedAction: FollowGlobal}
 
 # app → letter → saved window
 windowKeyAssignments: {}
