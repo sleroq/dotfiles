@@ -24,12 +24,6 @@ in
   "secrets/sing-box-subscription-cw" = {
     publicKeys = commonPublicKeys;
   };
-  "secrets/webdav-cert.pem" = {
-    publicKeys = commonPublicKeys;
-  };
-  "secrets/webdav-key.pem" = {
-    publicKeys = commonPublicKeys;
-  };
   "secrets/work-vpn/ca.crt" = {
     publicKeys = commonPublicKeys;
   };
