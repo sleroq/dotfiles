@@ -15,6 +15,7 @@
     ./remnanode.nix
     ./restic.nix
     ./starflake.nix
+    ./telegram-bot-api.nix
     ../../modules/attic-cache.nix
     ../../modules/cloudflared.nix
     ../../modules/feishin.nix

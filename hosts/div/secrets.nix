@@ -19,6 +19,7 @@ in
   "secrets/remnawaveNodeEnv".publicKeys = publicKeys;
   "secrets/sftpgoAdminEnv".publicKeys = publicKeys;
   "secrets/sftpgoUsers".publicKeys = publicKeys;
+  "secrets/telegramBotApiEnv".publicKeys = publicKeys;
   "secrets/tuwunelRegistrationToken".publicKeys = publicKeys;
   "secrets/tuwunelTurnSecret".publicKeys = publicKeys;
   "secrets/zefxiEnv".publicKeys = publicKeys;
