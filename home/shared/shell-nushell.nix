@@ -80,6 +80,7 @@ in
   settings = {
     show_banner = false;
     buffer_editor = "nvim";
+    table.mode = "single";
     history = {
       max_size = 1100000;
       sync_on_enter = true;
