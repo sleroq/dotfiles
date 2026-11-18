@@ -16,13 +16,13 @@ in
 
     image = lib.mkOption {
       type = lib.types.str;
-      default = "docker.io/remnawave/backend:3.4.7@sha256:5c26c0314be896dfac82020b693c50a73d2f18ef593da2ef97244330ac032bcf";
+      default = "docker.io/remnawave/backend:3.4.11@sha256:a5b9f81fe2cfacec1c41bd2bb43fa1a5980228b81aa2e744be4adffa3a00135b";
       description = "Docker image to use for Remnawave backend";
     };
 
     postgresImage = lib.mkOption {
       type = lib.types.str;
-      default = "docker.io/library/postgres:18.6@sha256:3a4264520e121176619f54ff867d12774bc81e95e7b84db58d63bccdb6144b81";
+      default = "docker.io/library/postgres:18.7@sha256:2ea8630df176ad090ec92136dee850397c5af8781e4bcf2e4162593691c61bbc";
       description = "Docker image to use for Remnawave PostgreSQL";
     };
 
@@ -113,7 +113,7 @@ in
 
       image = lib.mkOption {
         type = lib.types.str;
-        default = "docker.io/remnawave/node:3.4.3@sha256:793f4ac52289f680ea2b12be8047e93f68b710c22ca93b52b9448a6fef7eaaa6";
+        default = "docker.io/remnawave/node:3.4.6@sha256:3d5fde656a36920f53c5c080f2dc821df8318f453803b07c4e5242752a549d69";
         description = "Docker image to use for the local Remnawave node";
       };
 
