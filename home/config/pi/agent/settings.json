@@ -16,9 +16,9 @@
   },
   "theme": "dark",
   "enabledModels": [
+    "fumo/codex/gpt-6.2-sol:high",
     "fumo/codex/gpt-6.1-terra:high",
-    "FrankAI/FrankAI:xhigh",
-    "fumo/codex/gpt-6.1-sol:high"
+    "FrankAI/FrankAI:xhigh"
   ],
   "outputPad": 0
 }
