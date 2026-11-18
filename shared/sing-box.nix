@@ -8,7 +8,20 @@
 let
   policy = config.sleroq.sing-box;
   isLinux = pkgs.stdenv.hostPlatform.isLinux;
-  googleRuDomainRegex = [ ''(?i)(^|\.)google[a-z0-9-]*\.ru$'' ];
+  proxyRuDomains = {
+    domain_regex = [ ''(?i)(^|\.)google[a-z0-9-]*\.ru$'' ];
+    domain_suffix = [
+      "airbnb.ru"
+      "apple.ru"
+      "bing.ru"
+      "ebay.ru"
+      "microsoft.ru"
+      "netflix.ru"
+      "nikon.ru"
+      "spotify.ru"
+      "youtube.ru"
+    ];
+  };
   routeRules = [
     { action = "sniff"; }
     {
@@ -20,11 +33,13 @@ let
       ];
       action = "hijack-dns";
     }
-    {
-      domain_regex = googleRuDomainRegex;
-      action = "route";
-      outbound = "proxy";
-    }
+    (
+      proxyRuDomains
+      // {
+        action = "route";
+        outbound = "proxy";
+      }
+    )
     {
       # Roblox UDP can match the BitTorrent/uTP sniffer. The Flatpak game
       # process is named Main, so match its executable before protocol routing.
@@ -163,11 +178,13 @@ in
             }
           ];
           rules = [
-            {
-              domain_regex = googleRuDomainRegex;
-              action = "route";
-              server = "remote-dns";
-            }
+            (
+              proxyRuDomains
+              // {
+                action = "route";
+                server = "remote-dns";
+              }
+            )
             {
               rule_set = [ "steam" ];
               action = "route";
