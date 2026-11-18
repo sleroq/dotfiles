@@ -8,6 +8,7 @@
 let
   policy = config.sleroq.sing-box;
   isLinux = pkgs.stdenv.hostPlatform.isLinux;
+  googleRuDomainRegex = [ ''(?i)(^|\.)google[a-z0-9-]*\.ru$'' ];
   routeRules = [
     { action = "sniff"; }
     {
@@ -18,6 +19,11 @@ let
         { port = 53; }
       ];
       action = "hijack-dns";
+    }
+    {
+      domain_regex = googleRuDomainRegex;
+      action = "route";
+      outbound = "proxy";
     }
     {
       # Roblox UDP can match the BitTorrent/uTP sniffer. The Flatpak game
@@ -157,6 +163,11 @@ in
             }
           ];
           rules = [
+            {
+              domain_regex = googleRuDomainRegex;
+              action = "route";
+              server = "remote-dns";
+            }
             {
               rule_set = [ "steam" ];
               action = "route";
