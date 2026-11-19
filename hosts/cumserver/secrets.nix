@@ -74,6 +74,9 @@ let
     "secrets/ziplineEnv" = {
       publicKeys = commonPublicKeys;
     };
+    "secrets/koitoEnv" = {
+      publicKeys = commonPublicKeys;
+    };
     "secrets/resticMinecraftPassword" = {
       publicKeys = commonPublicKeys ++ [ div ];
     };

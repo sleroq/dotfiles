@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   modulesPath,
   pkgs,
@@ -155,6 +156,15 @@
       path = "/metrics_itslocalanyway";
     };
   };
+
+  services.navidrome.settings.ListenBrainz =
+    let
+      koito = inputs.self.nixosConfigurations.cumserver.config.cumserver.koito;
+    in
+    {
+      Enabled = true;
+      BaseURL = "https://${koito.domain}/apis/listenbrainz/1";
+    };
 
   sleroq.feishin = {
     enable = true;

@@ -28,6 +28,7 @@
     ./modules/remnawave.nix
     ./modules/remnawave-relays.nix
     ./modules/traggo.nix
+    ./modules/koito.nix
     ./modules/minecraft.nix
     ./modules/frp.nix
     ./modules/restic.nix
@@ -178,6 +179,12 @@
   cumserver.remnawaveRelays.enable = true;
 
   cumserver.traggo.enable = true;
+
+  age.secrets.koitoEnv.file = ./secrets/koitoEnv;
+  cumserver.koito = {
+    enable = true;
+    environmentFile = config.age.secrets.koitoEnv.path;
+  };
 
   age.secrets.grafanaPassword = {
     owner = "grafana";
