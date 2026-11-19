@@ -23,12 +23,23 @@ in
       type = lib.types.path;
       description = "Environment file for Koito";
     };
+
+    subsonicUrl = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Base URL of the Subsonic server used for artwork";
+    };
   };
 
   config = lib.mkIf cfg.enable {
     services.koito = {
       enable = true;
-      environment.KOITO_LOGIN_GATE = "true";
+      environment = {
+        KOITO_LOGIN_GATE = "true";
+      }
+      // lib.optionalAttrs (cfg.subsonicUrl != null) {
+        KOITO_SUBSONIC_URL = cfg.subsonicUrl;
+      };
       inherit (cfg) environmentFile;
     };
 
