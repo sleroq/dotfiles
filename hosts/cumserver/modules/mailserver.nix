@@ -79,6 +79,8 @@ let
   generatedLoginAccounts = lib.listToAttrs (map generateLoginAccountEntry secrets.mailUsers);
 in
 {
+  imports = [ ./wks.nix ];
+
   options.cumserver.mailserver = {
     enable = lib.mkEnableOption "Mail server";
     backup.enable = lib.mkEnableOption "backups" // {
