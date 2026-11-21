@@ -373,11 +373,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795294561,
-        "narHash": "sha256-iaTQYe5lGzjbUn8sM4TlRegXcuVSvJA89Z6uiUrlGaE=",
+        "lastModified": 1795297129,
+        "narHash": "sha256-WU0b9yLf8+dZJYk/5czGHCvJaAvgvYWTJa1SB3lnoN8=",
         "owner": "Teto-Industries",
         "repo": "cumcraft",
-        "rev": "8001d38b83c7e96aee5b293382a2b1acd7f6f252",
+        "rev": "8145b6a3cc2049aa5cba2b38b5046229b47fe7d2",
         "type": "github"
       },
       "original": {
