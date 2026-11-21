@@ -7,6 +7,16 @@
   ...
 }:
 {
+  # The pinned worker needs explicit source materialization with Nix 2.35.
+  # Scope the fix to this deployment until the controller input is updated.
+  systemd.services.starflake-build-cumcraft-website.serviceConfig.ExecStart =
+    let
+      worker = config.services.starflake.package.overrideAttrs (prev: {
+        patches = (prev.patches or [ ]) ++ [ ./starflake-materialize-source.patch ];
+      });
+    in
+    lib.mkForce "${worker}/bin/starflake worker --config /etc/starflake/cumcraft-website.json";
+
   # Keep the unpublished controller source available for future host evaluations.
   # TODO: remove this once the controller is published.
   system.extraDependencies = [ inputs.starflake.outPath ];
@@ -29,6 +39,22 @@
     enable = true;
 
     deployments = {
+      cumcraft-website = {
+        source = {
+          url = "github:Teto-Industries/cumcraft/main";
+          package = "website";
+        };
+        runtime.exec = [
+          "bin/cumcraft-website"
+          "--host"
+          "127.0.0.1"
+          "--port"
+          "8101"
+        ];
+        health.checks.http.url = "http://127.0.0.1:8101/";
+        poll.interval = "10m";
+      };
+
       celine = {
         source.url = "github:sleroq/celine/master";
         build.allowLocalBuild = false;

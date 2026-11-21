@@ -1,0 +1,17 @@
+diff --git a/internal/infrastructure/nix.go b/internal/infrastructure/nix.go
+index 1b67874..f7dc703 100644
+--- a/internal/infrastructure/nix.go
++++ b/internal/infrastructure/nix.go
+@@ -153,6 +153,12 @@ func (n Nix) Work(ctx context.Context) (resultErr error) {
+ 		result.Status = "skipped"
+ 		return AtomicJSON(n.Config.ResultPath, result, 0644)
+ 	}
++	// Newer Nix can report a source path without materializing it.
++	if _, err := os.Stat(meta.Path); errors.Is(err, os.ErrNotExist) {
++		if _, err := n.Commands.Run(ctx, "nix", "flake", "prefetch", "--json", "--option", "accept-flake-config", "false", meta.URL); err != nil {
++			return err
++		}
++	}
+ 	checkout, err := os.MkdirTemp(n.Config.WorkDirectory, "checkout-")
+ 	if err != nil {
+ 		return err

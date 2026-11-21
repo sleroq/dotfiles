@@ -45,7 +45,13 @@ in
         livePlayers = true;
       };
       services.caddy.virtualHosts."mine.cum.army".extraConfig = ''
-        reverse_proxy 127.0.0.1:8100
+        redir /map /map/ 308
+        handle_path /map/* {
+          reverse_proxy 127.0.0.1:8100
+        }
+        handle {
+          reverse_proxy 127.0.0.1:8101
+        }
       '';
       services.minecraft-servers.servers.cum.extraStartPre = lib.mkAfter ''
         install -CDm 0644 ${./bluemap-world.conf} config/bluemap/maps/world.conf
