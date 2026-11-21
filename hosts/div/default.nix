@@ -225,7 +225,7 @@
   systemd.services.docker-registry.environment.OTEL_TRACES_EXPORTER = "none";
 
   sleroq.slusha = {
-    enable = true;
+    enable = false;
     image = "div.capybara-menkent.ts.net:5000/slusha:edge-cumming-beta";
     environmentFile = config.age.secrets.slushaEnv.path;
     cloudflared.tunnel = "music";
