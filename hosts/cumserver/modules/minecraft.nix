@@ -39,6 +39,18 @@ in
         "rcon.port" = 25576;
       };
     })
+    (lib.mkIf config.services.cumcraft.enable {
+      services.cumcraft.bluemap = {
+        enable = true;
+        livePlayers = true;
+      };
+      services.caddy.virtualHosts."mine.cum.army".extraConfig = ''
+        reverse_proxy 127.0.0.1:8100
+      '';
+      services.minecraft-servers.servers.cum.extraStartPre = lib.mkAfter ''
+        install -CDm 0644 ${./bluemap-world.conf} config/bluemap/maps/world.conf
+      '';
+    })
     (lib.mkIf (config.services.cumcraft.enable && cfg.backup.enable) {
       age.secrets.resticMinecraftPassword = {
         owner = "minecraft";
@@ -60,6 +72,7 @@ in
           "crash-reports"
           "hs_err_pid*.log"
           "**/DistantHorizons.sqlite"
+          "/srv/minecraft/cum/bluemap"
         ];
         # The append-only endpoint cannot prune; div owns retention.
         timerConfig = {
