@@ -6623,6 +6623,10 @@ async function registerStructuredOutput(context) {
 }
 
 // src/server/agent/providers/opencode/v2/shared-bridge-plugin.mjs
+function isRefused(error) {
+  const code = error?.code ?? error?.cause?.code;
+  return code === "ECONNREFUSED" || code === "ConnectionRefused";
+}
 async function registerSharedBridge(context) {
   const state = await import(new URL("./state.mjs", import.meta.url).href);
   const { bindings, definitions } = state.stateFor(context.location);
@@ -6659,7 +6663,10 @@ async function registerSharedBridge(context) {
     return null;
   }
   async function install(binding) {
-    const manifest = await request(binding, "/tools");
+    const manifest = await request(
+      binding,
+      `/tools?sessionID=${encodeURIComponent(binding.sessionID)}`
+    );
     for (const definition of manifest.tools) await installDefinition(definition);
   }
   async function installDefinition(definition) {
@@ -6735,8 +6742,7 @@ async function registerSharedBridge(context) {
                 true
               );
             } catch (error) {
-              if (error?.status !== 401 && error?.cause?.code !== "ECONNREFUSED" && error?.code !== "ConnectionRefused")
-                throw error;
+              if (error?.status !== 401 && !isRefused(error)) throw error;
             }
             if (active)
               return { error: "OpenCode session is already bound to another Paseo bridge" };
