@@ -38,7 +38,11 @@ in
         2083 # Alternate ingress to the shared Warsaw reverse bridge
         2080 # Legacy Warsaw host via Germany's Remnawave relay
         4443 # Warsaw REALITY with WARP egress
+        21115 # RustDesk NAT test
+        21116 # RustDesk ID server
+        21117 # RustDesk relay
       ];
+      allowedUDPPorts = [ 21116 ];
       extraInputRules = ''
         ip saddr ${warsawAddress} tcp dport 7443 accept
       '';
@@ -125,6 +129,15 @@ in
   '';
 
   services = {
+    rustdesk-server = {
+      enable = true;
+      signal.relayHosts = [ "ru-desk.cum.army" ];
+      relay.extraArgs = [
+        "-k"
+        "_"
+      ];
+    };
+
     # Preserve the running bus backend so updates can be switched without a reboot.
     dbus.implementation = "dbus";
 
