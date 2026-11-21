@@ -37,6 +37,7 @@ in
         divRelayPort
         2083 # Alternate ingress to the shared Warsaw reverse bridge
         2080 # Legacy Warsaw host via Germany's Remnawave relay
+        4443 # Warsaw REALITY with WARP egress
       ];
       extraInputRules = ''
         ip saddr ${warsawAddress} tcp dport 7443 accept
@@ -202,6 +203,14 @@ in
 
         backend warsaw_reverse
           server warsaw 127.0.0.1:12085 check
+
+        frontend warsaw_warp_ingress
+          bind 0.0.0.0:4443
+          no log
+          default_backend warsaw_warp
+
+        backend warsaw_warp
+          server warsaw 127.0.0.1:12087 check
 
         frontend div_ingress
           bind 0.0.0.0:${toString divRelayPort}

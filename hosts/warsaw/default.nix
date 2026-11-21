@@ -78,6 +78,7 @@ in
   imports = [
     ../relay-common.nix
     ./reverse-tunnel.nix
+    ./warp-egress.nix
     ./disk-config.nix
   ];
 
@@ -90,7 +91,10 @@ in
         80 # nginx serves ACME HTTP-01 challenges
         443 # Remnawave Reality; nginx only listens on loopback for TLS
       ];
-      allowedUDPPorts = [ 8443 ]; # Direct Remnawave Hysteria2
+      allowedUDPPorts = [
+        8443 # Direct Remnawave Hysteria2
+        8444 # Hysteria2 with WARP egress
+      ];
       extraInputRules = ''
         ip saddr ${secrets.cumserverAddress} tcp dport { 2080, 62052, 9100 } accept
         ip saddr ${secrets.ruRelayAddress} tcp dport { 2080, 2084, 2443 } accept

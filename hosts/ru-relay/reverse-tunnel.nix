@@ -15,8 +15,9 @@
       allowPorts = [
         { single = 12085; }
         { single = 12086; }
+        { single = 12087; }
       ];
-      maxPortsPerClient = 2;
+      maxPortsPerClient = 3;
       auth = {
         method = "token";
         additionalScopes = [

@@ -51,6 +51,17 @@
           };
         }
         {
+          name = "warsaw-warp-reality";
+          type = "tcp";
+          localIP = "127.0.0.1";
+          localPort = 4443;
+          remotePort = 12087;
+          transport = {
+            useCompression = false;
+            useEncryption = false;
+          };
+        }
+        {
           name = "cumserver-metrics";
           type = "tcp";
           localIP = "cum.army";
