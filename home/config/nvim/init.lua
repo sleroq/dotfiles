@@ -88,9 +88,9 @@ vim.pack.add({
     -- { src = "onsails/lspkind.nvim" },
     -- to avoid learning to type fast and setting up proper completion
     { src = "https://github.com/supermaven-inc/supermaven-nvim" },
-    -- Native Pi sessions, workspaces, and reviewed edits:
-    { src = "https://github.com/OXY2DEV/markview.nvim" },
-    { src = "https://github.com/saya-ashen/agent-workbench.nvim" },
+    -- Native Pi sessions, workspaces, and reviewed edits (disabled for now):
+    -- { src = "https://github.com/OXY2DEV/markview.nvim" },
+    -- { src = "https://github.com/saya-ashen/agent-workbench.nvim" },
     -- Picker and input UI:
     { src = "https://github.com/folke/snacks.nvim" },
 
@@ -209,6 +209,7 @@ require("flash").setup({})
 
 require("supermaven-nvim").setup({ keymaps = { accept_suggestion = "<C-l>" } })
 
+--[[
 -- agent-workbench registers BufModifiedSet, which Neovim does not support.
 -- Refresh on edits and writes instead so the sidebar's modified markers stay current.
 local workspace_sidebar = require("agent-workbench.ui.workspace_sidebar")
@@ -229,6 +230,7 @@ require("agent-workbench").setup({
     layout = { default = "side", side = { position = "right", width = 80 } },
     workspace_bar = { show = "always" },
 })
+]]
 
 require("neoclip").setup({ preview = true, })
 
@@ -329,6 +331,7 @@ local map = vim.keymap.set
 local unmap = vim.keymap.del
 
 vim.g.mapleader = " "
+--[[
 map("n", "<leader>pp", "<Cmd>AgentWorkbench<CR>", { desc = "Toggle Pi workbench" })
 map({ "n", "v" }, "<leader>pm", "<Cmd>AgentWorkbenchSendMention<CR>", { desc = "Pi mention file/selection" })
 map("n", "<leader>pn", "<Cmd>AgentWorkbenchNewSession<CR>", { desc = "New Pi session" })
@@ -337,6 +340,7 @@ map("n", "<leader>ps", "<Cmd>AgentWorkbenchSessions<CR>", { desc = "Pi live sess
 map("n", "<leader>pw", "<Cmd>AgentWorkbenchWorkspaceSidebar<CR>", { desc = "Pi workspaces" })
 map("n", "<leader>pd", "<Cmd>AgentWorkbenchDiff<CR>", { desc = "Review Pi changes" })
 map("n", "<leader>pa", "<Cmd>AgentWorkbenchAttention<CR>", { desc = "Pi pending requests" })
+]]
 map({ "v", "x" }, "<C-y>", '"+y', { desc = "System clipboard yank" })
 map({ "n" }, "<C-x>", function() Snacks.picker.pick("neoclip") end, { desc = "Clipboard history" })
 map({ "n" }, "<leader>/", fff.live_grep, { desc = "Live grep" })
