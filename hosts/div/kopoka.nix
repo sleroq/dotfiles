@@ -26,7 +26,10 @@
       user = "kopoka";
       group = "kopoka";
       environmentFiles = [ config.age.secrets.kopokaEnv.path ];
-      environment.THUMBNAIL_BASE_URL = "https://kopoka.cum.army";
+      environment = {
+        THUMBNAIL_BASE_URL = "https://kopoka.cum.army";
+        OTEL_EXPORTER_OTLP_ENDPOINT = "http://cumserver.capybara-menkent.ts.net:4318";
+      };
     };
     state.dataDir = "/var/lib/kopoka";
     poll.interval = "10m";

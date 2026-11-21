@@ -8,7 +8,10 @@ let
   cfg = config.cumserver.monitoring;
 in
 {
-  imports = [ ./alerts.nix ];
+  imports = [
+    ./alerts.nix
+    ./kopoka.nix
+  ];
 
   options.cumserver.monitoring = {
     enable = lib.mkEnableOption "Monitoring";
