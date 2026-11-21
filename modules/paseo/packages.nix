@@ -2,7 +2,9 @@
 let
   paseo = inputs'.llm-agents.packages.paseo;
   desktop = inputs'.llm-agents.packages.paseo-desktop;
-  pi = inputs'.pi.packages.default;
+  pi = pkgs.callPackage ../../packages/pi.nix {
+    upstream = inputs'.pi.packages.default;
+  };
   codex = inputs'.llm-agents.packages.codex;
   opencode = pkgs.writeShellScriptBin "opencode" ''
     exec ${inputs'.llm-agents.packages.opencode2}/bin/opencode2 "$@"

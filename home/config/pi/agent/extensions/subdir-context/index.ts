@@ -1,4 +1,4 @@
-import { isReadToolResult } from "@earendil-works/pi-coding-agent";
+import { isReadToolResult, parseArgs } from "@earendil-works/pi-coding-agent";
 import type { ExtensionAPI, ExtensionContext, ReadToolInput, SessionStartEvent, SessionTreeEvent } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 import { Check } from "typebox/value";
@@ -34,6 +34,8 @@ function nestedInstructions(root: string, file: string): string[] {
 }
 
 export default function subdirContext(pi: SubdirContextAPI) {
+  if (parseArgs(process.argv.slice(2)).noContextFiles) return;
+
   let loaded = new Set<string>();
 
   function restore(_event: SessionStartEvent | SessionTreeEvent, ctx: ExtensionContext) {

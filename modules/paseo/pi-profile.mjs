@@ -44,8 +44,14 @@ function mergeMcp(defaults, current, managed) {
   for (const [name, definition] of Object.entries(defaults.mcpServers)) {
     const existing = current.mcpServers?.[name] ?? {};
     servers[name] = { ...definition };
-    for (const key of ["enabled", "exposure", "toolExposure", "auth", "headers", "oauth"]) {
+    for (const key of ["exposure", "auth", "headers", "oauth"]) {
       if (Object.hasOwn(existing, key)) servers[name][key] = existing[key];
+    }
+    if (!Object.hasOwn(definition, "enabled") && Object.hasOwn(existing, "enabled")) {
+      servers[name].enabled = existing.enabled;
+    }
+    if (existing.toolExposure) {
+      servers[name].toolExposure = { ...existing.toolExposure, ...definition.toolExposure };
     }
     if (existing.env) {
       servers[name].env = { ...existing.env, ...definition.env };

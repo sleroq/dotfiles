@@ -28,7 +28,7 @@ Use the cheapest direct source first. For a supplied URL or a basic “how do I 
 
 # Tools
 
-Use pi-fff's `find` for file/path discovery and `grep` for content search. Start with 1–2 high-signal searches; read the most relevant files next. Use grep MCP for remote code search and Exa for web research.
+Use pi-fff's `find` for file/path discovery and `grep` for content search. Start with 1–2 high-signal searches; read the most relevant files next. Use grep MCP for remote code search and the configured web search tool for web research.
 
 Run independent calls together. Serialize dependent planning or edits to the same files/contracts. Parallelize for speed, not broader exploration.
 

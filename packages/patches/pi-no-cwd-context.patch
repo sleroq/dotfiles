@@ -1,0 +1,138 @@
+diff --git a/packages/coding-agent/src/cli/args.ts b/packages/coding-agent/src/cli/args.ts
+index bf38841..3ec91d3 100644
+--- a/packages/coding-agent/src/cli/args.ts
++++ b/packages/coding-agent/src/cli/args.ts
+@@ -46,6 +46,7 @@ export interface Args {
+ 	useTheme?: string;
+ 	noThemes?: boolean;
+ 	noContextFiles?: boolean;
++	noCwdContext?: boolean;
+ 	listModels?: string | true;
+ 	offline?: boolean;
+ 	tuiMode?: TuiMode;
+@@ -215,6 +216,8 @@ export function parseArgs(args: string[]): Args {
+ 			result.noThemes = true;
+ 		} else if (arg === "--no-context-files" || arg === "-nc") {
+ 			result.noContextFiles = true;
++		} else if (arg === "--no-cwd-context" || arg === "-ncc") {
++			result.noCwdContext = true;
+ 		} else if (arg === "--list-models") {
+ 			// Check if next arg is a search pattern (not a flag or file arg)
+ 			if (i + 1 < args.length && !args[i + 1].startsWith("-") && !args[i + 1].startsWith("@")) {
+@@ -334,6 +337,7 @@ ${chalk.bold("Options:")}
+   --use-theme <name[/name]>      Set the initial interactive theme for this run
+   --no-themes                    Disable theme discovery and loading
+   --no-context-files, -nc        Disable AGENTS.md and CLAUDE.md discovery and loading
++  --no-cwd-context, -ncc         Skip AGENTS.md and CLAUDE.md in the working directory only
+   --export <file> [output]       Export session file to HTML and exit
+   --list-models [search]         List available models (with optional fuzzy search)
+   --verbose                      Force verbose startup (overrides quietStartup setting)
+diff --git a/packages/coding-agent/src/core/resource-loader.ts b/packages/coding-agent/src/core/resource-loader.ts
+index bb0740e..e6c2536 100644
+--- a/packages/coding-agent/src/core/resource-loader.ts
++++ b/packages/coding-agent/src/core/resource-loader.ts
+@@ -260,6 +260,7 @@ function findShadowedContextFile(cwd: string): string | undefined {
+ export function loadProjectContextFiles(options: {
+ 	cwd: string;
+ 	agentDir: string;
++	noCwdContext?: boolean;
+ }): Array<{ path: string; content: string }> {
+ 	const resolvedCwd = resolvePath(options.cwd);
+ 	const resolvedAgentDir = resolvePath(options.agentDir);
+@@ -267,16 +268,20 @@ export function loadProjectContextFiles(options: {
+ 	const contextFiles: Array<{ path: string; content: string }> = [];
+ 	const seenPaths = new Set<string>();
+ 
+-	const globalContext = loadContextFileFromDir(resolvedAgentDir);
++	const globalContext =
++		options.noCwdContext && pathsEqual(canonicalizePath(resolvedAgentDir), canonicalizePath(resolvedCwd))
++			? null
++			: loadContextFileFromDir(resolvedAgentDir);
+ 	if (globalContext) {
+ 		contextFiles.push(globalContext);
+ 		seenPaths.add(globalContext.path);
+ 	}
+ 
+-	const ancestorContextFiles: Array<{ path: string; content: string }> = [];
++	let currentDir = options.noCwdContext ? dirname(resolvedCwd) : resolvedCwd;
++	if (options.noCwdContext && currentDir === resolvedCwd) return contextFiles;
+ 
+-	const shadowedContextFile = findShadowedContextFile(resolvedCwd);
+-	let currentDir = resolvedCwd;
++	const ancestorContextFiles: Array<{ path: string; content: string }> = [];
++	const shadowedContextFile = findShadowedContextFile(currentDir);
+ 
+ 	while (true) {
+ 		const contextFile = loadContextFileFromDir(currentDir);
+@@ -318,6 +323,7 @@ export interface DefaultResourceLoaderOptions {
+ 	noPromptTemplates?: boolean;
+ 	noThemes?: boolean;
+ 	noContextFiles?: boolean;
++	noCwdContext?: boolean;
+ 	systemPrompt?: string;
+ 	appendSystemPrompt?: string[];
+ 	extensionsOverride?: (base: LoadExtensionsResult) => LoadExtensionsResult;
+@@ -358,6 +364,7 @@ export class DefaultResourceLoader implements ResourceLoader {
+ 	private noPromptTemplates: boolean;
+ 	private noThemes: boolean;
+ 	private noContextFiles: boolean;
++	private noCwdContext: boolean;
+ 	private systemPromptSource?: string;
+ 	private appendSystemPromptSource?: string[];
+ 	private extensionsOverride?: (base: LoadExtensionsResult) => LoadExtensionsResult;
+@@ -424,6 +431,7 @@ export class DefaultResourceLoader implements ResourceLoader {
+ 		this.noPromptTemplates = options.noPromptTemplates ?? false;
+ 		this.noThemes = options.noThemes ?? false;
+ 		this.noContextFiles = options.noContextFiles ?? false;
++		this.noCwdContext = options.noCwdContext ?? false;
+ 		this.systemPromptSource = options.systemPrompt;
+ 		this.appendSystemPromptSource = options.appendSystemPrompt;
+ 		this.extensionsOverride = options.extensionsOverride;
+@@ -681,6 +689,7 @@ export class DefaultResourceLoader implements ResourceLoader {
+ 				: loadProjectContextFiles({
+ 						cwd: this.cwd,
+ 						agentDir: this.agentDir,
++						noCwdContext: this.noCwdContext,
+ 					}),
+ 		};
+ 		const resolvedAgentsFiles = this.agentsFilesOverride ? this.agentsFilesOverride(agentsFiles) : agentsFiles;
+diff --git a/packages/coding-agent/src/main.ts b/packages/coding-agent/src/main.ts
+index 0c20274..3b6efb2 100644
+--- a/packages/coding-agent/src/main.ts
++++ b/packages/coding-agent/src/main.ts
+@@ -848,6 +848,7 @@ export async function main(args: string[], options?: MainOptions) {
+ 				noPromptTemplates: parsed.noPromptTemplates,
+ 				noThemes: parsed.noThemes,
+ 				noContextFiles: parsed.noContextFiles,
++				noCwdContext: parsed.noCwdContext,
+ 				systemPrompt: parsed.systemPrompt,
+ 				appendSystemPrompt: parsed.appendSystemPrompt,
+ 				extensionFactories,
+diff --git a/packages/coding-agent/test/resource-loader.test.ts b/packages/coding-agent/test/resource-loader.test.ts
+index e68b4cf..828fa57 100644
+--- a/packages/coding-agent/test/resource-loader.test.ts
++++ b/packages/coding-agent/test/resource-loader.test.ts
+@@ -1327,6 +1327,23 @@ export default function(pi: ExtensionAPI) {
+ 			expect(files.map((f) => f.content)).toEqual(["worktree instructions"]);
+ 		});
+ 
++		it("should keep global and ancestor context when skipping the working directory", async () => {
++			const { outer, main, worktree } = setupNestedWorktree();
++			writeFileSync(join(agentDir, "AGENTS.md"), "global instructions");
++			writeFileSync(join(outer, "AGENTS.md"), "outer instructions");
++			writeFileSync(join(main, "AGENTS.md"), "main repo instructions");
++			writeFileSync(join(worktree, "AGENTS.md"), "worktree instructions");
++
++			const loader = new DefaultResourceLoader({ cwd: worktree, agentDir, noCwdContext: true });
++			await loader.reload();
++
++			expect(loader.getAgentsFiles().agentsFiles.map((file) => file.content)).toEqual([
++				"global instructions",
++				"outer instructions",
++				"main repo instructions",
++			]);
++		});
++
+ 		// https://github.com/earendil-works/pi/issues/10681
+ 		it("should load the worktree's context once when it symlinks to the main repo's file", () => {
+ 			const { main, worktree, worktreeSrc } = setupNestedWorktree();

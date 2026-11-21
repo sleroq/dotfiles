@@ -20,7 +20,7 @@ type HarnessHandler = (event: HarnessEvent, ctx: HarnessContext) =>
 const fixtures: string[] = [];
 afterEach(() => fixtures.splice(0).forEach((path) => rmSync(path, { recursive: true, force: true })));
 
-function fixture() {
+function fixture(...args: string[]) {
   const cwd = realpathSync(mkdtempSync(join(tmpdir(), "subdir-context-")));
   fixtures.push(cwd);
 
@@ -42,10 +42,16 @@ function fixture() {
     },
   };
 
-  extension(pi);
+  const originalArgv = process.argv;
+  try {
+    process.argv = [...originalArgv.slice(0, 2), ...args];
+    extension(pi);
+  } finally {
+    process.argv = originalArgv;
+  }
   const ctx: HarnessContext = { cwd, hasUI: false, sessionManager: { getBranch: () => branch } };
   function emit(name: string, event: HarnessEvent = {}) {
-    return handlers.get(name)!(event, ctx);
+    return handlers.get(name)?.(event, ctx);
   }
   function file(path: string, text = path) {
     const full = join(cwd, path);
@@ -65,6 +71,14 @@ function fixture() {
   function setBranch(next: StoredEntry[]) { branch = next; }
   return { cwd, file, read, emit, content, details, entries, branch: setBranch };
 }
+
+test.each(["--no-context-files", "-nc"])("%s disables subdirectory context discovery", async (flag) => {
+  const f = fixture(flag);
+  f.file("a/AGENTS.md");
+  f.file("a/code.ts");
+  expect(await f.read("a/code.ts")).toBeUndefined();
+  expect(f.entries).toHaveLength(0);
+});
 
 test("parallel nested reads append once, preserve output, and honor hierarchy/override order", async () => {
   const f = fixture();

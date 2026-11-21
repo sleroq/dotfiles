@@ -152,6 +152,45 @@ test("syncs model and thinking defaults over host-local settings", async () => {
   }
 });
 
+test("the managed web provider overrides saved MCP settings without resetting other tools", async () => {
+  const home = mkdtempSync(join(tmpdir(), "pi-web-provider-"));
+  try {
+    const directory = join(home, "agent");
+    mkdirSync(directory);
+    const settings = join(home, "defaults-settings.json");
+    const mcp = join(home, "defaults-mcp.json");
+    const current = join(directory, "mcp.json");
+    writeFileSync(settings, "{}");
+    writeFileSync(current, JSON.stringify({ mcpServers: {
+      exa: { enabled: true, env: { EXA_API_KEY: "local-key" } },
+      radius: { enabled: false, toolExposure: { tools_webSearch_run: "hidden", tools_webFetch_run: "direct", packages_list: "deferred" } },
+    } }));
+
+    const sharedMcp = JSON.parse(readFileSync(join(root, "home/config/pi/agent/mcp.json"), "utf8"));
+    for (const enabled of [false, true]) {
+      const exposure = enabled ? "hidden" : "direct";
+      writeFileSync(mcp, JSON.stringify({ mcpServers: {
+        exa: { enabled },
+        radius: {
+          enabled: enabled ? undefined : true,
+          toolExposure: { ...sharedMcp.mcpServers.radius.toolExposure, tools_webSearch_run: exposure },
+        },
+      } }));
+
+      await syncProfile(settings, mcp, directory, undefined, home);
+      expect(JSON.parse(readFileSync(current, "utf8")).mcpServers).toEqual({
+        exa: { enabled, env: { EXA_API_KEY: "local-key" } },
+        radius: {
+          enabled: true,
+          toolExposure: { tools_webSearch_run: exposure, tools_webFetch_run: "hidden", packages_list: "deferred" },
+        },
+      });
+    }
+  } finally {
+    rmSync(home, { recursive: true, force: true });
+  }
+});
+
 test.each(["${EXA_API_KEY}", "host-local-test-key"])("migrates the old Exa placeholder but preserves explicit host keys: %s", async (key) => {
   const directory = mkdtempSync(join(tmpdir(), "pi-exa-sync-"));
   try {

@@ -115,6 +115,7 @@ in
       pi.enable = true;
       paseo.enable = true;
       pi.cloudflare.enable = true;
+      pi.webSearch.provider = "radius";
       opencode.enable = true;
       # mpv.enable = true; # waiting for fix
       ghostty.enable = true;

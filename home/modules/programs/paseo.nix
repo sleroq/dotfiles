@@ -6,7 +6,9 @@
   ...
 }:
 let
-  pi = inputs'.pi.packages.default;
+  pi = pkgs.callPackage ../../../packages/pi.nix {
+    upstream = inputs'.pi.packages.default;
+  };
   bin = "${config.home.profileDirectory}/bin";
   baseline = (pkgs.formats.json { }).generate "paseo-config.json" (
     import ../../../modules/paseo/config.nix {

@@ -9,7 +9,9 @@
 
 let
   cfg = config.myHome.programs.pi;
-  pi = inputs'.pi.packages.default;
+  pi = pkgs.callPackage ../../../packages/pi.nix {
+    upstream = inputs'.pi.packages.default;
+  };
   herdrPi = pkgs.writeShellScriptBin "pi" ''
     if [ -n "''${HC_TERMINAL_ID:-}" ]; then
       exec ${pi}/bin/pi --skill ${../../config/herdr-core/skills/herdr} "$@"
@@ -18,14 +20,29 @@ let
   '';
   settings = ../../config/pi/agent/settings.json;
   sharedMcp = builtins.fromJSON (builtins.readFile ../../config/pi/agent/mcp.json);
+  useRadius = cfg.webSearch.provider == "radius";
+  radiusWebExposure = if useRadius then "direct" else "hidden";
+  mcpServers = sharedMcp.mcpServers // {
+    exa = sharedMcp.mcpServers.exa // {
+      enabled = !useRadius;
+    };
+    radius =
+      sharedMcp.mcpServers.radius
+      // lib.optionalAttrs useRadius { enabled = true; }
+      // {
+        toolExposure = sharedMcp.mcpServers.radius.toolExposure // {
+          tools_webSearch_run = radiusWebExposure;
+        };
+      };
+  };
   mcpDefaults = (pkgs.formats.json { }).generate "pi-mcp.json" (
     sharedMcp
     // {
       mcpServers =
         if cfg.cloudflare.enable then
-          sharedMcp.mcpServers
+          mcpServers
         else
-          removeAttrs sharedMcp.mcpServers [
+          removeAttrs mcpServers [
             "cloudflare"
             "cloudflare-docs"
           ];
@@ -43,6 +60,14 @@ in
   options.myHome.programs.pi = {
     enable = lib.mkEnableOption "Pi coding agent";
     cloudflare.enable = lib.mkEnableOption "Cloudflare Pi MCP servers";
+    webSearch.provider = lib.mkOption {
+      type = lib.types.enum [
+        "exa"
+        "radius"
+      ];
+      default = "exa";
+      description = "Web search provider for Pi. Radius uses the organization's Parallel tier.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
