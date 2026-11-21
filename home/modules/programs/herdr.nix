@@ -2,12 +2,28 @@
   lib,
   config,
   opts,
+  pkgs,
   ...
 }:
+let
+  pixelIcons = ../../config/nvim/pixel-icons;
+  vga = "${pkgs.ultimate-oldschool-pc-font-pack}/share/fonts/truetype/PxPlus_IBM_VGA_8x16.ttf";
+  teto98Font =
+    pkgs.runCommand "teto98-vga"
+      {
+        nativeBuildInputs = [ (pkgs.python3.withPackages (ps: [ ps.fonttools ])) ];
+      }
+      ''
+        mkdir -p "$out"
+        python ${pixelIcons}/merge-vga.py ${vga} ${pixelIcons}/PixelIcons.ttf "$out/Teto98VGA.ttf"
+      '';
+in
 {
   options.myHome.programs.herdr.enable = lib.mkEnableOption "Herdr configuration";
 
   config = lib.mkIf config.myHome.programs.herdr.enable {
+    # Herdr does not fall back to the standalone font for Neovim's private-use icons.
+    xdg.configFile."herdr-app/fonts/Teto98VGA.ttf".source = "${teto98Font}/Teto98VGA.ttf";
     xdg.configFile."herdr-core/config.toml".source =
       config.lib.file.mkOutOfStoreSymlink "${opts.realConfigs}/herdr-core/config.toml";
     xdg.configFile."herdr-app/layouts/sidebar-right.json".source =

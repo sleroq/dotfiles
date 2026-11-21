@@ -11,10 +11,23 @@
       "type": "row",
       "children": [
         {
+          "id": "teto-host",
+          "type": "block",
+          "content": {
+            "mod": "teto98",
+            "props": {
+              "role": "host"
+            }
+          },
+          "size": {
+            "px": 0
+          }
+        },
+        {
           "id": "desktop",
           "type": "block",
           "content": {
-            "mod": "win98",
+            "mod": "teto98-taskbar",
             "props": {
               "role": "desktop"
             }
@@ -59,19 +72,6 @@
             10,
             10
           ]
-        },
-        {
-          "id": "teto-host",
-          "type": "block",
-          "content": {
-            "mod": "teto98",
-            "props": {
-              "role": "host"
-            }
-          },
-          "size": {
-            "px": 0
-          }
         }
       ],
       "resizable": false
@@ -93,7 +93,7 @@
   ],
   "background": "#008080",
   "theme": "win98",
-  "font": "PxPlus IBM VGA 8x16",
+  "font": "Teto98 VGA",
   "font_size": 16,
   "ui_font": "Pixelated MS Sans Serif",
   "terminal_padding": [
