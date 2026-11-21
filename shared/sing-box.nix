@@ -15,6 +15,7 @@ let
       "apple.ru"
       "bing.ru"
       "ebay.ru"
+      "kaiten.ru"
       "microsoft.ru"
       "netflix.ru"
       "nikon.ru"
