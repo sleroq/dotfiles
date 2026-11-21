@@ -260,7 +260,8 @@ vim.lsp.config["lua_ls"] = {
 }
 
 vim.lsp.config["ast_grep"] = {
-    cmd = { "ast-grep", "lsp", "--config", vim.fn.expand("~/sgconfig.yml") },
+    -- Allow native parsers only from the Home Manager-generated config.
+    cmd = { "ast-grep", "--custom-languages", "allow", "lsp", "--config", vim.fn.expand("~/sgconfig.yml") },
     filetypes = vim.list_extend(vim.lsp.config.ast_grep.filetypes, { "svelte" }),
 }
 
