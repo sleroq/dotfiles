@@ -9,11 +9,8 @@ let
   cfg = config.cumserver.minecraft;
 in
 {
-  options.cumserver.minecraft = {
-    cum.enable = lib.mkEnableOption "cum.army minecraft server";
-    backup.enable = lib.mkEnableOption "backups" // {
-      default = true;
-    };
+  options.cumserver.minecraft.backup.enable = lib.mkEnableOption "backups" // {
+    default = true;
   };
 
   config = lib.mkMerge [
@@ -25,81 +22,24 @@ in
       networking.firewall.allowedTCPPorts = lib.mapAttrsToList (
         _: server: server.serverProperties.server-port
       ) (lib.filterAttrs (_: server: server.enable) config.services.minecraft-servers.servers);
-
-      services.minecraft-servers = {
-        enable = true;
-        eula = true;
-        # Upstream opens RCON too; explicitly expose only enabled servers' game ports.
-        openFirewall = false;
-
-        servers = lib.mkMerge [
-          (lib.mkIf cfg.cum.enable {
-            cum = {
-              enable = true;
-              autoStart = true;
-              jvmOpts = "-Xms2G -Xmx4G -XX:MaxDirectMemorySize=1G -XX:MaxMetaspaceSize=512M"; # -XX:+UseZGC
-              package = pkgs.fabricServers.fabric-26_2.override {
-                jre_headless = pkgs.jdk25_headless;
-              };
-
-              serverProperties = {
-                difficulty = "normal";
-                player-idle-timeout = 0;
-                spawn-protection = 0;
-                server-port = 25569;
-                motd = "<3";
-                online-mode = false;
-                max-players = 10;
-                white-list = true;
-                enable-status = true;
-                hide-online-players = true;
-                allow-flight = true;
-                sync-chunk-writes = false;
-                enable-rcon = true;
-                "rcon.password" = "localbackup";
-                "rcon.port" = 25576;
-              };
-            };
-
-            cum-creative = {
-              enable = false;
-              autoStart = true;
-              jvmOpts = "-Xmx2G -XX:MaxDirectMemorySize=1G -XX:MaxMetaspaceSize=512M"; # -XX:+UseZGC
-              package = pkgs.fabricServers.fabric-26_2.override {
-                jre_headless = pkgs.jdk25_headless;
-              };
-
-              serverProperties = {
-                difficulty = "normal";
-                level-seed = -1694756061639681260;
-                player-idle-timeout = 0;
-                spawn-protection = 0;
-                server-port = 25567;
-                motd = "<3";
-                online-mode = false;
-                max-players = 10;
-                white-list = true;
-                enable-status = true;
-                hide-online-players = true;
-                allow-flight = true;
-                sync-chunk-writes = false;
-                enable-rcon = true;
-                "rcon.password" = "localbackup";
-                "rcon.port" = 25576;
-              };
-            };
-          })
-        ];
-      };
     }
-    (lib.mkIf cfg.cum.enable {
-      systemd.services.minecraft-server-cum.path = [
-        pkgs.git
-        pkgs.git-lfs
+    (lib.mkIf config.services.cumcraft.enable {
+      age.secrets.cumcraftEasyAuthPassword = {
+        file = ../secrets/cumcraftEasyAuthPassword;
+        owner = "minecraft";
+      };
+      services.cumcraft.easyAuth.passwordFile = config.age.secrets.cumcraftEasyAuthPassword.path;
+      systemd.services.minecraft-server-cum.restartTriggers = [
+        config.age.secrets.cumcraftEasyAuthPassword.file
       ];
-    })
 
-    (lib.mkIf (cfg.cum.enable && cfg.backup.enable) {
+      services.minecraft-servers.servers.cum.serverProperties = {
+        enable-rcon = true;
+        "rcon.password" = "localbackup";
+        "rcon.port" = 25576;
+      };
+    })
+    (lib.mkIf (config.services.cumcraft.enable && cfg.backup.enable) {
       age.secrets.resticMinecraftPassword = {
         owner = "minecraft";
         group = "minecraft";

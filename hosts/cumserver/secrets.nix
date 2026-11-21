@@ -77,6 +77,9 @@ let
     "secrets/koitoEnv" = {
       publicKeys = commonPublicKeys;
     };
+    "secrets/cumcraftEasyAuthPassword" = {
+      publicKeys = commonPublicKeys;
+    };
     "secrets/resticMinecraftPassword" = {
       publicKeys = commonPublicKeys ++ [ div ];
     };

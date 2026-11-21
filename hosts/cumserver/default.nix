@@ -280,7 +280,7 @@
     };
   };
 
-  cumserver.minecraft.cum.enable = true;
+  services.cumcraft.enable = true;
 
   # Keep the legacy Sieve binary across system switches and garbage collection.
   # The imported module is pinned, but its bot-split package is NOT deployed.

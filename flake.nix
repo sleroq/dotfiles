@@ -70,6 +70,9 @@
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
     mailserver.url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git/";
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
+    cumcraft.url = "github:Teto-Industries/cumcraft/main";
+    cumcraft.inputs.nixpkgs.follows = "nixpkgs-cumserver";
+    cumcraft.inputs.nix-minecraft.follows = "nix-minecraft";
     # FIXME: Maybe use overlays to avoid following everything?
     sleroq-link.url = "github:sleroq/sleroq.link";
     sleroq-link.inputs.nixpkgs.follows = "nixpkgs-cumserver";
@@ -235,18 +238,12 @@
                 secrets = import ./hosts/cumserver/secrets/default.nix;
               };
               modules = [
-                (
-                  { inputs, ... }:
-                  {
-                    nixpkgs.overlays = [ inputs.nix-minecraft.overlay ];
-                  }
-                )
+                inputs.cumcraft.nixosModules.default
                 inputs.disko.nixosModules.disko
                 inputs.mailserver.nixosModules.default
                 inputs.starflake.nixosModules.default
                 inputs.sieve.nixosModules.sieve
                 inputs.nixos-facter-modules.nixosModules.facter
-                inputs.nix-minecraft.nixosModules.minecraft-servers
               ];
             };
 

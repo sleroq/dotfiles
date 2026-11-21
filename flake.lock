@@ -363,6 +363,30 @@
         "type": "github"
       }
     },
+    "cumcraft": {
+      "inputs": {
+        "nix-minecraft": [
+          "nix-minecraft"
+        ],
+        "nixpkgs": [
+          "nixpkgs-cumserver"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795293132,
+        "narHash": "sha256-ef4YRCh+C1cRckCWK8X1PhP/jiFOhKOrm6lO9Sq9OZ0=",
+        "owner": "Teto-Industries",
+        "repo": "cumcraft",
+        "rev": "fdc673afbf8e5bbd1e3d024c8e12163f62fa28af",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Teto-Industries",
+        "ref": "main",
+        "repo": "cumcraft",
+        "type": "github"
+      }
+    },
     "determinate": {
       "inputs": {
         "determinate-nixd-aarch64-darwin": "determinate-nixd-aarch64-darwin",
@@ -2716,6 +2740,7 @@
         "bayan": "bayan",
         "caelestia_shell-interplanetary": "caelestia_shell-interplanetary",
         "cum-army": "cum-army",
+        "cumcraft": "cumcraft",
         "determinate": "determinate",
         "disko": "disko",
         "dwl": "dwl",
