@@ -35,7 +35,7 @@ in
     services.koito = {
       enable = true;
       environment = {
-        KOITO_LOGIN_GATE = "true";
+        KOITO_LOGIN_GATE = "false";
       }
       // lib.optionalAttrs (cfg.subsonicUrl != null) {
         KOITO_SUBSONIC_URL = cfg.subsonicUrl;

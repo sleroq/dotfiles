@@ -1,5 +1,6 @@
 {
   modulesPath,
+  inputs,
   lib,
   pkgs,
   secrets,
@@ -184,6 +185,7 @@
   cumserver.koito = {
     enable = true;
     environmentFile = config.age.secrets.koitoEnv.path;
+    subsonicUrl = "https://${inputs.self.nixosConfigurations.div.config.sleroq.navidrome.cloudflared.hostname}";
   };
 
   age.secrets.grafanaPassword = {
