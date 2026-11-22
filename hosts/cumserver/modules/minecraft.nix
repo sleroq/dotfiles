@@ -78,6 +78,7 @@ in
           "crash-reports"
           "hs_err_pid*.log"
           "**/DistantHorizons.sqlite"
+          "**/vss-lod"
           "/srv/minecraft/cum/bluemap"
         ];
         # The append-only endpoint cannot prune; div owns retention.
