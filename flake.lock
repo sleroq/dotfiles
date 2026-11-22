@@ -373,11 +373,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795299708,
-        "narHash": "sha256-7w29Z+CBdIbyDpSGCaN+QIhhkprqkVevtTk1cnaz7hw=",
+        "lastModified": 1795309537,
+        "narHash": "sha256-oT3wcIIAE0d39MFuhGFzeSHeap9BLDc74B+FByG/zWU=",
         "owner": "Teto-Industries",
         "repo": "cumcraft",
-        "rev": "79cac174a29a2e85b93824fe2fe1706e564a5dfd",
+        "rev": "c8dd1790f261807118d94d009935c11c04527841",
         "type": "github"
       },
       "original": {
@@ -1856,11 +1856,11 @@
         "nixpkgs": "nixpkgs_13"
       },
       "locked": {
-        "lastModified": 1794808030,
-        "narHash": "sha256-VFQXKm0nVF2AjRaxO9op6FAel7iTbYL+uuUegrFv2aE=",
+        "lastModified": 1795156834,
+        "narHash": "sha256-1PIR+1usRAK02VQerxIJ0rNr0Mix792R41wE9sgPUsY=",
         "owner": "fufexan",
         "repo": "nix-gaming",
-        "rev": "15d35729116985000ee5c3b2488bb800e4af50b2",
+        "rev": "fd0b5dbc9e15fefd867a713c06bd26a9309200ca",
         "type": "github"
       },
       "original": {
