@@ -77,6 +77,7 @@ in
     zig
     zls
     bottles
+    (callPackage ../../packages/horizon-launcher.nix { })
     qFlipper
     # blender
     # android-studio-full
