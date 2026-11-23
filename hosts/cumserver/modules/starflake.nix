@@ -65,6 +65,7 @@
           package = "default";
         };
         initialPackage = inputs'.reactor.packages.default;
+        build.allowLocalBuild = false;
         runtime = {
           exec = [ "bin/reactor" ];
           user = "reactor";

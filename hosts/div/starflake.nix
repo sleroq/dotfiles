@@ -14,6 +14,7 @@
     deployments.zefxi = {
       source.url = "github:sleroq/zefxi";
       initialPackage = inputs.zefxi.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      build.allowLocalBuild = false;
       runtime = {
         exec = [ "bin/zefxi" ];
         environmentFiles = [ config.age.secrets.zefxiEnv.path ];
@@ -34,6 +35,7 @@
         ];
         defaultTheme = "phosphor";
       };
+      build.allowLocalBuild = false;
       runtime = {
         exec = [ "bin/music-link" ];
         environment.MUSIC_LINK_SITE_URL = "https://${config.sleroq.navidrome.cloudflared.hostname}";

@@ -21,6 +21,7 @@
   services.starflake.deployments.kopoka = {
     source.url = "github:sleroq/kopoka";
     initialPackage = inputs'.kopoka.packages.default;
+    build.allowLocalBuild = false;
     runtime = {
       exec = [ "bin/kopoka" ];
       user = "kopoka";

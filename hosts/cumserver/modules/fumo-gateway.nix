@@ -31,6 +31,7 @@ in
   services.starflake.deployments.fumo-gateway = {
     source.url = "github:sleroq/fumo-gateway/main";
     initialPackage = cfg.package;
+    build.allowLocalBuild = false;
     runtime = {
       exec = [
         "bin/fumo-gateway"
