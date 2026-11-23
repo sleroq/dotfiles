@@ -7,16 +7,6 @@
   ...
 }:
 {
-  # The pinned worker needs explicit source materialization with Nix 2.35.
-  # Scope the fix to this deployment until the controller input is updated.
-  systemd.services.starflake-build-cumcraft-website.serviceConfig.ExecStart =
-    let
-      worker = config.services.starflake.package.overrideAttrs (prev: {
-        patches = (prev.patches or [ ]) ++ [ ./starflake-materialize-source.patch ];
-      });
-    in
-    lib.mkForce "${worker}/bin/starflake worker --config /etc/starflake/cumcraft-website.json";
-
   # Keep the unpublished controller source available for future host evaluations.
   # TODO: remove this once the controller is published.
   system.extraDependencies = [ inputs.starflake.outPath ];

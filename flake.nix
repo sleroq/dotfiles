@@ -83,7 +83,7 @@
     reactor.url = "github:sleroq/reactor";
 
     # Immutable local release until Starflake is published; rooted on cumserver.
-    starflake.url = "path:/nix/store/54cvmdx330v5f81d0b7gdrvb6qvy6kzl-source";
+    starflake.url = "path:/nix/store/84lc32rxfg3ds4h7q0yvr1q0w9g00zmk-source";
     starflake.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     # Initial Roundy release until its native package is published upstream.
