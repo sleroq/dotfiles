@@ -129,12 +129,12 @@ in
         x509.privateKeyFile = "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${fqdn}/${fqdn}.key";
       };
 
-      # Run before personal filters, without replacing them or cancelling local delivery.
-      services.dovecot2.settings."sieve_script alias-forwards" = {
+      # Apply server-managed routing before personal filters.
+      services.dovecot2.settings."sieve_script mail-routing" = {
         type = "before";
         bin_path = "/tmp/sieve/common/";
-        path = pkgs.writeText "alias-forwards.sieve" ''
-          require ["copy", "envelope"];
+        path = pkgs.writeText "mail-routing.sieve" ''
+          require ["copy", "envelope", "fileinto", "mailbox"];
 
           # Cloudflare preserves the original recipient here, including Bcc.
           if allof (
@@ -142,6 +142,15 @@ in
             header :is "X-Forwarded-For" "anthropic@sleroq.link sleroq@cum.army"
           ) {
             redirect :copy "anthropic@ku.ni";
+          }
+
+          # Sieve sees the original recipient for mail routed by the catch-all.
+          if allof (
+            envelope :is "to" ["admin@cum.army", "sleroq@cum.army"],
+            envelope :is "from" "grafana@cum.army"
+          ) {
+            fileinto :create "Alerts";
+            stop;
           }
         '';
       };
