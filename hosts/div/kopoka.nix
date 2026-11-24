@@ -10,6 +10,8 @@
     file = ./secrets/kopokaEnv;
   };
 
+  age.secrets.kopokaOtlpEnv.file = ../../shared/secrets/kopokaOtlpEnv;
+
   users.users.kopoka = {
     isSystemUser = true;
     group = "kopoka";
@@ -26,10 +28,13 @@
       exec = [ "bin/kopoka" ];
       user = "kopoka";
       group = "kopoka";
-      environmentFiles = [ config.age.secrets.kopokaEnv.path ];
+      environmentFiles = [
+        config.age.secrets.kopokaEnv.path
+        config.age.secrets.kopokaOtlpEnv.path
+      ];
       environment = {
         THUMBNAIL_BASE_URL = "https://kopoka.cum.army";
-        OTEL_EXPORTER_OTLP_ENDPOINT = "http://cumserver.capybara-menkent.ts.net:4318";
+        OTEL_EXPORTER_OTLP_ENDPOINT = "https://cum.army/otlp/kopoka";
       };
     };
     state.dataDir = "/var/lib/kopoka";

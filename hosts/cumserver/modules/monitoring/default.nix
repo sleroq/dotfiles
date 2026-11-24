@@ -6,6 +6,19 @@
 }:
 let
   cfg = config.cumserver.monitoring;
+  # Drop this override once nixpkgs includes the Infinity security fix.
+  infinityPlugin =
+    let
+      version = "4.1.8";
+    in
+    pkgs.grafanaPlugins.yesoreyeram-infinity-datasource.overrideAttrs {
+      inherit version;
+      src = pkgs.fetchurl {
+        url = "https://grafana.com/api/plugins/yesoreyeram-infinity-datasource/versions/${version}/download?os=linux&arch=amd64";
+        name = "yesoreyeram-infinity-datasource-${version}-linux-amd64.zip";
+        hash = "sha256-5jfh2OSlJF5NCuap9f8m467tuaD62ZTqQ/4kv7Pz/8s=";
+      };
+    };
 in
 {
   imports = [
@@ -102,7 +115,7 @@ in
     systemd.tmpfiles.rules = [
       "d ${config.services.grafana.dataDir} 0700 grafana grafana -"
       "d ${config.services.grafana.dataDir}/plugins 0750 grafana grafana -"
-      "L+ ${config.services.grafana.dataDir}/plugins/yesoreyeram-infinity-datasource - - - - ${pkgs.grafanaPlugins.yesoreyeram-infinity-datasource}"
+      "L+ ${config.services.grafana.dataDir}/plugins/yesoreyeram-infinity-datasource - - - - ${infinityPlugin}"
     ];
 
     services = {

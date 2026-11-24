@@ -1,12 +1,13 @@
 { config, lib, ... }:
 let
+  alloyOtlpEndpoint = "127.0.0.1:4318";
   tempoHttpPort = 3201;
   tempoOtlpEndpoint = "127.0.0.1:14318";
 in
 {
   config = lib.mkIf config.cumserver.monitoring.enable {
     services = {
-      # Loopback only; do not proxy the OTLP receiver through public Caddy.
+      # Only Alloy forwards metrics to the loopback Prometheus receiver.
       prometheus.extraFlags = [ "--web.enable-otlp-receiver" ];
       tempo = {
         enable = true;
@@ -33,6 +34,23 @@ in
           usage_report.reporting_enabled = false;
         };
       };
+      caddy.virtualHosts."cum.army".extraConfig = ''
+        @kopokaOtlp path /otlp/kopoka/v1/metrics /otlp/kopoka/v1/traces
+        handle @kopokaOtlp {
+          route {
+            @unsupportedMethod not method POST
+            header @unsupportedMethod Allow POST
+            respond @unsupportedMethod 405
+            basic_auth {
+              import {$KOPOKA_OTLP_AUTH_FILE}
+            }
+            uri strip_prefix /otlp/kopoka
+            reverse_proxy ${alloyOtlpEndpoint} {
+              header_up -Authorization
+            }
+          }
+        }
+      '';
       grafana.provision.datasources.settings.datasources = [
         {
           name = "Tempo";
@@ -44,11 +62,18 @@ in
       ];
     };
 
+    age.secrets.kopokaOtlpCaddyAuth.file = ../../../../shared/secrets/kopokaOtlpCaddyAuth;
+    systemd.services.caddy = {
+      environment.KOPOKA_OTLP_AUTH_FILE = "%d/kopoka-otlp-auth";
+      serviceConfig.LoadCredential = [
+        "kopoka-otlp-auth:${config.age.secrets.kopokaOtlpCaddyAuth.path}"
+      ];
+    };
+
     environment.etc."alloy/kopoka.alloy".text = ''
       otelcol.receiver.otlp "kopoka" {
         http {
-          // Not opened on the public firewall; Div connects over tailscale0.
-          endpoint = "0.0.0.0:4318"
+          endpoint = "${alloyOtlpEndpoint}"
         }
 
         output {
