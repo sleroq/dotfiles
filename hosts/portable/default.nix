@@ -82,6 +82,7 @@ in
   age.identityPaths = [ "/var/lib/agenix-key.txt" ];
   sleroq.sing-box = {
     # enable = lib.mkForce false;
+    enableIPv6 = false;
     directDomains = [
       "zoom.us"
       "skype.com"
