@@ -55,6 +55,12 @@ in
   "secrets/metricsRemoteWriteCaddyAuth" = {
     publicKeys = commonPublicKeys ++ [ cumserver ];
   };
+  "secrets/kopokaOtlpEnv" = {
+    publicKeys = commonPublicKeys ++ [ div ];
+  };
+  "secrets/kopokaOtlpCaddyAuth" = {
+    publicKeys = commonPublicKeys ++ [ cumserver ];
+  };
   "secrets/divLokiPassword" = {
     publicKeys = commonPublicKeys ++ [ div ];
   };
