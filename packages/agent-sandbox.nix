@@ -87,7 +87,7 @@ let
           command = "npx";
           args = [
             "-y"
-            "exa-mcp-server@3.4.3"
+            "exa-mcp-server@3.5.1"
           ];
           env = {
             EXA_API_KEY = "\${EXA_API_KEY}";
@@ -132,7 +132,8 @@ let
     }
   );
   root = runCommand "agent-sandbox-root" { } ''
-    mkdir -p "$out/etc/nix" "$out/etc/ssl/certs" "$out/etc/agent-pi" "$out/etc/agent-jobs" "$out/bin"
+    mkdir -p "$out/etc/nix" "$out/etc/ssl/certs" "$out/etc/agent-pi" "$out/etc/agent-jobs" "$out/bin" "$out/usr/bin"
+    ln -s ${coreutils}/bin/env "$out/usr/bin/env"
     touch "$out/.envrc"
     ln -s ${bashEnv} "$out/etc/agent-jobs/bash-env"
     ln -s ${nixConfig} "$out/etc/nix/nix.conf"

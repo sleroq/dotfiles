@@ -4,7 +4,7 @@
   inputs = {
     # these should not be used for any system and just for building. but I'm not verifying that anywhere
     nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
-    tuwunel.url = "github:matrix-construct/tuwunel/v1.9.4";
+    tuwunel.url = "github:matrix-construct/tuwunel/v2.0.0";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
@@ -53,6 +53,7 @@
     home-manager-cumserver.inputs.nixpkgs.follows = "nixpkgs-cumserver";
 
     pi.url = "github:earendil-works/pi/main";
+    pi-div.url = "github:earendil-works/pi/v1.6.1";
     llm-agents.url = "github:numtide/llm-agents.nix";
 
     # HM-related inputs used by home modules

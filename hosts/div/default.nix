@@ -199,7 +199,7 @@
     };
     oci-containers.backend = "podman";
     oci-containers.containers.prometheus-podman-exporter = {
-      image = "quay.io/navidys/prometheus-podman-exporter:v1.21.2";
+      image = "quay.io/navidys/prometheus-podman-exporter:v2.0.0";
       autoStart = true;
       ports = [ "0.0.0.0:9882:9882" ];
       volumes = [
@@ -298,10 +298,16 @@
   nixpkgs.config.allowUnfreePredicate = pkg: lib.getName pkg == "sftpgo";
 
   nix = {
-    settings.experimental-features = [
-      "nix-command"
-      "flakes"
-    ];
+    settings = {
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      extra-substituters = [ "https://cache.tuwunel.chat" ];
+      extra-trusted-public-keys = [
+        "cache.tuwunel.chat-1:ZafUaXiRMozDa9N2SWim6EdzH0EEjWjwfvlTxXvcjLA="
+      ];
+    };
     optimise.automatic = true;
 
     gc = {

@@ -33,6 +33,7 @@ let
     };
   };
   cfg = config.services.agent-jobs;
+  pi = inputs.pi-div.packages.${pkgs.stdenv.hostPlatform.system}.default;
 in
 {
   imports = [ ../../modules/agent-jobs.nix ];
@@ -59,7 +60,7 @@ in
   age.secrets.agentJobsExaKey.file = ./secrets/agentJobsExaKey;
   services.agent-jobs = {
     enable = true;
-    pi = inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    inherit pi;
     viewer.port = 8788;
     proxy.keyFile = config.age.secrets.agentJobsFumoKey.path;
     image = pkgs.callPackage ../../packages/agent-sandbox.nix {
@@ -68,9 +69,9 @@ in
       substituters = config.nix.settings.substituters ++ (config.nix.settings.extra-substituters or [ ]);
       trustedPublicKeys =
         config.nix.settings.trusted-public-keys ++ (config.nix.settings.extra-trusted-public-keys or [ ]);
-      pi = inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      inherit pi;
       fumo-pi = pkgs.callPackage ../../packages/fumo-pi.nix {
-        pi = inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        inherit pi;
         source = inputs.fumo-gateway;
       };
     };
