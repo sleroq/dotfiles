@@ -22,13 +22,13 @@ in
 
     postgresImage = lib.mkOption {
       type = lib.types.str;
-      default = "docker.io/library/postgres:18.7@sha256:2ea8630df176ad090ec92136dee850397c5af8781e4bcf2e4162593691c61bbc";
+      default = "docker.io/library/postgres:18.7@sha256:c699303802144847d238196173655dbbecf7a96aeca1565f2b02eb671a1f0b6b";
       description = "Docker image to use for Remnawave PostgreSQL";
     };
 
     redisImage = lib.mkOption {
       type = lib.types.str;
-      default = "docker.io/valkey/valkey:9.1.3-alpine@sha256:bf09d58e96d6b4524a15396b65b242bbe18beebbcc15a04d8ee75ddac62fae0b";
+      default = "docker.io/valkey/valkey:9.2.0-alpine@sha256:c8e2d17498838af5d91e12eb7c11220b3434a7b7131a333e3af52ad5e0b80882";
       description = "Docker image to use for Remnawave Redis/Valkey";
     };
 

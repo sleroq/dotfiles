@@ -120,7 +120,7 @@ in
         stateVersion = 5;
         domains = [ "cum.army" ];
         messageSizeLimit = 52428800; # 50MB
-        enableManageSieve = true;
+        listeners.manageSieve.enable = true;
 
         # nix-shell -p mkpasswd --run 'mkpasswd -sm bcrypt'
         accounts = generatedLoginAccounts;
@@ -154,6 +154,9 @@ in
           }
         '';
       };
+
+      # Mailserver 26.11 no longer enables the existing local resolver.
+      services.kresd.enable = true;
 
       # Wait for caddy, so certs are ready on first ever boot
       systemd.services.dovecot.after = [ "caddy.service" ];
