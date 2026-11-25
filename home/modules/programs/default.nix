@@ -13,6 +13,7 @@ let
 in
 {
   imports = [
+    ./antigravity.nix
     ./hammerspoon.nix
     ./herdr.nix
     ./himalaya.nix

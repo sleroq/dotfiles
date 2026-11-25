@@ -109,6 +109,7 @@ in
     };
 
     programs = {
+      antigravity.enable = true;
       hammerspoon.enable = true;
       herdr.enable = true;
       himalaya.enable = true;
