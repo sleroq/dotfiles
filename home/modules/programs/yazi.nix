@@ -23,6 +23,17 @@
       ];
 
       programs.yazi = {
+        # Match Otree's Directory and Normal highlights in midnight-tundra-black.
+        theme.filetype.rules = [
+          {
+            url = "*/";
+            fg = "#6da3cf";
+          }
+          {
+            url = "*";
+            fg = "#c9d4de";
+          }
+        ];
         plugins.piper = pkgs.yaziPlugins.piper;
         settings.plugin.prepend_previewers = [
           {
