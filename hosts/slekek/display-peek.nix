@@ -162,9 +162,14 @@ in
     systemd.services = {
       "systemd-backlight@".enable = false;
       "getty@tty1".enable = false;
+      "autovt@tty1".enable = false;
 
       slekek-btop = {
         description = "Read-only btop status display on tty1";
+        conflicts = [
+          "getty@tty1.service"
+          "autovt@tty1.service"
+        ];
         serviceConfig = {
           ExecStart = "${pkgs.btop}/bin/btop --config ${btopConfig} --tty";
           StandardInput = "tty";
