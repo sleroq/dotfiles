@@ -41,7 +41,10 @@ let
     WAKE_SECONDS = 60.0
     WAKE_BRIGHTNESS = "20000"
     POWER_DEBOUNCE_SECONDS = 0.4
-    SYSTEMCTL = "${pkgs.systemd}/bin/systemctl"
+    SYSTEMCTL = (
+        "${pkgs.systemd}"
+        "/bin/systemctl"
+    )
 
 
     def write_sysfs(pattern, value):
