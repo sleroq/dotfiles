@@ -30,7 +30,6 @@
     ./modules/remnawave-relays.nix
     ./modules/traggo.nix
     ./modules/koito.nix
-    ./modules/minecraft.nix
     ./modules/frp.nix
     ./modules/restic.nix
     ./modules/trusttunnel.nix
@@ -280,8 +279,6 @@
     };
   };
 
-  services.cumcraft.enable = true;
-
   # Keep the legacy Sieve binary across system switches and garbage collection.
   # The imported module is pinned, but its bot-split package is NOT deployed.
   # Future deployment: remove this override only after configuring the bot token,
@@ -370,7 +367,6 @@
   nixpkgs.config.allowUnfreePredicate =
     pkg:
     builtins.elem (lib.getName pkg) [
-      "minecraft-server"
       "sieve"
     ];
 

@@ -20,6 +20,7 @@ in
   imports = [
     ../relay-common.nix
     ./reverse-tunnel.nix
+    ./minecraft-tunnel.nix
     ./disk-config.nix
     ./coturn.nix
     ./warsaw-tunnels.nix
@@ -38,9 +39,11 @@ in
         2083 # Alternate ingress to the shared Warsaw reverse bridge
         2080 # Legacy Warsaw host via Germany's Remnawave relay
         4443 # Warsaw REALITY with WARP egress
+        7444 # Cumcraft reverse FRP bridge from slekek
         21115 # RustDesk NAT test
         21116 # RustDesk ID server
         21117 # RustDesk relay
+        25565 # Cumcraft Minecraft server
       ];
       allowedUDPPorts = [ 21116 ];
       extraInputRules = ''
@@ -160,6 +163,22 @@ in
           header Cross-Origin-Opener-Policy same-origin
           header Cross-Origin-Embedder-Policy require-corp
         '';
+        "http://mine.cum.army".extraConfig = ''
+          bind 0.0.0.0
+          redir https://mine.cum.army{uri} permanent
+        '';
+        "mine.cum.army".extraConfig = ''
+          redir /map /map/ 308
+          handle_path /map/* {
+            reverse_proxy 127.0.0.1:18100
+          }
+          handle {
+            rewrite * /_cumcraft-origin{uri}
+            reverse_proxy https://cum.army {
+              header_up Host cum.army
+            }
+          }
+        '';
       };
     };
 
@@ -189,6 +208,7 @@ in
           tcp-request content accept if { req.ssl_hello_type 1 }
           use_backend moq_https if { req.ssl_sni -i moq-relay.cum.army }
           use_backend broadcast_box_https if { req.ssl_sni -i alt-web.cum.army }
+          use_backend broadcast_box_https if { req.ssl_sni -i mine.cum.army }
           # RU-initiated connections to Warsaw are dropped upstream; reuse
           # the Warsaw-initiated bridge without changing client settings.
           default_backend warsaw_reverse
@@ -234,6 +254,14 @@ in
           option tcp-check
           default-server inter 5s fastinter 1s downinter 1s rise 2 fall 3
           server cumserver ${backendAddress}:${toString divBackendPort} check
+
+        frontend minecraft_ingress
+          bind 0.0.0.0:25565
+          no log
+          default_backend slekek_minecraft
+
+        backend slekek_minecraft
+          server slekek 127.0.0.1:12565 check
       '';
     };
 

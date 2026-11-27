@@ -78,7 +78,7 @@
         "crane": "crane",
         "flake-compat": "flake-compat_7",
         "flake-parts": "flake-parts_6",
-        "nix-github-actions": "nix-github-actions",
+        "nix-github-actions": "nix-github-actions_2",
         "nixpkgs": "nixpkgs_24",
         "nixpkgs-stable": "nixpkgs-stable_2"
       },
@@ -1635,6 +1635,27 @@
         "type": "github"
       }
     },
+    "jovian": {
+      "inputs": {
+        "nix-github-actions": "nix-github-actions",
+        "nixpkgs": [
+          "nixpkgs-slekek"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795794906,
+        "narHash": "sha256-dsW2DdE1ZG9rEXVwIJW5AooWzr3Zb64onGaxPwGU8MI=",
+        "owner": "Jovian-Experiments",
+        "repo": "Jovian-NixOS",
+        "rev": "8ef2bb8e3f5111eb47942a6049c4c7002bd28d4d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Jovian-Experiments",
+        "repo": "Jovian-NixOS",
+        "type": "github"
+      }
+    },
     "kopoka": {
       "inputs": {
         "flake-utils": "flake-utils_3",
@@ -1870,6 +1891,27 @@
       }
     },
     "nix-github-actions": {
+      "inputs": {
+        "nixpkgs": [
+          "jovian",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1737420293,
+        "narHash": "sha256-F1G5ifvqTpJq7fdkT34e/Jy9VCyzd5XfJ9TO8fHhJWE=",
+        "owner": "nix-community",
+        "repo": "nix-github-actions",
+        "rev": "f4158fa080ef4503c8f4c820967d946c2af31ec9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nix-github-actions",
+        "type": "github"
+      }
+    },
+    "nix-github-actions_2": {
       "inputs": {
         "nixpkgs": [
           "tuwunel",
@@ -2181,6 +2223,19 @@
         "rev": "5c9de89ec55bff981cb8da1a4ee92b10f1438ffc",
         "type": "tarball",
         "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1106677.5c9de89ec55b/nixexprs.tar.xz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz"
+      }
+    },
+    "nixpkgs-slekek": {
+      "locked": {
+        "lastModified": 1795371335,
+        "narHash": "sha256-3Xq+XlDu5l+UJ0cc+Jigs84+tz7Qu92NgXVHgJwC52M=",
+        "rev": "619c39f6eac5d1ed6b8f073a9414baf7034b2356",
+        "type": "tarball",
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1126808.619c39f6eac5/nixexprs.tar.xz"
       },
       "original": {
         "type": "tarball",
@@ -2806,6 +2861,7 @@
         "home-manager-portable": "home-manager-portable",
         "hy3": "hy3",
         "hyprland": "hyprland",
+        "jovian": "jovian",
         "kopoka": "kopoka",
         "llm-agents": "llm-agents",
         "mailserver": "mailserver",
@@ -2822,6 +2878,7 @@
         "nixpkgs-portable": "nixpkgs-portable",
         "nixpkgs-roundy": "nixpkgs-roundy",
         "nixpkgs-ru-relay": "nixpkgs-ru-relay",
+        "nixpkgs-slekek": "nixpkgs-slekek",
         "nixpkgs-warsaw": "nixpkgs-warsaw",
         "paisa": "paisa",
         "ph": "ph",

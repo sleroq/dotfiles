@@ -223,10 +223,6 @@ in
             ];
           }
           {
-            job_name = "fabric";
-            static_configs = [ { targets = [ "127.0.0.1:25585" ]; } ];
-          }
-          {
             job_name = "nerugaysya-bot";
             static_configs = [ { targets = [ "127.0.0.1:2112" ]; } ];
           }
@@ -425,6 +421,7 @@ in
                   basic_auth {
                     import {$METRICS_AUTH_FILE}
                     import {$RU_RELAY_METRICS_AUTH_FILE}
+                    import {$SLEKEK_METRICS_AUTH_FILE}
                   }
                   reverse_proxy 127.0.0.1:${toString config.services.prometheus.port} {
                     header_up -Authorization
@@ -456,17 +453,20 @@ in
     age.secrets.divLokiCaddyAuth.file = ../../../../shared/secrets/divLokiCaddyAuth;
     age.secrets.metricsRemoteWriteCaddyAuth.file = ../../../../shared/secrets/metricsRemoteWriteCaddyAuth;
     age.secrets.ruRelayMetricsCaddyAuth.file = ../../../../shared/secrets/ruRelayMetricsCaddyAuth;
+    age.secrets.slekekMetricsCaddyAuth.file = ../../../../shared/secrets/slekekMetricsCaddyAuth;
     # ExecReload needs both a stable credential path and a refreshed credential mount.
     systemd.services.caddy.environment = {
       DIV_LOKI_AUTH_FILE = "%d/div-loki-auth";
       METRICS_AUTH_FILE = "%d/metrics-auth";
       RU_RELAY_METRICS_AUTH_FILE = "%d/ru-relay-metrics-auth";
+      SLEKEK_METRICS_AUTH_FILE = "%d/slekek-metrics-auth";
     };
     systemd.services.caddy.serviceConfig = {
       LoadCredential = [
         "div-loki-auth:${config.age.secrets.divLokiCaddyAuth.path}"
         "metrics-auth:${config.age.secrets.metricsRemoteWriteCaddyAuth.path}"
         "ru-relay-metrics-auth:${config.age.secrets.ruRelayMetricsCaddyAuth.path}"
+        "slekek-metrics-auth:${config.age.secrets.slekekMetricsCaddyAuth.path}"
       ];
       RefreshOnReload = "extensions credentials";
     };

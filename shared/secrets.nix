@@ -6,6 +6,7 @@ let
   div = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKqaD8lUj2IoSXbd+ZngR3w+7rKxS7DU/3CPo4jd9SE9 root@shared";
   cumserver = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGNy4lHOvczy/vR4hf+uk6ciJGpkw5mqu3oC+9hTDbqf root@cumserver";
   ruRelay = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP0QRCneFJ8I6B5MLT5sXjomjB/E26jmUHxakhfiIwaX";
+  slekek = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHSheOjGPPHgrmhQp1gFED80IC5V+W03Q4qBqnJyYqJh root@slekek";
   work = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEHHbpg1BNB38XjKohJvWrWoTfj5hOteC14JpDsBBx9M kolomiets@frankrg.com";
   commonPublicKeys = [
     interplanetary
@@ -71,6 +72,12 @@ in
     publicKeys = commonPublicKeys ++ [ ruRelay ];
   };
   "secrets/ruRelayMetricsCaddyAuth" = {
+    publicKeys = commonPublicKeys ++ [ cumserver ];
+  };
+  "secrets/slekekMetricsPassword" = {
+    publicKeys = commonPublicKeys ++ [ slekek ];
+  };
+  "secrets/slekekMetricsCaddyAuth" = {
     publicKeys = commonPublicKeys ++ [ cumserver ];
   };
   "secrets/cloudflared-div.json" = {

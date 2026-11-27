@@ -52,6 +52,11 @@ in
 
             # Shortcut for fauna pic to avoid /u/
             redir /fauna /u/fauna-final.png 308
+
+            handle_path /_cumcraft-origin/* {
+              reverse_proxy 127.0.0.1:8101
+            }
+
             file_server
 
             ${lib.optionalString config.cumserver.zipline.enable ''

@@ -41,6 +41,10 @@
     nixpkgs-roundy.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-div.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-portable.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
+    nixpkgs-slekek.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
+
+    jovian.url = "github:Jovian-Experiments/Jovian-NixOS";
+    jovian.inputs.nixpkgs.follows = "nixpkgs-slekek";
 
     # Interplanetary flakes
     aagl.url = "github:ezKEa/aagl-gtk-on-nix";
@@ -239,7 +243,6 @@
                 secrets = import ./hosts/cumserver/secrets/default.nix;
               };
               modules = [
-                inputs.cumcraft.nixosModules.default
                 inputs.disko.nixosModules.disko
                 inputs.mailserver.nixosModules.default
                 inputs.starflake.nixosModules.default
@@ -288,6 +291,21 @@
 
               specialArgs.secrets = import ./hosts/warsaw/secrets/default.nix;
               modules = [ inputs.disko.nixosModules.disko ];
+            };
+
+            slekek = withNixpkgsFor "slekek" {
+              arch = "x86_64";
+              tags = [ "server" ];
+
+              specialArgs = {
+                inherit inputs username;
+                secrets = import ./hosts/slekek/secrets/default.nix;
+              };
+              modules = [
+                inputs.cumcraft.nixosModules.default
+                inputs.disko.nixosModules.disko
+                inputs.jovian.nixosModules.default
+              ];
             };
 
             portable =

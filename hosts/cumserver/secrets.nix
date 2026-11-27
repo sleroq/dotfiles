@@ -3,6 +3,7 @@ let
   portable = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSh54pu9bAH8DFBKPtswFJzevCft+gHZStJQ0trYGoj sleroq@cum.army";
   cumserver = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGNy4lHOvczy/vR4hf+uk6ciJGpkw5mqu3oC+9hTDbqf";
   div = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKqaD8lUj2IoSXbd+ZngR3w+7rKxS7DU/3CPo4jd9SE9 root@shared";
+  slekek = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHSheOjGPPHgrmhQp1gFED80IC5V+W03Q4qBqnJyYqJh root@slekek";
   commonPublicKeys = [
     sleroq
     portable
@@ -78,13 +79,16 @@ let
       publicKeys = commonPublicKeys;
     };
     "secrets/cumcraftEasyAuthPassword" = {
-      publicKeys = commonPublicKeys;
+      publicKeys = commonPublicKeys ++ [ slekek ];
     };
     "secrets/resticMinecraftPassword" = {
-      publicKeys = commonPublicKeys ++ [ div ];
+      publicKeys = commonPublicKeys ++ [
+        div
+        slekek
+      ];
     };
     "secrets/resticMinecraftRestEnv" = {
-      publicKeys = commonPublicKeys;
+      publicKeys = commonPublicKeys ++ [ slekek ];
     };
     "secrets/resticMailPassword" = {
       publicKeys = commonPublicKeys;
