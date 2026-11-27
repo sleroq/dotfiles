@@ -6,20 +6,31 @@
 }:
 let
   btopConfig = pkgs.writeText "slekek-btop.conf" ''
-    color_theme = "TTY"
-    theme_background = true
-    truecolor = false
-    tty_mode = true
-    rounded_corners = false
-    graph_symbol = "tty"
-    shown_boxes = "cpu mem net proc"
-    update_ms = 1000
-    proc_sorting = "cpu lazy"
-    proc_per_core = true
+    color_theme = "${pkgs.btop}/share/btop/themes/tokyo-night.theme"
+    theme_background = false
+    truecolor = true
+    tty_mode = false
+    rounded_corners = true
+    graph_symbol = "braille"
+    shown_boxes = "cpu mem net"
+    update_ms = 500
     show_cpu_freq = true
     show_coretemp = true
     show_battery = true
+    mem_graphs = true
     show_disks = true
+    net_auto = true
+    net_sync = true
+  '';
+
+  btopWrapper = pkgs.writeShellScript "slekek-btop-run" ''
+    export TERM="xterm-256color"
+    export COLORTERM="truecolor"
+    export LANG="en_US.UTF-8"
+    export HOME="/run/slekek-btop"
+    ${pkgs.coreutils}/bin/chown 65534:65534 /run/slekek-btop
+    exec ${pkgs.util-linux}/bin/setpriv --reuid=65534 --regid=65534 --clear-groups \
+      ${pkgs.btop}/bin/btop --config ${btopConfig} --force-utf
   '';
 
   peekDaemon = pkgs.writers.writePython3 "slekek-display-peek" { } ''
@@ -150,6 +161,14 @@ in
   config = lib.mkIf config.slekek.serverMode {
     boot.kernelParams = [ "consoleblank=0" ];
 
+    fonts = {
+      fontconfig.enable = true;
+      packages = with pkgs; [
+        jetbrains-mono
+        dejavu_fonts
+      ];
+    };
+
     services.logind.settings.Login = {
       HandlePowerKey = "ignore";
       HandlePowerKeyLongPress = "poweroff";
@@ -165,26 +184,34 @@ in
       "autovt@tty1".enable = false;
 
       slekek-btop = {
-        description = "Read-only btop status display on tty1";
+        description = "Read-only TrueColor btop status display on tty1 via kmscon";
         conflicts = [
           "getty@tty1.service"
           "autovt@tty1.service"
         ];
         serviceConfig = {
-          ExecStart = "${pkgs.btop}/bin/btop --config ${btopConfig} --tty";
-          StandardInput = "tty";
-          StandardOutput = "tty";
-          StandardError = "tty";
-          TTYPath = "/dev/tty1";
-          TTYReset = true;
-          TTYVHangup = true;
-          DynamicUser = true;
-          RuntimeDirectory = "slekek-btop";
-          Environment = [
-            "TERM=linux"
-            "LANG=en_US.UTF-8"
-            "HOME=/run/slekek-btop"
+          ExecStart = lib.concatStringsSep " " [
+            "${pkgs.kmscon}/bin/kmscon"
+            "--vt tty1"
+            "--switchvt"
+            "--no-libseat"
+            "--drm"
+            "--no-hwaccel"
+            "--screen right"
+            "--no-issue"
+            "--no-mouse"
+            "--no-blink"
+            "--dpms-timeout 0"
+            "--font-engine pango"
+            "--font-name=\"JetBrains Mono\""
+            "--font-size 16"
+            "--term xterm-256color"
+            "--oneshot"
+            "--login --"
+            btopWrapper
           ];
+          RuntimeDirectory = "slekek-btop";
+          KillMode = "mixed";
         };
       };
 
