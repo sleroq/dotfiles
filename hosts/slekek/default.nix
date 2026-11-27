@@ -16,6 +16,7 @@ in
 {
   imports = [
     ./disk-config.nix
+    ./display-peek.nix
     ./minecraft-tunnel.nix
   ];
 
@@ -241,36 +242,6 @@ in
     }
 
     (lib.mkIf cfg.serverMode {
-      # Keep eDP-1 initialized by amdgpu so DRM DPMS and backlight control can
-      # actually power off the panel instead of leaving the UEFI framebuffer lit.
-      boot.kernelParams = [ "consoleblank=1" ];
-
-      services.udev.extraRules = ''
-        ACTION=="add|change", SUBSYSTEM=="backlight", ATTR{brightness}="0", ATTR{bl_power}="4"
-      '';
-
-      systemd.services = {
-        "systemd-backlight@".enable = false;
-        slekek-backlight-off = {
-          description = "Power off built-in Steam Deck display and backlight in server mode";
-          wantedBy = [ "multi-user.target" ];
-          after = [ "systemd-udev-settle.service" ];
-          serviceConfig = {
-            Type = "oneshot";
-            ExecStart = pkgs.writeShellScript "slekek-backlight-off" ''
-              for fb in /sys/class/graphics/fb*; do
-                [ -w "$fb/blank" ] && echo 4 > "$fb/blank" || true
-              done
-              for bl in /sys/class/backlight/*; do
-                [ -d "$bl" ] || continue
-                echo 0 > "$bl/brightness" || true
-                echo 4 > "$bl/bl_power" || true
-              done
-            '';
-          };
-        };
-      };
-
       systemd.targets = {
         sleep.enable = false;
         suspend.enable = false;
