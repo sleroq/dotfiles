@@ -203,6 +203,7 @@ in
         gitMinimal
         htop
         mcrcon
+        neovim
         rsync
         tailscale
         tmux
