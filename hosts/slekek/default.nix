@@ -11,7 +11,7 @@ let
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSh54pu9bAH8DFBKPtswFJzevCft+gHZStJQ0trYGoj sleroq@cum.army"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK72BBTnP5Os5ZQfS1BuigNzWMqNFl7lgUH4CJq1bl9P cantundo@pm.me"
   ];
-  chargeLimit = if cfg.serverMode then "60" else "80";
+  chargeLimit = if cfg.serverMode then "50" else "80";
 in
 {
   imports = [
@@ -35,9 +35,6 @@ in
       };
 
       boot = {
-        # Mainline 7.3.5 is cached and supports Jupiter Wi-Fi, audio, GPU, and gamepad
-        # while Jovian-Experiments/linux archive fetches return GitHub 502s.
-        kernelPackages = pkgs.linuxPackages_latest;
         loader.systemd-boot = {
           enable = true;
           configurationLimit = 10;
