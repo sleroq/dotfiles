@@ -25,6 +25,7 @@ the weak-host prebuilt-closure workflow or a demonstrated tool limitation.
 | `cumserver` | itself; offload large uncached builds to `interplanetary` |
 | `ru-relay`, `warsaw` | capable Linux host; from Darwin prefer `interplanetary`, otherwise `cumserver` |
 | `roundy` | `cumserver` |
+| `slekek` | `interplanetary` |
 
 Never build Linux on `portable` (Darwin), or build on `ru-relay`/`warsaw`/`roundy`.
 Other Linux targets need a capable Linux builder. Copy and activate prebuilt
@@ -39,9 +40,9 @@ closures on `ru-relay`/`warsaw`.
 
 ## Access
 
-`div`, `interplanetary`, and `portable` require Tailscale. On connection failure,
+`div`, `interplanetary`, `portable`, and `slekek` require Tailscale. On connection failure,
 check it is running; if stopped, ask the user. Select `a9d4` for `div`, `6678` for
-`desktop`/`portable`. Switching is allowed, but coordinate with other deployment
+`desktop`/`portable`/`slekek`. Switching is allowed, but coordinate with other deployment
 sessions: the laptop's selected network is shared.
 
 ## Agent jobs
